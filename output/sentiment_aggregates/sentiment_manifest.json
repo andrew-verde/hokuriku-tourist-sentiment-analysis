@@ -1,8 +1,9 @@
 {
-  "generated_at": "2026-06-18T10:30:04+00:00",
-  "command": "scripts/build_sentiment_analysis.py --groups japanese,english --city Fukui",
+  "generated_at": "2026-06-18T10:57:49+00:00",
+  "command": "scripts/build_sentiment_analysis.py --groups japanese,english --prefecture Fukui",
   "filters": {
-    "city": "Fukui",
+    "city": null,
+    "prefecture": "Fukui",
     "groups": [
       "japanese",
       "english"
@@ -30,11 +31,13 @@
   },
   "input": {
     "path": "/Users/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/output/multilingual_review_analysis/reviews_multilingual.csv",
-    "sha256": "7642ca798262f925ee165582c5e5e341cd0d768d4bd034b8d0d6998e4d589579"
+    "sha256": "7642ca798262f925ee165582c5e5e341cd0d768d4bd034b8d0d6998e4d589579",
+    "poi_metadata_path": "/Users/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/output/checkpoints/poi_metadata.json",
+    "poi_metadata_sha256": "9c4312d2ff2469add73460a7dd50852562fac9b72684b73eebd49c5d26e4052c"
   },
   "outputs": {
     "row_level_path": "/Users/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/output/sentiment_row_level/google_reviews_fukui_japanese-english.csv",
-    "row_level_sha256": "1afb1aaefcf6b97d3329df4627b39d0b46d83079533932b2e5ac21d40bf3a099",
+    "row_level_sha256": "5f63deb2acfc69ffddfde138195c68d05e9b4f0dabeaf5e7bf782ad0ba77aed4",
     "summary_path": "/Users/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/output/sentiment_aggregates/source_group_sentiment_summary.csv",
     "tests_path": "/Users/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/output/sentiment_aggregates/source_group_sentiment_tests.csv",
     "readiness_path": "/Users/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/output/sentiment_aggregates/sentiment_readiness.md"
@@ -43,6 +46,7 @@
     {
       "source_group": "google_maps_outscraper",
       "language_group": "english",
+      "prefecture_normalized": "Fukui",
       "city": "Fukui",
       "n_reviews": 214,
       "n_scored": 214,
@@ -73,6 +77,7 @@
     {
       "source_group": "google_maps_outscraper",
       "language_group": "japanese",
+      "prefecture_normalized": "Fukui",
       "city": "Fukui",
       "n_reviews": 1800,
       "n_scored": 1800,

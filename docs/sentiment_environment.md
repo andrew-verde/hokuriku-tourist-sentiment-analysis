@@ -52,7 +52,7 @@ After setup, run:
 
 ```bash
 .venv/bin/python3 -m pytest
-.venv/bin/python3 scripts/build_sentiment_analysis.py --groups japanese,english --city Fukui
+.venv/bin/python3 scripts/build_sentiment_analysis.py --groups japanese,english --prefecture Fukui
 ```
 
 The sentiment readiness report records installed versions, command, filters,

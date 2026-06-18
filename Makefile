@@ -29,7 +29,7 @@ sentiment-env:
 	$(PYTHON) scripts/bootstrap_sentiment_environment.py
 
 sentiment-analysis:
-	$(PYTHON) scripts/build_sentiment_analysis.py --groups japanese,english --city Fukui
+	$(PYTHON) scripts/build_sentiment_analysis.py --groups japanese,english --prefecture Fukui
 
 test:
 	$(PYTHON) -m pytest

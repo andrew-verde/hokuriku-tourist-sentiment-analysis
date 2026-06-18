@@ -29,7 +29,7 @@ output/multilingual_review_analysis/reviews_multilingual.csv
 Filter Google reviews to:
 
 ```text
-city == "Fukui"
+prefecture_normalized == "Fukui" from output/checkpoints/poi_metadata.json
 language_group in ["english", "japanese"]
 ```
 
@@ -304,7 +304,7 @@ scripts/build_sentiment_analysis.py
 Initial command should focus on JP-EN:
 
 ```text
-.venv/bin/python3 scripts/build_sentiment_analysis.py --groups japanese,english --city Fukui
+.venv/bin/python3 scripts/build_sentiment_analysis.py --groups japanese,english --prefecture Fukui
 ```
 
 The script should keep a group-aware structure so Chinese-language posts can be

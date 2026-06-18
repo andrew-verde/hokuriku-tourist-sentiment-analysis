@@ -31,6 +31,7 @@ logger = setup_logger(__name__)
 
 ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_REVIEWS_PATH = ROOT / "output" / "multilingual_review_analysis" / "reviews_multilingual.csv"
+DEFAULT_POI_METADATA_PATH = ROOT / "output" / "checkpoints" / "poi_metadata.json"
 DEFAULT_ROW_OUTPUT_DIR = ROOT / "output" / "sentiment_row_level"
 DEFAULT_AGG_OUTPUT_DIR = ROOT / "output" / "sentiment_aggregates"
 SENTIMENT_LOCK_PATH = ROOT / "requirements-sentiment.lock.txt"
@@ -51,6 +52,8 @@ REQUIRED_COLUMNS = {
 OPTIONAL_ROW_COLUMNS = [
     "review_id",
     "city",
+    "prefecture_normalized",
+    "municipality",
     "poi_id",
     "poi_category",
     "review_date",
@@ -96,6 +99,7 @@ class MissingDependencyError(SentimentPipelineError):
 @dataclass(frozen=True)
 class PipelinePaths:
     reviews_path: Path = DEFAULT_REVIEWS_PATH
+    poi_metadata_path: Path = DEFAULT_POI_METADATA_PATH
     row_output_dir: Path = DEFAULT_ROW_OUTPUT_DIR
     aggregate_output_dir: Path = DEFAULT_AGG_OUTPUT_DIR
 
@@ -145,6 +149,40 @@ def dependency_versions() -> dict[str, str]:
         except metadata.PackageNotFoundError:
             versions[package] = "missing"
     return versions
+
+
+def load_poi_metadata(path: Path) -> pd.DataFrame:
+    if not path.exists():
+        raise MissingInputError(
+            f"Required POI metadata not found: {path}\n"
+            "Generate or sync it first with `make multilingual-reviews`. "
+            "Prefecture filtering requires checkpoint POI metadata."
+        )
+    raw = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(raw, dict):
+        raise MissingColumnsError(f"POI metadata must be a JSON object keyed by poi_id: {path}")
+    rows = []
+    for poi_id, attrs in raw.items():
+        if isinstance(attrs, dict):
+            rows.append({
+                "poi_id": str(poi_id),
+                "metadata_poi_name": attrs.get("name"),
+                "prefecture": attrs.get("prefecture"),
+                "prefecture_normalized": attrs.get("prefecture_normalized"),
+                "municipality": attrs.get("municipality"),
+                "municipality_short": attrs.get("municipality_short"),
+                "prefecture_metadata_source": attrs.get("metadata_source"),
+                "prefecture_metadata_language": attrs.get("metadata_language"),
+            })
+    metadata = pd.DataFrame(rows)
+    required = {"poi_id", "prefecture_normalized"}
+    missing = sorted(required - set(metadata.columns))
+    if missing:
+        raise MissingColumnsError(f"Required POI metadata columns missing from {path}: {', '.join(missing)}")
+    if metadata["poi_id"].duplicated().any():
+        duplicates = sorted(metadata.loc[metadata["poi_id"].duplicated(), "poi_id"].unique())
+        raise MissingColumnsError(f"Duplicate poi_id values in POI metadata: {duplicates[:5]}")
+    return metadata
 
 
 def require_dependency(module_name: str, package_name: str | None = None):
@@ -207,7 +245,13 @@ def score_japanese_text(text: str, analyzer=None) -> dict[str, object]:
     }
 
 
-def load_reviews(path: Path, groups: list[str], city: str) -> pd.DataFrame:
+def load_reviews(
+    path: Path,
+    groups: list[str],
+    city: str | None = None,
+    prefecture: str | None = None,
+    poi_metadata_path: Path = DEFAULT_POI_METADATA_PATH,
+) -> pd.DataFrame:
     if not path.exists():
         raise MissingInputError(
             f"Required input not found: {path}\n"
@@ -223,14 +267,27 @@ def load_reviews(path: Path, groups: list[str], city: str) -> pd.DataFrame:
         raise MissingGroupError(
             f"Requested language_group not present in input: {', '.join(missing_groups)}"
         )
-    filtered = df[
-        (df["city"].astype(str) == city)
-        & (df["language_group"].astype(str).str.lower().isin(groups))
-    ].copy()
+    filtered = df[df["language_group"].astype(str).str.lower().isin(groups)].copy()
+    if prefecture:
+        if "poi_id" not in filtered.columns:
+            raise MissingColumnsError("Prefecture filtering requires reviews column: poi_id")
+        metadata = load_poi_metadata(poi_metadata_path)
+        filtered = filtered.merge(metadata, on="poi_id", how="left", validate="many_to_one")
+        missing_metadata = filtered["prefecture_normalized"].isna()
+        if missing_metadata.any():
+            missing_count = int(missing_metadata.sum())
+            raise MissingColumnsError(
+                f"POI metadata missing for {missing_count} requested review rows; "
+                "prefecture filtering would be incomplete."
+            )
+        filtered = filtered[filtered["prefecture_normalized"].astype(str) == prefecture].copy()
+    if city:
+        filtered = filtered[filtered["city"].astype(str) == city].copy()
     filtered["language_group"] = filtered["language_group"].astype(str).str.lower()
     if filtered.empty:
         raise MissingGroupError(
-            f"No rows after filters: city == {city!r}, language_group in {groups!r}"
+            f"No rows after filters: city == {city!r}, prefecture == {prefecture!r}, "
+            f"language_group in {groups!r}"
         )
     filtered["review_rating"] = pd.to_numeric(filtered["review_rating"], errors="coerce")
     return filtered
@@ -287,13 +344,19 @@ def build_summary(scored: pd.DataFrame, source_groups: pd.Series) -> pd.DataFram
     work["source_group"] = source_groups.values
     rows = []
     category_order = ["negative", "neutral", "positive"]
-    for keys, chunk in work.groupby(["source_group", "language_group", "city"], dropna=False):
+    group_columns = ["source_group", "language_group"]
+    if "prefecture_normalized" in work.columns:
+        group_columns.append("prefecture_normalized")
+    group_columns.append("city")
+    for keys, chunk in work.groupby(group_columns, dropna=False):
+        key_map = dict(zip(group_columns, keys))
         total = len(chunk)
         rating = pd.to_numeric(chunk["review_rating"], errors="coerce")
         row = {
-            "source_group": keys[0],
-            "language_group": keys[1],
-            "city": keys[2],
+            "source_group": key_map["source_group"],
+            "language_group": key_map["language_group"],
+            "prefecture_normalized": key_map.get("prefecture_normalized"),
+            "city": key_map["city"],
             "n_reviews": total,
             "n_scored": int(chunk["sentiment_score"].notna().sum()),
             "mean_sentiment_score": round(float(chunk["sentiment_score"].mean()), 6),
@@ -317,7 +380,7 @@ def build_summary(scored: pd.DataFrame, source_groups: pd.Series) -> pd.DataFram
             sort_keys=True,
         )
         rows.append(row)
-    return pd.DataFrame(rows).sort_values(["source_group", "language_group", "city"])
+    return pd.DataFrame(rows).sort_values(["source_group", "language_group", "prefecture_normalized", "city"])
 
 
 def _bootstrap_diff(
@@ -615,9 +678,13 @@ def write_readiness(report: dict, summary: pd.DataFrame, tests: pd.DataFrame, pa
         f"- command: `{report['command']}`",
         f"- input: `{report['input']['path']}`",
         f"- input_sha256: `{report['input']['sha256']}`",
+        f"- poi_metadata: `{report['input']['poi_metadata_path']}`",
+        f"- poi_metadata_sha256: `{report['input']['poi_metadata_sha256']}`",
         f"- row_level_output: `{report['outputs']['row_level_path']}`",
         f"- row_level_sha256: `{report['outputs']['row_level_sha256']}`",
-        f"- filters: city == `{report['filters']['city']}`, language_group in {report['filters']['groups']}",
+        f"- filters: city == `{report['filters']['city']}`, "
+        f"prefecture == `{report['filters']['prefecture']}`, "
+        f"language_group in {report['filters']['groups']}",
         f"- primary_unit: {report['primary_unit']}",
         f"- codebook_evidence_status: {report['codebook_evidence_status']}",
         f"- bootstrap_seed: {BOOTSTRAP_SEED}",
@@ -638,8 +705,10 @@ def write_readiness(report: dict, summary: pd.DataFrame, tests: pd.DataFrame, pa
     ])
     lines.extend(["", "## Denominators", ""])
     for _, row in summary.iterrows():
+        prefecture = row.get("prefecture_normalized")
         lines.append(
-            f"- {row['source_group']} / {row['language_group']} / {row['city']}: "
+            f"- {row['source_group']} / {row['language_group']} / "
+            f"prefecture={prefecture} / city_bucket={row['city']}: "
             f"n_reviews={int(row['n_reviews'])}, n_scored={int(row['n_scored'])}, "
             f"ratings_present={int(row['n_review_rating_present'])}"
         )
@@ -664,19 +733,28 @@ def write_readiness(report: dict, summary: pd.DataFrame, tests: pd.DataFrame, pa
 def build_sentiment_analysis(
     paths: PipelinePaths = PipelinePaths(),
     groups: list[str] | None = None,
-    city: str = "Fukui",
+    city: str | None = None,
+    prefecture: str | None = None,
     command: str | None = None,
     english_scorer: Callable[[str], dict[str, object]] | None = None,
     japanese_scorer: Callable[[str], dict[str, object]] | None = None,
 ) -> dict:
     groups = groups or ["japanese", "english"]
     input_hash = sha256_file(paths.reviews_path) if paths.reviews_path.exists() else None
-    reviews = load_reviews(paths.reviews_path, groups, city)
+    metadata_hash = sha256_file(paths.poi_metadata_path) if prefecture and paths.poi_metadata_path.exists() else None
+    reviews = load_reviews(
+        paths.reviews_path,
+        groups,
+        city=city,
+        prefecture=prefecture,
+        poi_metadata_path=paths.poi_metadata_path,
+    )
     scored = score_reviews(reviews, english_scorer=english_scorer, japanese_scorer=japanese_scorer)
 
     paths.row_output_dir.mkdir(parents=True, exist_ok=True)
     paths.aggregate_output_dir.mkdir(parents=True, exist_ok=True)
-    row_path = paths.row_output_dir / f"google_reviews_{city.lower()}_{'-'.join(groups)}.csv"
+    scope = prefecture or city or "all"
+    row_path = paths.row_output_dir / f"google_reviews_{scope.lower()}_{'-'.join(groups)}.csv"
     scored.to_csv(row_path, index=False)
     row_hash = sha256_file(row_path)
 
@@ -696,7 +774,7 @@ def build_sentiment_analysis(
     report = {
         "generated_at": dt.datetime.now(dt.UTC).replace(microsecond=0).isoformat(),
         "command": command or " ".join(sys.argv),
-        "filters": {"city": city, "groups": groups},
+        "filters": {"city": city, "prefecture": prefecture, "groups": groups},
         "primary_unit": "one Google review row",
         "codebook_evidence_status": "pending",
         "dependency_versions": dependency_versions(),
@@ -709,7 +787,12 @@ def build_sentiment_analysis(
                 "mecab-python3 plus ipadic and initializes MeCab with -r /dev/null."
             ),
         },
-        "input": {"path": str(paths.reviews_path), "sha256": input_hash},
+        "input": {
+            "path": str(paths.reviews_path),
+            "sha256": input_hash,
+            "poi_metadata_path": str(paths.poi_metadata_path) if prefecture else None,
+            "poi_metadata_sha256": metadata_hash,
+        },
         "outputs": {
             "row_level_path": str(row_path),
             "row_level_sha256": row_hash,
@@ -727,10 +810,12 @@ def build_sentiment_analysis(
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--reviews-path", type=Path, default=DEFAULT_REVIEWS_PATH)
+    parser.add_argument("--poi-metadata-path", type=Path, default=DEFAULT_POI_METADATA_PATH)
     parser.add_argument("--row-output-dir", type=Path, default=DEFAULT_ROW_OUTPUT_DIR)
     parser.add_argument("--aggregate-output-dir", type=Path, default=DEFAULT_AGG_OUTPUT_DIR)
     parser.add_argument("--groups", default="japanese,english")
-    parser.add_argument("--city", default="Fukui")
+    parser.add_argument("--city", default=None)
+    parser.add_argument("--prefecture", default="Fukui")
     return parser.parse_args()
 
 
@@ -738,6 +823,7 @@ def main() -> int:
     args = parse_args()
     paths = PipelinePaths(
         reviews_path=args.reviews_path,
+        poi_metadata_path=args.poi_metadata_path,
         row_output_dir=args.row_output_dir,
         aggregate_output_dir=args.aggregate_output_dir,
     )
@@ -746,6 +832,7 @@ def main() -> int:
             paths=paths,
             groups=parse_groups(args.groups),
             city=args.city,
+            prefecture=args.prefecture,
             command=" ".join(sys.argv),
         )
     except SentimentPipelineError as error:

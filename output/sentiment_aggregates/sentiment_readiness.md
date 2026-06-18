@@ -1,12 +1,14 @@
 # Sentiment Readiness
 
-- generated_at: 2026-06-18T10:30:04+00:00
-- command: `scripts/build_sentiment_analysis.py --groups japanese,english --city Fukui`
+- generated_at: 2026-06-18T10:57:49+00:00
+- command: `scripts/build_sentiment_analysis.py --groups japanese,english --prefecture Fukui`
 - input: `/Users/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/output/multilingual_review_analysis/reviews_multilingual.csv`
 - input_sha256: `7642ca798262f925ee165582c5e5e341cd0d768d4bd034b8d0d6998e4d589579`
+- poi_metadata: `/Users/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/output/checkpoints/poi_metadata.json`
+- poi_metadata_sha256: `9c4312d2ff2469add73460a7dd50852562fac9b72684b73eebd49c5d26e4052c`
 - row_level_output: `/Users/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/output/sentiment_row_level/google_reviews_fukui_japanese-english.csv`
-- row_level_sha256: `1afb1aaefcf6b97d3329df4627b39d0b46d83079533932b2e5ac21d40bf3a099`
-- filters: city == `Fukui`, language_group in ['japanese', 'english']
+- row_level_sha256: `5f63deb2acfc69ffddfde138195c68d05e9b4f0dabeaf5e7bf782ad0ba77aed4`
+- filters: city == `None`, prefecture == `Fukui`, language_group in ['japanese', 'english']
 - primary_unit: one Google review row
 - codebook_evidence_status: pending
 - bootstrap_seed: 20260618
@@ -33,8 +35,8 @@
 
 ## Denominators
 
-- google_maps_outscraper / english / Fukui: n_reviews=214, n_scored=214, ratings_present=214
-- google_maps_outscraper / japanese / Fukui: n_reviews=1800, n_scored=1800, ratings_present=1800
+- google_maps_outscraper / english / prefecture=Fukui / city_bucket=Fukui: n_reviews=214, n_scored=214, ratings_present=214
+- google_maps_outscraper / japanese / prefecture=Fukui / city_bucket=Fukui: n_reviews=1800, n_scored=1800, ratings_present=1800
 
 ## Tests
 

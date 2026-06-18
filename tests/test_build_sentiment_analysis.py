@@ -1,4 +1,5 @@
 import hashlib
+import json
 import sys
 from pathlib import Path
 
@@ -26,6 +27,41 @@ def _write_reviews(path: Path) -> None:
         "Fukui,p3,temple,r3,2025-08-03,4,良いです,japanese,Chika,place3,src3,google_reviews\n"
         "Fukui,p4,park,r4,2025-08-04,1,悪いです,japanese,Dai,place4,src4,google_reviews\n"
         "Toyama,p5,park,r5,2025-08-05,5,Great,english,Eri,place5,src5,google_reviews\n",
+        encoding="utf-8",
+    )
+
+
+def _write_poi_metadata(path: Path) -> None:
+    path.write_text(
+        json.dumps(
+            {
+                "p1": {
+                    "name": "Fukui Castle",
+                    "prefecture_normalized": "Fukui",
+                    "municipality": "Fukui",
+                },
+                "p2": {
+                    "name": "Fukui Station",
+                    "prefecture_normalized": "Fukui",
+                    "municipality": "Fukui",
+                },
+                "p3": {
+                    "name": "Eiheiji Temple",
+                    "prefecture_normalized": "Fukui",
+                    "municipality": "Eiheiji",
+                },
+                "p4": {
+                    "name": "Echizen Ono Castle",
+                    "prefecture_normalized": "Fukui",
+                    "municipality": "Ono",
+                },
+                "p5": {
+                    "name": "Toyama Castle",
+                    "prefecture_normalized": "Toyama",
+                    "municipality": "Toyama",
+                },
+            }
+        ),
         encoding="utf-8",
     )
 
@@ -165,3 +201,29 @@ def test_scoring_wrappers_can_be_monkeypatched_without_external_models(tmp_path)
     japanese = row_level[row_level["language_group"] == "japanese"]
     assert set(english["sentiment_category"]) == {"positive", "negative"}
     assert set(japanese["sentiment_category"]) == {"positive", "negative"}
+
+
+def test_prefecture_filter_uses_poi_metadata_not_city_name(tmp_path):
+    reviews = tmp_path / "reviews_multilingual.csv"
+    metadata = tmp_path / "poi_metadata.json"
+    _write_reviews(reviews)
+    _write_poi_metadata(metadata)
+
+    report = build_sentiment_analysis(
+        paths=PipelinePaths(
+            reviews_path=reviews,
+            poi_metadata_path=metadata,
+            row_output_dir=tmp_path / "row",
+            aggregate_output_dir=tmp_path / "agg",
+        ),
+        groups=["japanese", "english"],
+        prefecture="Fukui",
+        english_scorer=_english_scorer,
+        japanese_scorer=_japanese_scorer,
+    )
+
+    row_level = pd.read_csv(tmp_path / "row" / "google_reviews_fukui_japanese-english.csv")
+    assert len(row_level) == 4
+    assert set(row_level["municipality"]) == {"Fukui", "Eiheiji", "Ono"}
+    assert "Toyama" not in set(row_level["prefecture_normalized"])
+    assert report["input"]["poi_metadata_sha256"] == sha256_file(metadata)
