@@ -57,3 +57,24 @@ Model sentiment tools may be added as secondary checks, not silent replacements.
 Academic rigor is a repo-wide requirement. Prefer provenance, reviewed
 codebooks, explicit denominators, reproducible scripts, and fail-loud errors over
 ad hoc outputs or undocumented manual changes.
+
+## Critical Academic Review Notes
+
+- Current JP-EN sentiment output is a library-score comparison only. Treat VADER
+  and oseti as secondary checks until reviewed JP/EN codebook evidence is
+  promoted into runtime configs and disagreement rates are reported.
+- Current JP-EN tests include review-row, POI-level, and POI cluster-bootstrap
+  sensitivity checks. Because rows are nested in POIs and sample sizes are
+  imbalanced, treat p-values as descriptive unless a later, explicitly justified
+  clustered/covariate model is added.
+- VADER compound and oseti document scores are not the same measurement scale.
+  Compare category shares and within-tool distributions; do not claim raw score
+  equivalence across languages.
+- Google review rows come from the local Outscraper-derived cache and may reflect
+  collection order/window and POI mix. Preserve denominators, date ranges,
+  source hashes, and POI imbalance notes in any presentation or paper output.
+- The oseti runtime is reproducible through
+  `scripts/bootstrap_sentiment_environment.py`; `pip check` may still report
+  `oseti requires mecab` because oseti metadata names legacy `mecab`. Runtime
+  uses `mecab-python3` plus `ipadic`; do not "fix" this without revalidating
+  Japanese scores.

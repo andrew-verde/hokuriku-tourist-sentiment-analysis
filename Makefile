@@ -1,6 +1,6 @@
 PYTHON = .venv/bin/python3
 
-.PHONY: help test chinese-codebook-template chinese-social multilingual-reviews cross-language-trends
+.PHONY: help test chinese-codebook-template chinese-social multilingual-reviews cross-language-trends sentiment-env sentiment-analysis
 
 help:
 	@echo "Hokuriku tourist sentiment analysis"
@@ -9,6 +9,8 @@ help:
 	@echo "  make chinese-social          Build Chinese XHS/Douyin cleaned outputs"
 	@echo "  make multilingual-reviews    Sync local Google review data from english-fukui-tourism"
 	@echo "  make cross-language-trends   Build monthly EN/JP/CN trend tables"
+	@echo "  make sentiment-env           Install pinned JP-EN sentiment runtime"
+	@echo "  make sentiment-analysis      Build JP-EN sentiment aggregate outputs"
 	@echo "  make test                    Run pytest"
 
 chinese-codebook-template:
@@ -22,6 +24,12 @@ multilingual-reviews:
 
 cross-language-trends:
 	$(PYTHON) scripts/build_cross_language_trends.py
+
+sentiment-env:
+	$(PYTHON) scripts/bootstrap_sentiment_environment.py
+
+sentiment-analysis:
+	$(PYTHON) scripts/build_sentiment_analysis.py --groups japanese,english --city Fukui
 
 test:
 	$(PYTHON) -m pytest

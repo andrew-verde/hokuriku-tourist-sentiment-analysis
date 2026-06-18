@@ -54,7 +54,7 @@ Chinese social inputs are external and should remain external:
 |---|---|---|
 | Human-reviewed keyword codebooks | Review templates exist in `output/codebook_review/`; Chinese config exists in `config/chinese_social_friction_codebook.yaml`. | Reviewed JP/EN decisions are not promoted into runtime configs. Chinese reviewed CSV also needs explicit promotion if it supersedes YAML. |
 | Chinese VADER-like sentiment for XHS/Douyin | `scripts/build_chinese_social_media_dataset.py` has transparent positive/negative lexicon scoring. `docs/sentiment_comparison_method.md` selects SnowNLP as the first pre-built Chinese sentiment tool for implementation. | SnowNLP dependency and sentiment stage are not implemented yet. Manual full text still WIP. |
-| Japanese Google review text analysis | Synced Japanese Google rows exist; derived tagged CSVs exist from source repo. | Runtime implementation here still depends on copied source outputs; manually reviewed Excel/CSV codebook is not implemented as first-class config. No Japanese VADER-like tool selected. |
+| Japanese Google review text analysis | Synced Japanese Google rows exist; derived tagged CSVs exist from source repo. `docs/sentiment_comparison_method.md` selects `oseti` as the primary VADER-type Japanese sentiment tool. | Runtime implementation here still depends on copied source outputs; manually reviewed Excel/CSV codebook is not implemented as first-class config. `oseti` scoring is not implemented yet. |
 | English Google review text/sentiment | Synced English Google rows exist; `docs/sentiment_comparison_method.md` selects VADER for English sentiment. | VADER dependency and English sentiment stage are not implemented here. Reviewed English codebook not promoted into runtime config. |
 | Statistical comparison suite | `scripts/build_cross_language_trends.py` compares monthly volumes and keeps sentiment scales separate; Chinese script has some friction comparisons. | Need Fukui-only filter, codebook-backed EN/JP/CN outputs, statistical comparison tables, nudge/enjoyment/friction summaries. |
 | Presentation-ready figures | None implemented in this repo beyond copied source output charts elsewhere. | Need figure generation targets, Fukui-only chart set, and presentation-safe captions/caveats. |
@@ -72,15 +72,33 @@ Default pipeline should become:
 3. Promote reviewed codebook CSV/Excel files into versioned configs.
 4. Run Fukui-only language/source tagging:
    - Chinese-language posts: topic/friction/enjoyment keywords plus Chinese sentiment
-   - Japanese-language reviews: manually reviewed Japanese codebook plus chosen sentiment method
+   - Japanese-language reviews: manually reviewed Japanese codebook plus `oseti`
    - English-language reviews: manually reviewed English codebook plus VADER
 5. Compare language/source groups descriptively and statistically where valid.
 6. Generate presentation figures with explicit caveats about platform/source differences.
 
+## Presentation Readiness Checklist
+
+- [ ] Promote reviewed JP/EN codebook evidence into runtime configs, then report
+  library-score/codebook disagreement rates.
+- [ ] Decide whether POIs should be weighted equally or by review volume in
+  presentation summaries. Current outputs include review-row, POI-level, and
+  POI cluster-bootstrap sensitivity checks, but the final weighting choice is a
+  research judgment.
+- [ ] Decide whether to add a clustered/covariate model. Candidate covariates are
+  text length, month, and POI category; include them only if the presentation
+  question justifies adjustment.
+- [ ] Document POI mix, date range, source hash, denominators, and source/platform
+  caveats on any slide that compares Japanese-language and English-language
+  review sentiment.
+
 ## Guardrails
 
-- Do not commit row-level post/review text, author names, URLs, screenshots, or raw manual captures.
+- Do not commit row-level post/review text, author names, URLs, screenshots, source IDs, or raw manual captures.
 - Keep `output/checkpoints/`, `output/multilingual_review_analysis/`, and Chinese raw/processed social rows ignored.
+- Track aggregate outputs that contain only counts, statistics, filters,
+  commands, dependency versions, input provenance, and SHA256 hashes for ignored
+  source/intermediate files.
 - Prefer fail-loud missing-input errors over demo data.
 - Use transparent keyword evidence and reviewed codebooks as primary analysis.
 - Model or VADER-like sentiment tools are secondary checks, not silent replacements for codebooks.

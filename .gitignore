@@ -17,6 +17,7 @@ output/google_review_sync_manifest.json
 output/multilingual_review_analysis/
 output/cross_language_trends/
 output/result_charts/
+output/sentiment_row_level/
 
 # Local exports/scratch.
 *.xlsx

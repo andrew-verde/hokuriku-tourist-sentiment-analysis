@@ -1,0 +1,26 @@
+# JP-EN sentiment runtime lock.
+#
+# Install with:
+#   .venv/bin/python3 scripts/bootstrap_sentiment_environment.py
+#
+# Do not install this file directly with plain `pip install -r`: oseti 0.4.3.1
+# declares legacy `mecab`, which can fail on macOS without system mecab-config.
+# The bootstrap installs these exact packages, then installs oseti with
+# `--no-deps` so runtime uses mecab-python3 + ipadic.
+bunkai==1.5.2
+dataclasses-json==0.6.7
+emoji==1.7.0
+emojis==0.7.0
+ipadic==1.0.0
+Janome==0.5.0
+marshmallow==3.26.2
+mecab-python3==1.0.12
+more-itertools==11.1.0
+mypy_extensions==1.1.0
+oseti==0.4.3.1
+Spans==1.1.1
+toml==0.10.2
+tqdm==4.68.3
+typing-inspect==0.9.0
+typing_extensions==4.15.0
+unidic-lite==1.0.8

@@ -1,0 +1,104 @@
+{
+  "generated_at": "2026-06-18T10:30:04+00:00",
+  "command": "scripts/build_sentiment_analysis.py --groups japanese,english --city Fukui",
+  "filters": {
+    "city": "Fukui",
+    "groups": [
+      "japanese",
+      "english"
+    ]
+  },
+  "primary_unit": "one Google review row",
+  "codebook_evidence_status": "pending",
+  "dependency_versions": {
+    "pandas": "3.0.3",
+    "numpy": "2.4.6",
+    "scipy": "1.17.1",
+    "vaderSentiment": "3.3.2",
+    "oseti": "0.4.3.1",
+    "mecab-python3": "1.0.12",
+    "bunkai": "1.5.2",
+    "unidic-lite": "1.0.8",
+    "ipadic": "1.0.0",
+    "emoji": "1.7.0"
+  },
+  "dependency_reproducibility": {
+    "sentiment_lock": "/Users/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/requirements-sentiment.lock.txt",
+    "environment_doc": "/Users/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/docs/sentiment_environment.md",
+    "setup_command": ".venv/bin/python3 scripts/bootstrap_sentiment_environment.py",
+    "known_metadata_exception": "oseti 0.4.3.1 declares legacy mecab; runtime uses mecab-python3 plus ipadic and initializes MeCab with -r /dev/null."
+  },
+  "input": {
+    "path": "/Users/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/output/multilingual_review_analysis/reviews_multilingual.csv",
+    "sha256": "7642ca798262f925ee165582c5e5e341cd0d768d4bd034b8d0d6998e4d589579"
+  },
+  "outputs": {
+    "row_level_path": "/Users/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/output/sentiment_row_level/google_reviews_fukui_japanese-english.csv",
+    "row_level_sha256": "1afb1aaefcf6b97d3329df4627b39d0b46d83079533932b2e5ac21d40bf3a099",
+    "summary_path": "/Users/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/output/sentiment_aggregates/source_group_sentiment_summary.csv",
+    "tests_path": "/Users/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/output/sentiment_aggregates/source_group_sentiment_tests.csv",
+    "readiness_path": "/Users/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/output/sentiment_aggregates/sentiment_readiness.md"
+  },
+  "denominators": [
+    {
+      "source_group": "google_maps_outscraper",
+      "language_group": "english",
+      "city": "Fukui",
+      "n_reviews": 214,
+      "n_scored": 214,
+      "mean_sentiment_score": 0.690213,
+      "median_sentiment_score": 0.8167,
+      "mean_review_rating": 4.53271,
+      "n_review_rating_present": 214,
+      "negative_count": 11,
+      "negative_pct": 0.051402,
+      "neutral_count": 8,
+      "neutral_pct": 0.037383,
+      "positive_count": 195,
+      "positive_pct": 0.911215,
+      "neutral_0_10_negative_count": 11,
+      "neutral_0_10_negative_pct": 0.051402,
+      "neutral_0_10_neutral_count": 8,
+      "neutral_0_10_neutral_pct": 0.037383,
+      "neutral_0_10_positive_count": 195,
+      "neutral_0_10_positive_pct": 0.911215,
+      "neutral_0_20_negative_count": 9,
+      "neutral_0_20_negative_pct": 0.042056,
+      "neutral_0_20_neutral_count": 11,
+      "neutral_0_20_neutral_pct": 0.051402,
+      "neutral_0_20_positive_count": 194,
+      "neutral_0_20_positive_pct": 0.906542,
+      "rating_distribution_json": "{\"1\": 8, \"2\": 2, \"3\": 12, \"4\": 38, \"5\": 154}"
+    },
+    {
+      "source_group": "google_maps_outscraper",
+      "language_group": "japanese",
+      "city": "Fukui",
+      "n_reviews": 1800,
+      "n_scored": 1800,
+      "mean_sentiment_score": 0.397134,
+      "median_sentiment_score": 0.375,
+      "mean_review_rating": 4.261667,
+      "n_review_rating_present": 1800,
+      "negative_count": 132,
+      "negative_pct": 0.073333,
+      "neutral_count": 365,
+      "neutral_pct": 0.202778,
+      "positive_count": 1303,
+      "positive_pct": 0.723889,
+      "neutral_0_10_negative_count": 121,
+      "neutral_0_10_negative_pct": 0.067222,
+      "neutral_0_10_neutral_count": 404,
+      "neutral_0_10_neutral_pct": 0.224444,
+      "neutral_0_10_positive_count": 1275,
+      "neutral_0_10_positive_pct": 0.708333,
+      "neutral_0_20_negative_count": 103,
+      "neutral_0_20_negative_pct": 0.057222,
+      "neutral_0_20_neutral_count": 502,
+      "neutral_0_20_neutral_pct": 0.278889,
+      "neutral_0_20_positive_count": 1195,
+      "neutral_0_20_positive_pct": 0.663889,
+      "rating_distribution_json": "{\"1\": 44, \"2\": 38, \"3\": 236, \"4\": 567, \"5\": 915}"
+    }
+  ]
+}

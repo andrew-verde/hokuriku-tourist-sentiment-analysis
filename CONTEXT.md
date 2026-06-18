@@ -19,6 +19,12 @@ derived multilingual review tables. These artifacts may contain row-level review
 text, author names, place IDs, or source identifiers, so they are local inputs
 for analysis and not committed in this repository.
 
+## Dual-path sentiment evidence
+
+Sentiment interpretation that preserves both a language-specific sentiment score
+and reviewed keyword evidence. The score path provides comparable categories;
+the evidence path provides human-auditable support and disagreement checks.
+
 ## Fukui-first analysis
 
 Default research scope for this repository. Initial comparisons should filter to
@@ -29,6 +35,12 @@ contains Kanazawa/Ishikawa-adjacent or Toyama rows.
 
 Google review rows whose review text is classified as Japanese-language content.
 This term describes review language, not reviewer nationality.
+
+## Review-row analysis
+
+Analysis whose primary observation is one Google review row. Sentence-level
+scores may support audit and diagnostics, but they are nested evidence inside a
+review rather than independent comparison observations.
 
 ## Survey data
 

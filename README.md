@@ -8,7 +8,8 @@ Scope:
 - Chinese Xiaohongshu / Douyin post text, titles, metadata from `tourism-data`
 - English/Japanese review text when explicitly provided as cleaned inputs
 - Transparent keyword/topic/sentiment codebooks
-- Optional model comparison later, e.g. SnowNLP, VADER, transformer models
+- Secondary library sentiment checks: VADER for English, oseti for Japanese,
+  SnowNLP for Chinese
 - Fukui Prefecture as the initial analysis scope; Ishikawa/Toyama Google review
   data can support later comparison, but should be filtered out by default for
   initial results.
@@ -44,6 +45,12 @@ python3 -m venv .venv
 .venv/bin/python3 -m pytest
 ```
 
+Install the pinned JP-EN sentiment runtime:
+
+```bash
+make sentiment-env
+```
+
 Build Chinese social outputs from local `tourism-data`:
 
 ```bash
@@ -66,6 +73,37 @@ Build cross-language trend tables after cleaned English/Japanese review rows exi
 ```bash
 make cross-language-trends
 ```
+
+Build Fukui JP-EN sentiment aggregates:
+
+```bash
+make sentiment-analysis
+```
+
+## Japanese Sentiment: oseti
+
+`oseti` is a deterministic Japanese sentiment analyzer. It uses MeCab tokenizing
+and polarity dictionaries to score Japanese text without calling a remote model.
+
+In this project, `oseti` is the Japanese-language counterpart to English VADER
+for Google review sentiment. It is a secondary library check alongside reviewed
+keyword/codebook evidence, not a replacement for human-auditable codebooks.
+
+For each Japanese review row, the sentiment pipeline writes ignored row-level
+fields:
+
+```text
+oseti_sentence_scores
+oseti_doc_score
+oseti_positive_count
+oseti_negative_count
+sentiment_category
+```
+
+`oseti_doc_score` is the mean of sentence scores. Categories use the shared
+threshold rule: positive `>= 0.05`, negative `<= -0.05`, neutral between those
+bounds. Tracked aggregate outputs keep only counts, tests, hashes, dependency
+versions, and readiness notes.
 
 ## Codebook Review
 
