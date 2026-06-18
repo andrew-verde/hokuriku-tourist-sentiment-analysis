@@ -1,0 +1,192 @@
+# Chinese social-media friction codebook.
+#
+# Codes intentionally mirror config/friction_codebook.yaml so Xiaohongshu and
+# Douyin title/text rows can be compared descriptively with Google-review
+# English/Japanese friction outputs. Matching is substring-based and should be
+# manually validated after real Chinese rows are populated.
+
+friction_codes:
+
+  transport_access:
+    label: "Transport / Access"
+    type: friction
+    keywords:
+      - 交通不便
+      - 不方便
+      - 公交
+      - 巴士
+      - 班次少
+      - 车次少
+      - 火车少
+      - 电车少
+      - 出租车少
+      - 打车难
+      - 远
+      - 难去
+      - 不好去
+      - 转车
+      - 换乘
+      - 停车
+      - 自驾
+
+  wayfinding_signage:
+    label: "Wayfinding / Signage"
+    type: friction
+    keywords:
+      - 指示
+      - 标识
+      - 标志
+      - 路牌
+      - 导览
+      - 地图
+      - 迷路
+      - 找不到
+      - 入口难找
+      - 不好找
+
+  language_information_gap:
+    label: "Language Information Gap"
+    type: friction
+    keywords:
+      - 英语
+      - 英文
+      - 外语
+      - 多语言
+      - 翻译
+      - 中文
+      - 中文说明
+      - 没有中文
+      - 看不懂
+
+  staff_communication:
+    label: "Staff Communication"
+    type: friction
+    keywords:
+      - 沟通
+      - 服务差
+      - 态度差
+      - 不友好
+      - 不耐烦
+      - 解释不清
+      - 说明不足
+      - 店员
+      - 工作人员
+
+  booking_ticketing:
+    label: "Booking / Ticketing"
+    type: friction
+    keywords:
+      - 预约
+      - 订票
+      - 门票
+      - 买票
+      - 排队买票
+      - 售罄
+      - 满员
+      - 现金
+      - 不能刷卡
+      - 支付
+      - 支付不便
+
+  waiting_crowding:
+    label: "Waiting / Crowding"
+    type: friction
+    keywords:
+      - 人多
+      - 拥挤
+      - 排队
+      - 等很久
+      - 等待
+      - 排长队
+      - 堵车
+      - 挤
+      - 爆满
+
+  price_value:
+    label: "Price / Value"
+    type: friction
+    keywords:
+      - 贵
+      - 太贵
+      - 价格高
+      - 费用高
+      - 门票贵
+      - 停车费
+      - 性价比低
+      - 不值
+      - 坑
+
+  cleanliness_comfort:
+    label: "Cleanliness / Comfort"
+    type: friction
+    keywords:
+      - 脏
+      - 不干净
+      - 卫生差
+      - 厕所
+      - 味道大
+      - 太热
+      - 太冷
+      - 休息
+      - 座位少
+      - 设施旧
+      - 老旧
+
+  opening_hours_availability:
+    label: "Opening Hours / Availability"
+    type: friction
+    keywords:
+      - 关门
+      - 没开
+      - 休息日
+      - 闭馆
+      - 营业时间
+      - 时间短
+      - 不能用
+      - 暂停
+      - 停业
+
+  itinerary_fit_time_cost:
+    label: "Itinerary Fit / Time & Cost"
+    type: friction
+    keywords:
+      - 时间不够
+      - 花时间
+      - 耗时
+      - 没什么
+      - 没什么看
+      - 不值得
+      - 行程
+      - 绕路
+      - 难安排
+      - 小众
+
+  accessibility_mobility:
+    label: "Accessibility / Mobility"
+    type: friction
+    keywords:
+      - 楼梯
+      - 台阶
+      - 坡
+      - 山路
+      - 不好走
+      - 走路累
+      - 推车
+      - 轮椅
+      - 带老人
+      - 带小孩
+
+  food_amenities_gap:
+    label: "Food / Amenities Gap"
+    type: friction
+    keywords:
+      - 餐厅少
+      - 吃饭不便
+      - 没吃的
+      - 商店少
+      - 便利店
+      - 休息区
+      - 寄存
+      - 储物柜
+      - 设施少
+      - 周边配套
