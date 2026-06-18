@@ -1,12 +1,17 @@
 # Hokuriku Tourist Sentiment Analysis
 
-Separate cross-language tourism text project.
+Fukui-first cross-language tourism text project.
+
+Project brief and readiness map: [docs/repo_guidance.md](docs/repo_guidance.md).
 
 Scope:
 - Chinese Xiaohongshu / Douyin post text, titles, metadata from `tourism-data`
 - English/Japanese review text when explicitly provided as cleaned inputs
 - Transparent keyword/topic/sentiment codebooks
-- Optional model comparison later, e.g. SnowNLP, BosonNLP, transformer models
+- Optional model comparison later, e.g. SnowNLP, VADER, transformer models
+- Fukui Prefecture as the initial analysis scope; Ishikawa/Toyama Google review
+  data can support later comparison, but should be filtered out by default for
+  initial results.
 
 Out of scope:
 - FTAS / Code for Fukui SEM thesis pipeline
@@ -45,6 +50,17 @@ Build Chinese social outputs from local `tourism-data`:
 TOURISM_DATA_DIR=/Users/andrewgreen/Repositories/tourism-data make chinese-social
 ```
 
+Sync Google review artifacts from the local `english-fukui-tourism` clone. If
+that directory is absent, the script uses the current local clone path
+`/Users/andrewgreen/Repositories/andrew-verde/america-fukui-tourism`, whose Git
+remote is `andrew-verde/english-fukui-tourism`. This copies
+`output/checkpoints/` and `output/multilingual_review_analysis/` only; survey
+outputs remain excluded.
+
+```bash
+make multilingual-reviews
+```
+
 Build cross-language trend tables after cleaned English/Japanese review rows exist:
 
 ```bash
@@ -59,6 +75,15 @@ not source text.
 The current Chinese analysis still supports friction keywords, but project aim is
 broader topic and sentiment analysis. Future work should promote the reviewed
 multilingual keyword CSV into a first-class config.
+
+Durable codebook and sentiment method notes:
+
+```text
+docs/codebook_reviews/source/
+docs/codebook_templates/
+config/chinese_social_friction_codebook.yaml
+docs/sentiment_comparison_method.md
+```
 
 ## Inputs Expected
 
