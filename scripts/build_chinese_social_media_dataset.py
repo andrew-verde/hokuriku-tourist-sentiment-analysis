@@ -40,6 +40,8 @@ DEFAULT_INPUT_DIR = Path(
 )
 OUTPUT_DIR = ROOT / "output" / "chinese_social_media_analysis"
 CODEBOOK_PATH = ROOT / "config" / "chinese_social_friction_codebook.yaml"
+REVIEWED_CODEBOOK_PATH = ROOT / "docs" / "codebook_templates" / "chinese_reviewed_codebook_template.csv"
+DEFAULT_XHS_MANUAL_WORKBOOK = ROOT / "docs" / "codebook_reviews" / "source" / "fukui_xhs_reviews_manual.xlsx"
 MULTILINGUAL_FRICTION_PATH = ROOT / "output" / "multilingual_review_analysis" / "friction_by_city_language_group.csv"
 
 SOURCE_COLUMNS = [
@@ -76,6 +78,12 @@ NEGATIVE_TERMS = [
     "不便", "不方便", "差", "贵", "拥挤", "排队", "少", "旧", "脏", "难",
     "堵", "累", "坑", "售罄", "关门", "没开", "找不到", "看不懂",
 ]
+
+REVIEWED_SENTIMENT_CODES = {
+    "positive_sentiment": "reviewed_positive_terms_matched",
+    "negative_sentiment": "reviewed_negative_terms_matched",
+    "recommendation_intent": "reviewed_recommendation_terms_matched",
+}
 
 CITY_ALIASES = {
     "fukui": "Fukui",
@@ -246,6 +254,20 @@ def _read_input_csv(path: Path) -> pd.DataFrame:
         return pd.DataFrame()
 
 
+def sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def _read_input_table(path: Path) -> pd.DataFrame:
+    if path.suffix.lower() in {".xlsx", ".xls"}:
+        return pd.read_excel(path, sheet_name="fukui_xhs_reviews")
+    return _read_input_csv(path)
+
+
 def discover_input_files(input_dir: Path) -> list[Path]:
     """Find raw social scrape CSVs in the companion tourism-data checkout.
 
@@ -256,12 +278,17 @@ def discover_input_files(input_dir: Path) -> list[Path]:
         return []
     search_dirs = [input_dir, input_dir / "data" / "raw" / "social"]
     files = []
+    use_repo_workbook = input_dir == DEFAULT_INPUT_DIR or input_dir.name == "tourism-data"
+    if use_repo_workbook and DEFAULT_XHS_MANUAL_WORKBOOK.exists():
+        files.append(DEFAULT_XHS_MANUAL_WORKBOOK)
     for directory in search_dirs:
         if not directory.exists():
             continue
         for path in directory.glob("*.csv"):
             name = path.name.lower()
             if any(token in name for token in ["xhs", "xiaohongshu", "douyin", "小红书", "抖音"]):
+                if use_repo_workbook and DEFAULT_XHS_MANUAL_WORKBOOK.exists() and any(token in name for token in ["xhs", "xiaohongshu", "小红书"]):
+                    continue
                 files.append(path)
     return sorted(set(files))
 
@@ -300,7 +327,7 @@ def load_theme_annotations(input_dir: Path) -> pd.DataFrame:
 
 
 def normalize_social_csv(path: Path, reference_date: dt.date | None = None) -> pd.DataFrame:
-    source = _read_input_csv(path)
+    source = _read_input_table(path)
     if source.empty:
         return pd.DataFrame(columns=SCHEMA_COLUMNS)
     if reference_date is None:
@@ -309,7 +336,12 @@ def normalize_social_csv(path: Path, reference_date: dt.date | None = None) -> p
     rows = []
     for _, row in source.iterrows():
         title = _clean_text(row.get("title", ""))
-        body = _clean_text(row.get("text", "")) or _clean_text(row.get("description", "")) or _clean_text(row.get("content", ""))
+        body = (
+            _clean_text(row.get("body_text", ""))
+            or _clean_text(row.get("text", ""))
+            or _clean_text(row.get("description", ""))
+            or _clean_text(row.get("content", ""))
+        )
         text_content = " ".join(part for part in [title, body] if part).strip()
         if not text_content:
             continue
@@ -340,6 +372,85 @@ def normalize_social_csv(path: Path, reference_date: dt.date | None = None) -> p
             "emotional_intensity_score": intensity,
         })
     return pd.DataFrame(rows, columns=SCHEMA_COLUMNS)
+
+
+def _snownlp_sentiment(text: str) -> tuple[float, float, str]:
+    if not text:
+        return 0.5, 0.0, "neutral"
+    try:
+        from snownlp import SnowNLP
+    except ImportError as error:
+        raise RuntimeError(
+            "Required dependency not importable: snownlp. "
+            "Install it with `.venv/bin/pip install -r requirements.txt`."
+        ) from error
+    positive_prob = float(SnowNLP(text).sentiments)
+    centered = (positive_prob * 2.0) - 1.0
+    if centered >= 0.05:
+        category = "positive"
+    elif centered <= -0.05:
+        category = "negative"
+    else:
+        category = "neutral"
+    return round(positive_prob, 6), round(centered, 6), category
+
+
+def _load_reviewed_terms(path: Path = REVIEWED_CODEBOOK_PATH) -> dict[str, list[str]]:
+    terms = {code: [] for code in REVIEWED_SENTIMENT_CODES}
+    if not path.exists():
+        return terms
+    reviewed = pd.read_csv(path)
+    required = {"code", "keyword_final", "review_decision"}
+    if not required.issubset(reviewed.columns):
+        return terms
+    for _, row in reviewed.iterrows():
+        code = _clean_text(row.get("code", ""))
+        if code not in terms:
+            continue
+        decision = _clean_text(row.get("review_decision", "")).lower()
+        if decision == "delete":
+            continue
+        keyword = _clean_text(row.get("keyword_final", ""))
+        if keyword and keyword not in terms[code]:
+            terms[code].append(keyword)
+    return terms
+
+
+def _append_sentiment_fields(df: pd.DataFrame, reviewed_terms: dict[str, list[str]]) -> pd.DataFrame:
+    scored = df.copy()
+    if scored.empty:
+        for column in [
+            "title_has_text",
+            "body_has_text",
+            "text_scope",
+            "text_length_chars",
+            "snownlp_positive_prob",
+            "snownlp_centered_score",
+            "sentiment_category",
+            *REVIEWED_SENTIMENT_CODES.values(),
+        ]:
+            scored[column] = pd.Series(dtype=object)
+        return scored
+    title_text = scored["title"].fillna("").astype(str).str.strip()
+    text_text = scored["text_content"].fillna("").astype(str).str.strip()
+    body_text = [
+        text[len(title):].strip() if title and text.startswith(title) else text
+        for title, text in zip(title_text, text_text, strict=False)
+    ]
+    scored["title_has_text"] = title_text != ""
+    scored["body_has_text"] = [bool(str(value).strip()) for value in body_text]
+    scored["text_scope"] = scored["body_has_text"].map(lambda value: "title_and_body" if value else "title_only")
+    scored["text_length_chars"] = text_text.str.len()
+    snow = scored["text_content"].apply(_snownlp_sentiment)
+    scored["snownlp_positive_prob"] = snow.apply(lambda value: value[0])
+    scored["snownlp_centered_score"] = snow.apply(lambda value: value[1])
+    scored["sentiment_category"] = snow.apply(lambda value: value[2])
+    for code, column in REVIEWED_SENTIMENT_CODES.items():
+        keywords = reviewed_terms.get(code, [])
+        scored[column] = scored["text_content"].apply(
+            lambda text, keywords=keywords: "|".join(keyword for keyword in keywords if keyword in str(text))
+        )
+    return scored
 
 
 def _tag_chinese_dataframe(df: pd.DataFrame, codebook: dict) -> pd.DataFrame:
@@ -390,6 +501,7 @@ def _theme_summary(df: pd.DataFrame) -> pd.DataFrame:
     columns = ["city", "source_platform", "theme", "count", "pct_posts", "sentiment_norm_mean"]
     if df.empty:
         return pd.DataFrame(columns=columns)
+    score_col = "snownlp_positive_prob" if "snownlp_positive_prob" in df.columns else "sentiment_norm"
     rows = []
     for (city, platform), group in df.groupby(["city", "source_platform"], dropna=False):
         denominator = len(group)
@@ -400,7 +512,7 @@ def _theme_summary(df: pd.DataFrame) -> pd.DataFrame:
                 "theme": theme,
                 "count": len(theme_group),
                 "pct_posts": round(100 * len(theme_group) / denominator, 3) if denominator else 0.0,
-                "sentiment_norm_mean": round(float(theme_group["sentiment_norm"].mean()), 6),
+                "sentiment_norm_mean": round(float(theme_group[score_col].mean()), 6),
             })
     return pd.DataFrame(rows, columns=columns)
 
@@ -408,7 +520,8 @@ def _theme_summary(df: pd.DataFrame) -> pd.DataFrame:
 def _sentiment_summary(df: pd.DataFrame) -> pd.DataFrame:
     if df.empty:
         return pd.DataFrame(columns=["city", "source_platform", "count", "mean", "median", "std"])
-    grouped = df.groupby(["city", "source_platform"], dropna=False)["sentiment_norm"]
+    score_col = "snownlp_positive_prob" if "snownlp_positive_prob" in df.columns else "sentiment_norm"
+    grouped = df.groupby(["city", "source_platform"], dropna=False)[score_col]
     return grouped.agg(["count", "mean", "median", "std"]).reset_index()
 
 
@@ -451,12 +564,27 @@ def _binary_group_test(df: pd.DataFrame, group_col: str, code: str) -> list[dict
 
 
 def _within_chinese_tests(tagged: pd.DataFrame, codebook: dict) -> pd.DataFrame:
+    columns = [
+        "comparison_type",
+        "group_a",
+        "group_b",
+        "friction_code",
+        "group_a_count",
+        "group_a_n",
+        "group_b_count",
+        "group_b_n",
+        "group_a_pct",
+        "group_b_pct",
+        "group_b_minus_group_a_pp",
+        "odds_ratio",
+        "fisher_exact_p",
+    ]
     rows = []
     codes = [code for code, attrs in codebook.items() if attrs["type"] == "friction"]
     for code in codes:
         rows.extend(_binary_group_test(tagged, "city", code))
         rows.extend(_binary_group_test(tagged, "source_platform", code))
-    return pd.DataFrame(rows)
+    return pd.DataFrame(rows, columns=columns)
 
 
 def _review_language_comparison(
@@ -514,17 +642,25 @@ def _write_readiness(report: dict, path: Path) -> None:
         "",
         f"- Input directory: `{report['input_dir']}`",
         f"- Input files discovered: {report['input_files_discovered']}",
+        f"- Input SHA256: `{report['input_sha256']}`",
         f"- Rows before deduplication: {report['rows_before_dedup']}",
         f"- Duplicate city/platform/text rows removed: {report['duplicates_removed']}",
         f"- Rows retained: {report['rows_retained']}",
+        f"- Rows with body text: {report['n_with_body_text']}",
+        f"- Title-only rows excluded from primary comparison: {report['n_title_only_excluded']}",
+        f"- Non-fan rows for primary comparison: {report['n_non_fan_compared']}",
         f"- Theme mix: {report['theme_counts']}",
         f"- Post-date precision mix: {report['post_date_precision_counts']}",
+        f"- Row-level output SHA256: `{report['row_level_output_sha256']}`",
+        f"- Reviewed codebook template: `{report['reviewed_codebook_path']}`",
+        f"- Reviewed codebook SHA256: `{report['reviewed_codebook_sha256']}`",
         "",
         "## Caveats",
         "",
-        "- Unit of analysis is one social-media search result row, currently title/text-level, not a full travel itinerary or confirmed visit.",
-        "- Chinese friction tags are substring keyword matches on titles; title-level rates understate friction relative to full-text review rates and are directional only.",
-        "- Sentiment fields use a transparent keyword polarity scaffold, not VADER and not a validated Chinese sentiment model.",
+        "- Unit of analysis is one social-media post row, not a full travel itinerary or confirmed visit.",
+        "- Primary Chinese sentiment rows require body text; title-only rows are smoke-test material only.",
+        "- Chinese friction tags are substring keyword matches from the YAML runtime codebook; reviewed CSV decisions are audit evidence but are not fully promoted into the friction runtime config yet.",
+        "- SnowNLP sentiment is a secondary library score for Chinese-language tourism/fandom text and needs domain caveats.",
         "- Compare Chinese social-media rates with Google review-language rates descriptively because source platform behavior and text length differ.",
         "- Theme labels (fan / travel / ordinary) come from the companion tourism-data processed CSVs, joined on note id; rows without a label are `unclassified`.",
         "- `post_date` is parsed from the Xiaohongshu author cell; `post_date_precision` marks exact vs year-inferred vs relative-inferred values (inference anchored to the scrape commit date).",
@@ -543,6 +679,7 @@ def build_chinese_social_outputs(
     output_dir.mkdir(parents=True, exist_ok=True)
     input_files = input_files if input_files is not None else discover_input_files(input_dir)
     codebook = load_chinese_codebook()
+    reviewed_terms = _load_reviewed_terms()
 
     frames = [normalize_social_csv(path) for path in input_files]
     df = pd.concat(frames, ignore_index=True) if frames else pd.DataFrame(columns=SCHEMA_COLUMNS)
@@ -559,6 +696,7 @@ def build_chinese_social_outputs(
         for column in THEME_COLUMNS:
             df[column] = pd.Series(dtype=object)
 
+    df = _append_sentiment_fields(df, reviewed_terms)
     tagged = _tag_chinese_dataframe(df, codebook) if not df.empty else df.copy()
     for code in codebook:
         if code not in tagged.columns:
@@ -608,18 +746,33 @@ def build_chinese_social_outputs(
     sentiment_summary.to_csv(sentiment_summary_path, index=False)
     within_tests.to_csv(within_tests_path, index=False)
     review_comparison.to_csv(review_comparison_path, index=False)
+    row_level_hash = sha256_file(tagged_path)
+    input_hashes = {str(path): sha256_file(path) for path in input_files if path.exists()}
+    reviewed_hash = sha256_file(REVIEWED_CODEBOOK_PATH) if REVIEWED_CODEBOOK_PATH.exists() else None
+    n_with_body_text = int(df["body_has_text"].sum()) if "body_has_text" in df.columns else 0
+    n_title_only = int((~df["body_has_text"]).sum()) if "body_has_text" in df.columns else len(df)
+    n_non_fan = int(((df["body_has_text"]) & (df["theme"] != "fan")).sum()) if not df.empty else 0
 
     report = {
         "input_dir": str(input_dir),
         "input_files": [str(path) for path in input_files],
+        "input_sha256": input_hashes,
         "input_files_discovered": len(input_files),
         "rows_before_dedup": rows_before_dedup,
         "duplicates_removed": duplicates_removed,
         "rows_retained": len(df),
+        "n_total_xhs_rows": int(len(df[df["source_platform"] == "xiaohongshu"])) if not df.empty else 0,
+        "n_with_body_text": n_with_body_text,
+        "n_title_only_excluded": n_title_only,
+        "n_non_fan_compared": n_non_fan,
         "source_platform_counts": {str(k): int(v) for k, v in df["source_platform"].value_counts().items()} if not df.empty else {},
         "city_counts": {str(k): int(v) for k, v in df["city"].value_counts().items()} if not df.empty else {},
         "theme_counts": {str(k): int(v) for k, v in df["theme"].value_counts().items()} if not df.empty else {},
         "post_date_precision_counts": {str(k): int(v) for k, v in df["post_date_precision"].value_counts().items()} if not df.empty else {},
+        "row_level_output_sha256": row_level_hash,
+        "reviewed_codebook_path": str(REVIEWED_CODEBOOK_PATH),
+        "reviewed_codebook_sha256": reviewed_hash,
+        "codebook_evidence_status": "reviewed_template_used_for_sentiment_terms; friction_yaml_not_fully_promoted",
         "outputs": {
             "chinese_social_posts": str(normalized_path),
             "tagged_chinese_social_posts": str(tagged_path),
