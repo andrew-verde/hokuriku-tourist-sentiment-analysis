@@ -68,7 +68,7 @@ Chinese social inputs are external and should remain external:
   scores Japanese reviews with oseti, writes ignored row-level output, and tracks
   aggregate summaries/tests/readiness with hashes and dependency versions.
 - [ ] Statistical comparison suite: JP-EN review-row tests, POI-level sensitivity,
-  POI-level sensitivity, POI cluster-bootstrap sensitivity, and Fukui-only
+  POI cluster-bootstrap sensitivity, and Fukui-only
   EN/JP/CN aggregate baseline outputs exist. Still needed: decide whether final
   presentation summaries should weight POIs equally or by review volume, decide
   whether a clustered/covariate model is justified, and add EN/JP/CN statistical
