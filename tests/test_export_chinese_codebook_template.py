@@ -30,7 +30,7 @@ def test_export_preserves_chinese_characters_and_review_decisions(tmp_path):
         "notes",
     ])
     worksheet.append([
-        "cross_language_tourism_side_project",
+        "cross_language_tourism_group_project",
         "Chinese",
         "Xiaohongshu titles",
         "friction",
@@ -46,7 +46,7 @@ def test_export_preserves_chinese_characters_and_review_decisions(tmp_path):
         "",
     ])
     worksheet.append([
-        "cross_language_tourism_side_project",
+        "cross_language_tourism_group_project",
         "Chinese",
         "Xiaohongshu titles",
         "friction",

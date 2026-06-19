@@ -1,21 +1,20 @@
 #!/usr/bin/env python3
 """
-Build cross-language monthly tourism-trend tables (side project).
+Build Fukui-first cross-language baseline tables (group project).
 
-Compares English-language Google reviewers, Japanese-language Google
-reviewers, and Chinese social-media commenters (Xiaohongshu/Douyin) on
-monthly volume and within-group sentiment, by city. Sentiment scales are
-group-specific (Google star ratings vs Chinese keyword-lexicon polarity)
-and are reported side by side, never merged.
+Compares English-language Google reviews, Japanese-language Google reviews,
+and Chinese social-media posts at aggregate level. Monthly trend output is
+intentionally disabled until Chinese post dates are scrubbed enough for time
+series use.
 
-This is a side-project deliverable separate from the tourist-friction
-thesis pipeline; nothing in the thesis chain depends on these outputs.
-Both inputs are row-level files produced by earlier stages:
+Inputs:
 
   - `make multilingual-reviews` -> output/multilingual_review_analysis/reviews_multilingual.csv
   - `make chinese-social`       -> output/chinese_social_media_analysis/tagged_chinese_social_posts.csv
 
-There is no demo mode: missing inputs are an error naming the command to run.
+Google review scope is filtered by checkpoint POI prefecture metadata. The
+default is Fukui; the same scaffold can later run for Ishikawa or Toyama once
+matching Chinese social inputs exist.
 """
 
 from __future__ import annotations
@@ -36,18 +35,33 @@ logger = setup_logger(__name__)
 ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_REVIEWS_PATH = ROOT / "output" / "multilingual_review_analysis" / "reviews_multilingual.csv"
 DEFAULT_CHINESE_PATH = ROOT / "output" / "chinese_social_media_analysis" / "tagged_chinese_social_posts.csv"
+DEFAULT_POI_METADATA_PATH = ROOT / "output" / "checkpoints" / "poi_metadata.json"
 DEFAULT_OUTPUT_DIR = ROOT / "output" / "cross_language_trends"
 
 REVIEW_GROUPS = ["english", "japanese"]
 CHINESE_GROUP = "chinese_social"
+NEIGHBORING_PREFECTURE_SCAFFOLD = ["Ishikawa", "Toyama"]
 
-TRENDS_COLUMNS = [
+BASELINE_COLUMNS = [
+    "prefecture",
     "city",
     "group",
-    "month",
+    "source_kind",
     "volume",
     "rating_mean",
     "sentiment_norm_mean",
+    "positive_pct",
+    "neutral_pct",
+    "negative_pct",
+]
+
+DATE_SCRUB_COLUMNS = [
+    "source_kind",
+    "date_precision",
+    "count",
+    "pct_rows",
+    "usable_for_monthly_trends",
+    "scrub_required",
 ]
 
 
@@ -64,104 +78,176 @@ def _require_input(path: Path, make_target: str) -> None:
         )
 
 
-def _month_series(values: pd.Series) -> pd.Series:
-    parsed = pd.to_datetime(values, errors="coerce", format="mixed", utc=True)
-    return parsed.dt.tz_localize(None).dt.to_period("M").astype(str)
+def load_poi_metadata(path: Path) -> pd.DataFrame:
+    _require_input(path, "multilingual-reviews")
+    raw = json.loads(path.read_text(encoding="utf-8"))
+    rows = []
+    for poi_id, attrs in raw.items():
+        rows.append({
+            "poi_id": str(poi_id),
+            "prefecture_normalized": attrs.get("prefecture_normalized") or attrs.get("prefecture"),
+            "municipality": attrs.get("municipality") or attrs.get("municipality_short"),
+        })
+    metadata = pd.DataFrame(rows)
+    if metadata.empty or "prefecture_normalized" not in metadata.columns:
+        raise MissingInputError(f"POI metadata missing prefecture_normalized values: {path}")
+    return metadata
 
 
-def load_review_rows(path: Path) -> pd.DataFrame:
+def load_review_rows(path: Path, poi_metadata_path: Path, prefecture: str) -> pd.DataFrame:
     df = pd.read_csv(path)
-    df = df[df["language_group"].isin(REVIEW_GROUPS)].copy()
-    df["month"] = _month_series(df["review_date"])
-    df["rating"] = pd.to_numeric(df.get("review_rating"), errors="coerce")
-    return df
+    df = df[df["language_group"].astype(str).str.lower().isin(REVIEW_GROUPS)].copy()
+    metadata = load_poi_metadata(poi_metadata_path)
+    df = df.merge(metadata, on="poi_id", how="left", validate="many_to_one")
+    missing = df["prefecture_normalized"].isna()
+    if missing.any():
+        missing_ids = sorted(df.loc[missing, "poi_id"].astype(str).unique())[:5]
+        raise MissingInputError(
+            "Review rows missing POI prefecture metadata; rerun `make multilingual-reviews`. "
+            f"Example poi_id values: {missing_ids}"
+        )
+    scoped = df[df["prefecture_normalized"].astype(str) == prefecture].copy()
+    scoped["review_rating"] = pd.to_numeric(scoped.get("review_rating"), errors="coerce")
+    scoped["review_date_present"] = pd.to_datetime(scoped.get("review_date"), errors="coerce", utc=True).notna()
+    scoped["language_group"] = scoped["language_group"].astype(str).str.lower()
+    return scoped
 
 
-def load_chinese_rows(path: Path) -> pd.DataFrame:
+def load_chinese_rows(path: Path, prefecture: str) -> pd.DataFrame:
     df = pd.read_csv(path)
     if df.empty:
         return df
-    df = df.copy()
-    df["month"] = _month_series(df.get("post_date"))
-    df["sentiment_norm"] = pd.to_numeric(df.get("sentiment_norm"), errors="coerce")
-    if "theme" not in df.columns:
-        df["theme"] = "unclassified"
-    df["theme"] = df["theme"].fillna("unclassified")
-    return df
+    scoped = df[df["city"].astype(str) == prefecture].copy()
+    scoped["sentiment_norm"] = pd.to_numeric(scoped.get("sentiment_norm"), errors="coerce")
+    if "sentiment_category" not in scoped.columns:
+        scoped["sentiment_category"] = "unknown"
+    if "post_date_precision" not in scoped.columns:
+        scoped["post_date_precision"] = "none"
+    return scoped
 
 
-def monthly_trends(reviews: pd.DataFrame, chinese: pd.DataFrame) -> pd.DataFrame:
+def _pct(count: int, denominator: int) -> float:
+    return round(100 * count / denominator, 3) if denominator else 0.0
+
+
+def baseline_snapshot(reviews: pd.DataFrame, chinese: pd.DataFrame, prefecture: str) -> pd.DataFrame:
     rows = []
-    dated_reviews = reviews[reviews["month"].notna()]
-    for (city, group, month), chunk in dated_reviews.groupby(["city", "language_group", "month"]):
+    for (city, group), chunk in reviews.groupby(["city", "language_group"], dropna=False):
+        denominator = len(chunk)
         rows.append({
+            "prefecture": prefecture,
             "city": city,
             "group": group,
-            "month": month,
-            "volume": len(chunk),
-            "rating_mean": round(float(chunk["rating"].mean()), 4) if chunk["rating"].notna().any() else None,
+            "source_kind": "google_review",
+            "volume": denominator,
+            "rating_mean": round(float(chunk["review_rating"].mean()), 4)
+            if chunk["review_rating"].notna().any() else None,
             "sentiment_norm_mean": None,
+            "positive_pct": None,
+            "neutral_pct": None,
+            "negative_pct": None,
         })
     if not chinese.empty:
-        dated_chinese = chinese[chinese["month"].notna()]
-        for (city, month), chunk in dated_chinese.groupby(["city", "month"]):
+        for (city, platform), chunk in chinese.groupby(["city", "source_platform"], dropna=False):
+            denominator = len(chunk)
+            categories = chunk["sentiment_category"].fillna("unknown").astype(str)
             rows.append({
+                "prefecture": prefecture,
                 "city": city,
-                "group": CHINESE_GROUP,
-                "month": month,
-                "volume": len(chunk),
+                "group": f"{CHINESE_GROUP}_{platform}",
+                "source_kind": "chinese_social_post",
+                "volume": denominator,
                 "rating_mean": None,
                 "sentiment_norm_mean": round(float(chunk["sentiment_norm"].mean()), 6)
                 if chunk["sentiment_norm"].notna().any() else None,
+                "positive_pct": _pct(int((categories == "positive").sum()), denominator),
+                "neutral_pct": _pct(int((categories == "neutral").sum()), denominator),
+                "negative_pct": _pct(int((categories == "negative").sum()), denominator),
             })
-    trends = pd.DataFrame(rows, columns=TRENDS_COLUMNS)
-    return trends.sort_values(["city", "group", "month"]).reset_index(drop=True)
+    return pd.DataFrame(rows, columns=BASELINE_COLUMNS).sort_values(
+        ["prefecture", "city", "source_kind", "group"]
+    ).reset_index(drop=True)
 
 
-def chinese_theme_mix_monthly(chinese: pd.DataFrame) -> pd.DataFrame:
-    columns = ["city", "month", "theme", "count", "pct_posts"]
-    if chinese.empty:
-        return pd.DataFrame(columns=columns)
-    dated = chinese[chinese["month"].notna()]
+def date_scrub_requirements(reviews: pd.DataFrame, chinese: pd.DataFrame) -> pd.DataFrame:
     rows = []
-    for (city, month), chunk in dated.groupby(["city", "month"]):
-        denominator = len(chunk)
-        for theme, theme_chunk in chunk.groupby("theme"):
+    if len(reviews):
+        present = int(reviews["review_date_present"].sum())
+        missing = len(reviews) - present
+        rows.extend([
+            {
+                "source_kind": "google_review",
+                "date_precision": "exact_or_provider_timestamp",
+                "count": present,
+                "pct_rows": _pct(present, len(reviews)),
+                "usable_for_monthly_trends": True,
+                "scrub_required": "Keep provider review_date, collection_date, POI metadata, and language filter hashes.",
+            },
+            {
+                "source_kind": "google_review",
+                "date_precision": "missing_or_unparseable",
+                "count": missing,
+                "pct_rows": _pct(missing, len(reviews)),
+                "usable_for_monthly_trends": False,
+                "scrub_required": "Exclude or repair before monthly trend output.",
+            },
+        ])
+    if len(chinese):
+        counts = chinese["post_date_precision"].fillna("none").astype(str).value_counts()
+        for precision, count in counts.items():
+            usable = precision == "exact"
+            if usable:
+                scrub = "Keep only rows with exact platform post dates for monthly trend output."
+            elif precision == "year_inferred":
+                scrub = "Recover exact source post date or exclude from monthly trend output."
+            elif precision == "relative_inferred":
+                scrub = "Recover absolute source post date from capture evidence; current scrape-anchored dates are not monthly-trend evidence."
+            else:
+                scrub = "Recover source post date or exclude from monthly trend output."
             rows.append({
-                "city": city,
-                "month": month,
-                "theme": theme,
-                "count": len(theme_chunk),
-                "pct_posts": round(100 * len(theme_chunk) / denominator, 3),
+                "source_kind": "chinese_social_post",
+                "date_precision": precision,
+                "count": int(count),
+                "pct_rows": _pct(int(count), len(chinese)),
+                "usable_for_monthly_trends": usable,
+                "scrub_required": scrub,
             })
-    return pd.DataFrame(rows, columns=columns).sort_values(["city", "month", "theme"]).reset_index(drop=True)
+    return pd.DataFrame(rows, columns=DATE_SCRUB_COLUMNS)
 
 
 def _write_readiness(report: dict, path: Path) -> None:
     lines = [
-        "# Cross-Language Trends Readiness (Side Project)",
+        "# Cross-Language Baseline Readiness (Group Project)",
         "",
-        "Monthly volume and within-group sentiment for English Google reviewers, "
-        "Japanese Google reviewers, and Chinese social-media commenters. "
-        "Descriptive side-project comparison; not thesis evidence.",
+        "Fukui-first aggregate comparison for English-language Google reviews, "
+        "Japanese-language Google reviews, and Chinese-language social-media posts. "
+        "Monthly trend output is disabled for now.",
         "",
-        f"- Review rows (english/japanese, dated): {report['review_rows_dated']}",
-        f"- Chinese posts total: {report['chinese_rows_total']}",
-        f"- Chinese posts with a usable post_date: {report['chinese_rows_dated']}",
-        f"- Chinese post_date precision mix: {report['chinese_date_precision_counts']}",
+        f"- Active prefecture: {report['prefecture']}",
+        f"- Review rows retained after POI-prefecture filter: {report['review_rows_retained']}",
+        f"- Chinese posts retained: {report['chinese_rows_retained']}",
+        f"- Neighboring-prefecture scaffold kept for later: {report['neighboring_prefecture_scaffold']}",
+        "",
+        "## Current Decision",
+        "",
+        "- Monthly trend analysis is not worthwhile yet for the Chinese layer. "
+        "Most Chinese rows use inferred dates, and Douyin comment dates are anchored to scrape/parser context rather than exact platform timestamps.",
+        "- Current output is aggregate baseline only: source volumes, Google rating mean, and Chinese SnowNLP sentiment summary by platform.",
+        "",
+        "## If Monthly Trends Are Reintroduced",
+        "",
+        "- Filter Google reviews by POI `prefecture_normalized` from `output/checkpoints/poi_metadata.json`.",
+        "- Keep Chinese rows with exact platform post dates, or recover exact dates from source evidence.",
+        "- Recover exact source post date for rows currently marked `year_inferred`, `relative_inferred`, or `none`; otherwise exclude them from monthly output.",
+        "- Exclude `year_inferred`, `relative_inferred`, and missing Chinese dates unless separately audited.",
+        "- Report date precision counts, source file hashes, collection windows, and per-platform monthly denominators.",
+        "- Stratify Chinese social posts by platform; do not pool Xiaohongshu notes and Douyin comments as one time series without weighting rationale.",
         "",
         "## Caveats",
         "",
-        "- Sentiment scales are group-specific: `rating_mean` is the Google 1-5 star mean "
-        "(english/japanese); `sentiment_norm_mean` is the Chinese keyword-lexicon polarity "
-        "mean in [0,1]. Levels are NOT comparable across groups; only within-group "
-        "trajectories are interpretable.",
-        "- Chinese text is title-level and volumes are small; treat monthly Chinese cells "
-        "as directional interest signals, not rates.",
-        "- Chinese `post_date` values flagged `year_inferred` or `relative_inferred` were "
-        "reconstructed relative to the scrape date (see chinese_social_readiness.md).",
-        "- Group membership is content language, not nationality.",
-        "- No significance testing is run on these series by design (descriptive scope).",
+        "- Group membership is content language/source platform, not nationality.",
+        "- Chinese sentiment uses SnowNLP as the current baseline; Google ratings are a separate measurement instrument.",
+        "- Neighboring prefectures remain scaffolded for later work, but current default output is Fukui-only.",
         "",
     ]
     path.write_text("\n".join(lines), encoding="utf-8")
@@ -171,38 +257,52 @@ def build_cross_language_trends(
     reviews_path: Path = DEFAULT_REVIEWS_PATH,
     chinese_path: Path = DEFAULT_CHINESE_PATH,
     output_dir: Path = DEFAULT_OUTPUT_DIR,
+    poi_metadata_path: Path = DEFAULT_POI_METADATA_PATH,
+    prefecture: str = "Fukui",
 ) -> dict:
     _require_input(reviews_path, "multilingual-reviews")
     _require_input(chinese_path, "chinese-social")
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    reviews = load_review_rows(reviews_path)
-    chinese = load_chinese_rows(chinese_path)
+    reviews = load_review_rows(reviews_path, poi_metadata_path, prefecture)
+    chinese = load_chinese_rows(chinese_path, prefecture)
 
-    trends = monthly_trends(reviews, chinese)
-    theme_mix = chinese_theme_mix_monthly(chinese)
+    baseline = baseline_snapshot(reviews, chinese, prefecture)
+    date_scrub = date_scrub_requirements(reviews, chinese)
 
-    trends_path = output_dir / "monthly_trends.csv"
-    theme_mix_path = output_dir / "chinese_theme_mix_monthly.csv"
+    baseline_path = output_dir / "cross_language_baseline_snapshot.csv"
+    date_scrub_path = output_dir / "date_scrub_requirements.csv"
     report_json_path = output_dir / "cross_language_trends_readiness.json"
     report_md_path = output_dir / "cross_language_trends_readiness.md"
+    for stale_path in [
+        output_dir / "monthly_trends.csv",
+        output_dir / "chinese_theme_mix_monthly.csv",
+    ]:
+        if stale_path.exists():
+            stale_path.unlink()
 
-    trends.to_csv(trends_path, index=False)
-    theme_mix.to_csv(theme_mix_path, index=False)
+    baseline.to_csv(baseline_path, index=False)
+    date_scrub.to_csv(date_scrub_path, index=False)
 
     report = {
+        "prefecture": prefecture,
+        "neighboring_prefecture_scaffold": NEIGHBORING_PREFECTURE_SCAFFOLD,
         "reviews_input": str(reviews_path),
+        "poi_metadata_input": str(poi_metadata_path),
         "chinese_input": str(chinese_path),
-        "review_rows_dated": int(reviews["month"].notna().sum()),
-        "chinese_rows_total": int(len(chinese)),
-        "chinese_rows_dated": int(chinese["month"].notna().sum()) if not chinese.empty else 0,
+        "review_rows_retained": int(len(reviews)),
+        "chinese_rows_retained": int(len(chinese)),
         "chinese_date_precision_counts": (
             {str(k): int(v) for k, v in chinese["post_date_precision"].value_counts().items()}
             if not chinese.empty and "post_date_precision" in chinese.columns else {}
         ),
+        "monthly_trends_enabled": False,
+        "monthly_trends_disabled_reason": (
+            "Chinese post dates are mostly inferred or scrape-anchored; aggregate baseline is safer."
+        ),
         "outputs": {
-            "monthly_trends": str(trends_path),
-            "chinese_theme_mix_monthly": str(theme_mix_path),
+            "cross_language_baseline_snapshot": str(baseline_path),
+            "date_scrub_requirements": str(date_scrub_path),
             "cross_language_trends_readiness": str(report_md_path),
         },
     }
@@ -215,7 +315,9 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--reviews-path", type=Path, default=DEFAULT_REVIEWS_PATH)
     parser.add_argument("--chinese-path", type=Path, default=DEFAULT_CHINESE_PATH)
+    parser.add_argument("--poi-metadata-path", type=Path, default=DEFAULT_POI_METADATA_PATH)
     parser.add_argument("--output-dir", type=Path, default=DEFAULT_OUTPUT_DIR)
+    parser.add_argument("--prefecture", default="Fukui")
     return parser.parse_args()
 
 
@@ -226,11 +328,13 @@ def main() -> int:
             reviews_path=args.reviews_path,
             chinese_path=args.chinese_path,
             output_dir=args.output_dir,
+            poi_metadata_path=args.poi_metadata_path,
+            prefecture=args.prefecture,
         )
     except MissingInputError as error:
         logger.error(str(error))
         return 1
-    logger.info("Monthly trend rows: %s", report["review_rows_dated"] + report["chinese_rows_dated"])
+    logger.info("Baseline rows retained: reviews=%s chinese=%s", report["review_rows_retained"], report["chinese_rows_retained"])
     logger.info("Output written: %s", args.output_dir)
     return 0
 

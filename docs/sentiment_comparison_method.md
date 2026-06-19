@@ -2,7 +2,7 @@
 
 This note defines the programming contract for comparing Chinese-language
 Xiaohongshu posts, Japanese-language Google reviews, and English-language Google
-reviews in the Fukui-first side project. Group labels describe content language
+reviews in the Fukui-first group project. Group labels describe content language
 and source platform, not nationality.
 
 ## Source Inputs

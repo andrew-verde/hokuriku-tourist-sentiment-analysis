@@ -8,7 +8,7 @@ help:
 	@echo "  make chinese-codebook-template Export reviewed Chinese codebook CSV"
 	@echo "  make chinese-social          Build Chinese XHS/Douyin cleaned outputs"
 	@echo "  make multilingual-reviews    Sync local Google review data from english-fukui-tourism"
-	@echo "  make cross-language-trends   Build monthly EN/JP/CN trend tables"
+	@echo "  make cross-language-trends   Build Fukui-first EN/JP/CN baseline tables"
 	@echo "  make sentiment-env           Install pinned JP-EN sentiment runtime"
 	@echo "  make sentiment-analysis      Build JP-EN sentiment aggregate outputs"
 	@echo "  make test                    Run pytest"

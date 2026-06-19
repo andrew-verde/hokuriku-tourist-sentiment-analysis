@@ -494,6 +494,9 @@ def _append_sentiment_fields(df: pd.DataFrame, reviewed_terms: dict[str, list[st
     scored["snownlp_positive_prob"] = snow.apply(lambda value: value[0])
     scored["snownlp_centered_score"] = snow.apply(lambda value: value[1])
     scored["sentiment_category"] = snow.apply(lambda value: value[2])
+    scored["sentiment_norm"] = scored["snownlp_positive_prob"]
+    scored["sentiment_score"] = scored["snownlp_centered_score"]
+    scored["emotional_intensity_score"] = scored["snownlp_centered_score"].abs()
     for code, column in REVIEWED_SENTIMENT_CODES.items():
         keywords = reviewed_terms.get(code, [])
         scored[column] = scored["text_content"].apply(
@@ -711,13 +714,13 @@ def _write_readiness(report: dict, path: Path) -> None:
         "- Douyin comments come from `tourism-data/data/processed/fukui_douyin_comments_from_md.csv` because the current source was parsed from markdown; keep that row-level file external.",
         "- Douyin comment ids are local parser ids, not platform comment ids; use input hashes and parser notes for provenance.",
         "- Douyin comment dates are inferred from relative timestamps anchored to the parsed CSV reference date, so they are not exact publication dates.",
-        "- Primary Chinese sentiment rows require body text/comment text; title-only rows are smoke-test material only.",
+        "- Primary Chinese sentiment rows require post body text or comment text; rows without that text are smoke-test material only.",
         "- Chinese friction tags are substring keyword matches from the YAML runtime codebook; reviewed CSV decisions are audit evidence but are not fully promoted into the friction runtime config yet.",
-        "- SnowNLP sentiment is a secondary library score for Chinese-language tourism/fandom text and needs domain caveats.",
+        "- Chinese sentiment fields use SnowNLP as the canonical current baseline (`sentiment_norm`, `sentiment_score`, and `sentiment_category`); reviewed term matches remain transparent evidence columns.",
         "- Compare Chinese social-media rates with Google review-language rates descriptively because source platform behavior and text length differ.",
         "- Theme labels (fan / travel / ordinary) come from the companion tourism-data processed CSVs, joined on note id; rows without a label are `unclassified`.",
         "- `post_date` is parsed from the Xiaohongshu author cell; `post_date_precision` marks exact vs year-inferred vs relative-inferred values (inference anchored to the scrape commit date).",
-        "- Side-project layer: these outputs feed the cross-language trends comparison only and are not thesis evidence.",
+        "- Group project layer: these outputs feed the cross-language trends comparison only and are not thesis evidence.",
         "",
     ]
     path.write_text("\n".join(lines), encoding="utf-8")

@@ -59,7 +59,7 @@ Chinese social inputs are external and should remain external:
   Chinese rows if they supersede YAML, then report library-score/codebook
   disagreement rates.
 - [ ] Chinese social sentiment/topic pipeline: `scripts/build_chinese_social_media_dataset.py`
-  builds cleaned Chinese social outputs with transparent lexicon sentiment from
+  builds cleaned Chinese social outputs with SnowNLP baseline sentiment from
   one `make chinese-social` trigger for Xiaohongshu rows and parsed Douyin
   comments. Still needed: reviewed config promotion, stronger Douyin provenance
   checks, and broader topic/enjoyment config wiring for presentation comparisons.
@@ -68,10 +68,12 @@ Chinese social inputs are external and should remain external:
   scores Japanese reviews with oseti, writes ignored row-level output, and tracks
   aggregate summaries/tests/readiness with hashes and dependency versions.
 - [ ] Statistical comparison suite: JP-EN review-row tests, POI-level sensitivity,
-  and POI cluster-bootstrap sensitivity exist. Still needed: decide whether final
+  POI-level sensitivity, POI cluster-bootstrap sensitivity, and Fukui-only
+  EN/JP/CN aggregate baseline outputs exist. Still needed: decide whether final
   presentation summaries should weight POIs equally or by review volume, decide
-  whether a clustered/covariate model is justified, and add EN/JP/CN comparisons
-  once Chinese sentiment/codebook outputs are ready.
+  whether a clustered/covariate model is justified, and add EN/JP/CN statistical
+  comparisons once Chinese codebook outputs are promoted and platform/date
+  caveats are locked.
 - [ ] Presentation outputs: presentation-safe figures and captions are not built
   yet. Slides must carry POI mix, date range, source hashes, denominators, and
   source/platform caveats for any Japanese-language vs English-language review

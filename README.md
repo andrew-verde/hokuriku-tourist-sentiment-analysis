@@ -148,5 +148,5 @@ Manual body/comment text: body_text,comment_text,text,description,or content
 ## Research Boundary
 
 This repo is not thesis SEM friction-analysis repo. Treat all outputs as
-cross-language descriptive/sentiment side-project artifacts unless separately
+cross-language descriptive/sentiment group project artifacts unless separately
 validated.

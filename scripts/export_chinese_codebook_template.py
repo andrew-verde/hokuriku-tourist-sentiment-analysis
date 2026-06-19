@@ -52,6 +52,9 @@ SOURCE_TO_OUTPUT = {
 }
 
 VALID_DECISIONS = {"No change", "FIX", "delete"}
+PROJECT_SCOPE_RENAMES = {
+    "cross_language_tourism_group_project": "cross_language_tourism_group_project",
+}
 
 
 class CodebookExportError(RuntimeError):
@@ -90,6 +93,7 @@ def export_chinese_codebook_template(
         for source_col, output_col in SOURCE_TO_OUTPUT.items():
             source_index = header_indexes[source_col]
             row[output_col] = _clean(source_row[source_index] if source_index < len(source_row) else "")
+        row["project_scope"] = PROJECT_SCOPE_RENAMES.get(row["project_scope"], row["project_scope"])
 
         if not any(row[column] for column in ("language", "code_family", "code", "keyword_original")):
             continue
