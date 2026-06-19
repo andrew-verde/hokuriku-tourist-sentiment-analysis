@@ -53,7 +53,8 @@ make sentiment-env
 
 Build Chinese social outputs from local `tourism-data`. This single target
 normalizes Xiaohongshu rows and the parsed Fukui Douyin comment CSV into the
-same Chinese social row schema before applying shared sentiment/friction code:
+same Chinese social row schema before applying SnowNLP plus reviewed
+friction/topic/positive-evidence codebook matching:
 
 ```bash
 TOURISM_DATA_DIR=/Users/andrewgreen/Repositories/tourism-data make chinese-social
@@ -112,9 +113,10 @@ versions, and readiness notes.
 Review templates live in `output/codebook_review/`. These are keyword lists only,
 not source text.
 
-The current Chinese analysis still supports friction keywords, but project aim is
-broader topic and sentiment analysis. Future work should promote the reviewed
-multilingual keyword CSV into a first-class config.
+The current Chinese analysis promotes reviewed Chinese codebook rows into the
+runtime evidence layer for friction, topic, and sentiment/recommendation terms.
+Legacy YAML friction terms remain documented, but reviewed rows supersede YAML
+terms for matching codes.
 
 Durable codebook and sentiment method notes:
 
@@ -141,9 +143,12 @@ Supported current columns:
 ```text
 XHS: note_id,title,note_url,author,author_url
 Douyin: video_id,title,video_url,author
-Douyin comments: source_record_id,comment_text,relative_time,parse_confidence,parse_notes
+Douyin comments: source_record_id,comment_text,relative_time,parse_confidence,parse_notes,source_start_line,source_end_line
 Manual body/comment text: body_text,comment_text,text,description,or content
 ```
+
+Parsed Douyin comment exports must preserve parser-line provenance and the
+`local_record_id_not_platform_comment_id` caveat in `parse_notes`.
 
 ## Research Boundary
 

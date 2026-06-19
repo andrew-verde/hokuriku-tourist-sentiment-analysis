@@ -58,11 +58,13 @@ Chinese social inputs are external and should remain external:
   needed: promote reviewed JP/EN decisions into runtime configs, promote reviewed
   Chinese rows if they supersede YAML, then report library-score/codebook
   disagreement rates.
-- [ ] Chinese social sentiment/topic pipeline: `scripts/build_chinese_social_media_dataset.py`
+- [x] Chinese social sentiment/topic pipeline: `scripts/build_chinese_social_media_dataset.py`
   builds cleaned Chinese social outputs with SnowNLP baseline sentiment from
   one `make chinese-social` trigger for Xiaohongshu rows and parsed Douyin
-  comments. Still needed: reviewed config promotion, stronger Douyin provenance
-  checks, and broader topic/enjoyment config wiring for presentation comparisons.
+  comments. Reviewed Chinese friction/topic/sentiment codebook rows now feed
+  runtime evidence matching, Douyin comment exports fail loud on missing parser
+  provenance fields, and aggregate topic/positive-evidence outputs are wired for
+  presentation comparisons.
 - [x] JP-EN Google review library sentiment: `scripts/build_sentiment_analysis.py`
   filters by Fukui prefecture metadata, scores English reviews with VADER,
   scores Japanese reviews with oseti, writes ignored row-level output, and tracks

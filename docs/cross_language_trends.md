@@ -23,7 +23,7 @@ Group membership is content language, never nationality.
 | Ingestion source | Companion repo social data located via `TOURISM_DATA_DIR`: raw Xiaohongshu/Douyin scrapes under `data/raw/social/*.csv`, plus the parsed Fukui Douyin comment export at `data/processed/fukui_douyin_comments_from_md.csv`; other processed CSVs remain annotations |
 | Fan-pilgrimage content | Keep it; left-join colleague's `theme`/`fan_score`/`travel_score` from `data/processed/*.csv` on note id; report comparisons for `all_posts` and `excluding_fan`; unmatched rows are `unclassified` |
 | Post dates | Parse from the Xiaohongshu author cell with a `post_date_precision` flag (`exact`/`year_inferred`/`relative_inferred`); inference anchored to the scrape file's git commit date (`CN_SCRAPE_REFERENCE_DATE` overrides) |
-| Post text | Current Chinese rows include post/comment body text where available; friction tagging remains directional until keyword matches are manually validated |
+| Post text | Current Chinese rows include post/comment body text where available; reviewed Chinese codebook rows now drive friction/topic/positive-evidence matching, but outputs remain descriptive until match precision is validated |
 | Headline deliverable | Fukui-first aggregate baseline snapshot: English/Japanese Google review volume and rating mean, plus Chinese social-media post volume and SnowNLP sentiment by platform |
 | Sentiment scales | Side-by-side, separate columns (`rating_mean` vs `sentiment_norm_mean`); never merged |
 | Code layout | Separate stage script `scripts/build_cross_language_trends.py` + `make cross-language-trends`; hard error (naming the make target) when inputs are missing |
@@ -48,6 +48,14 @@ make multilingual-reviews ──► make cross-language-trends
                   output/cross_language_trends/cross_language_baseline_snapshot.csv
                   output/cross_language_trends/date_scrub_requirements.csv
 ```
+
+`make chinese-social` also writes aggregate-safe Chinese evidence tables:
+
+- `chinese_friction_by_city_platform.csv`
+- `chinese_topic_by_city_platform.csv`
+- `chinese_enjoyment_evidence_by_city_platform.csv`
+- `douyin_provenance_report.json`
+- `chinese_reviewed_codebook_runtime_summary.csv`
 
 ## Expected growth
 
@@ -87,4 +95,6 @@ trend output is reintroduced, first scrub:
 - Chinese sentiment uses SnowNLP as the current baseline, not a validated
   project-specific sentiment model; Google star ratings and SnowNLP probability
   are different instruments.
-- Friction keyword tags on Chinese posts are unvalidated; treat as directional.
+- Friction/topic/positive-evidence keyword tags on Chinese posts are reviewed
+  codebook matches, but match precision is not yet independently validated;
+  treat rates as directional.

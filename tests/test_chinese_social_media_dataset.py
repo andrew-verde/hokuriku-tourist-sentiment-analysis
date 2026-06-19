@@ -7,8 +7,10 @@ import pandas as pd
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from scripts.build_chinese_social_media_dataset import (
+    InputSchemaError,
     build_chinese_social_outputs,
     discover_input_files,
+    load_chinese_codebook,
     load_theme_annotations,
     normalize_social_csv,
     parse_author_and_date,
@@ -87,6 +89,8 @@ def test_chinese_social_builder_tags_and_compares_populated_rows(tmp_path):
     fukui = tagged[tagged["city"] == "Fukui"].iloc[0]
     assert bool(fukui["transport_access"]) is True
     assert bool(fukui["any_friction"]) is True
+    assert "topic_codes" in tagged.columns
+    assert "enjoyment_evidence_codes" in tagged.columns
 
     friction = pd.read_csv(tmp_path / "out" / "chinese_friction_by_city_platform.csv")
     row = friction[
@@ -101,12 +105,26 @@ def test_chinese_social_builder_tags_and_compares_populated_rows(tmp_path):
     assert comparison.loc[0, "comparison_group"] == "google_english"
     assert set(comparison["chinese_subset"]) == {"all_posts", "excluding_fan"}
 
+    topic = pd.read_csv(tmp_path / "out" / "chinese_topic_by_city_platform.csv")
+    assert {"code_family", "code", "denominator_posts"}.issubset(topic.columns)
+
+    enjoyment = pd.read_csv(tmp_path / "out" / "chinese_enjoyment_evidence_by_city_platform.csv")
+    positive = enjoyment[
+        (enjoyment["city"] == "Fukui")
+        & (enjoyment["source_platform"] == "xiaohongshu")
+        & (enjoyment["code"] == "positive_sentiment")
+    ].iloc[0]
+    assert positive["count"] == 1
+
+    codebook_summary = pd.read_csv(tmp_path / "out" / "chinese_reviewed_codebook_runtime_summary.csv")
+    assert {"friction", "topic", "sentiment"}.issubset(set(codebook_summary["code_family"]))
+
 
 def test_normalize_social_csv_maps_douyin_comment_export(tmp_path):
     douyin = tmp_path / "fukui_douyin_comments_from_md.csv"
     douyin.write_text(
-        "source_record_id,douyin_post_id,author,comment_text,relative_time,parse_confidence,parse_notes\n"
-        "comment_000001,,旅行者,福井小众游超赞,2月前,medium,local_record_id_not_platform_comment_id\n",
+        "source_record_id,douyin_post_id,author,comment_text,relative_time,parse_confidence,parse_notes,source_start_line,source_end_line\n"
+        "comment_000001,,旅行者,福井小众游超赞,2月前,medium,local_record_id_not_platform_comment_id,10,12\n",
         encoding="utf-8",
     )
 
@@ -121,6 +139,48 @@ def test_normalize_social_csv_maps_douyin_comment_export(tmp_path):
     assert df.loc[0, "author"] == "旅行者"
     assert df.loc[0, "post_date"] == "2026-04-13"
     assert df.loc[0, "post_date_precision"] == "relative_inferred"
+
+
+def test_douyin_comment_export_fails_when_provenance_columns_missing(tmp_path):
+    douyin = tmp_path / "fukui_douyin_comments_from_md.csv"
+    douyin.write_text(
+        "source_record_id,comment_text,relative_time,parse_confidence,parse_notes\n"
+        "comment_000001,福井小众游超赞,2月前,medium,local_record_id_not_platform_comment_id\n",
+        encoding="utf-8",
+    )
+
+    try:
+        normalize_social_csv(douyin, reference_date=REFERENCE_DATE)
+    except InputSchemaError as error:
+        assert "source_start_line" in str(error)
+        assert "source_end_line" in str(error)
+    else:
+        raise AssertionError("Expected InputSchemaError")
+
+
+def test_douyin_comment_export_fails_without_parser_id_caveat(tmp_path):
+    douyin = tmp_path / "fukui_douyin_comments_from_md.csv"
+    douyin.write_text(
+        "source_record_id,douyin_post_id,author,comment_text,relative_time,parse_confidence,parse_notes,source_start_line,source_end_line\n"
+        "comment_000001,,旅行者,福井小众游超赞,2月前,medium,parsed_from_markdown,10,12\n",
+        encoding="utf-8",
+    )
+
+    try:
+        normalize_social_csv(douyin, reference_date=REFERENCE_DATE)
+    except InputSchemaError as error:
+        assert "missing_local_id_caveat" in str(error)
+    else:
+        raise AssertionError("Expected InputSchemaError")
+
+
+def test_reviewed_chinese_codebook_supersedes_legacy_yaml_terms():
+    codebook = load_chinese_codebook()
+
+    assert "都是英语" in codebook["language_information_gap"]["keywords"]
+    assert "英语" not in codebook["language_information_gap"]["keywords"]
+    assert codebook["scenic_nature"]["type"] == "topic"
+    assert "推荐" in codebook["recommendation_intent"]["keywords"]
 
 
 def test_parse_author_and_date_handles_xhs_display_forms():

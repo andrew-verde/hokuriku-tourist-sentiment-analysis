@@ -4,8 +4,8 @@ Build Chinese social-media tourism text analysis outputs.
 
 The input layer is schema-first and empty-data-safe. It normalizes Xiaohongshu
 rows and parsed Douyin comment exports from the companion tourism-data project into a
-review-like row schema, then applies Chinese friction keywords and transparent
-lexicon sentiment fields for comparison with the Google-review layers.
+review-like row schema, then applies SnowNLP plus reviewed Chinese
+friction/topic/sentiment evidence terms for comparison with Google-review layers.
 """
 
 from __future__ import annotations
@@ -88,6 +88,36 @@ REVIEWED_SENTIMENT_CODES = {
     "recommendation_intent": "reviewed_recommendation_terms_matched",
 }
 
+DOUYIN_COMMENT_REQUIRED_COLUMNS = {
+    "source_record_id",
+    "comment_text",
+    "relative_time",
+    "parse_confidence",
+    "parse_notes",
+    "source_start_line",
+    "source_end_line",
+}
+
+DOUYIN_LOCAL_ID_RE = re.compile(r"^comment_\d{6,}$")
+
+REVIEWED_CODEBOOK_REQUIRED_COLUMNS = {
+    "source_sheet",
+    "source_row_id",
+    "language",
+    "code_family",
+    "code",
+    "label_en",
+    "reviewer",
+    "review_decision",
+    "keyword_original",
+    "keyword_final",
+    "reviewed_at",
+}
+
+VALID_REVIEW_DECISIONS = {"no change", "fix", "delete"}
+EVIDENCE_CODE_TYPES = {"friction", "topic", "sentiment"}
+ENJOYMENT_EVIDENCE_CODES = {"positive_sentiment", "recommendation_intent"}
+
 CITY_ALIASES = {
     "fukui": "Fukui",
     "福井": "Fukui",
@@ -107,7 +137,18 @@ PLATFORM_ALIASES = {
 }
 
 
-def load_chinese_codebook(path: Path = CODEBOOK_PATH) -> dict:
+class InputSchemaError(RuntimeError):
+    pass
+
+
+class CodebookImportError(RuntimeError):
+    pass
+
+
+def load_chinese_codebook(
+    path: Path = CODEBOOK_PATH,
+    reviewed_path: Path = REVIEWED_CODEBOOK_PATH,
+) -> dict:
     with path.open(encoding="utf-8") as f:
         raw = yaml.safe_load(f) or {}
     codebook = {}
@@ -116,7 +157,14 @@ def load_chinese_codebook(path: Path = CODEBOOK_PATH) -> dict:
             "label": attrs["label"],
             "type": attrs["type"],
             "keywords": [str(keyword) for keyword in attrs.get("keywords", [])],
+            "source": "yaml_legacy_friction",
+            "reviewed_rows": [],
         }
+    if reviewed_path.exists():
+        reviewed = load_reviewed_codebook_config(reviewed_path)
+        # Reviewed rows supersede YAML terms for matching codes. This preserves
+        # delete/FIX decisions instead of appending reviewed terms onto stale YAML.
+        codebook.update(reviewed)
     return codebook
 
 
@@ -296,10 +344,177 @@ def sha256_file(path: Path) -> str:
     return digest.hexdigest()
 
 
+def _require_columns(df: pd.DataFrame, required: set[str], context: str) -> None:
+    missing = sorted(required - set(df.columns))
+    if missing:
+        raise InputSchemaError(f"{context} missing required columns: {missing}")
+
+
+def load_reviewed_codebook_config(path: Path = REVIEWED_CODEBOOK_PATH) -> dict:
+    if not path.exists():
+        raise CodebookImportError(f"Reviewed Chinese codebook template not found: {path}")
+    reviewed = pd.read_csv(path, encoding="utf-8-sig")
+    missing = sorted(REVIEWED_CODEBOOK_REQUIRED_COLUMNS - set(reviewed.columns))
+    if missing:
+        raise CodebookImportError(f"Reviewed Chinese codebook missing required columns: {missing}")
+
+    blank_decisions = reviewed["review_decision"].map(_clean_text).eq("")
+    if blank_decisions.any():
+        rows = reviewed.loc[blank_decisions, "source_row_id"].astype(str).head(5).tolist()
+        raise CodebookImportError(f"Reviewed Chinese codebook has blank review_decision rows: {rows}")
+
+    invalid_decisions = ~reviewed["review_decision"].map(_clean_text).str.lower().isin(VALID_REVIEW_DECISIONS)
+    if invalid_decisions.any():
+        rows = reviewed.loc[invalid_decisions, "source_row_id"].astype(str).head(5).tolist()
+        raise CodebookImportError(f"Reviewed Chinese codebook has invalid review_decision rows: {rows}")
+
+    chinese = reviewed[reviewed["language"].map(_clean_text) == "Chinese"].copy()
+    codebook: dict[str, dict] = {}
+    for _, row in chinese.iterrows():
+        family = _clean_text(row.get("code_family", "")).lower()
+        if family not in EVIDENCE_CODE_TYPES:
+            continue
+        code = _clean_text(row.get("code", ""))
+        if not code:
+            raise CodebookImportError(f"Reviewed Chinese codebook row missing code: {row.get('source_row_id')}")
+        decision = _clean_text(row.get("review_decision", "")).lower()
+        keyword = _clean_text(row.get("keyword_final", ""))
+        if decision in {"no change", "fix"} and not keyword:
+            raise CodebookImportError(
+                f"Reviewed Chinese codebook row missing keyword_final: {row.get('source_row_id')}"
+            )
+        entry = codebook.setdefault(
+            code,
+            {
+                "label": _clean_text(row.get("label_en", "")) or code,
+                "type": family,
+                "keywords": [],
+                "source": "reviewed_chinese_codebook_template",
+                "reviewed_rows": [],
+            },
+        )
+        if entry["type"] != family:
+            raise CodebookImportError(f"Reviewed Chinese codebook code has mixed families: {code}")
+        if decision != "delete" and keyword and keyword not in entry["keywords"]:
+            entry["keywords"].append(keyword)
+        entry["reviewed_rows"].append({
+            "source_sheet": _clean_text(row.get("source_sheet", "")),
+            "source_row_id": _clean_text(row.get("source_row_id", "")),
+            "review_decision": _clean_text(row.get("review_decision", "")),
+            "keyword_original": _clean_text(row.get("keyword_original", "")),
+            "keyword_final": keyword,
+            "reviewer": _clean_text(row.get("reviewer", "")),
+            "reviewed_at": _clean_text(row.get("reviewed_at", "")),
+        })
+
+    empty_codes = [code for code, attrs in codebook.items() if not attrs["keywords"]]
+    if empty_codes:
+        raise CodebookImportError(f"Reviewed Chinese codebook has no kept keywords for codes: {empty_codes}")
+    return codebook
+
+
+def reviewed_codebook_summary(codebook: dict) -> list[dict]:
+    rows = []
+    for code, attrs in sorted(codebook.items()):
+        reviewed_rows = attrs.get("reviewed_rows", [])
+        decisions: dict[str, int] = {}
+        reviewers = set()
+        reviewed_dates = set()
+        for row in reviewed_rows:
+            decision = _clean_text(row.get("review_decision", ""))
+            if decision:
+                decisions[decision] = decisions.get(decision, 0) + 1
+            reviewer = _clean_text(row.get("reviewer", ""))
+            if reviewer:
+                reviewers.add(reviewer)
+            reviewed_at = _clean_text(row.get("reviewed_at", ""))
+            if reviewed_at:
+                reviewed_dates.add(reviewed_at)
+        rows.append({
+            "code_family": attrs["type"],
+            "code": code,
+            "label": attrs["label"],
+            "keyword_count": len(attrs.get("keywords", [])),
+            "reviewed_row_count": len(reviewed_rows),
+            "review_decision_counts": json.dumps(decisions, ensure_ascii=False, sort_keys=True),
+            "reviewers": "|".join(sorted(reviewers)),
+            "reviewed_at": "|".join(sorted(reviewed_dates)),
+            "source": attrs.get("source", ""),
+        })
+    return rows
+
+
 def _read_input_table(path: Path) -> pd.DataFrame:
     if path.suffix.lower() in {".xlsx", ".xls"}:
         return pd.read_excel(path, sheet_name="fukui_xhs_reviews")
     return _read_input_csv(path)
+
+
+def is_douyin_comment_source(path: Path, df: pd.DataFrame) -> bool:
+    name = path.name.lower()
+    return "douyin" in name and ("comments" in name or "comment_text" in df.columns)
+
+
+def validate_douyin_comment_source(path: Path, source: pd.DataFrame) -> dict:
+    context = f"Douyin comment source {path}"
+    _require_columns(source, DOUYIN_COMMENT_REQUIRED_COLUMNS, context)
+    if source.empty:
+        return {
+            "source_file": str(path),
+            "source_sha256": sha256_file(path),
+            "rows": 0,
+            "status": "empty_schema_validated",
+        }
+
+    checks = {}
+    for column in DOUYIN_COMMENT_REQUIRED_COLUMNS:
+        checks[f"missing_{column}"] = int(source[column].map(_clean_text).eq("").sum())
+    bad_columns = {key: value for key, value in checks.items() if value}
+    if bad_columns:
+        raise InputSchemaError(f"{context} has blank provenance fields: {bad_columns}")
+
+    source_ids = source["source_record_id"].map(_clean_text)
+    duplicate_count = int(source_ids.duplicated().sum())
+    invalid_local_ids = int((~source_ids.str.match(DOUYIN_LOCAL_ID_RE)).sum())
+    notes = source["parse_notes"].map(_clean_text)
+    missing_parser_caveat = int((~notes.str.contains("local_record_id_not_platform_comment_id", regex=False)).sum())
+    confidence = source["parse_confidence"].map(_clean_text).str.lower()
+    unsupported_confidence = int((~confidence.isin({"medium", "high"})).sum())
+    start_lines = pd.to_numeric(source["source_start_line"], errors="coerce")
+    end_lines = pd.to_numeric(source["source_end_line"], errors="coerce")
+    invalid_line_spans = int((start_lines.isna() | end_lines.isna() | (end_lines < start_lines)).sum())
+
+    failures = {
+        "duplicate_source_record_id": duplicate_count,
+        "invalid_local_parser_id": invalid_local_ids,
+        "missing_local_id_caveat": missing_parser_caveat,
+        "unsupported_parse_confidence": unsupported_confidence,
+        "invalid_source_line_span": invalid_line_spans,
+    }
+    failures = {key: value for key, value in failures.items() if value}
+    if failures:
+        raise InputSchemaError(f"{context} provenance checks failed: {failures}")
+
+    parseable_time = source["relative_time"].apply(
+        lambda value: parse_douyin_relative_time(value, dt.date(2000, 1, 1))[1] != "none"
+    )
+    parse_notes_counts = source["parse_notes"].fillna("").astype(str).value_counts().to_dict()
+    return {
+        "source_file": str(path),
+        "source_sha256": sha256_file(path),
+        "rows": int(len(source)),
+        "status": "validated",
+        "source_record_id_kind": "local_parser_id_not_platform_comment_id",
+        "parse_confidence_counts": {
+            str(k): int(v) for k, v in source["parse_confidence"].fillna("").astype(str).value_counts().items()
+        },
+        "parse_notes_counts": {str(k): int(v) for k, v in parse_notes_counts.items()},
+        "relative_time_parseable_rows": int(parseable_time.sum()),
+        "relative_time_unparseable_rows": int((~parseable_time).sum()),
+        "post_id_available_rows": int(source.get("douyin_post_id", pd.Series(dtype=object)).map(_clean_text).ne("").sum())
+        if "douyin_post_id" in source.columns else 0,
+        "source_line_span_present_rows": int((start_lines.notna() & end_lines.notna()).sum()),
+    }
 
 
 def discover_input_files(input_dir: Path) -> list[Path]:
@@ -367,6 +582,8 @@ def load_theme_annotations(input_dir: Path) -> pd.DataFrame:
 
 def normalize_social_csv(path: Path, reference_date: dt.date | None = None) -> pd.DataFrame:
     source = _read_input_table(path)
+    if is_douyin_comment_source(path, source):
+        validate_douyin_comment_source(path, source)
     if source.empty:
         return pd.DataFrame(columns=SCHEMA_COLUMNS)
     if reference_date is None:
@@ -444,25 +661,11 @@ def _snownlp_sentiment(text: str) -> tuple[float, float, str]:
     return round(positive_prob, 6), round(centered, 6), category
 
 
-def _load_reviewed_terms(path: Path = REVIEWED_CODEBOOK_PATH) -> dict[str, list[str]]:
-    terms = {code: [] for code in REVIEWED_SENTIMENT_CODES}
-    if not path.exists():
-        return terms
-    reviewed = pd.read_csv(path)
-    required = {"code", "keyword_final", "review_decision"}
-    if not required.issubset(reviewed.columns):
-        return terms
-    for _, row in reviewed.iterrows():
-        code = _clean_text(row.get("code", ""))
-        if code not in terms:
-            continue
-        decision = _clean_text(row.get("review_decision", "")).lower()
-        if decision == "delete":
-            continue
-        keyword = _clean_text(row.get("keyword_final", ""))
-        if keyword and keyword not in terms[code]:
-            terms[code].append(keyword)
-    return terms
+def _reviewed_terms_from_codebook(codebook: dict) -> dict[str, list[str]]:
+    return {
+        code: list(codebook.get(code, {}).get("keywords", []))
+        for code in REVIEWED_SENTIMENT_CODES
+    }
 
 
 def _append_sentiment_fields(df: pd.DataFrame, reviewed_terms: dict[str, list[str]]) -> pd.DataFrame:
@@ -513,6 +716,8 @@ def _tag_chinese_dataframe(df: pd.DataFrame, codebook: dict) -> pd.DataFrame:
             lambda text, keywords=keywords: any(keyword in str(text) for keyword in keywords)
         )
     friction_codes = [code for code, attrs in codebook.items() if attrs["type"] == "friction"]
+    topic_codes = [code for code, attrs in codebook.items() if attrs["type"] == "topic"]
+    enjoyment_codes = [code for code in ENJOYMENT_EVIDENCE_CODES if code in codebook]
     if friction_codes:
         tagged["friction_codes"] = tagged[friction_codes].apply(
             lambda row: [code for code in friction_codes if bool(row[code])],
@@ -522,15 +727,37 @@ def _tag_chinese_dataframe(df: pd.DataFrame, codebook: dict) -> pd.DataFrame:
     else:
         tagged["friction_codes"] = [[] for _ in range(len(tagged))]
         tagged["any_friction"] = False
+    if topic_codes:
+        tagged["topic_codes"] = tagged[topic_codes].apply(
+            lambda row: [code for code in topic_codes if bool(row[code])],
+            axis=1,
+        )
+        tagged["any_topic"] = tagged[topic_codes].any(axis=1)
+    else:
+        tagged["topic_codes"] = [[] for _ in range(len(tagged))]
+        tagged["any_topic"] = False
+    if enjoyment_codes:
+        tagged["enjoyment_evidence_codes"] = tagged[enjoyment_codes].apply(
+            lambda row: [code for code in enjoyment_codes if bool(row[code])],
+            axis=1,
+        )
+        tagged["any_enjoyment_evidence"] = tagged[enjoyment_codes].any(axis=1)
+    else:
+        tagged["enjoyment_evidence_codes"] = [[] for _ in range(len(tagged))]
+        tagged["any_enjoyment_evidence"] = False
     return tagged
 
 
-def _friction_summary(
-    tagged: pd.DataFrame, codebook: dict, group_cols: list[str] | None = None
+def _code_summary(
+    tagged: pd.DataFrame,
+    codebook: dict,
+    code_family: str,
+    group_cols: list[str] | None = None,
+    codes: list[str] | None = None,
 ) -> pd.DataFrame:
     group_cols = group_cols or ["city", "source_platform"]
     rows = []
-    codes = [code for code, attrs in codebook.items() if attrs["type"] == "friction"]
+    codes = codes or [code for code, attrs in codebook.items() if attrs["type"] == code_family]
     grouped = tagged.groupby(group_cols, dropna=False)
     for keys, group in grouped:
         if not isinstance(keys, tuple):
@@ -540,13 +767,38 @@ def _friction_summary(
             count = int(group[code].sum()) if code in group.columns else 0
             rows.append({
                 **dict(zip(group_cols, keys)),
-                "friction_code": code,
-                "friction_label": codebook[code]["label"],
+                "code_family": codebook[code]["type"],
+                "code": code,
+                "label": codebook[code]["label"],
                 "count": count,
                 "denominator_posts": denominator,
                 "pct_posts": round(100 * count / denominator, 3) if denominator else 0.0,
             })
     return pd.DataFrame(rows)
+
+
+def _friction_summary(
+    tagged: pd.DataFrame, codebook: dict, group_cols: list[str] | None = None
+) -> pd.DataFrame:
+    summary = _code_summary(tagged, codebook, "friction", group_cols)
+    if summary.empty:
+        return summary
+    return summary.rename(columns={"code": "friction_code", "label": "friction_label"}).drop(
+        columns=["code_family"]
+    )
+
+
+def _topic_summary(
+    tagged: pd.DataFrame, codebook: dict, group_cols: list[str] | None = None
+) -> pd.DataFrame:
+    return _code_summary(tagged, codebook, "topic", group_cols)
+
+
+def _enjoyment_evidence_summary(
+    tagged: pd.DataFrame, codebook: dict, group_cols: list[str] | None = None
+) -> pd.DataFrame:
+    codes = [code for code in ENJOYMENT_EVIDENCE_CODES if code in codebook]
+    return _code_summary(tagged, codebook, "sentiment", group_cols, codes)
 
 
 def _theme_summary(df: pd.DataFrame) -> pd.DataFrame:
@@ -707,6 +959,10 @@ def _write_readiness(report: dict, path: Path) -> None:
         f"- Row-level output SHA256: `{report['row_level_output_sha256']}`",
         f"- Reviewed codebook template: `{report['reviewed_codebook_path']}`",
         f"- Reviewed codebook SHA256: `{report['reviewed_codebook_sha256']}`",
+        f"- Reviewed codebook rows promoted: {report['reviewed_codebook_rows_promoted']}",
+        f"- Runtime codebook counts by family: {report['runtime_codebook_counts_by_family']}",
+        f"- Douyin provenance sources validated: {report['douyin_provenance_sources_validated']}",
+        f"- Douyin provenance report: `{report['douyin_provenance_report']}`",
         "",
         "## Caveats",
         "",
@@ -715,8 +971,9 @@ def _write_readiness(report: dict, path: Path) -> None:
         "- Douyin comment ids are local parser ids, not platform comment ids; use input hashes and parser notes for provenance.",
         "- Douyin comment dates are inferred from relative timestamps anchored to the parsed CSV reference date, so they are not exact publication dates.",
         "- Primary Chinese sentiment rows require post body text or comment text; rows without that text are smoke-test material only.",
-        "- Chinese friction tags are substring keyword matches from the YAML runtime codebook; reviewed CSV decisions are audit evidence but are not fully promoted into the friction runtime config yet.",
+        "- Chinese friction/topic/positive-evidence tags are substring keyword matches from reviewed Chinese codebook rows; they are audit evidence, not a validated causal explanation.",
         "- Chinese sentiment fields use SnowNLP as the canonical current baseline (`sentiment_norm`, `sentiment_score`, and `sentiment_category`); reviewed term matches remain transparent evidence columns.",
+        "- Positive/recommendation evidence is labeled as enjoyment evidence for presentation scanning only; do not treat it as a psychometric enjoyment scale.",
         "- Compare Chinese social-media rates with Google review-language rates descriptively because source platform behavior and text length differ.",
         "- Theme labels (fan / travel / ordinary) come from the companion tourism-data processed CSVs, joined on note id; rows without a label are `unclassified`.",
         "- `post_date` is parsed from the Xiaohongshu author cell; `post_date_precision` marks exact vs year-inferred vs relative-inferred values (inference anchored to the scrape commit date).",
@@ -735,7 +992,7 @@ def build_chinese_social_outputs(
     output_dir.mkdir(parents=True, exist_ok=True)
     input_files = input_files if input_files is not None else discover_input_files(input_dir)
     codebook = load_chinese_codebook()
-    reviewed_terms = _load_reviewed_terms()
+    reviewed_terms = _reviewed_terms_from_codebook(codebook)
 
     frames = [normalize_social_csv(path) for path in input_files]
     df = pd.concat(frames, ignore_index=True) if frames else pd.DataFrame(columns=SCHEMA_COLUMNS)
@@ -761,26 +1018,54 @@ def build_chinese_social_outputs(
         tagged["friction_codes"] = pd.Series(dtype=object)
     if "any_friction" not in tagged.columns:
         tagged["any_friction"] = pd.Series(dtype=bool)
+    if "topic_codes" not in tagged.columns:
+        tagged["topic_codes"] = pd.Series(dtype=object)
+    if "any_topic" not in tagged.columns:
+        tagged["any_topic"] = pd.Series(dtype=bool)
+    if "enjoyment_evidence_codes" not in tagged.columns:
+        tagged["enjoyment_evidence_codes"] = pd.Series(dtype=object)
+    if "any_enjoyment_evidence" not in tagged.columns:
+        tagged["any_enjoyment_evidence"] = pd.Series(dtype=bool)
 
     normalized_path = output_dir / "chinese_social_posts.csv"
     tagged_path = output_dir / "tagged_chinese_social_posts.csv"
     friction_summary_path = output_dir / "chinese_friction_by_city_platform.csv"
     friction_theme_path = output_dir / "chinese_friction_by_city_platform_theme.csv"
+    topic_summary_path = output_dir / "chinese_topic_by_city_platform.csv"
+    topic_theme_path = output_dir / "chinese_topic_by_city_platform_theme.csv"
+    enjoyment_summary_path = output_dir / "chinese_enjoyment_evidence_by_city_platform.csv"
+    enjoyment_theme_path = output_dir / "chinese_enjoyment_evidence_by_city_platform_theme.csv"
     theme_summary_path = output_dir / "chinese_theme_by_city_platform.csv"
     sentiment_summary_path = output_dir / "chinese_sentiment_by_city_platform.csv"
     within_tests_path = output_dir / "chinese_city_platform_friction_tests.csv"
     review_comparison_path = output_dir / "chinese_vs_review_language_friction_comparison.csv"
+    codebook_summary_path = output_dir / "chinese_reviewed_codebook_runtime_summary.csv"
+    douyin_provenance_path = output_dir / "douyin_provenance_report.json"
     report_json_path = output_dir / "chinese_social_readiness.json"
     report_md_path = output_dir / "chinese_social_readiness.md"
 
     friction_columns = ["city", "source_platform", "friction_code", "friction_label", "count", "denominator_posts", "pct_posts"]
+    evidence_columns = ["city", "source_platform", "code_family", "code", "label", "count", "denominator_posts", "pct_posts"]
+    evidence_theme_columns = ["city", "source_platform", "theme", *evidence_columns[2:]]
     friction_summary = _friction_summary(tagged, codebook) if not tagged.empty else pd.DataFrame(columns=friction_columns)
     friction_by_theme = _friction_summary(tagged, codebook, ["city", "source_platform", "theme"]) if not tagged.empty else pd.DataFrame(
         columns=["city", "source_platform", "theme", *friction_columns[2:]]
     )
+    topic_summary = _topic_summary(tagged, codebook) if not tagged.empty else pd.DataFrame(columns=evidence_columns)
+    topic_by_theme = _topic_summary(tagged, codebook, ["city", "source_platform", "theme"]) if not tagged.empty else pd.DataFrame(columns=evidence_theme_columns)
+    enjoyment_summary = _enjoyment_evidence_summary(tagged, codebook) if not tagged.empty else pd.DataFrame(columns=evidence_columns)
+    enjoyment_by_theme = _enjoyment_evidence_summary(tagged, codebook, ["city", "source_platform", "theme"]) if not tagged.empty else pd.DataFrame(columns=evidence_theme_columns)
     theme_summary = _theme_summary(df)
     sentiment_summary = _sentiment_summary(df)
     within_tests = _within_chinese_tests(tagged, codebook) if not tagged.empty else pd.DataFrame()
+    codebook_summary = pd.DataFrame(reviewed_codebook_summary(codebook))
+    douyin_provenance = []
+    for path in input_files:
+        if not path.exists():
+            continue
+        source_table = _read_input_table(path)
+        if is_douyin_comment_source(path, source_table):
+            douyin_provenance.append(validate_douyin_comment_source(path, source_table))
 
     # Fan-pilgrimage notes are a distinct travel motivation, so the EN/JP
     # review comparison is reported both for all posts and excluding them.
@@ -798,16 +1083,26 @@ def build_chinese_social_outputs(
     tagged.to_csv(tagged_path, index=False)
     friction_summary.to_csv(friction_summary_path, index=False)
     friction_by_theme.to_csv(friction_theme_path, index=False)
+    topic_summary.to_csv(topic_summary_path, index=False)
+    topic_by_theme.to_csv(topic_theme_path, index=False)
+    enjoyment_summary.to_csv(enjoyment_summary_path, index=False)
+    enjoyment_by_theme.to_csv(enjoyment_theme_path, index=False)
     theme_summary.to_csv(theme_summary_path, index=False)
     sentiment_summary.to_csv(sentiment_summary_path, index=False)
     within_tests.to_csv(within_tests_path, index=False)
     review_comparison.to_csv(review_comparison_path, index=False)
+    codebook_summary.to_csv(codebook_summary_path, index=False)
+    douyin_provenance_path.write_text(json.dumps(douyin_provenance, ensure_ascii=False, indent=2), encoding="utf-8")
     row_level_hash = sha256_file(tagged_path)
     input_hashes = {str(path): sha256_file(path) for path in input_files if path.exists()}
     reviewed_hash = sha256_file(REVIEWED_CODEBOOK_PATH) if REVIEWED_CODEBOOK_PATH.exists() else None
     n_with_body_text = int(df["body_has_text"].sum()) if "body_has_text" in df.columns else 0
     n_title_only = int((~df["body_has_text"]).sum()) if "body_has_text" in df.columns else len(df)
     n_non_fan = int(((df["body_has_text"]) & (df["theme"] != "fan")).sum()) if not df.empty else 0
+    runtime_counts_by_family = {
+        str(k): int(v) for k, v in codebook_summary["code_family"].value_counts().items()
+    } if not codebook_summary.empty else {}
+    promoted_rows = int(codebook_summary["reviewed_row_count"].sum()) if not codebook_summary.empty else 0
 
     report = {
         "input_dir": str(input_dir),
@@ -829,16 +1124,27 @@ def build_chinese_social_outputs(
         "row_level_output_sha256": row_level_hash,
         "reviewed_codebook_path": str(REVIEWED_CODEBOOK_PATH),
         "reviewed_codebook_sha256": reviewed_hash,
-        "codebook_evidence_status": "reviewed_template_used_for_sentiment_terms; friction_yaml_not_fully_promoted",
+        "reviewed_codebook_rows_promoted": promoted_rows,
+        "runtime_codebook_counts_by_family": runtime_counts_by_family,
+        "codebook_evidence_status": "reviewed_chinese_template_promoted_for_friction_topic_sentiment_evidence",
+        "douyin_provenance_sources_validated": len(douyin_provenance),
+        "douyin_provenance_report": str(douyin_provenance_path),
+        "douyin_provenance": douyin_provenance,
         "outputs": {
             "chinese_social_posts": str(normalized_path),
             "tagged_chinese_social_posts": str(tagged_path),
             "chinese_friction_by_city_platform": str(friction_summary_path),
             "chinese_friction_by_city_platform_theme": str(friction_theme_path),
+            "chinese_topic_by_city_platform": str(topic_summary_path),
+            "chinese_topic_by_city_platform_theme": str(topic_theme_path),
+            "chinese_enjoyment_evidence_by_city_platform": str(enjoyment_summary_path),
+            "chinese_enjoyment_evidence_by_city_platform_theme": str(enjoyment_theme_path),
             "chinese_theme_by_city_platform": str(theme_summary_path),
             "chinese_sentiment_by_city_platform": str(sentiment_summary_path),
             "chinese_city_platform_friction_tests": str(within_tests_path),
             "chinese_vs_review_language_friction_comparison": str(review_comparison_path),
+            "chinese_reviewed_codebook_runtime_summary": str(codebook_summary_path),
+            "douyin_provenance_report": str(douyin_provenance_path),
             "chinese_social_readiness": str(report_md_path),
         },
     }

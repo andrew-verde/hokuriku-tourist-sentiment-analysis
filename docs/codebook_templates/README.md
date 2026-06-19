@@ -15,6 +15,9 @@ Required import rules:
 - `FIX`: use `keyword_final`; preserve `keyword_original`
 - `delete`: keep row for audit trail, but importer excludes it
 - blank `review_decision`: fail import
+- accepted friction/topic/sentiment rows are runtime evidence terms
+- reviewed friction rows supersede legacy YAML terms for the same code, so
+  `delete` and `FIX` decisions are honored
 
 `keyword_final` should always contain the exact term the pipeline should use
 for `No change` and `FIX` rows. For `delete` rows, leave `keyword_final` blank.

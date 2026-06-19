@@ -31,14 +31,16 @@ The current Douyin source is a parsed markdown comment export:
 Required Douyin comment columns:
 
 ```text
-source_record_id,comment_text,relative_time,parse_confidence,parse_notes
+source_record_id,comment_text,relative_time,parse_confidence,parse_notes,source_start_line,source_end_line
 ```
 
 `comment_text` maps into the same `text_content` / body-text analysis path as
 Xiaohongshu body text. `relative_time` is preserved and, when parsed, converted
 only to an approximate `post_date` with `post_date_precision ==
 "relative_inferred"`. Douyin `source_record_id` values are local parser ids, not
-platform comment ids.
+platform comment ids. Parsed Douyin comment exports must preserve parser-line
+provenance and `parse_notes` must explicitly carry the local-id caveat; otherwise
+the Chinese social build fails.
 
 Japanese-language and English-language reviews use the synced Google review
 table:
@@ -131,6 +133,17 @@ replacement term, reviewer, and review date when promoting them into runtime
 configs. Codebook matches should be reported as transparent evidence, not as a
 silent replacement for the pre-built sentiment library.
 
+Current Chinese runtime promotion uses the reviewed Chinese CSV for:
+
+```text
+friction keyword evidence
+topic keyword evidence
+positive/recommendation evidence
+```
+
+The positive/recommendation layer can support presentation scanning for
+"enjoyment evidence", but it is not a validated enjoyment scale.
+
 Japanese-language sentiment should use a dual-path design:
 
 1. Primary score path: `oseti` polarity scores and categories.
@@ -171,6 +184,10 @@ sentiment_category
 reviewed_positive_terms_matched
 reviewed_negative_terms_matched
 reviewed_recommendation_terms_matched
+topic_codes
+any_topic
+enjoyment_evidence_codes
+any_enjoyment_evidence
 ```
 
 English ignored row-level output:
