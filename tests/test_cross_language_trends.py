@@ -66,8 +66,22 @@ def test_baseline_filters_reviews_by_prefecture_metadata_and_keeps_scales_separa
     assert set(baseline["prefecture"]) == {"Fukui"}
     assert report["review_rows_retained"] == 3
     assert report["chinese_rows_retained"] == 3
+    assert report["schema_version"] == "cross_language_trends_manifest.v2"
+    assert len(report["reviews_input_sha256"]) == 64
+    assert len(report["chinese_input_sha256"]) == 64
     assert report["monthly_trends_enabled"] is False
     assert not (tmp_path / "out" / "monthly_trends.csv").exists()
+
+    manifest = json.loads((tmp_path / "out" / "cross_language_trends_readiness.json").read_text(encoding="utf-8"))
+    assert manifest["provenance"]["schema_version"] == "research_provenance.v1"
+    assert manifest["provenance"]["metrics"]["review_scope_method"] == ["poi_metadata_prefecture"]
+    assert manifest["provenance"]["metrics"]["chinese_scope_method"] == ["source_city_label"]
+    assert {record["role"] for record in manifest["provenance"]["inputs"]} == {
+        "reviews_multilingual",
+        "poi_metadata",
+        "tagged_chinese_social_posts",
+    }
+    assert all("sha256" in record for record in manifest["provenance"]["inputs"])
 
     english = baseline[baseline["group"] == "english"].iloc[0]
     # Google-review rows keep rating means but do not get Chinese sentiment means.

@@ -29,6 +29,7 @@ from scipy import stats
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from src.utils.logger import setup_logger
+from src.provenance import file_record, research_manifest, sha256_file, write_json
 
 load_dotenv()
 
@@ -373,16 +374,6 @@ def _read_input_csv(path: Path) -> pd.DataFrame:
         return pd.read_csv(path)
     except pd.errors.EmptyDataError:
         return pd.DataFrame()
-
-
-def sha256_file(path: Path) -> str:
-    # Hash files in chunks so large ignored input files can be fingerprinted
-    # without reading the whole file into memory.
-    digest = hashlib.sha256()
-    with path.open("rb") as handle:
-        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
-            digest.update(chunk)
-    return digest.hexdigest()
 
 
 def _require_columns(df: pd.DataFrame, required: set[str], context: str) -> None:
@@ -1200,6 +1191,7 @@ def build_chinese_social_outputs(
     promoted_rows = int(codebook_summary["reviewed_row_count"].sum()) if not codebook_summary.empty else 0
 
     report = {
+        "schema_version": "chinese_social_manifest.v2",
         "input_dir": str(input_dir),
         "input_files": [str(path) for path in input_files],
         "input_sha256": input_hashes,
@@ -1243,9 +1235,55 @@ def build_chinese_social_outputs(
             "chinese_social_readiness": str(report_md_path),
         },
     }
-    report_json_path.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
-    # JSON is machine-readable; markdown is easier for a human reviewer.
     _write_readiness(report, report_md_path)
+    report["provenance"] = research_manifest(
+        kind="chinese_social_media_analysis",
+        command=" ".join(sys.argv),
+        filters={
+            "input_dir": str(input_dir),
+            "primary_scope": "Chinese-language posts",
+            "fan_subset": "all_posts and excluding_fan",
+        },
+        inputs=[
+            *(file_record(path, "social_source_input", required=True) for path in input_files if path.exists()),
+            file_record(REVIEWED_CODEBOOK_PATH, "reviewed_chinese_codebook_template", required=True),
+            file_record(CODEBOOK_PATH, "legacy_yaml_codebook", required=True),
+            file_record(review_friction_path, "review_language_friction_comparison_input"),
+        ],
+        outputs=[
+            file_record(normalized_path, "ignored_normalized_chinese_rows", required=True),
+            file_record(tagged_path, "ignored_tagged_chinese_rows", required=True),
+            file_record(friction_summary_path, "aggregate_friction_by_city_platform", required=True),
+            file_record(topic_summary_path, "aggregate_topic_by_city_platform", required=True),
+            file_record(enjoyment_summary_path, "aggregate_enjoyment_evidence_by_city_platform", required=True),
+            file_record(sentiment_summary_path, "aggregate_sentiment_by_city_platform", required=True),
+            file_record(within_tests_path, "aggregate_within_chinese_tests", required=True),
+            file_record(codebook_summary_path, "aggregate_runtime_codebook_summary", required=True),
+            file_record(douyin_provenance_path, "douyin_provenance_report", required=True),
+            file_record(report_md_path, "readiness_markdown", required=True),
+        ],
+        metrics={
+            "rows_before_dedup": rows_before_dedup,
+            "duplicates_removed": duplicates_removed,
+            "rows_retained": len(df),
+            "source_platform_counts": report["source_platform_counts"],
+            "post_date_precision_counts": report["post_date_precision_counts"],
+            "runtime_codebook_counts_by_family": runtime_counts_by_family,
+        },
+        caveats=[
+            "Group labels describe content language/source platform, not nationality.",
+            "SnowNLP is a secondary model baseline; reviewed term matches remain transparent evidence.",
+            "Douyin comment IDs are local parser IDs, not platform comment IDs.",
+            "Relative and year-inferred dates are not exact monthly trend evidence.",
+            "Chinese social-media rates and Google review rates are descriptive cross-platform comparisons.",
+        ],
+        extra={
+            "codebook_evidence_status": report["codebook_evidence_status"],
+            "douyin_provenance": douyin_provenance,
+        },
+    )
+    write_json(report_json_path, report)
+    # JSON is machine-readable; markdown is easier for a human reviewer.
     return report
 
 

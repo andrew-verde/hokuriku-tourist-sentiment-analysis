@@ -172,6 +172,22 @@ def test_build_outputs_aggregate_excludes_forbidden_row_level_fields(tmp_path):
     assert report["outputs"]["row_level_sha256"] in readiness
     assert "codebook_evidence_status: pending" in readiness
 
+    manifest = json.loads((tmp_path / "agg" / "sentiment_manifest.json").read_text(encoding="utf-8"))
+    assert manifest["schema_version"] == "sentiment_manifest.v2"
+    assert manifest["provenance"]["schema_version"] == "research_provenance.v1"
+    assert {record["role"] for record in manifest["provenance"]["inputs"]} >= {
+        "reviews_multilingual",
+        "poi_metadata",
+    }
+    output_roles = {record["role"] for record in manifest["provenance"]["outputs"]}
+    assert "tracked_aggregate_summary" in output_roles
+    assert "tracked_statistical_tests" in output_roles
+    assert all(
+        "sha256" in record
+        for record in manifest["provenance"]["outputs"]
+        if record["role"].startswith("tracked_")
+    )
+
 
 def test_missing_input_and_columns_fail_loud(tmp_path):
     # Missing files or required columns should stop the pipeline, not generate
@@ -250,3 +266,4 @@ def test_prefecture_filter_uses_poi_metadata_not_city_name(tmp_path):
     assert set(row_level["municipality"]) == {"Fukui", "Eiheiji", "Ono"}
     assert "Toyama" not in set(row_level["prefecture_normalized"])
     assert report["input"]["poi_metadata_sha256"] == sha256_file(metadata)
+    assert report["provenance"]["metrics"]["scope_method"] == ["poi_metadata_prefecture"]

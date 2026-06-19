@@ -20,7 +20,6 @@ matching Chinese social inputs exist.
 from __future__ import annotations
 
 import argparse
-import json
 import sys
 from pathlib import Path
 
@@ -29,6 +28,14 @@ import pandas as pd
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from src.utils.logger import setup_logger
+from src.provenance import file_record, research_manifest, sha256_file, write_json
+from src.scope import (
+    MissingScopeColumnsError,
+    MissingScopeInputError,
+    load_poi_scope_metadata,
+    scope_reviews_by_poi_prefecture,
+    scope_rows_by_source_city_label,
+)
 
 logger = setup_logger(__name__)
 
@@ -84,21 +91,16 @@ def _require_input(path: Path, make_target: str) -> None:
 
 def load_poi_metadata(path: Path) -> pd.DataFrame:
     # POI metadata is the authority for prefecture scoping.
-    _require_input(path, "multilingual-reviews")
-    raw = json.loads(path.read_text(encoding="utf-8"))
-    rows = []
-    for poi_id, attrs in raw.items():
-        # Keep only the fields needed for prefecture scoping and simple output labels.
-        rows.append({
-            "poi_id": str(poi_id),
-            "prefecture_normalized": attrs.get("prefecture_normalized") or attrs.get("prefecture"),
-            "municipality": attrs.get("municipality") or attrs.get("municipality_short"),
-        })
-    metadata = pd.DataFrame(rows)
-    if metadata.empty or "prefecture_normalized" not in metadata.columns:
-        # Without prefecture data, Fukui-only filtering would be unreliable.
-        raise MissingInputError(f"POI metadata missing prefecture_normalized values: {path}")
-    return metadata
+    try:
+        return load_poi_scope_metadata(path)
+    except MissingScopeInputError as error:
+        raise MissingInputError(
+            f"Required input not found: {path}\n"
+            "Generate it first with `make multilingual-reviews`. "
+            "This pipeline has no demo mode."
+        ) from error
+    except MissingScopeColumnsError as error:
+        raise MissingInputError(str(error)) from error
 
 
 def load_review_rows(path: Path, poi_metadata_path: Path, prefecture: str) -> pd.DataFrame:
@@ -107,15 +109,13 @@ def load_review_rows(path: Path, poi_metadata_path: Path, prefecture: str) -> pd
     df = pd.read_csv(path)
     df = df[df["language_group"].astype(str).str.lower().isin(REVIEW_GROUPS)].copy()
     metadata = load_poi_metadata(poi_metadata_path)
-    df = df.merge(metadata, on="poi_id", how="left", validate="many_to_one")
-    missing = df["prefecture_normalized"].isna()
-    if missing.any():
-        missing_ids = sorted(df.loc[missing, "poi_id"].astype(str).unique())[:5]
+    try:
+        scoped = scope_reviews_by_poi_prefecture(df, metadata, prefecture)
+    except MissingScopeColumnsError as error:
         raise MissingInputError(
             "Review rows missing POI prefecture metadata; rerun `make multilingual-reviews`. "
-            f"Example poi_id values: {missing_ids}"
-        )
-    scoped = df[df["prefecture_normalized"].astype(str) == prefecture].copy()
+            f"{error}"
+        ) from error
     # Normalize numeric/date-like columns before any aggregate calculation happens.
     scoped["review_rating"] = pd.to_numeric(scoped.get("review_rating"), errors="coerce")
     scoped["review_date_present"] = pd.to_datetime(scoped.get("review_date"), errors="coerce", utc=True).notna()
@@ -128,7 +128,10 @@ def load_chinese_rows(path: Path, prefecture: str) -> pd.DataFrame:
     df = pd.read_csv(path)
     if df.empty:
         return df
-    scoped = df[df["city"].astype(str) == prefecture].copy()
+    try:
+        scoped = scope_rows_by_source_city_label(df, prefecture)
+    except MissingScopeColumnsError as error:
+        raise MissingInputError(str(error)) from error
     # Leave the Chinese layer in its original shape except for the columns used here.
     scoped["sentiment_norm"] = pd.to_numeric(scoped.get("sentiment_norm"), errors="coerce")
     if "sentiment_category" not in scoped.columns:
@@ -309,11 +312,15 @@ def build_cross_language_trends(
     date_scrub.to_csv(date_scrub_path, index=False)
 
     report = {
+        "schema_version": "cross_language_trends_manifest.v2",
         "prefecture": prefecture,
         "neighboring_prefecture_scaffold": NEIGHBORING_PREFECTURE_SCAFFOLD,
         "reviews_input": str(reviews_path),
+        "reviews_input_sha256": sha256_file(reviews_path),
         "poi_metadata_input": str(poi_metadata_path),
+        "poi_metadata_input_sha256": sha256_file(poi_metadata_path),
         "chinese_input": str(chinese_path),
+        "chinese_input_sha256": sha256_file(chinese_path),
         "review_rows_retained": int(len(reviews)),
         "chinese_rows_retained": int(len(chinese)),
         "chinese_date_precision_counts": (
@@ -331,8 +338,56 @@ def build_cross_language_trends(
             "cross_language_trends_readiness": str(report_md_path),
         },
     }
-    report_json_path.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
     _write_readiness(report, report_md_path)
+    report["outputs"].update({
+        "cross_language_baseline_snapshot_sha256": sha256_file(baseline_path),
+        "date_scrub_requirements_sha256": sha256_file(date_scrub_path),
+        "cross_language_trends_readiness_sha256": sha256_file(report_md_path),
+    })
+    report["provenance"] = research_manifest(
+        kind="cross_language_baseline",
+        command=" ".join(sys.argv),
+        filters={
+            "prefecture": prefecture,
+            "review_groups": REVIEW_GROUPS,
+            "chinese_group": CHINESE_GROUP,
+        },
+        inputs=[
+            file_record(reviews_path, "reviews_multilingual", required=True),
+            file_record(poi_metadata_path, "poi_metadata", required=True),
+            file_record(chinese_path, "tagged_chinese_social_posts", required=True),
+        ],
+        outputs=[
+            file_record(baseline_path, "aggregate_cross_language_baseline", required=True),
+            file_record(date_scrub_path, "aggregate_date_scrub_requirements", required=True),
+            file_record(report_md_path, "readiness_markdown", required=True),
+        ],
+        metrics={
+            "review_rows_retained": int(len(reviews)),
+            "chinese_rows_retained": int(len(chinese)),
+            "review_scope_method": (
+                sorted(str(value) for value in reviews["scope_method"].dropna().unique())
+                if "scope_method" in reviews.columns else []
+            ),
+            "chinese_scope_method": (
+                sorted(str(value) for value in chinese["scope_method"].dropna().unique())
+                if "scope_method" in chinese.columns else []
+            ),
+            "monthly_trends_enabled": False,
+            "chinese_date_precision_counts": report["chinese_date_precision_counts"],
+        },
+        caveats=[
+            "Group membership is content language/source platform, not nationality.",
+            "Chinese SnowNLP sentiment and Google review ratings are separate instruments.",
+            "Monthly trend output is disabled until Chinese post dates are exact enough.",
+            "Default output is Fukui-only.",
+        ],
+        extra={
+            "neighboring_prefecture_scaffold": NEIGHBORING_PREFECTURE_SCAFFOLD,
+            "monthly_trends_disabled_reason": report["monthly_trends_disabled_reason"],
+        },
+    )
+    write_json(report_json_path, report)
     return report
 
 

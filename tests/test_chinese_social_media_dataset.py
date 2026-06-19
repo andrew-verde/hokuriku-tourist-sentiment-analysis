@@ -1,4 +1,5 @@
 import datetime as dt
+import json
 import sys
 from pathlib import Path
 
@@ -33,6 +34,14 @@ def test_chinese_social_builder_handles_schema_only_csv(tmp_path):
         review_friction_path=tmp_path / "missing_review_friction.csv",
     )
 
+    manifest = json.loads((tmp_path / "out" / "chinese_social_readiness.json").read_text(encoding="utf-8"))
+    assert manifest["schema_version"] == "chinese_social_manifest.v2"
+    assert manifest["provenance"]["schema_version"] == "research_provenance.v1"
+    assert {record["role"] for record in manifest["provenance"]["inputs"]} >= {
+        "social_source_input",
+        "reviewed_chinese_codebook_template",
+        "legacy_yaml_codebook",
+    }
     assert report["input_files_discovered"] == 1
     assert report["rows_retained"] == 0
     assert (tmp_path / "out" / "chinese_social_posts.csv").exists()

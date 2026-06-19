@@ -11,7 +11,6 @@ from __future__ import annotations
 
 import argparse
 import datetime as dt
-import hashlib
 import json
 import sys
 from dataclasses import dataclass
@@ -26,6 +25,20 @@ from scipy import stats
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from src.utils.logger import setup_logger
+from src.provenance import (
+    ProvenanceError,
+    assert_no_forbidden_columns,
+    file_record,
+    research_manifest,
+    sha256_file,
+    write_json,
+)
+from src.scope import (
+    MissingScopeColumnsError,
+    MissingScopeInputError,
+    load_poi_scope_metadata,
+    scope_reviews_by_poi_prefecture,
+)
 
 logger = setup_logger(__name__)
 
@@ -105,15 +118,6 @@ class PipelinePaths:
     aggregate_output_dir: Path = DEFAULT_AGG_OUTPUT_DIR
 
 
-def sha256_file(path: Path) -> str:
-    # Hash the file in chunks so large inputs do not need to be loaded at once.
-    digest = hashlib.sha256()
-    with path.open("rb") as handle:
-        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
-            digest.update(chunk)
-    return digest.hexdigest()
-
-
 def sentiment_category(score: float, band: float = PRIMARY_BAND) -> str:
     # Convert a numeric sentiment score into the coarse category used in reports.
     if pd.isna(score):
@@ -157,38 +161,16 @@ def dependency_versions() -> dict[str, str]:
 
 
 def load_poi_metadata(path: Path) -> pd.DataFrame:
-    if not path.exists():
+    try:
+        return load_poi_scope_metadata(path)
+    except MissingScopeInputError as error:
         raise MissingInputError(
             f"Required POI metadata not found: {path}\n"
             "Generate or sync it first with `make multilingual-reviews`. "
             "Prefecture filtering requires checkpoint POI metadata."
-        )
-    raw = json.loads(path.read_text(encoding="utf-8"))
-    if not isinstance(raw, dict):
-        raise MissingColumnsError(f"POI metadata must be a JSON object keyed by poi_id: {path}")
-    rows = []
-    for poi_id, attrs in raw.items():
-        # Keep only the metadata needed to filter review rows by prefecture.
-        if isinstance(attrs, dict):
-            rows.append({
-                "poi_id": str(poi_id),
-                "metadata_poi_name": attrs.get("name"),
-                "prefecture": attrs.get("prefecture"),
-                "prefecture_normalized": attrs.get("prefecture_normalized"),
-                "municipality": attrs.get("municipality"),
-                "municipality_short": attrs.get("municipality_short"),
-                "prefecture_metadata_source": attrs.get("metadata_source"),
-                "prefecture_metadata_language": attrs.get("metadata_language"),
-            })
-    metadata = pd.DataFrame(rows)
-    required = {"poi_id", "prefecture_normalized"}
-    missing = sorted(required - set(metadata.columns))
-    if missing:
-        raise MissingColumnsError(f"Required POI metadata columns missing from {path}: {', '.join(missing)}")
-    if metadata["poi_id"].duplicated().any():
-        duplicates = sorted(metadata.loc[metadata["poi_id"].duplicated(), "poi_id"].unique())
-        raise MissingColumnsError(f"Duplicate poi_id values in POI metadata: {duplicates[:5]}")
-    return metadata
+        ) from error
+    except MissingScopeColumnsError as error:
+        raise MissingColumnsError(str(error)) from error
 
 
 def require_dependency(module_name: str, package_name: str | None = None):
@@ -287,20 +269,11 @@ def load_reviews(
     # columns later in this function.
     if prefecture:
         # Prefecture filtering depends on POI metadata because the review file only stores poi_id.
-        if "poi_id" not in filtered.columns:
-            raise MissingColumnsError("Prefecture filtering requires reviews column: poi_id")
         metadata = load_poi_metadata(poi_metadata_path)
-        # many_to_one means many review rows may point to one POI, but each POI
-        # id in metadata must appear once. Pandas raises if that is not true.
-        filtered = filtered.merge(metadata, on="poi_id", how="left", validate="many_to_one")
-        missing_metadata = filtered["prefecture_normalized"].isna()
-        if missing_metadata.any():
-            missing_count = int(missing_metadata.sum())
-            raise MissingColumnsError(
-                f"POI metadata missing for {missing_count} requested review rows; "
-                "prefecture filtering would be incomplete."
-            )
-        filtered = filtered[filtered["prefecture_normalized"].astype(str) == prefecture].copy()
+        try:
+            filtered = scope_reviews_by_poi_prefecture(filtered, metadata, prefecture)
+        except MissingScopeColumnsError as error:
+            raise MissingColumnsError(str(error)) from error
     if city:
         filtered = filtered[filtered["city"].astype(str) == city].copy()
     filtered["language_group"] = filtered["language_group"].astype(str).str.lower()
@@ -718,11 +691,10 @@ def build_tests(scored: pd.DataFrame) -> pd.DataFrame:
 
 def assert_no_forbidden_aggregate_columns(df: pd.DataFrame) -> None:
     # Prevent row-level text and IDs from leaking into tracked aggregate outputs.
-    forbidden = sorted(FORBIDDEN_AGGREGATE_COLUMNS & set(df.columns))
-    if forbidden:
-        raise SentimentPipelineError(
-            f"Aggregate output contains forbidden row-level/PII columns: {', '.join(forbidden)}"
-        )
+    try:
+        assert_no_forbidden_columns(df.columns, FORBIDDEN_AGGREGATE_COLUMNS, "Aggregate output")
+    except ProvenanceError as error:
+        raise SentimentPipelineError(str(error)) from error
 
 
 def write_readiness(report: dict, summary: pd.DataFrame, tests: pd.DataFrame, path: Path) -> None:
@@ -831,8 +803,10 @@ def build_sentiment_analysis(
 
     # The manifest is machine-readable provenance; readiness markdown is the
     # same run summarized for humans.
+    generated_at = dt.datetime.now(dt.UTC).replace(microsecond=0).isoformat()
     report = {
-        "generated_at": dt.datetime.now(dt.UTC).replace(microsecond=0).isoformat(),
+        "schema_version": "sentiment_manifest.v2",
+        "generated_at": generated_at,
         "command": command or " ".join(sys.argv),
         "filters": {"city": city, "prefecture": prefecture, "groups": groups},
         "primary_unit": "one Google review row",
@@ -862,8 +836,44 @@ def build_sentiment_analysis(
         },
         "denominators": json.loads(summary.to_json(orient="records")),
     }
-    manifest_path.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
     write_readiness(report, summary, tests, readiness_path)
+    report["provenance"] = research_manifest(
+        kind="jp_en_sentiment_analysis",
+        command=report["command"],
+        generated_at=generated_at,
+        filters=report["filters"],
+        inputs=[
+            file_record(paths.reviews_path, "reviews_multilingual", required=True),
+            file_record(paths.poi_metadata_path, "poi_metadata", required=bool(prefecture)),
+        ],
+        outputs=[
+            file_record(row_path, "ignored_row_level_scored_reviews", required=True),
+            file_record(summary_path, "tracked_aggregate_summary", required=True),
+            file_record(tests_path, "tracked_statistical_tests", required=True),
+            file_record(readiness_path, "tracked_readiness_markdown", required=True),
+        ],
+        metrics={
+            "primary_unit": report["primary_unit"],
+            "scope_method": (
+                sorted(str(value) for value in reviews["scope_method"].dropna().unique())
+                if "scope_method" in reviews.columns else []
+            ),
+            "denominators": report["denominators"],
+            "bootstrap_seed": BOOTSTRAP_SEED,
+            "bootstrap_iterations": BOOTSTRAP_ITERATIONS,
+        },
+        caveats=[
+            "Group labels describe review language, not reviewer nationality.",
+            "VADER and oseti scores are tool-specific; compare category shares and within-tool distributions.",
+            "POI-level and cluster-bootstrap rows are sensitivity checks.",
+            "Reviewed JP/EN codebook evidence path is pending.",
+        ],
+        extra={
+            "dependency_versions": report["dependency_versions"],
+            "dependency_reproducibility": report["dependency_reproducibility"],
+        },
+    )
+    write_json(manifest_path, report)
     return report
 
 

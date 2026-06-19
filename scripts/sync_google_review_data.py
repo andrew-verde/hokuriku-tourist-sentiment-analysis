@@ -9,11 +9,11 @@ analysis outputs. It intentionally skips official survey outputs.
 from __future__ import annotations
 
 import argparse
-import hashlib
-import json
 import os
 import shutil
 from pathlib import Path
+
+from src.provenance import file_record, research_manifest, sha256_file, write_json
 
 ROOT = Path(__file__).resolve().parent.parent
 SOURCE_REPO_CANDIDATES = (
@@ -50,11 +50,7 @@ def _require_dir(path: Path) -> None:
 
 
 def _sha256(path: Path) -> str:
-    digest = hashlib.sha256()
-    with path.open("rb") as handle:
-        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
-            digest.update(chunk)
-    return digest.hexdigest()
+    return sha256_file(path)
 
 
 def _manifest_path(path: Path, base: Path) -> str:
@@ -97,13 +93,34 @@ def sync_google_review_data(
         ))
 
     manifest = {
+        "schema_version": "google_review_sync_manifest.v2",
         "source_repo": str(source_repo),
         "synced_dirs": [str(path) for path in SYNC_DIRS],
         "skipped": ["output/official_fukui", "output/hokuriku_merged", "survey outputs"],
         "files": copied_files,
     }
+    manifest["provenance"] = research_manifest(
+        kind="google_review_sync",
+        command=None,
+        inputs=[
+            file_record(source_repo / relative_dir, f"source_{relative_dir.as_posix()}", required=True)
+            for relative_dir in SYNC_DIRS
+        ],
+        outputs=[
+            file_record(output_root / relative_dir.name, f"synced_{relative_dir.name}", required=True)
+            for relative_dir in SYNC_DIRS
+        ],
+        metrics={
+            "files_synced": len(copied_files),
+            "synced_dirs": [str(path) for path in SYNC_DIRS],
+        },
+        caveats=[
+            "Only Google review checkpoints and multilingual review analysis outputs are synced.",
+            "Official survey outputs are skipped.",
+        ],
+    )
     manifest_path = output_root / "google_review_sync_manifest.json"
-    manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
+    write_json(manifest_path, manifest)
     return manifest
 
 

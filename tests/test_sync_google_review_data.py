@@ -31,4 +31,7 @@ def test_sync_google_review_data_copies_review_artifacts_and_skips_surveys(tmp_p
     assert "output/official_fukui" in manifest["skipped"]
 
     manifest_on_disk = json.loads((out / "google_review_sync_manifest.json").read_text(encoding="utf-8"))
+    assert manifest_on_disk["schema_version"] == "google_review_sync_manifest.v2"
+    assert manifest_on_disk["provenance"]["schema_version"] == "research_provenance.v1"
+    assert manifest_on_disk["provenance"]["metrics"]["files_synced"] == 2
     assert len(manifest_on_disk["files"]) == 2
