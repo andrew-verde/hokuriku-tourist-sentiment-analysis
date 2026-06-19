@@ -1,6 +1,4 @@
-"""
-Logging utilities for the project.
-"""
+"""Small helper for creating a consistent project logger."""
 
 import logging
 import os
@@ -9,40 +7,40 @@ from datetime import datetime
 
 def setup_logger(name: str, log_level=logging.INFO) -> logging.Logger:
     """
-    Set up a logger with file and console handlers.
-    
+    Create a logger that writes to both the terminal and a dated log file.
+
     Args:
-        name: Logger name (usually __name__)
-        log_level: Logging level (default: INFO)
-        
+        name: Logger name, usually ``__name__`` from the caller.
+        log_level: Minimum level to record.
+
     Returns:
-        Configured logger instance
+        A logger instance ready for reuse.
     """
     logger = logging.getLogger(name)
     logger.setLevel(log_level)
-    
-    # Create logs directory if it doesn't exist
+
+    # Keep logs in one shared folder so repeated runs land in the same place.
     log_dir = 'logs'
     if not os.path.exists(log_dir):
         os.makedirs(log_dir)
-    
-    # File handler
+
+    # One file per day keeps the log history easy to scan.
     log_file = os.path.join(log_dir, f'analysis_{datetime.now().strftime("%Y%m%d")}.log')
     file_handler = logging.FileHandler(log_file)
     file_handler.setLevel(log_level)
-    
-    # Console handler
+
+    # Also send the same messages to the terminal while the script runs.
     console_handler = logging.StreamHandler()
     console_handler.setLevel(log_level)
-    
-    # Formatter
+
+    # Use the same line format everywhere so file and console output match.
     formatter = logging.Formatter(
         '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
     )
     file_handler.setFormatter(formatter)
     console_handler.setFormatter(formatter)
-    
-    # Add handlers
+
+    # Avoid adding duplicate handlers if the caller asks for the same logger twice.
     if not logger.handlers:
         logger.addHandler(file_handler)
         logger.addHandler(console_handler)

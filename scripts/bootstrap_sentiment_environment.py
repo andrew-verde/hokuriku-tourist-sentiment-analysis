@@ -21,6 +21,7 @@ OSETI_PIN = "oseti==0.4.3.1"
 
 
 def _read_lock(path: Path) -> list[str]:
+    # Keep only real requirement lines; blank lines and comments are ignored.
     requirements = []
     for raw_line in path.read_text(encoding="utf-8").splitlines():
         line = raw_line.strip()
@@ -35,6 +36,7 @@ def _run(args: list[str]) -> None:
 
 
 def _installed_versions(packages: list[str]) -> dict[str, str]:
+    # Import names and distribution names differ for some packages, so map them carefully.
     versions = {}
     for requirement in packages:
         package = requirement.split("==", 1)[0]
@@ -44,6 +46,7 @@ def _installed_versions(packages: list[str]) -> dict[str, str]:
 
 
 def _smoke_test_oseti() -> None:
+    # Run a tiny sentence check so we know the tokenizer and dictionary wiring work.
     import ipadic
     import oseti
 
@@ -54,6 +57,7 @@ def _smoke_test_oseti() -> None:
 
 
 def main() -> int:
+    # Install the pinned stack first, then install oseti without its legacy dependency set.
     requirements = _read_lock(LOCK_PATH)
     if OSETI_PIN not in requirements:
         raise RuntimeError(f"{LOCK_PATH} must include {OSETI_PIN}")

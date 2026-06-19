@@ -5,6 +5,7 @@ from scripts.parse_xhs_google_doc_xml import parse_document
 
 
 def _write_word_xml(path: Path, paragraphs: list[str]) -> None:
+    # Write just enough Word XML structure for the parser to find document paragraphs.
     body = "".join(
         f'<w:p><w:r><w:t>{text}</w:t></w:r></w:p>'
         for text in paragraphs
@@ -25,6 +26,7 @@ def _write_word_xml(path: Path, paragraphs: list[str]) -> None:
 
 
 def test_parse_document_splits_posts_and_comments_with_index_anchor(tmp_path):
+    # The fixture mixes a title, body text, a comment block, and a second post.
     xml_path = tmp_path / "xhs.xml"
     _write_word_xml(
         xml_path,
@@ -63,6 +65,7 @@ def test_parse_document_splits_posts_and_comments_with_index_anchor(tmp_path):
 
     posts, comments, summary = parse_document(xml_path, index_path)
 
+    # The parser should split the document into two posts and preserve comment metadata.
     assert summary["posts"] == 2
     assert posts[0]["doc_title"] == "福井一日游"
     assert posts[0]["post_date_raw"] == "2025-10-01"

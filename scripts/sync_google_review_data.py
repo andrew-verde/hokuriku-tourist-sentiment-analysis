@@ -33,6 +33,7 @@ class SyncInputError(RuntimeError):
 
 
 def default_source_repo() -> Path:
+    # Prefer an explicit override, then the known local repo paths.
     override = os.environ.get("ENGLISH_FUKUI_TOURISM_DIR")
     if override:
         return Path(override)
@@ -43,6 +44,7 @@ def default_source_repo() -> Path:
 
 
 def _require_dir(path: Path) -> None:
+    # Fail loudly if a required source folder is missing.
     if not path.is_dir():
         raise SyncInputError(f"Required Google review source directory not found: {path}")
 
@@ -63,6 +65,7 @@ def _manifest_path(path: Path, base: Path) -> str:
 
 
 def _copy_dir(src: Path, dst: Path, manifest_base: Path) -> list[dict[str, object]]:
+    # Copy the directory tree, then record file metadata for the manifest.
     _require_dir(src)
     dst.parent.mkdir(parents=True, exist_ok=True)
     shutil.copytree(src, dst, dirs_exist_ok=True)
@@ -82,6 +85,7 @@ def sync_google_review_data(
     source_repo: Path | None = None,
     output_root: Path = DEFAULT_OUTPUT_ROOT,
 ) -> dict[str, object]:
+    # Only sync the review-analysis folders that this repo actually consumes.
     source_repo = source_repo or default_source_repo()
     copied_files: list[dict[str, object]] = []
     manifest_base = output_root.parent

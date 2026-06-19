@@ -5,6 +5,7 @@ from scripts.sync_google_review_data import sync_google_review_data
 
 
 def test_sync_google_review_data_copies_review_artifacts_and_skips_surveys(tmp_path):
+    # Set up a fake source repo with the two folders this sync script is allowed to copy.
     source = tmp_path / "english-fukui-tourism"
     checkpoints = source / "output" / "checkpoints"
     multilingual = source / "output" / "multilingual_review_analysis"
@@ -23,6 +24,7 @@ def test_sync_google_review_data_copies_review_artifacts_and_skips_surveys(tmp_p
     out = tmp_path / "hokuriku" / "output"
     manifest = sync_google_review_data(source, out)
 
+    # The survey folder is intentionally left behind, while review-analysis files are copied.
     assert (out / "checkpoints" / "google_fukui.json").exists()
     assert (out / "multilingual_review_analysis" / "reviews_multilingual.csv").exists()
     assert not (out / "official_fukui").exists()

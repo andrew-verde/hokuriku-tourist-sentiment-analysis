@@ -21,6 +21,8 @@ REFERENCE_DATE = dt.date(2026, 6, 12)
 
 
 def test_chinese_social_builder_handles_schema_only_csv(tmp_path):
+    # A header-only input is valid during early data collection: it should build
+    # empty output files instead of crashing or inventing sample rows.
     xhs = tmp_path / "fukui_xhs_reviews.csv"
     xhs.write_text("note_id,title,note_url,author,author_url\n", encoding="utf-8")
 
@@ -38,6 +40,8 @@ def test_chinese_social_builder_handles_schema_only_csv(tmp_path):
 
 
 def test_normalize_social_csv_maps_xhs_schema_to_review_like_rows(tmp_path):
+    # Xiaohongshu rows start with social-media column names; the normalizer
+    # converts them into the shared row schema used by later summaries.
     xhs = tmp_path / "fukui_xhs_reviews.csv"
     xhs.write_text(
         "note_id,title,note_url,author,author_url\n"
@@ -56,6 +60,8 @@ def test_normalize_social_csv_maps_xhs_schema_to_review_like_rows(tmp_path):
 
 
 def test_chinese_social_builder_tags_and_compares_populated_rows(tmp_path):
+    # This exercises the full mini-pipeline: ingest two platforms, tag friction,
+    # write aggregate files, and compare against a tiny Google-review summary.
     xhs = tmp_path / "fukui_xhs_reviews.csv"
     xhs.write_text(
         "note_id,title,note_url,author,author_url\n"
@@ -86,6 +92,8 @@ def test_chinese_social_builder_tags_and_compares_populated_rows(tmp_path):
     assert report["rows_retained"] == 3
 
     tagged = pd.read_csv(tmp_path / "out" / "tagged_chinese_social_posts.csv")
+    # `tagged` is row-level and lives under ignored output in real runs; tests
+    # read it to prove the boolean evidence columns were created.
     fukui = tagged[tagged["city"] == "Fukui"].iloc[0]
     assert bool(fukui["transport_access"]) is True
     assert bool(fukui["any_friction"]) is True
@@ -106,9 +114,12 @@ def test_chinese_social_builder_tags_and_compares_populated_rows(tmp_path):
     assert set(comparison["chinese_subset"]) == {"all_posts", "excluding_fan"}
 
     topic = pd.read_csv(tmp_path / "out" / "chinese_topic_by_city_platform.csv")
+    # Topic output is aggregate-safe: code names and counts only, no source text.
     assert {"code_family", "code", "denominator_posts"}.issubset(topic.columns)
 
     enjoyment = pd.read_csv(tmp_path / "out" / "chinese_enjoyment_evidence_by_city_platform.csv")
+    # "Enjoyment" here means positive/recommendation keyword evidence, not a
+    # validated psychology scale.
     positive = enjoyment[
         (enjoyment["city"] == "Fukui")
         & (enjoyment["source_platform"] == "xiaohongshu")
@@ -121,6 +132,8 @@ def test_chinese_social_builder_tags_and_compares_populated_rows(tmp_path):
 
 
 def test_normalize_social_csv_maps_douyin_comment_export(tmp_path):
+    # Douyin comments use local parser IDs and relative times; the parser keeps
+    # those caveats visible in normalized fields.
     douyin = tmp_path / "fukui_douyin_comments_from_md.csv"
     douyin.write_text(
         "source_record_id,douyin_post_id,author,comment_text,relative_time,parse_confidence,parse_notes,source_start_line,source_end_line\n"
@@ -142,6 +155,8 @@ def test_normalize_social_csv_maps_douyin_comment_export(tmp_path):
 
 
 def test_douyin_comment_export_fails_when_provenance_columns_missing(tmp_path):
+    # Parsed Douyin files need line-number provenance so another reviewer can
+    # trace a row back to the markdown export.
     douyin = tmp_path / "fukui_douyin_comments_from_md.csv"
     douyin.write_text(
         "source_record_id,comment_text,relative_time,parse_confidence,parse_notes\n"
@@ -159,6 +174,7 @@ def test_douyin_comment_export_fails_when_provenance_columns_missing(tmp_path):
 
 
 def test_douyin_comment_export_fails_without_parser_id_caveat(tmp_path):
+    # The pipeline must not treat local parser IDs like real platform comment IDs.
     douyin = tmp_path / "fukui_douyin_comments_from_md.csv"
     douyin.write_text(
         "source_record_id,douyin_post_id,author,comment_text,relative_time,parse_confidence,parse_notes,source_start_line,source_end_line\n"
@@ -175,6 +191,8 @@ def test_douyin_comment_export_fails_without_parser_id_caveat(tmp_path):
 
 
 def test_reviewed_chinese_codebook_supersedes_legacy_yaml_terms():
+    # Reviewed CSV decisions are now runtime inputs, so FIX/delete decisions
+    # must override older YAML keywords for the same code.
     codebook = load_chinese_codebook()
 
     assert "都是英语" in codebook["language_information_gap"]["keywords"]
@@ -184,6 +202,8 @@ def test_reviewed_chinese_codebook_supersedes_legacy_yaml_terms():
 
 
 def test_parse_author_and_date_handles_xhs_display_forms():
+    # Xiaohongshu dates appear in several display formats; this verifies the
+    # precision label that tells downstream code how trustworthy the date is.
     assert parse_author_and_date("Juunae 2025-08-14", REFERENCE_DATE) == ("Juunae", "2025-08-14", "exact")
     assert parse_author_and_date("momo 05-25", REFERENCE_DATE) == ("momo", "2026-05-25", "year_inferred")
     # Month-day later than the scrape date belongs to the previous year.
@@ -194,6 +214,8 @@ def test_parse_author_and_date_handles_xhs_display_forms():
 
 
 def test_parse_douyin_relative_time_marks_approximate_dates():
+    # Douyin relative times become approximate dates only; they never become
+    # exact monthly-trend evidence.
     assert parse_douyin_relative_time("1周前", REFERENCE_DATE) == ("2026-06-05", "relative_inferred")
     assert parse_douyin_relative_time("2月前", REFERENCE_DATE) == ("2026-04-13", "relative_inferred")
     assert parse_douyin_relative_time("6年前", REFERENCE_DATE) == ("2020-06-13", "relative_inferred")
@@ -201,6 +223,8 @@ def test_parse_douyin_relative_time_marks_approximate_dates():
 
 
 def test_discover_input_files_searches_raw_social_layout(tmp_path):
+    # Discovery should find source-like social CSVs and the current parsed
+    # Douyin comments export, while ignoring unrelated files.
     social_dir = tmp_path / "data" / "raw" / "social"
     social_dir.mkdir(parents=True)
     (social_dir / "fukui_xhs_reviews.csv").write_text("note_id,title,note_url,author,author_url\n", encoding="utf-8")
@@ -216,6 +240,8 @@ def test_discover_input_files_searches_raw_social_layout(tmp_path):
 
 
 def test_theme_annotations_join_from_processed_csv(tmp_path):
+    # Colleague theme/fan/travel annotations live in processed files and are
+    # joined as annotations, not used as the text source of truth.
     social_dir = tmp_path / "data" / "raw" / "social"
     social_dir.mkdir(parents=True)
     raw = social_dir / "fukui_xhs_reviews.csv"
@@ -256,6 +282,8 @@ def test_theme_annotations_join_from_processed_csv(tmp_path):
 
 
 def test_unmatched_rows_fall_back_to_unclassified_theme(tmp_path):
+    # Rows without an annotation should still survive; `unclassified` makes the
+    # missing theme explicit in denominator reporting.
     social_dir = tmp_path / "data" / "raw" / "social"
     social_dir.mkdir(parents=True)
     (social_dir / "fukui_xhs_reviews.csv").write_text(

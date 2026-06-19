@@ -62,6 +62,7 @@ class CodebookExportError(RuntimeError):
 
 
 def _clean(value: object) -> str:
+    # Excel cells can come back as None; normalize everything to plain text for CSV output.
     return "" if value is None else str(value).strip()
 
 
@@ -70,6 +71,7 @@ def export_chinese_codebook_template(
     output_path: Path = DEFAULT_OUTPUT,
     reviewed_at: str = "",
 ) -> list[dict[str, str]]:
+    # Read the reviewed workbook and convert the Chinese sheet into a stable CSV layout.
     workbook = load_workbook(workbook_path, read_only=True, data_only=True)
     if CHINESE_SHEET not in workbook.sheetnames:
         raise CodebookExportError(f"Workbook missing required sheet: {CHINESE_SHEET}")
@@ -86,6 +88,7 @@ def export_chinese_codebook_template(
 
     exported: list[dict[str, str]] = []
     for excel_row_number, source_row in enumerate(rows[1:], start=2):
+        # Start each output row empty, then fill only the fields we know how to map.
         row = {column: "" for column in OUTPUT_COLUMNS}
         row["source_sheet"] = CHINESE_SHEET
         row["source_row_id"] = str(excel_row_number)

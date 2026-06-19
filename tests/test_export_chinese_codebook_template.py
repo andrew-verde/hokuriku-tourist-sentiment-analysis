@@ -7,6 +7,7 @@ from scripts.export_chinese_codebook_template import export_chinese_codebook_tem
 
 
 def test_export_preserves_chinese_characters_and_review_decisions(tmp_path):
+    # Build a tiny in-memory workbook so the test controls every source cell.
     workbook_path = tmp_path / "review.xlsx"
     output_path = tmp_path / "review.csv"
 
@@ -65,6 +66,7 @@ def test_export_preserves_chinese_characters_and_review_decisions(tmp_path):
 
     rows = export_chinese_codebook_template(workbook_path, output_path, reviewed_at="2026-06-18")
 
+    # "No change" copies the original keyword, and "FIX" uses the suggested replacement.
     assert rows[0]["keyword_final"] == "交通不便"
     assert rows[1]["keyword_final"] == "都是英语"
     assert output_path.read_bytes().startswith(b"\xef\xbb\xbf")

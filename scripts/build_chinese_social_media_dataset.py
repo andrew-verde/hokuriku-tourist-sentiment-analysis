@@ -35,16 +35,22 @@ load_dotenv()
 logger = setup_logger(__name__)
 
 ROOT = Path(__file__).resolve().parent.parent
+# Default to the companion tourism-data checkout, but allow an environment
+# override so the script can point at a different local copy.
 DEFAULT_INPUT_DIR = Path(
     os.getenv("TOURISM_DATA_DIR", "/home/andrewgreen/Repositories/external/tourism-data")
 )
 OUTPUT_DIR = ROOT / "output" / "chinese_social_media_analysis"
+# YAML is the legacy friction source; the reviewed CSV is the current audit
+# source for promoted Chinese evidence terms.
 CODEBOOK_PATH = ROOT / "config" / "chinese_social_friction_codebook.yaml"
 REVIEWED_CODEBOOK_PATH = ROOT / "docs" / "codebook_templates" / "chinese_reviewed_codebook_template.csv"
 DEFAULT_XHS_MANUAL_WORKBOOK = ROOT / "docs" / "codebook_reviews" / "source" / "fukui_xhs_reviews_manual.xlsx"
 MULTILINGUAL_FRICTION_PATH = ROOT / "output" / "multilingual_review_analysis" / "friction_by_city_language_group.csv"
 
 SOURCE_COLUMNS = [
+    # Source fields mirror names that can identify rows. They are useful for
+    # ignored row-level outputs, but must not be copied into tracked aggregates.
     "city",
     "source_platform",
     "source_file",
@@ -60,6 +66,8 @@ SOURCE_COLUMNS = [
 ]
 
 SCHEMA_COLUMNS = [
+    # Every source is normalized into these columns before sentiment/topic logic
+    # runs. Keeping one schema makes XHS notes and Douyin comments comparable.
     *SOURCE_COLUMNS,
     "post_date",
     "post_date_precision",
@@ -73,22 +81,28 @@ SCHEMA_COLUMNS = [
 THEME_COLUMNS = ["theme", "fan_score", "travel_score"]
 
 POSITIVE_TERMS = [
+    # Legacy transparent lexicon terms. SnowNLP is now the main score, but this
+    # simple count remains useful as a lightweight interpretable field.
     "好", "方便", "便利", "推荐", "值得", "喜欢", "美", "震撼", "舒服", "干净",
     "热情", "新鲜", "便宜", "顺利", "梦幻", "完善", "直达",
 ]
 
 NEGATIVE_TERMS = [
+    # Same idea as POSITIVE_TERMS, but for friction/negative language.
     "不便", "不方便", "差", "贵", "拥挤", "排队", "少", "旧", "脏", "难",
     "堵", "累", "坑", "售罄", "关门", "没开", "找不到", "看不懂",
 ]
 
 REVIEWED_SENTIMENT_CODES = {
+    # Map reviewed codebook code names to row-level evidence column names.
     "positive_sentiment": "reviewed_positive_terms_matched",
     "negative_sentiment": "reviewed_negative_terms_matched",
     "recommendation_intent": "reviewed_recommendation_terms_matched",
 }
 
 DOUYIN_COMMENT_REQUIRED_COLUMNS = {
+    # These fields prove the parsed Douyin row can be traced back to the local
+    # parser output. Without them, the parser source is too weak for audit.
     "source_record_id",
     "comment_text",
     "relative_time",
@@ -119,6 +133,7 @@ EVIDENCE_CODE_TYPES = {"friction", "topic", "sentiment"}
 ENJOYMENT_EVIDENCE_CODES = {"positive_sentiment", "recommendation_intent"}
 
 CITY_ALIASES = {
+    # Tokens that may appear in file names or explicit city columns.
     "fukui": "Fukui",
     "福井": "Fukui",
     "kanazawa": "Kanazawa",
@@ -129,6 +144,7 @@ CITY_ALIASES = {
 }
 
 PLATFORM_ALIASES = {
+    # Tokens that may appear in file names or explicit platform columns.
     "xhs": "xiaohongshu",
     "xiaohongshu": "xiaohongshu",
     "小红书": "xiaohongshu",
@@ -149,6 +165,8 @@ def load_chinese_codebook(
     path: Path = CODEBOOK_PATH,
     reviewed_path: Path = REVIEWED_CODEBOOK_PATH,
 ) -> dict:
+    # Start with the older YAML codebook so tests/old runs still have a base
+    # structure, then replace matching codes with reviewed CSV decisions.
     with path.open(encoding="utf-8") as f:
         raw = yaml.safe_load(f) or {}
     codebook = {}
@@ -169,6 +187,8 @@ def load_chinese_codebook(
 
 
 def _clean_text(value: object) -> str:
+    # Normalize missing values, pandas NaN, and repeated whitespace to a
+    # single stable string form before comparisons.
     if pd.isna(value):
         return ""
     text = str(value).strip()
@@ -199,6 +219,8 @@ def scrape_reference_date(path: Path) -> dt.date:
     """
     override = os.getenv("CN_SCRAPE_REFERENCE_DATE", "").strip()
     if override:
+        # Manual override is useful when analyzing copied files outside their
+        # original Git history.
         return dt.date.fromisoformat(override)
     try:
         committed = subprocess.run(
@@ -219,6 +241,7 @@ def parse_author_and_date(raw: str, reference_date: dt.date) -> tuple[str, str, 
         return "", "", "none"
     match = _DATE_FULL_RE.match(value)
     if match:
+        # Full YYYY-MM-DD is the safest case: no inference required.
         try:
             parsed = dt.date.fromisoformat(match.group("date"))
         except ValueError:
@@ -226,6 +249,8 @@ def parse_author_and_date(raw: str, reference_date: dt.date) -> tuple[str, str, 
         return match.group("author").strip(), parsed.isoformat(), "exact"
     match = _DATE_MONTH_DAY_RE.match(value)
     if match:
+        # XHS often omits the year. Use the scrape year unless that would put
+        # the post after the scrape date, then roll back one year.
         try:
             parsed = dt.date(reference_date.year, int(match.group("month")), int(match.group("day")))
         except ValueError:
@@ -235,6 +260,7 @@ def parse_author_and_date(raw: str, reference_date: dt.date) -> tuple[str, str, 
         return match.group("author").strip(), parsed.isoformat(), "year_inferred"
     match = _DATE_RELATIVE_DAY_RE.match(value)
     if match:
+        # Words like 今天/昨天/前天 are anchored to the scrape reference date.
         offset = {"今天": 0, "昨天": 1, "前天": 2}[match.group("word")]
         parsed = reference_date - dt.timedelta(days=offset)
         return match.group("author").strip(), parsed.isoformat(), "relative_inferred"
@@ -264,6 +290,7 @@ def parse_douyin_relative_time(raw: object, reference_date: dt.date) -> tuple[st
     count = int(match.group("count"))
     unit = match.group("unit")
     if unit == "分钟前" or unit == "小时前":
+        # Minute/hour precision is collapsed to the same calendar day.
         days = 0
     elif unit == "天前":
         days = count
@@ -279,6 +306,8 @@ def parse_douyin_relative_time(raw: object, reference_date: dt.date) -> tuple[st
 
 
 def _infer_city(path: Path, row: pd.Series) -> str:
+    # Prefer an explicit city cell, then fall back to filename hints when the
+    # source file already encodes the city in its name.
     explicit = _clean_text(row.get("city", ""))
     haystack = " ".join([explicit, path.stem, path.name]).lower()
     for token, city in CITY_ALIASES.items():
@@ -297,6 +326,8 @@ def _infer_platform(path: Path, row: pd.Series) -> str:
 
 
 def _source_record_id(row: pd.Series, platform: str) -> str:
+    # Reuse any existing identifier field first; only hash the row when the
+    # source did not provide a stable record id.
     candidates = ["source_record_id", "note_id", "video_id", "id", "note_url", "video_url", "url"]
     for field in candidates:
         value = _clean_text(row.get(field, ""))
@@ -307,6 +338,8 @@ def _source_record_id(row: pd.Series, platform: str) -> str:
 
 
 def _source_url(row: pd.Series) -> str:
+    # Preserve source URL in ignored row-level outputs when present, but do not
+    # include it in aggregate/tracked summaries.
     for field in ["source_url", "note_url", "video_url", "url"]:
         value = _clean_text(row.get(field, ""))
         if value:
@@ -315,11 +348,15 @@ def _source_url(row: pd.Series) -> str:
 
 
 def _record_id(city: str, platform: str, source_record_id: str, text: str) -> str:
+    # Hash several stable fields into one short local row id. The hash avoids
+    # writing long source identifiers into downstream filenames/reports.
     raw = f"{city}|{platform}|{source_record_id}|{text}"
     return hashlib.sha256(raw.encode()).hexdigest()[:12]
 
 
 def _lexicon_sentiment(text: str) -> tuple[float, float, float]:
+    # Count matched positive and negative terms, then map the result onto a
+    # simple -1..1 score plus a 0..1 normalized value.
     if not text:
         return 0.0, 0.5, 0.0
     positive = sum(text.count(term) for term in POSITIVE_TERMS)
@@ -330,6 +367,8 @@ def _lexicon_sentiment(text: str) -> tuple[float, float, float]:
 
 
 def _read_input_csv(path: Path) -> pd.DataFrame:
+    # Empty CSVs are allowed during collection; return an empty DataFrame rather
+    # than letting pandas raise.
     try:
         return pd.read_csv(path)
     except pd.errors.EmptyDataError:
@@ -337,6 +376,8 @@ def _read_input_csv(path: Path) -> pd.DataFrame:
 
 
 def sha256_file(path: Path) -> str:
+    # Hash files in chunks so large ignored input files can be fingerprinted
+    # without reading the whole file into memory.
     digest = hashlib.sha256()
     with path.open("rb") as handle:
         for chunk in iter(lambda: handle.read(1024 * 1024), b""):
@@ -351,6 +392,8 @@ def _require_columns(df: pd.DataFrame, required: set[str], context: str) -> None
 
 
 def load_reviewed_codebook_config(path: Path = REVIEWED_CODEBOOK_PATH) -> dict:
+    # Read the reviewed template and promote only Chinese rows that still map
+    # to the supported evidence families.
     if not path.exists():
         raise CodebookImportError(f"Reviewed Chinese codebook template not found: {path}")
     reviewed = pd.read_csv(path, encoding="utf-8-sig")
@@ -414,6 +457,7 @@ def load_reviewed_codebook_config(path: Path = REVIEWED_CODEBOOK_PATH) -> dict:
 
 
 def reviewed_codebook_summary(codebook: dict) -> list[dict]:
+    # Collapse the reviewed rows into a compact per-code audit summary.
     rows = []
     for code, attrs in sorted(codebook.items()):
         reviewed_rows = attrs.get("reviewed_rows", [])
@@ -445,6 +489,7 @@ def reviewed_codebook_summary(codebook: dict) -> list[dict]:
 
 
 def _read_input_table(path: Path) -> pd.DataFrame:
+    # The manual Xiaohongshu source is an Excel workbook; most other sources are CSV.
     if path.suffix.lower() in {".xlsx", ".xls"}:
         return pd.read_excel(path, sheet_name="fukui_xhs_reviews")
     return _read_input_csv(path)
@@ -456,6 +501,8 @@ def is_douyin_comment_source(path: Path, df: pd.DataFrame) -> bool:
 
 
 def validate_douyin_comment_source(path: Path, source: pd.DataFrame) -> dict:
+    # The Douyin export is treated as an already-parsed source table, so this
+    # function validates the provenance fields instead of the free text itself.
     context = f"Douyin comment source {path}"
     _require_columns(source, DOUYIN_COMMENT_REQUIRED_COLUMNS, context)
     if source.empty:
@@ -528,6 +575,8 @@ def discover_input_files(input_dir: Path) -> list[Path]:
         return []
     search_dirs = [input_dir, input_dir / "data" / "raw" / "social"]
     files = []
+    # In the normal repo workflow, prefer the reviewed/manual workbook for XHS
+    # body text instead of older raw title-only CSVs.
     use_repo_workbook = input_dir == DEFAULT_INPUT_DIR or input_dir.name == "tourism-data"
     if use_repo_workbook and DEFAULT_XHS_MANUAL_WORKBOOK.exists():
         files.append(DEFAULT_XHS_MANUAL_WORKBOOK)
@@ -548,6 +597,7 @@ def discover_input_files(input_dir: Path) -> list[Path]:
 
 
 def discover_theme_files(input_dir: Path) -> list[Path]:
+    # Theme annotations are processed CSVs from the companion repo.
     processed_dir = input_dir / "data" / "processed"
     if not processed_dir.exists():
         return []
@@ -565,11 +615,13 @@ def load_theme_annotations(input_dir: Path) -> pd.DataFrame:
     for path in discover_theme_files(input_dir):
         df = _read_input_csv(path)
         if df.empty or "theme" not in df.columns:
+            # Processed files without a theme column are unrelated to fan/travel annotations.
             continue
         id_col = next((c for c in ["note_id", "video_id", "id"] if c in df.columns), None)
         if id_col is None:
             continue
         annotation = pd.DataFrame({"source_record_id": df[id_col].map(_clean_text)})
+        # Keep only annotation fields; never use processed rows as text source.
         annotation["theme"] = df["theme"].map(_clean_text)
         for column in ["fan_score", "travel_score"]:
             annotation[column] = pd.to_numeric(df[column], errors="coerce") if column in df.columns else pd.NA
@@ -581,6 +633,8 @@ def load_theme_annotations(input_dir: Path) -> pd.DataFrame:
 
 
 def normalize_social_csv(path: Path, reference_date: dt.date | None = None) -> pd.DataFrame:
+    # Turn each source row into the shared review-like schema used by the rest
+    # of the pipeline.
     source = _read_input_table(path)
     if is_douyin_comment_source(path, source):
         validate_douyin_comment_source(path, source)
@@ -591,6 +645,9 @@ def normalize_social_csv(path: Path, reference_date: dt.date | None = None) -> p
 
     rows = []
     for _, row in source.iterrows():
+        # Merge title and body/comment fields into one text field for matching.
+        # Body/comment text is preferred when available, title-only rows remain
+        # possible for smoke tests and denominator reporting.
         title = _clean_text(row.get("title", ""))
         body = (
             _clean_text(row.get("body_text", ""))
@@ -601,6 +658,7 @@ def normalize_social_csv(path: Path, reference_date: dt.date | None = None) -> p
         )
         text_content = " ".join(part for part in [title, body] if part).strip()
         if not text_content:
+            # Rows with no text cannot be scored or matched, so drop them.
             continue
 
         city = _infer_city(path, row)
@@ -608,11 +666,13 @@ def normalize_social_csv(path: Path, reference_date: dt.date | None = None) -> p
         source_record_id = _source_record_id(row, platform)
         sentiment_score, sentiment_norm, intensity = _lexicon_sentiment(text_content)
         if platform == "douyin" and "relative_time" in source.columns:
+            # Douyin comments do not expose exact dates in the current export.
             author = _clean_text(row.get("author", ""))
             post_date, post_date_precision = parse_douyin_relative_time(
                 row.get("relative_time", ""), reference_date
             )
         else:
+            # XHS date parsing is tied to the author display cell.
             author, post_date, post_date_precision = parse_author_and_date(
                 row.get("author", ""), reference_date
             )
@@ -641,6 +701,8 @@ def normalize_social_csv(path: Path, reference_date: dt.date | None = None) -> p
 
 
 def _snownlp_sentiment(text: str) -> tuple[float, float, str]:
+    # SnowNLP returns probability of positive sentiment. Centering maps that
+    # 0..1 value into -1..1 so categories match the EN/JP threshold style.
     if not text:
         return 0.5, 0.0, "neutral"
     try:
@@ -662,6 +724,8 @@ def _snownlp_sentiment(text: str) -> tuple[float, float, str]:
 
 
 def _reviewed_terms_from_codebook(codebook: dict) -> dict[str, list[str]]:
+    # Pull only the reviewed sentiment/recommendation terms needed for the
+    # transparent evidence columns.
     return {
         code: list(codebook.get(code, {}).get("keywords", []))
         for code in REVIEWED_SENTIMENT_CODES
@@ -669,6 +733,8 @@ def _reviewed_terms_from_codebook(codebook: dict) -> dict[str, list[str]]:
 
 
 def _append_sentiment_fields(df: pd.DataFrame, reviewed_terms: dict[str, list[str]]) -> pd.DataFrame:
+    # This adds both library-based sentiment columns and transparent keyword
+    # evidence columns, keeping the two forms of signal separate.
     scored = df.copy()
     if scored.empty:
         for column in [
@@ -685,6 +751,8 @@ def _append_sentiment_fields(df: pd.DataFrame, reviewed_terms: dict[str, list[st
         return scored
     title_text = scored["title"].fillna("").astype(str).str.strip()
     text_text = scored["text_content"].fillna("").astype(str).str.strip()
+    # Remove the title prefix from text_content to infer whether body/comment
+    # content exists beyond the title.
     body_text = [
         text[len(title):].strip() if title and text.startswith(title) else text
         for title, text in zip(title_text, text_text, strict=False)
@@ -694,6 +762,7 @@ def _append_sentiment_fields(df: pd.DataFrame, reviewed_terms: dict[str, list[st
     scored["text_scope"] = scored["body_has_text"].map(lambda value: "title_and_body" if value else "title_only")
     scored["text_length_chars"] = text_text.str.len()
     snow = scored["text_content"].apply(_snownlp_sentiment)
+    # `apply` returns tuples; each lambda pulls one tuple slot into its own column.
     scored["snownlp_positive_prob"] = snow.apply(lambda value: value[0])
     scored["snownlp_centered_score"] = snow.apply(lambda value: value[1])
     scored["sentiment_category"] = snow.apply(lambda value: value[2])
@@ -701,6 +770,7 @@ def _append_sentiment_fields(df: pd.DataFrame, reviewed_terms: dict[str, list[st
     scored["sentiment_score"] = scored["snownlp_centered_score"]
     scored["emotional_intensity_score"] = scored["snownlp_centered_score"].abs()
     for code, column in REVIEWED_SENTIMENT_CODES.items():
+        # Store matched reviewed terms as a pipe-delimited evidence string.
         keywords = reviewed_terms.get(code, [])
         scored[column] = scored["text_content"].apply(
             lambda text, keywords=keywords: "|".join(keyword for keyword in keywords if keyword in str(text))
@@ -709,8 +779,11 @@ def _append_sentiment_fields(df: pd.DataFrame, reviewed_terms: dict[str, list[st
 
 
 def _tag_chinese_dataframe(df: pd.DataFrame, codebook: dict) -> pd.DataFrame:
+    # Build one boolean column per code, then cache the matched code lists for
+    # each row so summaries can work from either representation.
     tagged = df.copy()
     for code, attrs in codebook.items():
+        # One boolean column per code makes later groupby/count steps simple.
         keywords = attrs["keywords"]
         tagged[code] = tagged["text_content"].apply(
             lambda text, keywords=keywords: any(keyword in str(text) for keyword in keywords)
@@ -719,6 +792,8 @@ def _tag_chinese_dataframe(df: pd.DataFrame, codebook: dict) -> pd.DataFrame:
     topic_codes = [code for code, attrs in codebook.items() if attrs["type"] == "topic"]
     enjoyment_codes = [code for code in ENJOYMENT_EVIDENCE_CODES if code in codebook]
     if friction_codes:
+        # `apply(axis=1)` receives one row of booleans and returns the code names
+        # that were true for that row.
         tagged["friction_codes"] = tagged[friction_codes].apply(
             lambda row: [code for code in friction_codes if bool(row[code])],
             axis=1,
@@ -755,6 +830,7 @@ def _code_summary(
     group_cols: list[str] | None = None,
     codes: list[str] | None = None,
 ) -> pd.DataFrame:
+    # Summarize one code family at a time for the requested grouping columns.
     group_cols = group_cols or ["city", "source_platform"]
     rows = []
     codes = codes or [code for code, attrs in codebook.items() if attrs["type"] == code_family]
@@ -802,6 +878,7 @@ def _enjoyment_evidence_summary(
 
 
 def _theme_summary(df: pd.DataFrame) -> pd.DataFrame:
+    # Summarize colleague theme annotations by city/platform.
     columns = ["city", "source_platform", "theme", "count", "pct_posts", "sentiment_norm_mean"]
     if df.empty:
         return pd.DataFrame(columns=columns)
@@ -822,6 +899,7 @@ def _theme_summary(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def _sentiment_summary(df: pd.DataFrame) -> pd.DataFrame:
+    # Basic SnowNLP summary by city/platform.
     if df.empty:
         return pd.DataFrame(columns=["city", "source_platform", "count", "mean", "median", "std"])
     score_col = "snownlp_positive_prob" if "snownlp_positive_prob" in df.columns else "sentiment_norm"
@@ -830,6 +908,7 @@ def _sentiment_summary(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def _binary_group_test(df: pd.DataFrame, group_col: str, code: str) -> list[dict]:
+    # Compare one boolean code between every pair of groups with Fisher's exact test.
     rows = []
     groups = sorted(str(value) for value in df[group_col].dropna().unique())
     for a, b in combinations(groups, 2):
@@ -838,6 +917,7 @@ def _binary_group_test(df: pd.DataFrame, group_col: str, code: str) -> list[dict
         a_count = int(ga[code].sum())
         b_count = int(gb[code].sum())
         table = [[a_count, len(ga) - a_count], [b_count, len(gb) - b_count]]
+        # The 2x2 table is: matched/not-matched for group A and group B.
         fisher_p = None
         odds_ratio = None
         if len(ga) and len(gb):
@@ -868,6 +948,8 @@ def _binary_group_test(df: pd.DataFrame, group_col: str, code: str) -> list[dict
 
 
 def _within_chinese_tests(tagged: pd.DataFrame, codebook: dict) -> pd.DataFrame:
+    # Run pairwise Fisher exact tests for friction codes across cities and
+    # across source platforms.
     columns = [
         "comparison_type",
         "group_a",
@@ -894,6 +976,8 @@ def _within_chinese_tests(tagged: pd.DataFrame, codebook: dict) -> pd.DataFrame:
 def _review_language_comparison(
     friction_summary: pd.DataFrame, review_path: Path, chinese_subset: str = "all_posts"
 ) -> pd.DataFrame:
+    # Compare Chinese friction rates with the existing English/Japanese review
+    # summary using the same friction code names.
     columns = [
         "city", "friction_code", "friction_label", "comparison_group", "chinese_subset",
         "chinese_count", "chinese_n", "chinese_pct_posts",
@@ -939,6 +1023,7 @@ def _review_language_comparison(
 
 
 def _write_readiness(report: dict, path: Path) -> None:
+    # Emit a human-readable markdown summary that mirrors the JSON report.
     lines = [
         "# Chinese Social Media Analysis Readiness",
         "",
@@ -989,12 +1074,15 @@ def build_chinese_social_outputs(
     input_files: list[Path] | None = None,
     review_friction_path: Path = MULTILINGUAL_FRICTION_PATH,
 ) -> dict:
+    # Orchestrate the full build: ingest, deduplicate, annotate, score, tag,
+    # summarize, validate, and write every derived output.
     output_dir.mkdir(parents=True, exist_ok=True)
     input_files = input_files if input_files is not None else discover_input_files(input_dir)
     codebook = load_chinese_codebook()
     reviewed_terms = _reviewed_terms_from_codebook(codebook)
 
     frames = [normalize_social_csv(path) for path in input_files]
+    # Concatenate normalized rows from every discovered source file into one table.
     df = pd.concat(frames, ignore_index=True) if frames else pd.DataFrame(columns=SCHEMA_COLUMNS)
     rows_before_dedup = len(df)
     if not df.empty:
@@ -1003,6 +1091,7 @@ def build_chinese_social_outputs(
 
     themes = load_theme_annotations(input_dir)
     if not df.empty:
+        # Theme rows are annotations keyed by source_record_id, not extra text sources.
         df = df.merge(themes, on="source_record_id", how="left")
         df["theme"] = df["theme"].fillna("unclassified").replace("", "unclassified")
     else:
@@ -1012,6 +1101,7 @@ def build_chinese_social_outputs(
     df = _append_sentiment_fields(df, reviewed_terms)
     tagged = _tag_chinese_dataframe(df, codebook) if not df.empty else df.copy()
     for code in codebook:
+        # Ensure every expected code column exists even for empty outputs.
         if code not in tagged.columns:
             tagged[code] = pd.Series(dtype=bool)
     if "friction_codes" not in tagged.columns:
@@ -1048,6 +1138,8 @@ def build_chinese_social_outputs(
     evidence_columns = ["city", "source_platform", "code_family", "code", "label", "count", "denominator_posts", "pct_posts"]
     evidence_theme_columns = ["city", "source_platform", "theme", *evidence_columns[2:]]
     friction_summary = _friction_summary(tagged, codebook) if not tagged.empty else pd.DataFrame(columns=friction_columns)
+    # The next summaries are aggregate-safe: they contain counts/rates, never
+    # source text, author names, URLs, or platform row IDs.
     friction_by_theme = _friction_summary(tagged, codebook, ["city", "source_platform", "theme"]) if not tagged.empty else pd.DataFrame(
         columns=["city", "source_platform", "theme", *friction_columns[2:]]
     )
@@ -1067,8 +1159,8 @@ def build_chinese_social_outputs(
         if is_douyin_comment_source(path, source_table):
             douyin_provenance.append(validate_douyin_comment_source(path, source_table))
 
-    # Fan-pilgrimage notes are a distinct travel motivation, so the EN/JP
-    # review comparison is reported both for all posts and excluding them.
+    # Fan-pilgrimage notes are a distinct travel motivation, so the review
+    # comparison is reported both with and without them.
     excluding_fan = tagged[tagged["theme"] != "fan"] if not tagged.empty else tagged
     friction_excluding_fan = _friction_summary(excluding_fan, codebook) if not excluding_fan.empty else pd.DataFrame(columns=friction_columns)
     review_comparison = pd.concat(
@@ -1080,6 +1172,7 @@ def build_chinese_social_outputs(
     )
 
     df.to_csv(normalized_path, index=False)
+    # These row-level CSVs are ignored by Git; they are written for local audit only.
     tagged.to_csv(tagged_path, index=False)
     friction_summary.to_csv(friction_summary_path, index=False)
     friction_by_theme.to_csv(friction_theme_path, index=False)
@@ -1095,6 +1188,8 @@ def build_chinese_social_outputs(
     douyin_provenance_path.write_text(json.dumps(douyin_provenance, ensure_ascii=False, indent=2), encoding="utf-8")
     row_level_hash = sha256_file(tagged_path)
     input_hashes = {str(path): sha256_file(path) for path in input_files if path.exists()}
+    # Hashes let tracked/readiness outputs identify ignored source files without
+    # committing those source files.
     reviewed_hash = sha256_file(REVIEWED_CODEBOOK_PATH) if REVIEWED_CODEBOOK_PATH.exists() else None
     n_with_body_text = int(df["body_has_text"].sum()) if "body_has_text" in df.columns else 0
     n_title_only = int((~df["body_has_text"]).sum()) if "body_has_text" in df.columns else len(df)
@@ -1149,11 +1244,14 @@ def build_chinese_social_outputs(
         },
     }
     report_json_path.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
+    # JSON is machine-readable; markdown is easier for a human reviewer.
     _write_readiness(report, report_md_path)
     return report
 
 
 def parse_args() -> argparse.Namespace:
+    # Keep CLI options minimal: input directory, output directory, explicit
+    # input files, and an override for the comparison dataset.
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--input-dir", type=Path, default=DEFAULT_INPUT_DIR)
     parser.add_argument("--output-dir", type=Path, default=OUTPUT_DIR)
@@ -1163,6 +1261,7 @@ def parse_args() -> argparse.Namespace:
 
 
 def main() -> int:
+    # Run the pipeline and log the retention/output location for quick CLI use.
     args = parse_args()
     report = build_chinese_social_outputs(
         input_dir=args.input_dir,

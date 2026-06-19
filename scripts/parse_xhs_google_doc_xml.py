@@ -56,15 +56,18 @@ class MatchedStart:
 
 
 def normalize_text(value: str) -> str:
+    # Collapse repeated whitespace so copied lines compare more reliably.
     return re.sub(r"\s+", " ", value).strip()
 
 
 def normalize_for_match(value: str) -> str:
+    # Strip spaces and punctuation before comparing a document title to the index title.
     value = normalize_text(value).lower()
     return re.sub(r"[\s\W_]+", "", value)
 
 
 def extract_paragraphs(xml_path: Path) -> list[str]:
+    # Word XML stores the document body inside a package part, so we read that part only.
     root = ET.parse(xml_path).getroot()
     for part in root.findall(".//pkg:part", NS):
         if part.attrib.get(f"{{{PKG_NS}}}name") != "/word/document.xml":
@@ -82,6 +85,7 @@ def extract_paragraphs(xml_path: Path) -> list[str]:
 def load_xhs_index(path: Path | None) -> list[IndexRow]:
     if path is None:
         return []
+    # The index file is an optional anchor for matching noisy Google Doc paragraphs.
     with path.open(encoding="utf-8-sig", newline="") as f:
         return [
             IndexRow(
@@ -115,6 +119,7 @@ def _match_title(paragraph: str, index_rows: list[IndexRow]) -> tuple[IndexRow |
 def find_post_starts(paragraphs: list[str], index_rows: list[IndexRow]) -> list[MatchedStart]:
     starts: list[MatchedStart] = []
     seen_positions: set[int] = set()
+    # The first real content block starts after the optional document heading.
     first_content_index = 1 if paragraphs and paragraphs[0].upper() == "XHS NOTES DATA" else 0
     if first_content_index < len(paragraphs):
         starts.append(MatchedStart(first_content_index, None, "document_start"))
@@ -144,6 +149,7 @@ def _body_without_terminal_date(body_lines: list[str]) -> list[str]:
 
 
 def split_segment(lines: list[str]) -> tuple[list[str], int | None, list[str]]:
+    # A copied note may include a comment-count marker that separates post text from comments.
     for i, line in enumerate(lines):
         match = COMMENT_COUNT_RE.match(line)
         if match:
@@ -156,6 +162,7 @@ def parse_comment_lines(comment_lines: list[str]) -> list[dict[str, str]]:
     pending: list[str] = []
 
     def content_parts(lines: list[str]) -> list[str]:
+        # Remove UI labels like "赞" and keep the actual author/text tokens.
         return [line for line in lines if line == "作者" or not UI_LINE_RE.match(line)]
 
     def flush(date_raw: str) -> None:
@@ -200,6 +207,7 @@ def parse_comment_lines(comment_lines: list[str]) -> list[dict[str, str]]:
 
 
 def parse_document(xml_path: Path, index_path: Path | None = DEFAULT_INDEX) -> tuple[list[dict[str, str]], list[dict[str, str]], dict[str, int]]:
+    # Build post rows and comment rows from the same paragraph stream.
     paragraphs = extract_paragraphs(xml_path)
     index_rows = load_xhs_index(index_path) if index_path and index_path.exists() else []
     starts = find_post_starts(paragraphs, index_rows)
@@ -269,6 +277,7 @@ def parse_document(xml_path: Path, index_path: Path | None = DEFAULT_INDEX) -> t
 
 
 def write_csv(path: Path, rows: list[dict[str, str]]) -> None:
+    # Write the parsed rows as a normal UTF-8 CSV file, creating parent folders if needed.
     path.parent.mkdir(parents=True, exist_ok=True)
     fieldnames = list(rows[0].keys()) if rows else []
     with path.open("w", encoding="utf-8", newline="") as f:

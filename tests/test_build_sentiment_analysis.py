@@ -19,6 +19,8 @@ from scripts.build_sentiment_analysis import (
 
 
 def _write_reviews(path: Path) -> None:
+    # This CSV is deliberately tiny and fake: enough columns to exercise the
+    # pipeline without using any real review text or real reviewer IDs.
     path.write_text(
         "city,poi_id,poi_category,review_id,review_date,review_rating,review_text,language_group,"
         "review_author,place_id,source_review_id,source_platform\n"
@@ -32,6 +34,8 @@ def _write_reviews(path: Path) -> None:
 
 
 def _write_poi_metadata(path: Path) -> None:
+    # POI metadata is separate from review rows in the real pipeline, so the
+    # tests mirror that shape instead of putting prefecture directly in reviews.
     path.write_text(
         json.dumps(
             {
@@ -67,6 +71,8 @@ def _write_poi_metadata(path: Path) -> None:
 
 
 def _english_scorer(text: str) -> dict[str, float]:
+    # Test scorer: deterministic stand-in for VADER so tests do not depend on
+    # external model behavior.
     compound = 0.80 if "Great" in text else -0.80
     return {
         "vader_neg": 0.0 if compound > 0 else 0.8,
@@ -77,6 +83,8 @@ def _english_scorer(text: str) -> dict[str, float]:
 
 
 def _japanese_scorer(text: str) -> dict[str, object]:
+    # Test scorer: deterministic stand-in for oseti with the same output fields
+    # the production code expects.
     score = 0.20 if "良い" in text else -0.20
     return {
         "oseti_sentence_scores": f"[{score}]",
@@ -88,6 +96,8 @@ def _japanese_scorer(text: str) -> dict[str, object]:
 
 
 def test_category_threshold_boundaries():
+    # Boundaries matter because exactly +/-0.05 should fall into positive/negative,
+    # while values just inside the band should stay neutral.
     assert sentiment_category(0.05) == "positive"
     assert sentiment_category(0.049999) == "neutral"
     assert sentiment_category(-0.049999) == "neutral"
@@ -97,6 +107,7 @@ def test_category_threshold_boundaries():
 
 
 def test_sha256_file_stable(tmp_path):
+    # Hashing the same bytes twice should always produce the same digest.
     path = tmp_path / "sample.txt"
     path.write_text("same bytes\n", encoding="utf-8")
     assert sha256_file(path) == hashlib.sha256(b"same bytes\n").hexdigest()
@@ -104,6 +115,8 @@ def test_sha256_file_stable(tmp_path):
 
 
 def test_build_outputs_aggregate_excludes_forbidden_row_level_fields(tmp_path):
+    # Main privacy regression test: row-level outputs can keep IDs/text, but
+    # tracked aggregate outputs must not expose those fields.
     reviews = tmp_path / "reviews_multilingual.csv"
     _write_reviews(reviews)
 
@@ -121,11 +134,15 @@ def test_build_outputs_aggregate_excludes_forbidden_row_level_fields(tmp_path):
     )
 
     row_level = pd.read_csv(tmp_path / "row" / "google_reviews_fukui_japanese-english.csv")
+    # Row-level output is ignored by Git, so it can keep review IDs and scoring
+    # details needed for audit/debugging.
     assert "review_id" in row_level.columns
     assert "oseti_sentence_scores" in row_level.columns
 
     summary = pd.read_csv(tmp_path / "agg" / "source_group_sentiment_summary.csv")
     tests = pd.read_csv(tmp_path / "agg" / "source_group_sentiment_tests.csv")
+    # These names are disallowed in aggregate files because they can identify
+    # people, places, source rows, or original text.
     forbidden = {
         "review_text",
         "review_author",
@@ -157,6 +174,8 @@ def test_build_outputs_aggregate_excludes_forbidden_row_level_fields(tmp_path):
 
 
 def test_missing_input_and_columns_fail_loud(tmp_path):
+    # Missing files or required columns should stop the pipeline, not generate
+    # demo/fallback data.
     with pytest.raises(MissingInputError, match="make multilingual-reviews"):
         build_sentiment_analysis(
             paths=PipelinePaths(
@@ -183,6 +202,8 @@ def test_missing_input_and_columns_fail_loud(tmp_path):
 
 
 def test_scoring_wrappers_can_be_monkeypatched_without_external_models(tmp_path):
+    # Injected scorer functions let this test validate pipeline wiring without
+    # importing VADER/oseti.
     reviews = tmp_path / "reviews_multilingual.csv"
     _write_reviews(reviews)
     build_sentiment_analysis(
@@ -204,6 +225,8 @@ def test_scoring_wrappers_can_be_monkeypatched_without_external_models(tmp_path)
 
 
 def test_prefecture_filter_uses_poi_metadata_not_city_name(tmp_path):
+    # The review CSV city field is not enough for scope control; this test
+    # proves prefecture filtering comes from POI metadata.
     reviews = tmp_path / "reviews_multilingual.csv"
     metadata = tmp_path / "poi_metadata.json"
     _write_reviews(reviews)

@@ -43,6 +43,8 @@ CHINESE_GROUP = "chinese_social"
 NEIGHBORING_PREFECTURE_SCAFFOLD = ["Ishikawa", "Toyama"]
 
 BASELINE_COLUMNS = [
+    # Columns in the aggregate baseline CSV. Each row is a language/source
+    # group inside one city/prefecture bucket.
     "prefecture",
     "city",
     "group",
@@ -56,6 +58,7 @@ BASELINE_COLUMNS = [
 ]
 
 DATE_SCRUB_COLUMNS = [
+    # Columns in the date-readiness CSV. This replaces weak monthly trend output.
     "source_kind",
     "date_precision",
     "count",
@@ -70,6 +73,7 @@ class MissingInputError(RuntimeError):
 
 
 def _require_input(path: Path, make_target: str) -> None:
+    # Fail loudly if the upstream build step has not created the required file yet.
     if not path.exists():
         raise MissingInputError(
             f"Required input not found: {path}\n"
@@ -79,10 +83,12 @@ def _require_input(path: Path, make_target: str) -> None:
 
 
 def load_poi_metadata(path: Path) -> pd.DataFrame:
+    # POI metadata is the authority for prefecture scoping.
     _require_input(path, "multilingual-reviews")
     raw = json.loads(path.read_text(encoding="utf-8"))
     rows = []
     for poi_id, attrs in raw.items():
+        # Keep only the fields needed for prefecture scoping and simple output labels.
         rows.append({
             "poi_id": str(poi_id),
             "prefecture_normalized": attrs.get("prefecture_normalized") or attrs.get("prefecture"),
@@ -90,11 +96,14 @@ def load_poi_metadata(path: Path) -> pd.DataFrame:
         })
     metadata = pd.DataFrame(rows)
     if metadata.empty or "prefecture_normalized" not in metadata.columns:
+        # Without prefecture data, Fukui-only filtering would be unreliable.
         raise MissingInputError(f"POI metadata missing prefecture_normalized values: {path}")
     return metadata
 
 
 def load_review_rows(path: Path, poi_metadata_path: Path, prefecture: str) -> pd.DataFrame:
+    # Load Google reviews, keep only English/Japanese groups, then attach POI
+    # metadata so the prefecture filter does not rely on city text.
     df = pd.read_csv(path)
     df = df[df["language_group"].astype(str).str.lower().isin(REVIEW_GROUPS)].copy()
     metadata = load_poi_metadata(poi_metadata_path)
@@ -107,6 +116,7 @@ def load_review_rows(path: Path, poi_metadata_path: Path, prefecture: str) -> pd
             f"Example poi_id values: {missing_ids}"
         )
     scoped = df[df["prefecture_normalized"].astype(str) == prefecture].copy()
+    # Normalize numeric/date-like columns before any aggregate calculation happens.
     scoped["review_rating"] = pd.to_numeric(scoped.get("review_rating"), errors="coerce")
     scoped["review_date_present"] = pd.to_datetime(scoped.get("review_date"), errors="coerce", utc=True).notna()
     scoped["language_group"] = scoped["language_group"].astype(str).str.lower()
@@ -114,10 +124,12 @@ def load_review_rows(path: Path, poi_metadata_path: Path, prefecture: str) -> pd
 
 
 def load_chinese_rows(path: Path, prefecture: str) -> pd.DataFrame:
+    # Load ignored row-level Chinese output created by `make chinese-social`.
     df = pd.read_csv(path)
     if df.empty:
         return df
     scoped = df[df["city"].astype(str) == prefecture].copy()
+    # Leave the Chinese layer in its original shape except for the columns used here.
     scoped["sentiment_norm"] = pd.to_numeric(scoped.get("sentiment_norm"), errors="coerce")
     if "sentiment_category" not in scoped.columns:
         scoped["sentiment_category"] = "unknown"
@@ -127,13 +139,16 @@ def load_chinese_rows(path: Path, prefecture: str) -> pd.DataFrame:
 
 
 def _pct(count: int, denominator: int) -> float:
+    # Use percentages in the readiness table so the denominator is easy to read.
     return round(100 * count / denominator, 3) if denominator else 0.0
 
 
 def baseline_snapshot(reviews: pd.DataFrame, chinese: pd.DataFrame, prefecture: str) -> pd.DataFrame:
+    # Build one combined table for presentation-safe headline numbers.
     rows = []
     for (city, group), chunk in reviews.groupby(["city", "language_group"], dropna=False):
         denominator = len(chunk)
+        # One row per city/language bucket keeps the baseline compact and comparable.
         rows.append({
             "prefecture": prefecture,
             "city": city,
@@ -151,6 +166,7 @@ def baseline_snapshot(reviews: pd.DataFrame, chinese: pd.DataFrame, prefecture: 
         for (city, platform), chunk in chinese.groupby(["city", "source_platform"], dropna=False):
             denominator = len(chunk)
             categories = chunk["sentiment_category"].fillna("unknown").astype(str)
+            # Keep Xiaohongshu and Douyin separate so platform differences stay visible.
             rows.append({
                 "prefecture": prefecture,
                 "city": city,
@@ -170,10 +186,12 @@ def baseline_snapshot(reviews: pd.DataFrame, chinese: pd.DataFrame, prefecture: 
 
 
 def date_scrub_requirements(reviews: pd.DataFrame, chinese: pd.DataFrame) -> pd.DataFrame:
+    # Explain which rows are safe for monthly trends and which need date repair.
     rows = []
     if len(reviews):
         present = int(reviews["review_date_present"].sum())
         missing = len(reviews) - present
+        # Split Google review rows into usable and unusable date buckets.
         rows.extend([
             {
                 "source_kind": "google_review",
@@ -196,6 +214,7 @@ def date_scrub_requirements(reviews: pd.DataFrame, chinese: pd.DataFrame) -> pd.
         counts = chinese["post_date_precision"].fillna("none").astype(str).value_counts()
         for precision, count in counts.items():
             usable = precision == "exact"
+            # Only exact Chinese post dates are ready for a monthly trend pipeline.
             if usable:
                 scrub = "Keep only rows with exact platform post dates for monthly trend output."
             elif precision == "year_inferred":
@@ -216,6 +235,7 @@ def date_scrub_requirements(reviews: pd.DataFrame, chinese: pd.DataFrame) -> pd.
 
 
 def _write_readiness(report: dict, path: Path) -> None:
+    # Write a compact note for humans about what this baseline does and does not do.
     lines = [
         "# Cross-Language Baseline Readiness (Group Project)",
         "",
@@ -260,6 +280,8 @@ def build_cross_language_trends(
     poi_metadata_path: Path = DEFAULT_POI_METADATA_PATH,
     prefecture: str = "Fukui",
 ) -> dict:
+    # Main orchestration function: validate inputs, load scoped rows, write
+    # aggregate outputs, and record a manifest/readiness note.
     _require_input(reviews_path, "multilingual-reviews")
     _require_input(chinese_path, "chinese-social")
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -270,6 +292,7 @@ def build_cross_language_trends(
     baseline = baseline_snapshot(reviews, chinese, prefecture)
     date_scrub = date_scrub_requirements(reviews, chinese)
 
+    # All outputs are aggregate/readiness files; no row-level text is written here.
     baseline_path = output_dir / "cross_language_baseline_snapshot.csv"
     date_scrub_path = output_dir / "date_scrub_requirements.csv"
     report_json_path = output_dir / "cross_language_trends_readiness.json"
@@ -278,6 +301,7 @@ def build_cross_language_trends(
         output_dir / "monthly_trends.csv",
         output_dir / "chinese_theme_mix_monthly.csv",
     ]:
+        # Remove old monthly outputs so the directory does not suggest a result that is no longer produced.
         if stale_path.exists():
             stale_path.unlink()
 
@@ -297,6 +321,7 @@ def build_cross_language_trends(
             if not chinese.empty and "post_date_precision" in chinese.columns else {}
         ),
         "monthly_trends_enabled": False,
+        # The disabled reason is stored in the manifest so the choice stays auditable.
         "monthly_trends_disabled_reason": (
             "Chinese post dates are mostly inferred or scrape-anchored; aggregate baseline is safer."
         ),
@@ -312,6 +337,7 @@ def build_cross_language_trends(
 
 
 def parse_args() -> argparse.Namespace:
+    # Convert command-line strings into typed Path/default values.
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--reviews-path", type=Path, default=DEFAULT_REVIEWS_PATH)
     parser.add_argument("--chinese-path", type=Path, default=DEFAULT_CHINESE_PATH)
@@ -322,6 +348,7 @@ def parse_args() -> argparse.Namespace:
 
 
 def main() -> int:
+    # CLI entrypoint: return status code 1 on known input problems.
     args = parse_args()
     try:
         report = build_cross_language_trends(

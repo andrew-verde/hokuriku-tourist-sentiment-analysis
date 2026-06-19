@@ -14,6 +14,8 @@ from scripts.build_cross_language_trends import (
 
 
 def _write_inputs(tmp_path: Path) -> tuple[Path, Path, Path]:
+    # Create three fake input files matching the real pipeline contracts:
+    # multilingual reviews, Chinese social rows, and POI prefecture metadata.
     reviews = tmp_path / "reviews_multilingual.csv"
     reviews.write_text(
         "city,poi_id,language_group,review_date,review_rating,review_text\n"
@@ -48,6 +50,8 @@ def _write_inputs(tmp_path: Path) -> tuple[Path, Path, Path]:
 
 
 def test_baseline_filters_reviews_by_prefecture_metadata_and_keeps_scales_separate(tmp_path):
+    # Google ratings and Chinese sentiment are different scales, so the baseline
+    # should put them in separate columns instead of blending them.
     reviews, chinese, metadata = _write_inputs(tmp_path)
 
     report = build_cross_language_trends(
@@ -66,17 +70,21 @@ def test_baseline_filters_reviews_by_prefecture_metadata_and_keeps_scales_separa
     assert not (tmp_path / "out" / "monthly_trends.csv").exists()
 
     english = baseline[baseline["group"] == "english"].iloc[0]
+    # Google-review rows keep rating means but do not get Chinese sentiment means.
     assert english["volume"] == 2
     assert english["rating_mean"] == 4.0
     assert pd.isna(english["sentiment_norm_mean"])
 
     xhs = baseline[baseline["group"] == "chinese_social_xiaohongshu"].iloc[0]
+    # Chinese social rows keep SnowNLP sentiment means but do not get Google ratings.
     assert xhs["volume"] == 2
     assert pd.isna(xhs["rating_mean"])
     assert xhs["sentiment_norm_mean"] == 0.5
 
 
 def test_date_scrub_requirements_replace_monthly_theme_mix(tmp_path):
+    # Monthly trend outputs are disabled; this test checks that date quality is
+    # reported instead of silently publishing a weak monthly trend.
     reviews, chinese, metadata = _write_inputs(tmp_path)
 
     build_cross_language_trends(
@@ -96,6 +104,7 @@ def test_date_scrub_requirements_replace_monthly_theme_mix(tmp_path):
 
 
 def test_missing_inputs_fail_with_make_target_hint(tmp_path):
+    # Missing prerequisites should fail with a concrete make target for repair.
     reviews, chinese, metadata = _write_inputs(tmp_path)
 
     with pytest.raises(MissingInputError, match="make multilingual-reviews"):
