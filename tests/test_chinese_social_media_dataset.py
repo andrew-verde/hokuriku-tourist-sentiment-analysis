@@ -12,6 +12,7 @@ from scripts.build_chinese_social_media_dataset import (
     load_theme_annotations,
     normalize_social_csv,
     parse_author_and_date,
+    parse_douyin_relative_time,
 )
 
 REFERENCE_DATE = dt.date(2026, 6, 12)
@@ -101,6 +102,27 @@ def test_chinese_social_builder_tags_and_compares_populated_rows(tmp_path):
     assert set(comparison["chinese_subset"]) == {"all_posts", "excluding_fan"}
 
 
+def test_normalize_social_csv_maps_douyin_comment_export(tmp_path):
+    douyin = tmp_path / "fukui_douyin_comments_from_md.csv"
+    douyin.write_text(
+        "source_record_id,douyin_post_id,author,comment_text,relative_time,parse_confidence,parse_notes\n"
+        "comment_000001,,旅行者,福井小众游超赞,2月前,medium,local_record_id_not_platform_comment_id\n",
+        encoding="utf-8",
+    )
+
+    df = normalize_social_csv(douyin, reference_date=REFERENCE_DATE)
+
+    assert len(df) == 1
+    assert df.loc[0, "city"] == "Fukui"
+    assert df.loc[0, "source_platform"] == "douyin"
+    assert df.loc[0, "source_record_id"] == "comment_000001"
+    assert df.loc[0, "title"] == ""
+    assert df.loc[0, "text_content"] == "福井小众游超赞"
+    assert df.loc[0, "author"] == "旅行者"
+    assert df.loc[0, "post_date"] == "2026-04-13"
+    assert df.loc[0, "post_date_precision"] == "relative_inferred"
+
+
 def test_parse_author_and_date_handles_xhs_display_forms():
     assert parse_author_and_date("Juunae 2025-08-14", REFERENCE_DATE) == ("Juunae", "2025-08-14", "exact")
     assert parse_author_and_date("momo 05-25", REFERENCE_DATE) == ("momo", "2026-05-25", "year_inferred")
@@ -111,16 +133,26 @@ def test_parse_author_and_date_handles_xhs_display_forms():
     assert parse_author_and_date("无日期作者", REFERENCE_DATE) == ("无日期作者", "", "none")
 
 
+def test_parse_douyin_relative_time_marks_approximate_dates():
+    assert parse_douyin_relative_time("1周前", REFERENCE_DATE) == ("2026-06-05", "relative_inferred")
+    assert parse_douyin_relative_time("2月前", REFERENCE_DATE) == ("2026-04-13", "relative_inferred")
+    assert parse_douyin_relative_time("6年前", REFERENCE_DATE) == ("2020-06-13", "relative_inferred")
+    assert parse_douyin_relative_time("", REFERENCE_DATE) == ("", "none")
+
+
 def test_discover_input_files_searches_raw_social_layout(tmp_path):
     social_dir = tmp_path / "data" / "raw" / "social"
     social_dir.mkdir(parents=True)
     (social_dir / "fukui_xhs_reviews.csv").write_text("note_id,title,note_url,author,author_url\n", encoding="utf-8")
+    processed_dir = tmp_path / "data" / "processed"
+    processed_dir.mkdir(parents=True)
+    (processed_dir / "fukui_douyin_comments_from_md.csv").write_text("source_record_id,comment_text\n", encoding="utf-8")
     (social_dir / "README.md").write_text("not a csv", encoding="utf-8")
     (tmp_path / "unrelated.csv").write_text("a,b\n", encoding="utf-8")
 
     files = discover_input_files(tmp_path)
 
-    assert [path.name for path in files] == ["fukui_xhs_reviews.csv"]
+    assert [path.name for path in files] == ["fukui_douyin_comments_from_md.csv", "fukui_xhs_reviews.csv"]
 
 
 def test_theme_annotations_join_from_processed_csv(tmp_path):

@@ -3,7 +3,7 @@
 Build Chinese social-media tourism text analysis outputs.
 
 The input layer is schema-first and empty-data-safe. It normalizes Xiaohongshu
-and Douyin CSV exports from the companion tourism-data project into a
+rows and parsed Douyin comment exports from the companion tourism-data project into a
 review-like row schema, then applies Chinese friction keywords and transparent
 lexicon sentiment fields for comparison with the Google-review layers.
 """
@@ -54,6 +54,9 @@ SOURCE_COLUMNS = [
     "author_url",
     "title",
     "text_content",
+    "source_relative_time",
+    "source_parse_confidence",
+    "source_parse_notes",
 ]
 
 SCHEMA_COLUMNS = [
@@ -137,6 +140,7 @@ _DATE_MONTH_DAY_RE = re.compile(r"^(?P<author>.*?)\s*(?P<month>\d{2})-(?P<day>\d
 _DATE_RELATIVE_DAY_RE = re.compile(r"^(?P<author>.*?)\s*(?P<word>今天|昨天|前天)(\s*\d{1,2}:\d{2})?$")
 _DATE_DAYS_AGO_RE = re.compile(r"^(?P<author>.*?)\s*(?P<days>\d{1,2})\s*天前$")
 _DATE_HOURS_AGO_RE = re.compile(r"^(?P<author>.*?)\s*\d{1,2}\s*(小时前|分钟前)$")
+_DOUYIN_RELATIVE_RE = re.compile(r"^(?P<count>\d+)\s*(?P<unit>分钟前|小时前|天前|周前|月前|年前)$")
 
 
 def scrape_reference_date(path: Path) -> dt.date:
@@ -194,6 +198,36 @@ def parse_author_and_date(raw: str, reference_date: dt.date) -> tuple[str, str, 
     if match:
         return match.group("author").strip(), reference_date.isoformat(), "relative_inferred"
     return value, "", "none"
+
+
+def parse_douyin_relative_time(raw: object, reference_date: dt.date) -> tuple[str, str]:
+    """Parse Douyin relative comment time into an approximate date.
+
+    Douyin comment exports currently expose relative times only. Month/year
+    offsets are approximate calendar-free offsets so outputs carry precision
+    as relative-inferred, not exact.
+    """
+    value = _clean_text(raw)
+    if not value:
+        return "", "none"
+    match = _DOUYIN_RELATIVE_RE.match(value)
+    if not match:
+        return "", "none"
+    count = int(match.group("count"))
+    unit = match.group("unit")
+    if unit == "分钟前" or unit == "小时前":
+        days = 0
+    elif unit == "天前":
+        days = count
+    elif unit == "周前":
+        days = count * 7
+    elif unit == "月前":
+        days = count * 30
+    elif unit == "年前":
+        days = count * 365
+    else:
+        return "", "none"
+    return (reference_date - dt.timedelta(days=days)).isoformat(), "relative_inferred"
 
 
 def _infer_city(path: Path, row: pd.Series) -> str:
@@ -271,8 +305,9 @@ def _read_input_table(path: Path) -> pd.DataFrame:
 def discover_input_files(input_dir: Path) -> list[Path]:
     """Find raw social scrape CSVs in the companion tourism-data checkout.
 
-    Raw scrapes are the ingestion contract; the processed analysis CSVs are
-    consumed only as theme annotations (see load_theme_annotations).
+    Raw scrapes are preferred for source text. The current Douyin comment export
+    is parsed from markdown into data/processed and is also an ingestion source.
+    Other processed CSVs are consumed only as annotations.
     """
     if not input_dir.exists():
         return []
@@ -290,6 +325,10 @@ def discover_input_files(input_dir: Path) -> list[Path]:
                 if use_repo_workbook and DEFAULT_XHS_MANUAL_WORKBOOK.exists() and any(token in name for token in ["xhs", "xiaohongshu", "小红书"]):
                     continue
                 files.append(path)
+    processed_dir = input_dir / "data" / "processed"
+    if processed_dir.exists():
+        for path in processed_dir.glob("*douyin*comments*.csv"):
+            files.append(path)
     return sorted(set(files))
 
 
@@ -338,6 +377,7 @@ def normalize_social_csv(path: Path, reference_date: dt.date | None = None) -> p
         title = _clean_text(row.get("title", ""))
         body = (
             _clean_text(row.get("body_text", ""))
+            or _clean_text(row.get("comment_text", ""))
             or _clean_text(row.get("text", ""))
             or _clean_text(row.get("description", ""))
             or _clean_text(row.get("content", ""))
@@ -350,9 +390,15 @@ def normalize_social_csv(path: Path, reference_date: dt.date | None = None) -> p
         platform = _infer_platform(path, row)
         source_record_id = _source_record_id(row, platform)
         sentiment_score, sentiment_norm, intensity = _lexicon_sentiment(text_content)
-        author, post_date, post_date_precision = parse_author_and_date(
-            row.get("author", ""), reference_date
-        )
+        if platform == "douyin" and "relative_time" in source.columns:
+            author = _clean_text(row.get("author", ""))
+            post_date, post_date_precision = parse_douyin_relative_time(
+                row.get("relative_time", ""), reference_date
+            )
+        else:
+            author, post_date, post_date_precision = parse_author_and_date(
+                row.get("author", ""), reference_date
+            )
         rows.append({
             "city": city,
             "source_platform": platform,
@@ -363,6 +409,9 @@ def normalize_social_csv(path: Path, reference_date: dt.date | None = None) -> p
             "author_url": _clean_text(row.get("author_url", "")),
             "title": title,
             "text_content": text_content,
+            "source_relative_time": _clean_text(row.get("relative_time", "")),
+            "source_parse_confidence": _clean_text(row.get("parse_confidence", "")),
+            "source_parse_notes": _clean_text(row.get("parse_notes", "")),
             "post_date": post_date,
             "post_date_precision": post_date_precision,
             "content_language": "zh",
@@ -638,14 +687,15 @@ def _write_readiness(report: dict, path: Path) -> None:
     lines = [
         "# Chinese Social Media Analysis Readiness",
         "",
-        "This layer treats Xiaohongshu notes and Douyin videos as Chinese-language recommendation text, analogous to the role Google reviews play for English-language review analysis. It is not a nationality inference.",
+        "This layer treats Xiaohongshu notes and Douyin comments as Chinese-language tourism text, analogous to the role Google reviews play for English-language review analysis. It is not a nationality inference.",
         "",
         f"- Input directory: `{report['input_dir']}`",
         f"- Input files discovered: {report['input_files_discovered']}",
         f"- Input SHA256: `{report['input_sha256']}`",
         f"- Rows before deduplication: {report['rows_before_dedup']}",
-        f"- Duplicate city/platform/text rows removed: {report['duplicates_removed']}",
+        f"- Duplicate record rows removed: {report['duplicates_removed']}",
         f"- Rows retained: {report['rows_retained']}",
+        f"- Source platform mix: {report['source_platform_counts']}",
         f"- Rows with body text: {report['n_with_body_text']}",
         f"- Title-only rows excluded from primary comparison: {report['n_title_only_excluded']}",
         f"- Non-fan rows for primary comparison: {report['n_non_fan_compared']}",
@@ -657,8 +707,11 @@ def _write_readiness(report: dict, path: Path) -> None:
         "",
         "## Caveats",
         "",
-        "- Unit of analysis is one social-media post row, not a full travel itinerary or confirmed visit.",
-        "- Primary Chinese sentiment rows require body text; title-only rows are smoke-test material only.",
+        "- Unit of analysis is one social-media source row: one Xiaohongshu note or one Douyin comment, not a full travel itinerary or confirmed visit.",
+        "- Douyin comments come from `tourism-data/data/processed/fukui_douyin_comments_from_md.csv` because the current source was parsed from markdown; keep that row-level file external.",
+        "- Douyin comment ids are local parser ids, not platform comment ids; use input hashes and parser notes for provenance.",
+        "- Douyin comment dates are inferred from relative timestamps anchored to the parsed CSV reference date, so they are not exact publication dates.",
+        "- Primary Chinese sentiment rows require body text/comment text; title-only rows are smoke-test material only.",
         "- Chinese friction tags are substring keyword matches from the YAML runtime codebook; reviewed CSV decisions are audit evidence but are not fully promoted into the friction runtime config yet.",
         "- SnowNLP sentiment is a secondary library score for Chinese-language tourism/fandom text and needs domain caveats.",
         "- Compare Chinese social-media rates with Google review-language rates descriptively because source platform behavior and text length differ.",
@@ -685,7 +738,7 @@ def build_chinese_social_outputs(
     df = pd.concat(frames, ignore_index=True) if frames else pd.DataFrame(columns=SCHEMA_COLUMNS)
     rows_before_dedup = len(df)
     if not df.empty:
-        df = df.drop_duplicates(subset=["city", "source_platform", "text_content"], keep="first").reset_index(drop=True)
+        df = df.drop_duplicates(subset=["record_id"], keep="first").reset_index(drop=True)
     duplicates_removed = rows_before_dedup - len(df)
 
     themes = load_theme_annotations(input_dir)
@@ -762,6 +815,7 @@ def build_chinese_social_outputs(
         "duplicates_removed": duplicates_removed,
         "rows_retained": len(df),
         "n_total_xhs_rows": int(len(df[df["source_platform"] == "xiaohongshu"])) if not df.empty else 0,
+        "n_total_douyin_rows": int(len(df[df["source_platform"] == "douyin"])) if not df.empty else 0,
         "n_with_body_text": n_with_body_text,
         "n_title_only_excluded": n_title_only,
         "n_non_fan_compared": n_non_fan,

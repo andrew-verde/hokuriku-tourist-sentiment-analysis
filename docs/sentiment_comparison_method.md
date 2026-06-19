@@ -7,7 +7,10 @@ and source platform, not nationality.
 
 ## Source Inputs
 
-Chinese-language posts use the `fukui_xhs_reviews` sheet from:
+Chinese-language social rows use Xiaohongshu note rows and Douyin comment rows
+from the companion `tourism-data` repo through one `make chinese-social`
+runtime path. The Xiaohongshu manual source is the `fukui_xhs_reviews` sheet
+from:
 
 ```text
 docs/codebook_reviews/source/fukui_xhs_reviews_manual.xlsx
@@ -18,6 +21,24 @@ The sheet may be exported as UTF-8 CSV before analysis. Required columns:
 ```text
 note_id,title,note_url,author,author_url,body_text,capture_notes
 ```
+
+The current Douyin source is a parsed markdown comment export:
+
+```text
+/Users/andrewgreen/Repositories/tourism-data/data/processed/fukui_douyin_comments_from_md.csv
+```
+
+Required Douyin comment columns:
+
+```text
+source_record_id,comment_text,relative_time,parse_confidence,parse_notes
+```
+
+`comment_text` maps into the same `text_content` / body-text analysis path as
+Xiaohongshu body text. `relative_time` is preserved and, when parsed, converted
+only to an approximate `post_date` with `post_date_precision ==
+"relative_inferred"`. Douyin `source_record_id` values are local parser ids, not
+platform comment ids.
 
 Japanese-language and English-language reviews use the synced Google review
 table:
@@ -43,15 +64,16 @@ data.
 
 ## Scope Rules
 
-Primary statistical comparison should use non-fan Chinese-language posts only.
+Primary statistical comparison should use non-fan Chinese-language social rows
+only.
 Fan-pilgrimage posts are a valid descriptive subgroup, but fandom is currently a
 source-specific theme in the Chinese data and should not be mixed into the main
 cross-source test unless matching fandom evidence is built for English-language
 reviews.
 
-Primary Chinese sentiment rows should require non-empty `body_text`. Title-only
-rows can be scored during early build-out for smoke tests, but exclude them from
-published comparison tables. Report:
+Primary Chinese sentiment rows should require non-empty body/comment text.
+Title-only rows can be scored during early build-out for smoke tests, but
+exclude them from published comparison tables. Report:
 
 ```text
 n_total_xhs_rows
@@ -140,6 +162,9 @@ text_scope
 text_length_chars
 post_date
 post_date_precision
+source_relative_time
+source_parse_confidence
+source_parse_notes
 snownlp_positive_prob
 snownlp_centered_score
 sentiment_category

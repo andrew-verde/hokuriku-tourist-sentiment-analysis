@@ -20,7 +20,7 @@ Group membership is content language, never nationality.
 
 | Decision | Choice |
 |---|---|
-| Ingestion source | Companion repo **raw scrapes** (`tourism-data/data/raw/social/*.csv`), located via `TOURISM_DATA_DIR`; processed CSVs are consumed only as annotations |
+| Ingestion source | Companion repo social data located via `TOURISM_DATA_DIR`: raw Xiaohongshu/Douyin scrapes under `data/raw/social/*.csv`, plus the parsed Fukui Douyin comment export at `data/processed/fukui_douyin_comments_from_md.csv`; other processed CSVs remain annotations |
 | Fan-pilgrimage content | Keep it; left-join colleague's `theme`/`fan_score`/`travel_score` from `data/processed/*.csv` on note id; report comparisons for `all_posts` and `excluding_fan`; unmatched rows are `unclassified` |
 | Post dates | Parse from the Xiaohongshu author cell with a `post_date_precision` flag (`exact`/`year_inferred`/`relative_inferred`); inference anchored to the scrape file's git commit date (`CN_SCRAPE_REFERENCE_DATE` overrides) |
 | Title-only text | Theme mix, monthly volume, and sentiment are headline outputs; friction tagging runs but is directional only with an explicit title-level caveat |
@@ -33,15 +33,16 @@ Group membership is content language, never nationality.
 ## Pipeline
 
 ```
-tourism-data/data/raw/social/*.csv ──┐
-tourism-data/data/processed/*.csv ───┤ (theme annotations)
-                                     ▼
+tourism-data/data/raw/social/*.csv ─────────────┐
+tourism-data/data/processed/fukui_douyin_*.csv ─┤ (Douyin comment source)
+tourism-data/data/processed/*.csv ──────────────┤ (theme annotations)
+                                                ▼
                          make chinese-social
-                                     ▼
+                                                ▼
         output/chinese_social_media_analysis/tagged_chinese_social_posts.csv
-                                     ▼
+                                                ▼
 make multilingual-reviews ──► make cross-language-trends
-                                     ▼
+                                                ▼
                   output/cross_language_trends/monthly_trends.csv
                   output/cross_language_trends/chinese_theme_mix_monthly.csv
 ```
@@ -50,15 +51,18 @@ make multilingual-reviews ──► make cross-language-trends
 
 The colleague will add more scrape files (more keywords, Kanazawa/Toyama,
 Douyin). The ingestion stage discovers any `*xhs*`/`*douyin*` CSV under
-`data/raw/social/` and any theme-bearing CSV under `data/processed/`, so new
-files require no code changes. Re-run `make chinese-social` then
-`make cross-language-trends` after each upstream update, and regenerate the
-data manifest (`make data-manifest`).
+`data/raw/social/`, the current `*douyin*comments*.csv` parsed export under
+`data/processed/`, and any theme-bearing CSV under `data/processed/`.
+Re-run `make chinese-social` then `make cross-language-trends` after each
+upstream update, and regenerate the data manifest (`make data-manifest`).
 
 ## Known limitations
 
-- Chinese rows are title-level search results, not full posts or confirmed
-  visits; volumes are small (106 notes as of 2026-06-12, Fukui only).
+- Chinese rows mix Xiaohongshu notes and Douyin comments. They are not full
+  itineraries, platform-native POI reviews, or confirmed visits.
+- Douyin comment rows use local parser IDs, not platform comment IDs; relative
+  timestamps are approximate and cannot support exact month comparisons without
+  a collection-date caveat.
 - A large share of Fukui Xiaohongshu chatter is idol fan-pilgrimage content
   (theme `fan`, 22/105 after dedup) — analytically interesting, but a different
   travel motivation than general tourism; hence the dual-subset reporting.

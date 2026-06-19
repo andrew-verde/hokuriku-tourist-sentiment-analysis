@@ -46,6 +46,7 @@ Chinese social inputs are external and should remain external:
 
 - Source repo: `/Users/andrewgreen/Repositories/tourism-data`
 - Expected raw social inputs: `data/raw/social/*xhs*.csv`, `data/raw/social/*douyin*.csv`
+- Current parsed Douyin comment source: `data/processed/fukui_douyin_comments_from_md.csv`
 - Current visible Fukui XHS files exist; manual full-text XHS pull is WIP.
 
 ## Project Readiness Checklist
@@ -58,9 +59,10 @@ Chinese social inputs are external and should remain external:
   Chinese rows if they supersede YAML, then report library-score/codebook
   disagreement rates.
 - [ ] Chinese social sentiment/topic pipeline: `scripts/build_chinese_social_media_dataset.py`
-  builds cleaned Chinese social outputs with transparent lexicon sentiment.
-  Still needed: manual body-text completion, SnowNLP sentiment stage, and broader
-  topic/enjoyment config wiring for presentation comparisons.
+  builds cleaned Chinese social outputs with transparent lexicon sentiment from
+  one `make chinese-social` trigger for Xiaohongshu rows and parsed Douyin
+  comments. Still needed: reviewed config promotion, stronger Douyin provenance
+  checks, and broader topic/enjoyment config wiring for presentation comparisons.
 - [x] JP-EN Google review library sentiment: `scripts/build_sentiment_analysis.py`
   filters by Fukui prefecture metadata, scores English reviews with VADER,
   scores Japanese reviews with oseti, writes ignored row-level output, and tracks
@@ -81,6 +83,8 @@ Default pipeline should become:
 
 1. Sync Google review artifacts with `make multilingual-reviews`.
 2. Build Chinese social rows from `tourism-data` with `make chinese-social`.
+   Keep Xiaohongshu and Douyin in the same runtime path so codebook matching,
+   SnowNLP scoring, denominator reporting, and caveats stay comparable.
 3. Promote reviewed codebook CSV/Excel files into versioned configs.
 4. Run Fukui-only language/source tagging:
    - Chinese-language posts: topic/friction/enjoyment keywords plus Chinese sentiment

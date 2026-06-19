@@ -5,7 +5,7 @@ Fukui-first cross-language tourism text project.
 Project brief and readiness map: [docs/repo_guidance.md](docs/repo_guidance.md).
 
 Scope:
-- Chinese Xiaohongshu / Douyin post text, titles, metadata from `tourism-data`
+- Chinese Xiaohongshu note text and Douyin comment text from `tourism-data`
 - English/Japanese review text when explicitly provided as cleaned inputs
 - Transparent keyword/topic/sentiment codebooks
 - Secondary library sentiment checks: VADER for English, oseti for Japanese,
@@ -51,7 +51,9 @@ Install the pinned JP-EN sentiment runtime:
 make sentiment-env
 ```
 
-Build Chinese social outputs from local `tourism-data`:
+Build Chinese social outputs from local `tourism-data`. This single target
+normalizes Xiaohongshu rows and the parsed Fukui Douyin comment CSV into the
+same Chinese social row schema before applying shared sentiment/friction code:
 
 ```bash
 TOURISM_DATA_DIR=/Users/andrewgreen/Repositories/tourism-data make chinese-social
@@ -130,7 +132,8 @@ Raw social files, outside Git:
 ```text
 data/raw/social/*xhs*.csv
 data/raw/social/*douyin*.csv
-data/processed/*.csv
+data/processed/fukui_douyin_comments_from_md.csv
+data/processed/*.csv for theme annotations
 ```
 
 Supported current columns:
@@ -138,7 +141,8 @@ Supported current columns:
 ```text
 XHS: note_id,title,note_url,author,author_url
 Douyin: video_id,title,video_url,author
-Future manual body text: text,description,or content
+Douyin comments: source_record_id,comment_text,relative_time,parse_confidence,parse_notes
+Manual body/comment text: body_text,comment_text,text,description,or content
 ```
 
 ## Research Boundary
