@@ -474,6 +474,60 @@ def _cramers_v(table: pd.DataFrame) -> float:
     return float(np.sqrt(chi2 / denom)) if denom else np.nan
 
 
+def _numeric_group_arrays(
+    df: pd.DataFrame,
+    value_column: str,
+    languages: list[str],
+) -> dict[str, np.ndarray]:
+    arrays = {}
+    for language in languages:
+        values = pd.to_numeric(
+            df.loc[df["language_group"] == language, value_column],
+            errors="coerce",
+        ).dropna()
+        arrays[language] = values.to_numpy(dtype=float)
+    return arrays
+
+
+def _welch_anova(groups: list[np.ndarray]) -> tuple[float, float, float, float]:
+    # Welch ANOVA keeps unequal group variances/sample sizes explicit.
+    usable = [group for group in groups if len(group) >= 2 and np.var(group, ddof=1) > 0]
+    if len(usable) < 2:
+        return np.nan, np.nan, np.nan, np.nan
+    k = len(usable)
+    n = np.array([len(group) for group in usable], dtype=float)
+    means = np.array([np.mean(group) for group in usable], dtype=float)
+    variances = np.array([np.var(group, ddof=1) for group in usable], dtype=float)
+    weights = n / variances
+    weight_sum = float(np.sum(weights))
+    weighted_mean = float(np.sum(weights * means) / weight_sum)
+    df1 = float(k - 1)
+    adjustment_terms = ((1.0 - (weights / weight_sum)) ** 2) / (n - 1.0)
+    adjustment_sum = float(np.sum(adjustment_terms))
+    numerator = float(np.sum(weights * ((means - weighted_mean) ** 2)) / df1)
+    denominator = 1.0 + ((2.0 * (k - 2.0)) / ((k**2) - 1.0)) * adjustment_sum
+    f_stat = numerator / denominator
+    df2 = float(((k**2) - 1.0) / (3.0 * adjustment_sum)) if adjustment_sum else np.inf
+    p_value = float(stats.f.sf(f_stat, df1, df2)) if np.isfinite(df2) else np.nan
+    return float(f_stat), p_value, df1, df2
+
+
+def _append_raw_score_parametric_skip(rows: list[dict], comparison: str) -> None:
+    rows.append({
+        "test_name": "raw_score_parametric_tests_not_run",
+        "comparison": comparison,
+        "status": "skipped",
+        "statistic": np.nan,
+        "p_value": np.nan,
+        "effect": np.nan,
+        "details_json": json.dumps({
+            "reason": "VADER compound and oseti document scores are different tool-specific scales",
+            "recommended_parametric_path": "Welch t-test/ANOVA only on common-scale Google review_rating, or later on validated codebook-derived common outcomes",
+            "text_sentiment_path": "category-share tests plus distribution/bootstrap sensitivity with explicit non-equivalence caveat",
+        }),
+    })
+
+
 def build_tests(scored: pd.DataFrame) -> pd.DataFrame:
     # Returns one row per statistical check. Tests can be "ok" or "skipped" so
     # reports explain why a check was not meaningful.
@@ -497,6 +551,15 @@ def build_tests(scored: pd.DataFrame) -> pd.DataFrame:
     # `left` and `right` are plain NumPy arrays because scipy functions expect
     # numeric array-like inputs.
     comparison = f"{left_name}_vs_{right_name}"
+    score_scale_details = {
+        "left": left_name,
+        "right": right_name,
+        "measurement_scale": "tool_specific_non_equivalent",
+        "interpretation": (
+            "Descriptive score-distribution sensitivity only; do not interpret as "
+            "a raw VADER-vs-oseti mean-scale comparison."
+        ),
+    }
 
     table = pd.crosstab(scored["language_group"], scored["sentiment_category"])
     # crosstab counts how many negative/neutral/positive rows each language has.
@@ -555,7 +618,7 @@ def build_tests(scored: pd.DataFrame) -> pd.DataFrame:
         "statistic": float(mann.statistic),
         "p_value": float(mann.pvalue),
         "effect": np.nan,
-        "details_json": json.dumps({"left": left_name, "right": right_name}),
+        "details_json": json.dumps(score_scale_details),
     })
 
     for name, reducer in [("mean", np.mean), ("median", np.median)]:
@@ -570,8 +633,7 @@ def build_tests(scored: pd.DataFrame) -> pd.DataFrame:
             "p_value": np.nan,
             "effect": observed,
             "details_json": json.dumps({
-                "left": left_name,
-                "right": right_name,
+                **score_scale_details,
                 "ci_95_lower": lower,
                 "ci_95_upper": upper,
                 "iterations": BOOTSTRAP_ITERATIONS,
@@ -597,8 +659,7 @@ def build_tests(scored: pd.DataFrame) -> pd.DataFrame:
             "p_value": float(poi_mann.pvalue),
             "effect": np.nan,
             "details_json": json.dumps({
-                "left": left_name,
-                "right": right_name,
+                **score_scale_details,
                 "left_n_poi": int(len(poi_left)),
                 "right_n_poi": int(len(poi_right)),
                 "unit": "one POI-language mean",
@@ -613,8 +674,7 @@ def build_tests(scored: pd.DataFrame) -> pd.DataFrame:
             "p_value": np.nan,
             "effect": observed,
             "details_json": json.dumps({
-                "left": left_name,
-                "right": right_name,
+                **score_scale_details,
                 "ci_95_lower": lower,
                 "ci_95_upper": upper,
                 "left_n_poi": int(len(poi_left)),
@@ -651,8 +711,7 @@ def build_tests(scored: pd.DataFrame) -> pd.DataFrame:
         "p_value": np.nan,
         "effect": observed,
         "details_json": json.dumps({
-            "left": left_name,
-            "right": right_name,
+            **score_scale_details,
             "ci_95_lower": lower,
             "ci_95_upper": upper,
             "left_n_poi": int(left_n_clusters),
@@ -662,6 +721,116 @@ def build_tests(scored: pd.DataFrame) -> pd.DataFrame:
             "unit": "POI cluster resampling with review rows retained inside sampled clusters",
         }),
     })
+
+    _append_raw_score_parametric_skip(rows, comparison)
+
+    rating_arrays = _numeric_group_arrays(scored, "review_rating", languages)
+    rating_left = rating_arrays[left_name]
+    rating_right = rating_arrays[right_name]
+    if len(rating_left) >= 2 and len(rating_right) >= 2:
+        rating_t = stats.ttest_ind(rating_left, rating_right, equal_var=False, alternative="two-sided")
+        rows.append({
+            "test_name": "welch_t_review_rating",
+            "comparison": comparison,
+            "status": "ok",
+            "statistic": float(rating_t.statistic),
+            "p_value": float(rating_t.pvalue),
+            "effect": float(np.mean(rating_left) - np.mean(rating_right)),
+            "details_json": json.dumps({
+                "left": left_name,
+                "right": right_name,
+                "unit": "one Google review row",
+                "measurement_scale": "common_google_1_to_5_star_rating",
+                "left_n": int(len(rating_left)),
+                "right_n": int(len(rating_right)),
+                "effect": "left_mean_rating_minus_right_mean_rating",
+                "interpretation": "Parametric comparison is defensible for ratings because both groups use the same Google star scale.",
+            }),
+        })
+    else:
+        rows.append({
+            "test_name": "welch_t_review_rating",
+            "comparison": comparison,
+            "status": "skipped",
+            "statistic": np.nan,
+            "p_value": np.nan,
+            "effect": np.nan,
+            "details_json": json.dumps({
+                "reason": "fewer than 2 rows with review_rating per language group",
+                "left_n": int(len(rating_left)),
+                "right_n": int(len(rating_right)),
+            }),
+        })
+
+    rating_f, rating_p, rating_df1, rating_df2 = _welch_anova(list(rating_arrays.values()))
+    rows.append({
+        "test_name": "welch_anova_review_rating",
+        "comparison": comparison,
+        "status": "ok" if not np.isnan(rating_f) else "skipped",
+        "statistic": rating_f,
+        "p_value": rating_p,
+        "effect": np.nan,
+        "details_json": json.dumps({
+            "groups": languages,
+            "unit": "one Google review row",
+            "measurement_scale": "common_google_1_to_5_star_rating",
+            "df_between": rating_df1,
+            "df_within": rating_df2,
+            "group_ns": {name: int(len(values)) for name, values in rating_arrays.items()},
+            "interpretation": "Use for two or more Google review language groups on common star-rating scale; with two groups it is redundant with Welch t-test.",
+        }),
+    })
+
+    if {"poi_id", "review_rating"} <= set(scored.columns):
+        poi_rating = (
+            scored[["language_group", "poi_id", "review_rating"]]
+            .dropna()
+            .assign(poi_id=lambda frame: frame["poi_id"].astype(str))
+            .groupby(["language_group", "poi_id"], as_index=False)
+            .agg(mean_review_rating=("review_rating", "mean"))
+        )
+        poi_rating_arrays = _numeric_group_arrays(poi_rating, "mean_review_rating", languages)
+        poi_rating_left = poi_rating_arrays[left_name]
+        poi_rating_right = poi_rating_arrays[right_name]
+        if len(poi_rating_left) >= 2 and len(poi_rating_right) >= 2:
+            poi_rating_t = stats.ttest_ind(
+                poi_rating_left,
+                poi_rating_right,
+                equal_var=False,
+                alternative="two-sided",
+            )
+            rows.append({
+                "test_name": "poi_level_welch_t_mean_review_rating",
+                "comparison": comparison,
+                "status": "ok",
+                "statistic": float(poi_rating_t.statistic),
+                "p_value": float(poi_rating_t.pvalue),
+                "effect": float(np.mean(poi_rating_left) - np.mean(poi_rating_right)),
+                "details_json": json.dumps({
+                    "left": left_name,
+                    "right": right_name,
+                    "unit": "one POI-language mean Google rating",
+                    "measurement_scale": "common_google_1_to_5_star_rating",
+                    "left_n_poi": int(len(poi_rating_left)),
+                    "right_n_poi": int(len(poi_rating_right)),
+                    "effect": "left_poi_mean_rating_minus_right_poi_mean_rating",
+                    "interpretation": "POI-level sensitivity reduces review nesting but can be noisy with few English-language POIs.",
+                }),
+            })
+        else:
+            rows.append({
+                "test_name": "poi_level_welch_t_mean_review_rating",
+                "comparison": comparison,
+                "status": "skipped",
+                "statistic": np.nan,
+                "p_value": np.nan,
+                "effect": np.nan,
+                "details_json": json.dumps({
+                    "reason": "fewer than 2 POIs with review_rating per language group",
+                    "left_n_poi": int(len(poi_rating_left)),
+                    "right_n_poi": int(len(poi_rating_right)),
+                }),
+            })
 
     rating_work = scored[["language_group", "review_rating", "sentiment_score"]].dropna()
     if len(rating_work) >= 3:
@@ -749,8 +918,9 @@ def write_readiness(report: dict, summary: pd.DataFrame, tests: pd.DataFrame, pa
         "## Caveats",
         "",
         "- Group labels describe review language, not reviewer nationality.",
-        "- VADER and oseti scores are tool-specific. Main comparison uses category shares and score distributions.",
-        "- `review_rating` is validation evidence only, not a covariate in this skeleton.",
+        "- VADER and oseti scores are tool-specific. Do not interpret raw-score tests as cross-tool mean equivalence.",
+        "- Raw sentiment-score t-tests/ANOVA are skipped because VADER compound and oseti document scores are not the same measurement scale.",
+        "- `review_rating` is a common Google 1-to-5 scale, so Welch rating tests are companion outcome/validation evidence.",
         "- POI-level and cluster-bootstrap rows are sensitivity checks, not replacement primary models.",
         "- Reviewed JP/EN codebook evidence path is pending and does not block this library comparison.",
         "",
@@ -864,7 +1034,8 @@ def build_sentiment_analysis(
         },
         caveats=[
             "Group labels describe review language, not reviewer nationality.",
-            "VADER and oseti scores are tool-specific; compare category shares and within-tool distributions.",
+            "VADER and oseti scores are tool-specific; raw sentiment-score t-tests/ANOVA are not run.",
+            "Welch rating tests use common-scale Google review_rating as companion outcome/validation evidence.",
             "POI-level and cluster-bootstrap rows are sensitivity checks.",
             "Reviewed JP/EN codebook evidence path is pending.",
         ],

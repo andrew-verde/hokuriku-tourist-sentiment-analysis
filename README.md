@@ -83,6 +83,28 @@ Build Fukui JP-EN sentiment aggregates:
 make sentiment-analysis
 ```
 
+Build slide-safe JP-EN aggregate chart/table scaffolding from tracked aggregate
+sentiment outputs:
+
+```bash
+make presentation-safe
+```
+
+This writes aggregate-only files under `output/presentation_safe/`:
+
+```text
+jp_en_library_sentiment_chart_data.csv
+jp_en_statistical_sensitivity_summary.csv
+presentation_readiness.md
+presentation_manifest.json
+```
+
+The presentation scaffold carries denominators, source hashes, caveats, date
+ranges, date coverage counts, and POI-category mix. Date range and POI mix are
+derived as aggregate metadata from the ignored scored-review audit file named in
+the sentiment manifest; if required metadata is missing, the command fails
+instead of writing placeholder figure data.
+
 ## Japanese Sentiment: oseti
 
 `oseti` is a deterministic Japanese sentiment analyzer. It uses MeCab tokenizing

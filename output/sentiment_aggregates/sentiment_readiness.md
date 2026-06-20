@@ -1,6 +1,6 @@
 # Sentiment Readiness
 
-- generated_at: 2026-06-20T02:47:52+00:00
+- generated_at: 2026-06-20T10:51:10+00:00
 - command: `scripts/build_sentiment_analysis.py --groups japanese,english --prefecture Fukui`
 - input: `/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/output/multilingual_review_analysis/reviews_multilingual.csv`
 - input_sha256: `6bc06f34848954674506f6fefb84ffd9689b4cc9b2c90780fd5c8fc45eafaa56`
@@ -47,12 +47,17 @@
 - poi_level_mann_whitney_mean_sentiment_score (english_vs_japanese): status=ok, p=1.21892e-05
 - poi_level_bootstrap_mean_difference_sentiment_score (english_vs_japanese): status=ok, p=NA
 - cluster_bootstrap_poi_mean_difference_sentiment_score (english_vs_japanese): status=ok, p=NA
+- raw_score_parametric_tests_not_run (english_vs_japanese): status=skipped, p=NA
+- welch_t_review_rating (english_vs_japanese): status=ok, p=7.65005e-05
+- welch_anova_review_rating (english_vs_japanese): status=ok, p=7.65005e-05
+- poi_level_welch_t_mean_review_rating (english_vs_japanese): status=ok, p=0.035139
 - rating_validation_spearman_score (all_groups): status=ok, p=2.44023e-24
 
 ## Caveats
 
 - Group labels describe review language, not reviewer nationality.
-- VADER and oseti scores are tool-specific. Main comparison uses category shares and score distributions.
-- `review_rating` is validation evidence only, not a covariate in this skeleton.
+- VADER and oseti scores are tool-specific. Do not interpret raw-score tests as cross-tool mean equivalence.
+- Raw sentiment-score t-tests/ANOVA are skipped because VADER compound and oseti document scores are not the same measurement scale.
+- `review_rating` is a common Google 1-to-5 scale, so Welch rating tests are companion outcome/validation evidence.
 - POI-level and cluster-bootstrap rows are sensitivity checks, not replacement primary models.
 - Reviewed JP/EN codebook evidence path is pending and does not block this library comparison.

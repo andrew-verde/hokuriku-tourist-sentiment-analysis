@@ -29,7 +29,7 @@ Group membership is content language, never nationality.
 | Code layout | Separate stage script `scripts/build_cross_language_trends.py` + `make cross-language-trends`; hard error (naming the make target) when inputs are missing |
 | Google scope filter | Use `output/checkpoints/poi_metadata.json` and `prefecture_normalized`; default prefecture is Fukui, with scaffold left for Ishikawa/Toyama later |
 | Monthly trend posture | Disabled for now. Current Chinese post dates are mostly inferred or scrape-anchored; reintroduce only after date scrub requirements are met |
-| Statistical posture | Descriptive only; no significance testing in this group project layer |
+| Statistical posture | Descriptive cross-source category-share tests are allowed with caveats; raw SnowNLP/VADER/oseti score tests and cross-source friction/enjoyment tests are skipped until aligned evidence exists |
 | Thesis isolation | No thesis make-chain includes these targets; row-level outputs gitignored; source-ledger rows marked group project |
 
 ## Pipeline
@@ -47,6 +47,13 @@ make multilingual-reviews ──► make cross-language-trends
                                                 ▼
                   output/cross_language_trends/cross_language_baseline_snapshot.csv
                   output/cross_language_trends/date_scrub_requirements.csv
+                  output/cross_language_trends/cross_language_statistical_tests.csv
+
+make sentiment-analysis ─────► make presentation-safe
+                                                ▼
+                  output/presentation_safe/jp_en_library_sentiment_chart_data.csv
+                  output/presentation_safe/jp_en_statistical_sensitivity_summary.csv
+                  output/presentation_safe/presentation_readiness.md
 ```
 
 `make chinese-social` also writes aggregate-safe Chinese evidence tables:
@@ -56,6 +63,24 @@ make multilingual-reviews ──► make cross-language-trends
 - `chinese_enjoyment_evidence_by_city_platform.csv`
 - `douyin_provenance_report.json`
 - `chinese_reviewed_codebook_runtime_summary.csv`
+
+`make presentation-safe` is deliberately narrower than the cross-language
+baseline. It consumes tracked JP-EN sentiment aggregate files plus the ignored
+scored-review audit file named in the sentiment manifest, then produces
+slide-ready chart/table data plus captions. It reads only safe metadata from
+the audit file to aggregate date ranges and POI-category mix. It does not write
+row-level review text, POI IDs, author fields, URLs, or manual codebook review
+files.
+
+Presentation safeguards:
+
+- Date range and POI-category mix must be real aggregate values; missing
+  required metadata fails the command instead of writing placeholders.
+- Date ranges come from parseable review dates, with parseable/missing date
+  counts carried in the chart data.
+- Generated chart/table files are scanned for dummy/placeholder-like values.
+- JP/EN sentiment remains a secondary VADER/oseti check until reviewed codebook
+  evidence is promoted into runtime configs.
 
 ## Expected growth
 
@@ -83,6 +108,30 @@ trend output is reintroduced, first scrub:
 - prefecture scope for every group; default stays Fukui until Ishikawa/Toyama
   Chinese inputs exist
 
+## Current statistical tests
+
+`make cross-language-trends` now writes
+`output/cross_language_trends/cross_language_statistical_tests.csv`.
+
+Currently valid:
+
+- descriptive chi-square/Fisher category-share tests for
+  English-language Google reviews, Japanese-language Google reviews, and
+  Chinese-language social rows using positive/neutral/negative categories
+- pairwise category-share tests comparing each Google review language group
+  with all Chinese social rows
+- within-Chinese source-platform tests for Xiaohongshu vs Douyin sentiment
+  categories, `any_friction`, and `any_enjoyment_evidence`
+
+Explicitly skipped:
+
+- raw SnowNLP/VADER/oseti score t-tests or ANOVA
+- cross-source friction/enjoyment prevalence tests, because EN/JP reviewed
+  keyword evidence is not promoted into runtime outputs yet
+
+Interpretation: these p-values describe differences in platformed discourse
+categories, not direct visitor satisfaction or nationality differences.
+
 ## Known limitations
 
 - Chinese rows mix Xiaohongshu notes and Douyin comments. They are not full
@@ -95,6 +144,9 @@ trend output is reintroduced, first scrub:
 - Chinese sentiment uses SnowNLP as the current baseline, not a validated
   project-specific sentiment model; Google star ratings and SnowNLP probability
   are different instruments.
+- Cross-source sentiment category tests compare platformed discourse categories
+  across reviews, notes, and comments; they do not make social-media rows
+  equivalent to Google reviews.
 - Friction/topic/positive-evidence keyword tags on Chinese posts are reviewed
   codebook matches, but match precision is not yet independently validated;
   treat rates as directional.

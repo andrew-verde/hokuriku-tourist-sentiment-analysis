@@ -159,6 +159,17 @@ codebook evidence path as pending. Once reviewed codebooks are complete, promote
 them into runtime configs and add the evidence columns without changing the
 library-score definitions.
 
+JP/EN runtime-config promotion is intentionally fail-loud:
+
+```bash
+python3 scripts/import_reviewed_codebook_config.py --status-only
+python3 scripts/import_reviewed_codebook_config.py
+```
+
+The status command may be used before manual review is complete. The full import
+must fail while Japanese-language or English-language `review_decision` cells are
+blank, and it must not invent reviewer decisions or replacement keywords.
+
 ## Row-Level Fields
 
 Chinese ignored row-level output:
@@ -308,10 +319,41 @@ bootstrap 95% CI: mean/median score difference within the selected tools
 logistic regression: positive_vs_not ~ source_group + text_length_chars + month
 ```
 
-For this current JP-EN comparison, use `review_rating` only as descriptive
-validation. Report rating distribution by language group and correlation between
-rating and sentiment score/category. Do not control for rating in the main JP-EN
-model unless a later research question explicitly needs that sensitivity check.
+Parametric tests need a common measurement scale. Do not run or report a raw
+VADER-compound-vs-oseti-document-score t-test or ANOVA as evidence that one
+language group is "more positive" in absolute score units. The two tools use
+different dictionaries, segmentation behavior, and score construction. A
+parametric raw-score p-value would mostly test an undocumented mixture of
+language, tool, and scale differences.
+
+Defensible t-test/ANOVA path for current JP-EN Google review data:
+
+```text
+Primary text sentiment:
+  chi-square/Fisher on positive/neutral/negative category shares
+  Mann-Whitney/bootstrap score-distribution sensitivity, labeled descriptive
+
+Parametric common-scale outcome:
+  Welch t-test on review_rating by language group
+  Welch ANOVA on review_rating when two or more Google review language groups
+  are compared
+  POI-level Welch t-test on mean review_rating as nesting sensitivity
+```
+
+Because `review_rating` is a shared Google 1-to-5 star scale, Welch t-tests and
+Welch ANOVA are statistically interpretable for rating differences. They are not
+text-sentiment tool validation by themselves. Treat rating tests as a
+common-scale companion outcome and validation/sensitivity evidence. If reviewed
+JP/EN codebooks later produce a shared binary outcome, such as
+`positive_evidence_present`, parametric tests can still be secondary, but
+logistic or category-share models should remain easier to defend than raw score
+ANOVA.
+
+For this current JP-EN comparison, use `review_rating` as a common-scale
+companion outcome and validation check. Report rating distribution by language
+group, Welch rating tests, and correlation between rating and sentiment
+score/category. Do not control for rating in the main JP-EN text-sentiment model
+unless a later research question explicitly needs that sensitivity check.
 Ratings are platform-native outcomes and may partly encode sentiment, so
 controlling for them can remove the signal being studied.
 
@@ -333,6 +375,23 @@ for parity checks. Published JP-EN tests should aggregate sentence scores back t
 one score per review before statistical comparison. Sentence rows are nested
 inside reviews, are not independent observations, and Japanese sentence boundary
 segmentation can differ from English punctuation behavior.
+
+For EN/JP/CN cross-source comparisons, the current defensible statistical layer
+is limited to sentiment category shares and within-Chinese platform checks:
+
+```text
+English-language Google reviews vs Japanese-language Google reviews vs
+Chinese-language social rows: chi-square/Fisher on positive/neutral/negative
+categories, labeled as descriptive cross-source evidence.
+
+Xiaohongshu vs Douyin: within-Chinese category-share and binary evidence tests
+for current Chinese fields.
+```
+
+Do not run raw SnowNLP/VADER/oseti score t-tests or ANOVA. Do not run
+cross-source friction/enjoyment evidence tests until reviewed English and
+Japanese keyword evidence has been promoted into the same runtime comparison
+shape as the Chinese `any_friction` and `any_enjoyment_evidence` fields.
 
 ## Aggregate Outputs
 

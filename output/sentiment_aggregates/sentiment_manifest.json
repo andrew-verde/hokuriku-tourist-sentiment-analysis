@@ -1,6 +1,6 @@
 {
   "schema_version": "sentiment_manifest.v2",
-  "generated_at": "2026-06-20T02:47:52+00:00",
+  "generated_at": "2026-06-20T10:51:10+00:00",
   "command": "scripts/build_sentiment_analysis.py --groups japanese,english --prefecture Fukui",
   "filters": {
     "city": null,
@@ -110,7 +110,7 @@
   "provenance": {
     "schema_version": "research_provenance.v1",
     "kind": "jp_en_sentiment_analysis",
-    "generated_at": "2026-06-20T02:47:52+00:00",
+    "generated_at": "2026-06-20T10:51:10+00:00",
     "command": "scripts/build_sentiment_analysis.py --groups japanese,english --prefecture Fukui",
     "inputs": [
       {
@@ -147,15 +147,15 @@
         "role": "tracked_statistical_tests",
         "path": "/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/output/sentiment_aggregates/source_group_sentiment_tests.csv",
         "exists": true,
-        "bytes": 2242,
-        "sha256": "6020ce3c34255b22bd0074c2057fbc97a0445a9ceff1a2cf69f54f6ad346010e"
+        "bytes": 5332,
+        "sha256": "3314b4f3afb598eaf6f697f7a4df8067409caa605976c550b92715b7d396842e"
       },
       {
         "role": "tracked_readiness_markdown",
         "path": "/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/output/sentiment_aggregates/sentiment_readiness.md",
         "exists": true,
-        "bytes": 3216,
-        "sha256": "d285bbdfbce8e47df37b3ff52099e47d781345c3a4e85ceb8429c2b05f762e19"
+        "bytes": 3700,
+        "sha256": "d2884a8bbc94b2a79a947ea4699c11c485aeb3cb40315e7ff47ea9be52f61af8"
       }
     ],
     "filters": {
@@ -240,7 +240,8 @@
     },
     "caveats": [
       "Group labels describe review language, not reviewer nationality.",
-      "VADER and oseti scores are tool-specific; compare category shares and within-tool distributions.",
+      "VADER and oseti scores are tool-specific; raw sentiment-score t-tests/ANOVA are not run.",
+      "Welch rating tests use common-scale Google review_rating as companion outcome/validation evidence.",
       "POI-level and cluster-bootstrap rows are sensitivity checks.",
       "Reviewed JP/EN codebook evidence path is pending."
     ],

@@ -33,3 +33,29 @@ Chinese/Japanese characters intact.
 
 Do not paste source post/review text, URLs, author names, or screenshots into
 these templates.
+
+## Japanese/English Runtime Config Import
+
+The JP/EN importer scaffold is:
+
+```bash
+python3 scripts/import_reviewed_codebook_config.py --status-only
+python3 scripts/import_reviewed_codebook_config.py
+```
+
+`--status-only` reports review-completion counts without writing a runtime
+config. The full import writes `config/reviewed_jp_en_codebook.yaml` only after
+the requested Japanese-language and English-language rows have complete
+`review_decision` values.
+
+Required import rules:
+
+- `No change`: keep `keyword_original` as the runtime keyword
+- `FIX`: use `suggested_replacement_keyword` / `keyword_final`
+- `delete`: preserve audit row metadata, exclude from runtime matching
+- blank `review_decision`: fail import for JP/EN rows
+- invalid `review_decision`: fail import
+- fully deleted codes: fail import because no runtime keyword remains
+
+Current status: manual JP/EN review is not complete, so this importer should be
+treated as a validation gate and not as an evidence-producing runtime input yet.

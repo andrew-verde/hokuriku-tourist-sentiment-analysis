@@ -54,10 +54,16 @@ Chinese social inputs are external and should remain external:
 - [ ] Human-reviewed keyword codebooks: review templates exist in
   `output/codebook_review/`, Chinese config exists in
   `config/chinese_social_friction_codebook.yaml`, and reviewed Chinese rows exist
-  in `docs/codebook_templates/chinese_reviewed_codebook_template.csv`. Still
-  needed: promote reviewed JP/EN decisions into runtime configs, promote reviewed
-  Chinese rows if they supersede YAML, then report library-score/codebook
-  disagreement rates.
+  in `docs/codebook_templates/chinese_reviewed_codebook_template.csv`. Current
+  Chinese social runtime promotion uses reviewed Chinese friction/topic/sentiment
+  rows and supersedes legacy YAML terms for matching codes. A JP/EN import gate
+  now exists (`make reviewed-codebook-status` /
+  `make reviewed-codebook-config`) and fails loud until manual JP/EN
+  `review_decision` values are complete. Still needed: finish manual JP/EN
+  review decisions, promote reviewed JP/EN decisions into runtime configs, add
+  JP/EN evidence columns, then report library-score/codebook disagreement rates.
+  Once manual review is complete, use `docs/manual_keyword_review_followup.md`
+  as the agent implementation checklist.
 - [x] Chinese social sentiment/topic pipeline: `scripts/build_chinese_social_media_dataset.py`
   builds cleaned Chinese social outputs with SnowNLP baseline sentiment from
   one `make chinese-social` trigger for Xiaohongshu rows and parsed Douyin
@@ -69,17 +75,19 @@ Chinese social inputs are external and should remain external:
   filters by Fukui prefecture metadata, scores English reviews with VADER,
   scores Japanese reviews with oseti, writes ignored row-level output, and tracks
   aggregate summaries/tests/readiness with hashes and dependency versions.
-- [ ] Statistical comparison suite: JP-EN review-row tests, POI-level sensitivity,
+- [x] Statistical comparison suite: JP-EN review-row tests, POI-level sensitivity,
   POI cluster-bootstrap sensitivity, and Fukui-only
-  EN/JP/CN aggregate baseline outputs exist. Still needed: decide whether final
-  presentation summaries should weight POIs equally or by review volume, decide
-  whether a clustered/covariate model is justified, and add EN/JP/CN statistical
-  comparisons once Chinese codebook outputs are promoted and platform/date
-  caveats are locked.
-- [ ] Presentation outputs: presentation-safe figures and captions are not built
-  yet. Slides must carry POI mix, date range, source hashes, denominators, and
-  source/platform caveats for any Japanese-language vs English-language review
-  sentiment comparison.
+  EN/JP/CN aggregate baseline outputs exist. Current valid tests include
+  common-scale Google `review_rating` Welch t-test / Welch ANOVA, explicit
+  skipped raw-score parametric tests for VADER/oseti/SnowNLP non-equivalence,
+  EN/JP/CN sentiment-category chi-square/Fisher tests, and within-Chinese
+  source-platform tests. Cross-source friction/enjoyment evidence tests remain
+  skipped until JP/EN reviewed codebooks land.
+- [x] Presentation outputs: `make presentation-safe` builds aggregate-only JP-EN
+  chart/table data, captions, readiness notes, hashes, date coverage, and
+  POI-category mix under `output/presentation_safe/`. The stage regenerates from
+  real ignored inputs, fails on missing metadata instead of placeholders, and
+  scans generated data for dummy/placeholder/test markers and row-level fields.
 
 ## Expected Analysis Shape
 

@@ -160,17 +160,28 @@ def test_build_outputs_aggregate_excludes_forbidden_row_level_fields(tmp_path):
     assert not (forbidden & set(tests.columns))
     assert summary["n_reviews"].sum() == 4
     assert "mann_whitney_u_sentiment_score" in set(tests["test_name"])
+    assert "raw_score_parametric_tests_not_run" in set(tests["test_name"])
+    assert "welch_t_review_rating" in set(tests["test_name"])
+    assert "welch_anova_review_rating" in set(tests["test_name"])
     assert (
         {"chi_square_sentiment_category", "fisher_exact_sentiment_category"}
         & set(tests["test_name"])
     )
     assert "poi_level_mann_whitney_mean_sentiment_score" in set(tests["test_name"])
     assert "cluster_bootstrap_poi_mean_difference_sentiment_score" in set(tests["test_name"])
+    assert "poi_level_welch_t_mean_review_rating" in set(tests["test_name"])
+    raw_parametric = tests[tests["test_name"] == "raw_score_parametric_tests_not_run"].iloc[0]
+    assert raw_parametric["status"] == "skipped"
+    assert "different tool-specific scales" in raw_parametric["details_json"]
+    rating_t = tests[tests["test_name"] == "welch_t_review_rating"].iloc[0]
+    assert rating_t["status"] == "ok"
+    assert "common_google_1_to_5_star_rating" in rating_t["details_json"]
 
     readiness = (tmp_path / "agg" / "sentiment_readiness.md").read_text(encoding="utf-8")
     assert report["input"]["sha256"] in readiness
     assert report["outputs"]["row_level_sha256"] in readiness
     assert "codebook_evidence_status: pending" in readiness
+    assert "Raw sentiment-score t-tests/ANOVA are skipped" in readiness
 
     manifest = json.loads((tmp_path / "agg" / "sentiment_manifest.json").read_text(encoding="utf-8"))
     assert manifest["schema_version"] == "sentiment_manifest.v2"
