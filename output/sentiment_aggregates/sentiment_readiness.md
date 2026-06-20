@@ -1,13 +1,13 @@
 # Sentiment Readiness
 
-- generated_at: 2026-06-18T10:57:49+00:00
+- generated_at: 2026-06-20T02:47:52+00:00
 - command: `scripts/build_sentiment_analysis.py --groups japanese,english --prefecture Fukui`
-- input: `/Users/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/output/multilingual_review_analysis/reviews_multilingual.csv`
-- input_sha256: `7642ca798262f925ee165582c5e5e341cd0d768d4bd034b8d0d6998e4d589579`
-- poi_metadata: `/Users/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/output/checkpoints/poi_metadata.json`
-- poi_metadata_sha256: `9c4312d2ff2469add73460a7dd50852562fac9b72684b73eebd49c5d26e4052c`
-- row_level_output: `/Users/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/output/sentiment_row_level/google_reviews_fukui_japanese-english.csv`
-- row_level_sha256: `5f63deb2acfc69ffddfde138195c68d05e9b4f0dabeaf5e7bf782ad0ba77aed4`
+- input: `/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/output/multilingual_review_analysis/reviews_multilingual.csv`
+- input_sha256: `6bc06f34848954674506f6fefb84ffd9689b4cc9b2c90780fd5c8fc45eafaa56`
+- poi_metadata: `/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/output/checkpoints/poi_metadata.json`
+- poi_metadata_sha256: `34b088a57c0e61d23471cf3745ca2ec6e2811dce71aa7ab2a5a508fa5178e79a`
+- row_level_output: `/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/output/sentiment_row_level/google_reviews_fukui_japanese-english.csv`
+- row_level_sha256: `3af51c8f32cdfe24207f32071ef3c74d9ff0271cd306bce7462bcbc4913de542`
 - filters: city == `None`, prefecture == `Fukui`, language_group in ['japanese', 'english']
 - primary_unit: one Google review row
 - codebook_evidence_status: pending
@@ -17,7 +17,7 @@
 
 - pandas: 3.0.3
 - numpy: 2.4.6
-- scipy: 1.17.1
+- scipy: 1.18.0
 - vaderSentiment: 3.3.2
 - oseti: 0.4.3.1
 - mecab-python3: 1.0.12
@@ -29,8 +29,8 @@
 ## Dependency Reproducibility
 
 - setup_command: `.venv/bin/python3 scripts/bootstrap_sentiment_environment.py`
-- sentiment_lock: `/Users/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/requirements-sentiment.lock.txt`
-- environment_doc: `/Users/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/docs/sentiment_environment.md`
+- sentiment_lock: `/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/requirements-sentiment.lock.txt`
+- environment_doc: `/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/docs/sentiment_environment.md`
 - known_metadata_exception: oseti 0.4.3.1 declares legacy mecab; runtime uses mecab-python3 plus ipadic and initializes MeCab with -r /dev/null.
 
 ## Denominators
