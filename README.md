@@ -60,6 +60,23 @@ friction/topic/positive-evidence codebook matching:
 TOURISM_DATA_DIR=/Users/andrewgreen/Repositories/tourism-data make chinese-social
 ```
 
+Build Chinese-specific presentation figures and supporting aggregate data views:
+
+```bash
+make chinese-insights
+```
+
+This writes tracked, aggregate-only outputs under
+`output/chinese_specific_insights/`, including SVG figures for category
+topic occurrence by positive/negative sentiment, top reviewed sentiment
+keywords, platform sentiment shares, and theme volume. The figure generator uses the Python standard library plus
+`pandas`, which is already listed in `requirements.txt`; no extra plotting
+package is required. The companion CSV files preserve the denominators behind
+each figure and omit row-level text, authors, URLs, and source record IDs.
+Theme figures show classified themes only; the backing CSV keeps
+`unclassified`, which is high in the current snapshot because parsed Douyin
+comments do not yet have companion theme annotations.
+
 Sync Google review artifacts from the local `english-fukui-tourism` clone. If
 that directory is absent, the script uses the current local clone path
 `/Users/andrewgreen/Repositories/andrew-verde/america-fukui-tourism`, whose Git

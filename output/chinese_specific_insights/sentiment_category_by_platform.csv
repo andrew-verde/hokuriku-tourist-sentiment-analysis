@@ -1,0 +1,7 @@
+source_platform,sentiment_category,count,pct_platform_rows
+douyin,negative,299,19.658
+douyin,neutral,78,5.128
+douyin,positive,1144,75.214
+xiaohongshu,negative,30,20.134
+xiaohongshu,neutral,2,1.342
+xiaohongshu,positive,117,78.523

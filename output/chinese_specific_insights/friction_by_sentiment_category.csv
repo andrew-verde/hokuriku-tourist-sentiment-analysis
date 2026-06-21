@@ -1,0 +1,20 @@
+sentiment_category,code_family,code,label,count,denominator_rows,pct_sentiment_category_rows
+negative,friction,transport_access,Transport / Access,10,329,3.04
+negative,friction,waiting_crowding,Waiting / Crowding,7,329,2.128
+negative,friction,cleanliness_comfort,Cleanliness / Comfort,6,329,1.824
+negative,friction,price_value,Price / Value,5,329,1.52
+negative,friction,wayfinding_signage,Wayfinding / Signage,4,329,1.216
+negative,friction,opening_hours_availability,Opening Hours / Availability,3,329,0.912
+negative,friction,staff_communication,Staff Communication,2,329,0.608
+negative,friction,booking_ticketing,Booking / Ticketing,1,329,0.304
+neutral,friction,price_value,Price / Value,1,80,1.25
+neutral,friction,waiting_crowding,Waiting / Crowding,1,80,1.25
+positive,friction,transport_access,Transport / Access,58,1261,4.6
+positive,friction,price_value,Price / Value,17,1261,1.348
+positive,friction,booking_ticketing,Booking / Ticketing,13,1261,1.031
+positive,friction,waiting_crowding,Waiting / Crowding,12,1261,0.952
+positive,friction,cleanliness_comfort,Cleanliness / Comfort,8,1261,0.634
+positive,friction,accessibility_mobility,Accessibility / Mobility,6,1261,0.476
+positive,friction,opening_hours_availability,Opening Hours / Availability,6,1261,0.476
+positive,friction,wayfinding_signage,Wayfinding / Signage,5,1261,0.397
+positive,friction,staff_communication,Staff Communication,4,1261,0.317

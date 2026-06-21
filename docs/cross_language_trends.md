@@ -64,6 +64,31 @@ make sentiment-analysis ─────► make presentation-safe
 - `douyin_provenance_report.json`
 - `chinese_reviewed_codebook_runtime_summary.csv`
 
+`make chinese-insights` turns those Chinese-only outputs into tracked
+presentation figures and aggregate data views under
+`output/chinese_specific_insights/`:
+
+- `figure_keyword_occurrence_by_category.svg`
+- `figure_top_sentiment_keywords.svg`
+- `figure_sentiment_category_by_platform.svg`
+- `figure_theme_sentiment.svg`
+- `keyword_occurrence_by_category.csv`
+- `sentiment_keyword_counts.csv`
+- `keywords_by_snownlp_sentiment_category.csv`
+- `theme_sentiment_summary.csv`
+
+The SVG figures are generated without a plotting dependency: the script uses
+`pandas` plus Python standard-library SVG writing, so `requirements.txt` remains
+the complete runtime package list for this step. The CSVs are the auditable
+source for each figure and keep denominators, code labels, and caveats while
+excluding row-level post/comment text, authors, URLs, and source IDs.
+The main keyword-occurrence figure focuses on reviewed topic evidence split by
+positive vs negative SnowNLP category, so positive-sentiment evidence terms do
+not crowd out concrete Fukui topics.
+The theme figure shows classified themes only; the CSV retains `unclassified`.
+At the current snapshot, `unclassified` is high because the companion theme
+annotations cover Xiaohongshu note IDs but not the parsed Douyin comment rows.
+
 `make presentation-safe` is deliberately narrower than the cross-language
 baseline. It consumes tracked JP-EN sentiment aggregate files plus the ignored
 scored-review audit file named in the sentiment manifest, then produces

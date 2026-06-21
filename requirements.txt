@@ -8,6 +8,9 @@ openpyxl>=3.1
 snownlp>=0.12
 vaderSentiment>=3.3
 
+# Chinese-specific insight figures are written as SVG with the Python standard
+# library and pandas; no matplotlib/seaborn/plotly dependency is required.
+
 # Japanese sentiment runtime has a separate reproducible bootstrap because
 # oseti's PyPI metadata depends on legacy `mecab`, which requires system
 # `mecab-config` on macOS. Use:

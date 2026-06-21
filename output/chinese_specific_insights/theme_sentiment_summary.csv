@@ -1,0 +1,10 @@
+theme,source_platform,rows,sentiment_norm_mean,positive_rows,negative_rows,positive_pct,negative_pct
+unclassified,all,1522,0.726101,1145,299,75.23,19.645
+unclassified,douyin,1521,0.725921,1144,299,75.214,19.658
+travel,xiaohongshu,94,0.85318,80,13,85.106,13.83
+travel,all,94,0.85318,80,13,85.106,13.83
+fan,xiaohongshu,49,0.68101,33,15,67.347,30.612
+fan,all,49,0.68101,33,15,67.347,30.612
+ordinary,xiaohongshu,5,0.563761,3,2,60.0,40.0
+ordinary,all,5,0.563761,3,2,60.0,40.0
+unclassified,xiaohongshu,1,1.0,1,0,100.0,0.0

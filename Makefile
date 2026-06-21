@@ -1,6 +1,6 @@
 PYTHON = .venv/bin/python3
 
-.PHONY: help test chinese-codebook-template reviewed-codebook-config reviewed-codebook-status chinese-social multilingual-reviews cross-language-trends sentiment-env sentiment-analysis presentation-safe
+.PHONY: help test chinese-codebook-template reviewed-codebook-config reviewed-codebook-status chinese-social chinese-insights multilingual-reviews cross-language-trends sentiment-env sentiment-analysis presentation-safe
 
 help:
 	@echo "Hokuriku tourist sentiment analysis"
@@ -9,6 +9,7 @@ help:
 	@echo "  make reviewed-codebook-status Show JP/EN review completion counts"
 	@echo "  make reviewed-codebook-config Import completed reviewed JP/EN codebook YAML"
 	@echo "  make chinese-social          Build Chinese XHS/Douyin cleaned outputs"
+	@echo "  make chinese-insights        Build tracked Chinese-specific figure/data outputs"
 	@echo "  make multilingual-reviews    Sync local Google review data from english-fukui-tourism"
 	@echo "  make cross-language-trends   Build Fukui-first EN/JP/CN baseline tables"
 	@echo "  make sentiment-env           Install pinned JP-EN sentiment runtime"
@@ -27,6 +28,9 @@ reviewed-codebook-config:
 
 chinese-social:
 	$(PYTHON) scripts/build_chinese_social_media_dataset.py
+
+chinese-insights:
+	$(PYTHON) scripts/build_chinese_specific_insights.py
 
 multilingual-reviews:
 	$(PYTHON) scripts/sync_google_review_data.py

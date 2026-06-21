@@ -1,0 +1,25 @@
+sentiment_category,code_family,code,label,count,denominator_rows,pct_sentiment_category_rows
+negative,topic,fan_pilgrimage_pop_culture,Fan Pilgrimage / Pop Culture,17,329,5.167
+negative,topic,history_culture,History / Culture,14,329,4.255
+negative,topic,temples_spiritual,Temples / Spiritual,13,329,3.951
+negative,topic,food_local_cuisine,Food / Local Cuisine,10,329,3.04
+negative,topic,hot_springs_relaxation,Hot Springs / Relaxation,10,329,3.04
+negative,topic,accommodation,Accommodation,8,329,2.432
+negative,topic,crafts_shopping,Crafts / Shopping,7,329,2.128
+negative,topic,scenic_nature,Scenic Nature,7,329,2.128
+negative,topic,seasonal_events,Seasonal Events,5,329,1.52
+negative,topic,dinosaurs_museums,Dinosaurs / Museums,1,329,0.304
+neutral,topic,history_culture,History / Culture,4,80,5.0
+neutral,topic,fan_pilgrimage_pop_culture,Fan Pilgrimage / Pop Culture,1,80,1.25
+neutral,topic,food_local_cuisine,Food / Local Cuisine,1,80,1.25
+neutral,topic,scenic_nature,Scenic Nature,1,80,1.25
+positive,topic,history_culture,History / Culture,98,1261,7.772
+positive,topic,temples_spiritual,Temples / Spiritual,85,1261,6.741
+positive,topic,scenic_nature,Scenic Nature,77,1261,6.106
+positive,topic,hot_springs_relaxation,Hot Springs / Relaxation,55,1261,4.362
+positive,topic,fan_pilgrimage_pop_culture,Fan Pilgrimage / Pop Culture,54,1261,4.282
+positive,topic,dinosaurs_museums,Dinosaurs / Museums,43,1261,3.41
+positive,topic,food_local_cuisine,Food / Local Cuisine,41,1261,3.251
+positive,topic,crafts_shopping,Crafts / Shopping,33,1261,2.617
+positive,topic,accommodation,Accommodation,29,1261,2.3
+positive,topic,seasonal_events,Seasonal Events,26,1261,2.062

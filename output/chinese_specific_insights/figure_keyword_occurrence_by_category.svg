@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="618" viewBox="0 0 1000 618">
+<rect width="100%" height="100%" fill="#fbfaf7"/>
+<text x="32" y="38" font-family="Arial, sans-serif" font-size="24" font-weight="700" fill="#1f2933">Chinese Topic Evidence by Sentiment</text>
+<text x="32" y="66" font-family="Arial, sans-serif" font-size="14" fill="#52616b">Topic keyword matches across n=1,670 rows; positive n=1,261, negative n=329</text>
+<text x="266" y="126" text-anchor="end" font-family="Arial, sans-serif" font-size="13" fill="#1f2933">History / Culture</text>
+<rect x="280" y="107" width="640.00" height="14" rx="3" fill="#2f6f73"/>
+<rect x="280" y="125" width="91.43" height="14" rx="3" fill="#9a031e"/>
+<text x="928.0" y="119" font-family="Arial, sans-serif" font-size="11" fill="#1f2933">98</text>
+<text x="379.42857142857144" y="137" font-family="Arial, sans-serif" font-size="11" fill="#1f2933">14</text>
+<text x="266" y="172" text-anchor="end" font-family="Arial, sans-serif" font-size="13" fill="#1f2933">Temples / Spiritual</text>
+<rect x="280" y="153" width="555.10" height="14" rx="3" fill="#2f6f73"/>
+<rect x="280" y="171" width="84.90" height="14" rx="3" fill="#9a031e"/>
+<text x="843.1020408163265" y="165" font-family="Arial, sans-serif" font-size="11" fill="#1f2933">85</text>
+<text x="372.8979591836735" y="183" font-family="Arial, sans-serif" font-size="11" fill="#1f2933">13</text>
+<text x="266" y="218" text-anchor="end" font-family="Arial, sans-serif" font-size="13" fill="#1f2933">Scenic Nature</text>
+<rect x="280" y="199" width="502.86" height="14" rx="3" fill="#2f6f73"/>
+<rect x="280" y="217" width="45.71" height="14" rx="3" fill="#9a031e"/>
+<text x="790.8571428571429" y="211" font-family="Arial, sans-serif" font-size="11" fill="#1f2933">77</text>
+<text x="333.7142857142857" y="229" font-family="Arial, sans-serif" font-size="11" fill="#1f2933">7</text>
+<text x="266" y="264" text-anchor="end" font-family="Arial, sans-serif" font-size="13" fill="#1f2933">Fan Pilgrimage / Pop Culture</text>
+<rect x="280" y="245" width="352.65" height="14" rx="3" fill="#2f6f73"/>
+<rect x="280" y="263" width="111.02" height="14" rx="3" fill="#9a031e"/>
+<text x="640.6530612244898" y="257" font-family="Arial, sans-serif" font-size="11" fill="#1f2933">54</text>
+<text x="399.0204081632653" y="275" font-family="Arial, sans-serif" font-size="11" fill="#1f2933">17</text>
+<text x="266" y="310" text-anchor="end" font-family="Arial, sans-serif" font-size="13" fill="#1f2933">Hot Springs / Relaxation</text>
+<rect x="280" y="291" width="359.18" height="14" rx="3" fill="#2f6f73"/>
+<rect x="280" y="309" width="65.31" height="14" rx="3" fill="#9a031e"/>
+<text x="647.1836734693877" y="303" font-family="Arial, sans-serif" font-size="11" fill="#1f2933">55</text>
+<text x="353.3061224489796" y="321" font-family="Arial, sans-serif" font-size="11" fill="#1f2933">10</text>
+<text x="266" y="356" text-anchor="end" font-family="Arial, sans-serif" font-size="13" fill="#1f2933">Food / Local Cuisine</text>
+<rect x="280" y="337" width="267.76" height="14" rx="3" fill="#2f6f73"/>
+<rect x="280" y="355" width="65.31" height="14" rx="3" fill="#9a031e"/>
+<text x="555.7551020408164" y="349" font-family="Arial, sans-serif" font-size="11" fill="#1f2933">41</text>
+<text x="353.3061224489796" y="367" font-family="Arial, sans-serif" font-size="11" fill="#1f2933">10</text>
+<text x="266" y="402" text-anchor="end" font-family="Arial, sans-serif" font-size="13" fill="#1f2933">Dinosaurs / Museums</text>
+<rect x="280" y="383" width="280.82" height="14" rx="3" fill="#2f6f73"/>
+<rect x="280" y="401" width="6.53" height="14" rx="3" fill="#9a031e"/>
+<text x="568.8163265306123" y="395" font-family="Arial, sans-serif" font-size="11" fill="#1f2933">43</text>
+<text x="294.53061224489795" y="413" font-family="Arial, sans-serif" font-size="11" fill="#1f2933">1</text>
+<text x="266" y="448" text-anchor="end" font-family="Arial, sans-serif" font-size="13" fill="#1f2933">Crafts / Shopping</text>
+<rect x="280" y="429" width="215.51" height="14" rx="3" fill="#2f6f73"/>
+<rect x="280" y="447" width="45.71" height="14" rx="3" fill="#9a031e"/>
+<text x="503.51020408163265" y="441" font-family="Arial, sans-serif" font-size="11" fill="#1f2933">33</text>
+<text x="333.7142857142857" y="459" font-family="Arial, sans-serif" font-size="11" fill="#1f2933">7</text>
+<text x="266" y="494" text-anchor="end" font-family="Arial, sans-serif" font-size="13" fill="#1f2933">Accommodation</text>
+<rect x="280" y="475" width="189.39" height="14" rx="3" fill="#2f6f73"/>
+<rect x="280" y="493" width="52.24" height="14" rx="3" fill="#9a031e"/>
+<text x="477.38775510204084" y="487" font-family="Arial, sans-serif" font-size="11" fill="#1f2933">29</text>
+<text x="340.2448979591837" y="505" font-family="Arial, sans-serif" font-size="11" fill="#1f2933">8</text>
+<text x="266" y="540" text-anchor="end" font-family="Arial, sans-serif" font-size="13" fill="#1f2933">Seasonal Events</text>
+<rect x="280" y="521" width="169.80" height="14" rx="3" fill="#2f6f73"/>
+<rect x="280" y="539" width="32.65" height="14" rx="3" fill="#9a031e"/>
+<text x="457.795918367347" y="533" font-family="Arial, sans-serif" font-size="11" fill="#1f2933">26</text>
+<text x="320.6530612244898" y="551" font-family="Arial, sans-serif" font-size="11" fill="#1f2933">5</text>
+<rect x="280" y="580" width="10" height="10" fill="#2f6f73"/>
+<text x="296" y="590" font-family="Arial, sans-serif" font-size="12" fill="#52616b">positive SnowNLP rows</text>
+<rect x="470" y="580" width="10" height="10" fill="#9a031e"/>
+<text x="486" y="590" font-family="Arial, sans-serif" font-size="12" fill="#52616b">negative SnowNLP rows</text>
+</svg>
