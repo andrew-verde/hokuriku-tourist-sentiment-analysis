@@ -15,7 +15,7 @@ from scripts.build_presentation_safe_outputs import (
 )
 
 
-def _write_inputs(tmp_path: Path) -> tuple[Path, Path, Path]:
+def _write_inputs(tmp_path: Path) -> tuple[Path, Path, Path, Path, Path]:
     summary = tmp_path / "source_group_sentiment_summary.csv"
     summary.write_text(
         "source_group,language_group,prefecture_normalized,city,n_reviews,n_scored,"
@@ -67,16 +67,36 @@ def _write_inputs(tmp_path: Path) -> tuple[Path, Path, Path]:
         "r5,Fukui,Fukui,Fukui,p5,park,2026-05-05T00:00:00+00:00,2,japanese,24,-0.5,negative\n",
         encoding="utf-8",
     )
-    return summary, tests, manifest
+    baseline = tmp_path / "cross_language_baseline_snapshot.csv"
+    baseline.write_text(
+        "prefecture,city,group,source_kind,volume,rating_mean,sentiment_norm_mean,positive_pct,neutral_pct,negative_pct\n"
+        "Fukui,Fukui,chinese_social_douyin,chinese_social_post,10,,0.7,70.0,10.0,20.0\n"
+        "Fukui,Fukui,chinese_social_xiaohongshu,chinese_social_post,5,,0.8,80.0,0.0,20.0\n"
+        "Fukui,Fukui,english,google_review,2,4.5,,,\n"
+        "Fukui,Fukui,japanese,google_review,3,4.0,,,\n",
+        encoding="utf-8",
+    )
+    cross_tests = tmp_path / "cross_language_statistical_tests.csv"
+    cross_tests.write_text(
+        "test_name,comparison,status,statistic,p_value,effect,details_json\n"
+        'cross_source_sentiment_category_independence,all,ok,3.2,0.04,0.2,"{}"\n'
+        'within_chinese_platform_sentiment_category_independence,chinese_source_platforms,ok,1.1,0.2,0.1,"{}"\n'
+        'cross_source_friction_prevalence_not_run,all,skipped,,,"","{}"\n'
+        'cross_source_enjoyment_recommendation_prevalence_not_run,all,skipped,,,"","{}"\n',
+        encoding="utf-8",
+    )
+    return summary, tests, manifest, baseline, cross_tests
 
 
 def test_builds_presentation_safe_aggregate_files_with_required_provenance(tmp_path):
-    summary, tests, manifest = _write_inputs(tmp_path)
+    summary, tests, manifest, baseline, cross_tests = _write_inputs(tmp_path)
 
     report = build_presentation_safe_outputs(
         sentiment_summary_path=summary,
         sentiment_tests_path=tests,
         sentiment_manifest_path=manifest,
+        cross_language_baseline_path=baseline,
+        cross_language_tests_path=cross_tests,
         output_dir=tmp_path / "presentation",
         command="pytest command",
     )
@@ -88,9 +108,21 @@ def test_builds_presentation_safe_aggregate_files_with_required_provenance(tmp_p
     readiness = (tmp_path / "presentation" / "presentation_readiness.md").read_text(
         encoding="utf-8"
     )
+    figure_questions = (
+        tmp_path / "presentation" / "presentation_figure_questions.md"
+    ).read_text(encoding="utf-8")
     manifest_out = json.loads(
         (tmp_path / "presentation" / "presentation_manifest.json").read_text(encoding="utf-8")
     )
+    figure_paths = [
+        tmp_path / "presentation" / "japanese" / "figure_japanese_sentiment_profile.svg",
+        tmp_path / "presentation" / "japanese" / "figure_japanese_poi_priority_mix.svg",
+        tmp_path / "presentation" / "english" / "figure_english_sentiment_profile.svg",
+        tmp_path / "presentation" / "english" / "figure_english_poi_priority_mix.svg",
+        tmp_path / "presentation" / "multilingual" / "figure_sentiment_share_by_language_source.svg",
+        tmp_path / "presentation" / "multilingual" / "figure_volume_context.svg",
+        tmp_path / "presentation" / "multilingual" / "figure_statistical_evidence_summary.svg",
+    ]
 
     assert set(chart["language_source_group"]) == {
         "english-language Google reviews",
@@ -111,6 +143,17 @@ def test_builds_presentation_safe_aggregate_files_with_required_provenance(tmp_p
     assert "Date range: derived from parseable review_date values" in readiness
     assert "Date coverage: chart data includes parseable and missing review_date counts" in readiness
     assert "POI mix: derived from ignored scored-review audit file" in readiness
+    assert "`japanese/`" in readiness
+    assert "`english/`" in readiness
+    assert "`multilingual/`" in readiness
+    assert "Questions answered by each figure" in readiness
+    assert "Question answered: What share of japanese-language Fukui Google reviews" in figure_questions
+    assert "Question answered: How do positive, neutral, and negative category shares differ" in figure_questions
+    for path in figure_paths:
+        assert path.exists()
+        svg = path.read_text(encoding="utf-8")
+        assert "<svg" in svg
+        assert "placeholder" not in svg.lower()
     assert "not nationality" in readiness
     assert "reviewer" not in "\n".join(chart.astype(str).to_numpy().ravel())
 
@@ -119,23 +162,32 @@ def test_builds_presentation_safe_aggregate_files_with_required_provenance(tmp_p
     assert manifest_out["metrics"]["codebook_evidence_status"] == "pending"
     assert manifest_out["metrics"]["date_range_status"] == "derived_from_scored_review_audit_file"
     assert manifest_out["metrics"]["poi_mix_status"] == "derived_from_scored_review_audit_file"
+    assert manifest_out["metrics"]["figure_count"] == 7
     assert manifest_out["extra"]["source_hashes"]["reviews_input_sha256"] == "a" * 64
-    assert {record["role"] for record in manifest_out["outputs"]} == {
+    output_roles = {record["role"] for record in manifest_out["outputs"]}
+    assert {
         "presentation_chart_data",
         "presentation_statistical_summary",
+        "presentation_figure_questions",
         "presentation_readiness_markdown",
-    }
-    assert "ignored_scored_review_audit_file" in {record["role"] for record in manifest_out["inputs"]}
+    } <= output_roles
+    assert len([role for role in output_roles if role.startswith("presentation_figure_")]) == 8
+    input_roles = {record["role"] for record in manifest_out["inputs"]}
+    assert "ignored_scored_review_audit_file" in input_roles
+    assert "aggregate_cross_language_baseline" in input_roles
+    assert "aggregate_cross_language_statistical_tests" in input_roles
 
 
 def test_missing_inputs_and_required_columns_fail_loud(tmp_path):
-    summary, tests, manifest = _write_inputs(tmp_path)
+    summary, tests, manifest, baseline, cross_tests = _write_inputs(tmp_path)
 
     with pytest.raises(MissingInputError, match="make sentiment-analysis"):
         build_presentation_safe_outputs(
             sentiment_summary_path=tmp_path / "missing.csv",
             sentiment_tests_path=tests,
             sentiment_manifest_path=manifest,
+            cross_language_baseline_path=baseline,
+            cross_language_tests_path=cross_tests,
             output_dir=tmp_path / "presentation",
         )
 
@@ -146,5 +198,7 @@ def test_missing_inputs_and_required_columns_fail_loud(tmp_path):
             sentiment_summary_path=bad_summary,
             sentiment_tests_path=tests,
             sentiment_manifest_path=manifest,
+            cross_language_baseline_path=baseline,
+            cross_language_tests_path=cross_tests,
             output_dir=tmp_path / "presentation",
         )

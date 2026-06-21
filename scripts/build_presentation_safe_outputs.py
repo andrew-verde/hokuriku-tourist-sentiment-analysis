@@ -12,6 +12,7 @@ manual capture files.
 from __future__ import annotations
 
 import argparse
+import html
 import json
 import sys
 from pathlib import Path
@@ -40,6 +41,12 @@ DEFAULT_SENTIMENT_TESTS_PATH = (
     ROOT / "output" / "sentiment_aggregates" / "source_group_sentiment_tests.csv"
 )
 DEFAULT_SENTIMENT_MANIFEST_PATH = ROOT / "output" / "sentiment_aggregates" / "sentiment_manifest.json"
+DEFAULT_CROSS_LANGUAGE_BASELINE_PATH = (
+    ROOT / "output" / "cross_language_trends" / "cross_language_baseline_snapshot.csv"
+)
+DEFAULT_CROSS_LANGUAGE_TESTS_PATH = (
+    ROOT / "output" / "cross_language_trends" / "cross_language_statistical_tests.csv"
+)
 DEFAULT_OUTPUT_DIR = ROOT / "output" / "presentation_safe"
 
 REQUIRED_SUMMARY_COLUMNS = {
@@ -77,6 +84,19 @@ REQUIRED_ROW_LEVEL_COLUMNS = {
     "language_group",
 }
 
+REQUIRED_BASELINE_COLUMNS = {
+    "prefecture",
+    "city",
+    "group",
+    "source_kind",
+    "volume",
+    "rating_mean",
+    "sentiment_norm_mean",
+    "positive_pct",
+    "neutral_pct",
+    "negative_pct",
+}
+
 FORBIDDEN_PRESENTATION_COLUMNS = {
     "review_text",
     "text_content",
@@ -91,6 +111,17 @@ FORBIDDEN_PRESENTATION_COLUMNS = {
     "review_id",
     "source_review_id",
     "source_record_id",
+}
+
+FIGURE_PALETTE = {
+    "english": "#2f6f73",
+    "japanese": "#5b6c94",
+    "chinese_social": "#bc6c25",
+    "positive": "#2f6f73",
+    "neutral": "#8d99ae",
+    "negative": "#9a031e",
+    "rating": "#5b6c94",
+    "volume": "#bc6c25",
 }
 
 FORBIDDEN_PRESENTATION_VALUES = {
@@ -218,6 +249,307 @@ def _assert_no_fake_or_placeholder_values(df: pd.DataFrame, context: str) -> Non
         )
 
 
+def _fmt_n(value: int | float) -> str:
+    return f"{int(value):,}"
+
+
+def _pct(numerator: float, denominator: float) -> float:
+    return round((numerator / denominator) * 100, 3) if denominator else 0.0
+
+
+def _language_key(language_source_group: str) -> str:
+    return str(language_source_group).split("-language", maxsplit=1)[0]
+
+
+def _svg_header(width: int, height: int, title: str, subtitle: str) -> list[str]:
+    return [
+        f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}">',
+        '<rect width="100%" height="100%" fill="#fbfaf7"/>',
+        f'<text x="32" y="38" font-family="Arial, sans-serif" font-size="24" font-weight="700" fill="#1f2933">{html.escape(title)}</text>',
+        f'<text x="32" y="66" font-family="Arial, sans-serif" font-size="14" fill="#52616b">{html.escape(subtitle)}</text>',
+    ]
+
+
+def _write_single_sentiment_profile(row: pd.Series, path: Path, language_label: str) -> None:
+    width = 1000
+    height = 250
+    left = 190
+    top = 108
+    chart_width = 690
+    categories = [
+        ("negative", float(row["negative_pct"])),
+        ("neutral", float(row["neutral_pct"])),
+        ("positive", float(row["positive_pct"])),
+    ]
+    parts = _svg_header(
+        width,
+        height,
+        f"{language_label} Sentiment Profile",
+        (
+            f"{row['sentiment_tool']} secondary check; n={_fmt_n(row['n_reviews'])}, "
+            f"mean rating={float(row['mean_review_rating']):.2f}"
+        ),
+    )
+    parts.append(
+        f'<text x="{left - 14}" y="{top + 24}" text-anchor="end" font-family="Arial, sans-serif" font-size="14" fill="#1f2933">share of rows</text>'
+    )
+    x = left
+    for category, value in categories:
+        segment_width = (value / 100.0) * chart_width
+        parts.append(
+            f'<rect x="{x:.2f}" y="{top + 7}" width="{segment_width:.2f}" height="26" fill="{FIGURE_PALETTE[category]}"/>'
+        )
+        if segment_width > 48:
+            parts.append(
+                f'<text x="{x + segment_width / 2:.2f}" y="{top + 26}" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#ffffff">{value:.1f}%</text>'
+            )
+        x += segment_width
+    parts.append(
+        f'<text x="{left}" y="{top + 72}" font-family="Arial, sans-serif" font-size="13" fill="#52616b">Date range: {html.escape(str(row["date_range_start"]))} to {html.escape(str(row["date_range_end"]))}; dated={_fmt_n(row["review_date_parseable_count"])}, undated={_fmt_n(row["review_date_missing_count"])}</text>'
+    )
+    legend_y = height - 34
+    legend_x = left
+    for index, (category, value) in enumerate(categories):
+        offset = index * 150
+        parts.extend([
+            f'<rect x="{legend_x + offset}" y="{legend_y - 10}" width="10" height="10" fill="{FIGURE_PALETTE[category]}"/>',
+            f'<text x="{legend_x + offset + 16}" y="{legend_y}" font-family="Arial, sans-serif" font-size="12" fill="#52616b">{category} ({value:.1f}%)</text>',
+        ])
+    parts.append("</svg>")
+    path.write_text("\n".join(parts), encoding="utf-8")
+
+
+def _poi_mix_rows(row: pd.Series) -> list[dict[str, object]]:
+    rows = []
+    total = int(row["n_reviews"])
+    for item in str(row["poi_mix"]).split(";"):
+        if "=" not in item:
+            continue
+        category, count = item.strip().split("=", maxsplit=1)
+        count_int = int(count)
+        rows.append({
+            "category": category,
+            "count": count_int,
+            "pct": _pct(count_int, total),
+        })
+    return sorted(rows, key=lambda item: (-int(item["count"]), str(item["category"])))
+
+
+def _write_poi_priority_mix(row: pd.Series, path: Path, language_label: str) -> None:
+    rows = _poi_mix_rows(row)
+    width = 1000
+    top = 100
+    row_height = 38
+    left = 270
+    right = 90
+    height = top + 58 + max(1, len(rows)) * row_height
+    chart_width = width - left - right
+    max_count = max([int(item["count"]) for item in rows] or [1])
+    parts = _svg_header(
+        width,
+        height,
+        f"{language_label} Tourism Priority Mix",
+        f"Google review POI-category distribution; n={_fmt_n(row['n_reviews'])} rows",
+    )
+    color = FIGURE_PALETTE[_language_key(row["language_source_group"])]
+    for index, item in enumerate(rows):
+        y = top + index * row_height
+        bar_width = (int(item["count"]) / max_count) * chart_width
+        label = str(item["category"]).replace("_", " ")
+        parts.extend([
+            f'<text x="{left - 14}" y="{y + 23}" text-anchor="end" font-family="Arial, sans-serif" font-size="13" fill="#1f2933">{html.escape(label[:34])}</text>',
+            f'<rect x="{left}" y="{y + 8}" width="{bar_width:.2f}" height="20" rx="3" fill="{color}"/>',
+            f'<text x="{left + bar_width + 8}" y="{y + 23}" font-family="Arial, sans-serif" font-size="12" fill="#1f2933">{_fmt_n(item["count"])} ({float(item["pct"]):.1f}%)</text>',
+        ])
+    parts.append("</svg>")
+    path.write_text("\n".join(parts), encoding="utf-8")
+
+
+def _write_multilingual_sentiment_share(
+    chart: pd.DataFrame,
+    baseline: pd.DataFrame,
+    path: Path,
+) -> None:
+    rows = []
+    for _, row in chart.iterrows():
+        language = _language_key(row["language_source_group"])
+        rows.append({
+            "label": f"{language} Google reviews",
+            "n": int(row["n_reviews"]),
+            "negative": float(row["negative_pct"]),
+            "neutral": float(row["neutral_pct"]),
+            "positive": float(row["positive_pct"]),
+        })
+    chinese = baseline[baseline["source_kind"] == "chinese_social_post"].copy()
+    if not chinese.empty:
+        total = int(chinese["volume"].sum())
+        rows.append({
+            "label": "Chinese-language social rows",
+            "n": total,
+            "negative": round(float((chinese["negative_pct"] * chinese["volume"]).sum()) / total, 3),
+            "neutral": round(float((chinese["neutral_pct"] * chinese["volume"]).sum()) / total, 3),
+            "positive": round(float((chinese["positive_pct"] * chinese["volume"]).sum()) / total, 3),
+        })
+    width = 1000
+    row_height = 48
+    top = 98
+    left = 245
+    right = 80
+    height = top + 64 + max(1, len(rows)) * row_height
+    chart_width = width - left - right
+    parts = _svg_header(
+        width,
+        height,
+        "Sentiment Category Share by Language Source",
+        "Secondary library/category shares; source platforms and tools differ",
+    )
+    for index, row in enumerate(rows):
+        y = top + index * row_height
+        parts.append(
+            f'<text x="{left - 14}" y="{y + 25}" text-anchor="end" font-family="Arial, sans-serif" font-size="13" fill="#1f2933">{html.escape(row["label"])}</text>'
+        )
+        x = left
+        for category in ["negative", "neutral", "positive"]:
+            value = float(row[category])
+            segment_width = (value / 100.0) * chart_width
+            parts.append(
+                f'<rect x="{x:.2f}" y="{y + 8}" width="{segment_width:.2f}" height="24" fill="{FIGURE_PALETTE[category]}"/>'
+            )
+            if segment_width > 44:
+                parts.append(
+                    f'<text x="{x + segment_width / 2:.2f}" y="{y + 25}" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#ffffff">{value:.1f}%</text>'
+                )
+            x += segment_width
+        parts.append(
+            f'<text x="{left + chart_width + 10}" y="{y + 25}" font-family="Arial, sans-serif" font-size="12" fill="#52616b">n={_fmt_n(row["n"])}</text>'
+        )
+    legend_y = height - 30
+    for index, category in enumerate(["negative", "neutral", "positive"]):
+        offset = index * 122
+        parts.extend([
+            f'<rect x="{left + offset}" y="{legend_y - 10}" width="10" height="10" fill="{FIGURE_PALETTE[category]}"/>',
+            f'<text x="{left + offset + 16}" y="{legend_y}" font-family="Arial, sans-serif" font-size="12" fill="#52616b">{category}</text>',
+        ])
+    parts.append("</svg>")
+    path.write_text("\n".join(parts), encoding="utf-8")
+
+
+def _write_multilingual_volume_context(baseline: pd.DataFrame, path: Path) -> None:
+    rows = baseline.copy()
+    rows["label"] = rows["group"].astype(str).str.replace("_", " ", regex=False)
+    rows = rows.sort_values(["source_kind", "volume"], ascending=[True, False])
+    width = 1000
+    top = 98
+    row_height = 38
+    left = 285
+    right = 120
+    height = top + 52 + max(1, len(rows)) * row_height
+    chart_width = width - left - right
+    max_volume = max([int(value) for value in rows["volume"]] or [1])
+    parts = _svg_header(
+        width,
+        height,
+        "Comparable Volume Context",
+        "Rows represented by source group; rating shown only for Google reviews",
+    )
+    for index, (_, row) in enumerate(rows.iterrows()):
+        y = top + index * row_height
+        volume = int(row["volume"])
+        bar_width = (volume / max_volume) * chart_width
+        if row["source_kind"] == "google_review":
+            color = FIGURE_PALETTE[str(row["group"])]
+            metric = f"mean rating {float(row['rating_mean']):.2f}"
+        else:
+            color = FIGURE_PALETTE["chinese_social"]
+            metric = f"SnowNLP mean {float(row['sentiment_norm_mean']):.2f}"
+        value_label = f"n={_fmt_n(volume)}; {metric}"
+        if bar_width > chart_width * 0.72:
+            value_x = left + bar_width - 8
+            value_anchor = "end"
+            value_fill = "#ffffff"
+        else:
+            value_x = left + bar_width + 8
+            value_anchor = "start"
+            value_fill = "#1f2933"
+        parts.extend([
+            f'<text x="{left - 14}" y="{y + 23}" text-anchor="end" font-family="Arial, sans-serif" font-size="13" fill="#1f2933">{html.escape(str(row["label"])[:38])}</text>',
+            f'<rect x="{left}" y="{y + 8}" width="{bar_width:.2f}" height="20" rx="3" fill="{color}"/>',
+            f'<text x="{value_x:.2f}" y="{y + 23}" text-anchor="{value_anchor}" font-family="Arial, sans-serif" font-size="12" fill="{value_fill}">{html.escape(value_label)}</text>',
+        ])
+    parts.append("</svg>")
+    path.write_text("\n".join(parts), encoding="utf-8")
+
+
+def _write_statistical_evidence_summary(jp_en_tests: pd.DataFrame, cross_tests: pd.DataFrame, path: Path) -> None:
+    selected = pd.concat([
+        jp_en_tests[jp_en_tests["test_name"].isin([
+            "chi_square_sentiment_category",
+            "cluster_bootstrap_poi_mean_difference_sentiment_score",
+            "poi_level_welch_t_mean_review_rating",
+        ])],
+        cross_tests[cross_tests["test_name"].isin([
+            "cross_source_sentiment_category_independence",
+            "within_chinese_platform_sentiment_category_independence",
+            "cross_source_friction_prevalence_not_run",
+            "cross_source_enjoyment_recommendation_prevalence_not_run",
+        ])],
+    ], ignore_index=True)
+    width = 1000
+    top = 98
+    row_height = 42
+    left = 365
+    right = 80
+    height = top + 52 + max(1, len(selected)) * row_height
+    chart_width = width - left - right
+    ok_effects = pd.to_numeric(selected.loc[selected["status"] == "ok", "effect"], errors="coerce").fillna(0)
+    max_effect = max([float(value) for value in ok_effects] + [1.0])
+    parts = _svg_header(
+        width,
+        height,
+        "Statistical Backing Readiness",
+        "Effect sizes for ok checks; skipped rows mark evidence gaps",
+    )
+    for index, (_, row) in enumerate(selected.iterrows()):
+        y = top + index * row_height
+        name = str(row["test_name"]).replace("_", " ")
+        status = str(row["status"])
+        if status == "ok":
+            effect = float(pd.to_numeric(pd.Series([row.get("effect")]), errors="coerce").fillna(0).iloc[0])
+            bar_width = (effect / max_effect) * chart_width
+            label = f"effect={effect:.3f}"
+            color = "#5b6c94"
+        else:
+            bar_width = chart_width * 0.18
+            label = status
+            color = "#8d99ae"
+        parts.extend([
+            f'<text x="{left - 14}" y="{y + 24}" text-anchor="end" font-family="Arial, sans-serif" font-size="12" fill="#1f2933">{html.escape(name[:52])}</text>',
+            f'<rect x="{left}" y="{y + 9}" width="{bar_width:.2f}" height="20" rx="3" fill="{color}"/>',
+            f'<text x="{left + bar_width + 8}" y="{y + 24}" font-family="Arial, sans-serif" font-size="12" fill="#1f2933">{html.escape(label)}</text>',
+        ])
+    parts.append("</svg>")
+    path.write_text("\n".join(parts), encoding="utf-8")
+
+
+def _write_figure_questions(path: Path, figure_questions: list[dict[str, str]]) -> None:
+    lines = [
+        "# Presentation Figure Questions",
+        "",
+        "Each figure is aggregate-only and omits row-level review/post text, author fields, URLs, screenshots, POI IDs, and review IDs.",
+        "",
+    ]
+    for item in figure_questions:
+        lines.extend([
+            f"## {item['figure']}",
+            "",
+            f"- Path: `{item['path']}`",
+            f"- Question answered: {item['question']}",
+            f"- Use caveat: {item['caveat']}",
+            "",
+        ])
+    path.write_text("\n".join(lines), encoding="utf-8")
+
+
 def build_sentiment_chart_data(
     summary: pd.DataFrame,
     metadata_summary: pd.DataFrame,
@@ -321,6 +653,7 @@ def _write_readiness(
     tests: pd.DataFrame,
     sentiment_manifest: dict,
     outputs: dict[str, Path],
+    figure_outputs: dict[str, Path],
 ) -> None:
     total_reviews = int(chart["n_reviews"].sum()) if not chart.empty else 0
     caveats = sentiment_manifest.get("provenance", {}).get("caveats", [])
@@ -339,6 +672,7 @@ def _write_readiness(
         "- Ready for presentation as a secondary library sentiment check.",
         "- Not ready as primary JP/EN sentiment evidence until reviewed codebook evidence is promoted.",
         "- Statistical rows are descriptive sensitivity checks, not confirmatory claims.",
+        "- SVG figures are organized under `japanese/`, `english/`, and `multilingual/`.",
         "",
         "## Denominators",
         "",
@@ -375,6 +709,15 @@ def _write_readiness(
         "within POIs and group sizes are imbalanced, use as descriptive "
         "sensitivity only.",
         "",
+        "## Figure Folders",
+        "",
+    ])
+    for name, figure_path in figure_outputs.items():
+        lines.append(f"- `{name}`: `{figure_path}`")
+    lines.extend([
+        "",
+        "Questions answered by each figure are documented in `presentation_figure_questions.md`.",
+        "",
         "## Caveats From Upstream Manifest",
         "",
     ])
@@ -386,6 +729,8 @@ def build_presentation_safe_outputs(
     sentiment_summary_path: Path = DEFAULT_SENTIMENT_SUMMARY_PATH,
     sentiment_tests_path: Path = DEFAULT_SENTIMENT_TESTS_PATH,
     sentiment_manifest_path: Path = DEFAULT_SENTIMENT_MANIFEST_PATH,
+    cross_language_baseline_path: Path = DEFAULT_CROSS_LANGUAGE_BASELINE_PATH,
+    cross_language_tests_path: Path = DEFAULT_CROSS_LANGUAGE_TESTS_PATH,
     row_level_path: Path | None = None,
     output_dir: Path = DEFAULT_OUTPUT_DIR,
     command: str | None = None,
@@ -393,15 +738,21 @@ def build_presentation_safe_outputs(
     _require_input(sentiment_summary_path, "sentiment-analysis")
     _require_input(sentiment_tests_path, "sentiment-analysis")
     _require_input(sentiment_manifest_path, "sentiment-analysis")
+    _require_input(cross_language_baseline_path, "cross-language-trends")
+    _require_input(cross_language_tests_path, "cross-language-trends")
 
     summary = pd.read_csv(sentiment_summary_path)
     tests = pd.read_csv(sentiment_tests_path)
+    cross_baseline = pd.read_csv(cross_language_baseline_path)
+    cross_tests = pd.read_csv(cross_language_tests_path)
     manifest = _read_manifest(sentiment_manifest_path)
     audit_path = _row_level_path(manifest, row_level_path)
     _require_input(audit_path, "sentiment-analysis")
     row_level = pd.read_csv(audit_path)
     _require_columns(summary, REQUIRED_SUMMARY_COLUMNS, sentiment_summary_path)
     _require_columns(tests, REQUIRED_TEST_COLUMNS, sentiment_tests_path)
+    _require_columns(cross_baseline, REQUIRED_BASELINE_COLUMNS, cross_language_baseline_path)
+    _require_columns(cross_tests, REQUIRED_TEST_COLUMNS, cross_language_tests_path)
     _require_columns(row_level, REQUIRED_ROW_LEVEL_COLUMNS, audit_path)
 
     if set(summary["prefecture_normalized"].dropna().astype(str)) != {"Fukui"}:
@@ -410,8 +761,14 @@ def build_presentation_safe_outputs(
         raise PresentationOutputError("Presentation-safe JP-EN output accepts only English/Japanese review groups.")
 
     output_dir.mkdir(parents=True, exist_ok=True)
+    japanese_dir = output_dir / "japanese"
+    english_dir = output_dir / "english"
+    multilingual_dir = output_dir / "multilingual"
+    for figure_dir in [japanese_dir, english_dir, multilingual_dir]:
+        figure_dir.mkdir(parents=True, exist_ok=True)
     chart_path = output_dir / "jp_en_library_sentiment_chart_data.csv"
     test_summary_path = output_dir / "jp_en_statistical_sensitivity_summary.csv"
+    figure_questions_path = output_dir / "presentation_figure_questions.md"
     readiness_path = output_dir / "presentation_readiness.md"
     manifest_path = output_dir / "presentation_manifest.json"
 
@@ -421,12 +778,71 @@ def build_presentation_safe_outputs(
     chart.to_csv(chart_path, index=False)
     test_summary.to_csv(test_summary_path, index=False)
 
+    figure_outputs = {
+        "japanese_sentiment_profile": japanese_dir / "figure_japanese_sentiment_profile.svg",
+        "japanese_poi_priority_mix": japanese_dir / "figure_japanese_poi_priority_mix.svg",
+        "english_sentiment_profile": english_dir / "figure_english_sentiment_profile.svg",
+        "english_poi_priority_mix": english_dir / "figure_english_poi_priority_mix.svg",
+        "multilingual_sentiment_share": multilingual_dir / "figure_sentiment_share_by_language_source.svg",
+        "multilingual_volume_context": multilingual_dir / "figure_volume_context.svg",
+        "multilingual_statistical_evidence": multilingual_dir / "figure_statistical_evidence_summary.svg",
+    }
+    figure_questions = []
+    for language, language_dir, label in [
+        ("japanese", japanese_dir, "Japanese-Language Reviews"),
+        ("english", english_dir, "English-Language Reviews"),
+    ]:
+        row = chart[chart["language_source_group"].str.startswith(language)].iloc[0]
+        sentiment_path = figure_outputs[f"{language}_sentiment_profile"]
+        poi_path = figure_outputs[f"{language}_poi_priority_mix"]
+        _write_single_sentiment_profile(row, sentiment_path, label)
+        _write_poi_priority_mix(row, poi_path, label)
+        figure_questions.extend([
+            {
+                "figure": f"{label} sentiment profile",
+                "path": str(sentiment_path),
+                "question": f"What share of {language}-language Fukui Google reviews is positive, neutral, or negative under the secondary library tool?",
+                "caveat": "Secondary library-score check; reviewed JP/EN keyword evidence still pending.",
+            },
+            {
+                "figure": f"{label} tourism priority mix",
+                "path": str(poi_path),
+                "question": f"Which POI categories dominate the {language}-language review sample, shaping what tourism priorities the sentiment result reflects?",
+                "caveat": "POI-category mix describes collection/sample composition, not all visitor priorities.",
+            },
+        ])
+    _write_multilingual_sentiment_share(chart, cross_baseline, figure_outputs["multilingual_sentiment_share"])
+    _write_multilingual_volume_context(cross_baseline, figure_outputs["multilingual_volume_context"])
+    _write_statistical_evidence_summary(test_summary, cross_tests, figure_outputs["multilingual_statistical_evidence"])
+    figure_questions.extend([
+        {
+            "figure": "Multilingual sentiment share",
+            "path": str(figure_outputs["multilingual_sentiment_share"]),
+            "question": "How do positive, neutral, and negative category shares differ across English-language reviews, Japanese-language reviews, and Chinese-language social rows?",
+            "caveat": "Source platforms and scoring tools differ; use category shares only as descriptive comparison.",
+        },
+        {
+            "figure": "Multilingual volume context",
+            "path": str(figure_outputs["multilingual_volume_context"]),
+            "question": "How imbalanced are the language/source group sample sizes, and which scales are available for each group?",
+            "caveat": "Google ratings and SnowNLP sentiment means are different scales and should not be equated.",
+        },
+        {
+            "figure": "Statistical evidence summary",
+            "path": str(figure_outputs["multilingual_statistical_evidence"]),
+            "question": "Which descriptive statistical checks currently support language/source comparisons, and where are aligned evidence gaps still present?",
+            "caveat": "Effects and p-values are descriptive; rows are nested in POIs and cross-source units differ.",
+        },
+    ])
+    _write_figure_questions(figure_questions_path, figure_questions)
+
     outputs = {
         "chart_data": chart_path,
         "statistical_summary": test_summary_path,
+        "figure_questions": figure_questions_path,
         "readiness": readiness_path,
     }
-    _write_readiness(readiness_path, chart, test_summary, manifest, outputs)
+    _write_readiness(readiness_path, chart, test_summary, manifest, outputs, figure_outputs)
 
     report = research_manifest(
         kind="presentation_safe_jp_en_sentiment",
@@ -435,11 +851,18 @@ def build_presentation_safe_outputs(
             file_record(sentiment_summary_path, "tracked_aggregate_summary", required=True),
             file_record(sentiment_tests_path, "tracked_statistical_tests", required=True),
             file_record(sentiment_manifest_path, "tracked_sentiment_manifest", required=True),
+            file_record(cross_language_baseline_path, "aggregate_cross_language_baseline", required=True),
+            file_record(cross_language_tests_path, "aggregate_cross_language_statistical_tests", required=True),
             file_record(audit_path, "ignored_scored_review_audit_file", required=True),
         ],
         outputs=[
             file_record(chart_path, "presentation_chart_data", required=True),
             file_record(test_summary_path, "presentation_statistical_summary", required=True),
+            file_record(figure_questions_path, "presentation_figure_questions", required=True),
+            *[
+                file_record(path, f"presentation_figure_{name}", required=True)
+                for name, path in figure_outputs.items()
+            ],
             file_record(readiness_path, "presentation_readiness_markdown", required=True),
         ],
         filters={"prefecture": "Fukui", "groups": ["english", "japanese"]},
@@ -448,6 +871,7 @@ def build_presentation_safe_outputs(
             "codebook_evidence_status": manifest.get("codebook_evidence_status", "unknown"),
             "date_range_status": "derived_from_scored_review_audit_file",
             "poi_mix_status": "derived_from_scored_review_audit_file",
+            "figure_count": len(figure_outputs),
         },
         caveats=[
             "Presentation files are aggregate-only and must not be used as row-level evidence.",
@@ -466,6 +890,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--sentiment-summary-path", type=Path, default=DEFAULT_SENTIMENT_SUMMARY_PATH)
     parser.add_argument("--sentiment-tests-path", type=Path, default=DEFAULT_SENTIMENT_TESTS_PATH)
     parser.add_argument("--sentiment-manifest-path", type=Path, default=DEFAULT_SENTIMENT_MANIFEST_PATH)
+    parser.add_argument("--cross-language-baseline-path", type=Path, default=DEFAULT_CROSS_LANGUAGE_BASELINE_PATH)
+    parser.add_argument("--cross-language-tests-path", type=Path, default=DEFAULT_CROSS_LANGUAGE_TESTS_PATH)
     parser.add_argument("--row-level-path", type=Path, default=None)
     parser.add_argument("--output-dir", type=Path, default=DEFAULT_OUTPUT_DIR)
     return parser.parse_args()
@@ -478,6 +904,8 @@ def main() -> int:
             sentiment_summary_path=args.sentiment_summary_path,
             sentiment_tests_path=args.sentiment_tests_path,
             sentiment_manifest_path=args.sentiment_manifest_path,
+            cross_language_baseline_path=args.cross_language_baseline_path,
+            cross_language_tests_path=args.cross_language_tests_path,
             row_level_path=args.row_level_path,
             output_dir=args.output_dir,
         )
