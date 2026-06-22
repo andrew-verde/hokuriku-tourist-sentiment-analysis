@@ -38,10 +38,16 @@ logger = setup_logger(__name__)
 ROOT = Path(__file__).resolve().parent.parent
 # Default to the companion tourism-data checkout, but allow an environment
 # override so the script can point at a different local copy.
+SIBLING_INPUT_DIR = ROOT.parent / "tourism-data"
+EXTERNAL_INPUT_DIR = Path("/home/andrewgreen/Repositories/external/tourism-data")
 DEFAULT_INPUT_DIR = Path(
-    os.getenv("TOURISM_DATA_DIR", "/home/andrewgreen/Repositories/external/tourism-data")
+    os.getenv(
+        "TOURISM_DATA_DIR",
+        str(SIBLING_INPUT_DIR if SIBLING_INPUT_DIR.exists() else EXTERNAL_INPUT_DIR),
+    )
 )
 OUTPUT_DIR = ROOT / "output" / "chinese_social_media_analysis"
+XHS_ONLY_OUTPUT_DIR = ROOT / "output" / "chinese_social_media_analysis_xhs_only"
 # YAML is the legacy friction source; the reviewed CSV is the current audit
 # source for promoted Chinese evidence terms.
 CODEBOOK_PATH = ROOT / "config" / "chinese_social_friction_codebook.yaml"
@@ -82,7 +88,7 @@ SCHEMA_COLUMNS = [
 THEME_COLUMNS = ["theme", "fan_score", "travel_score"]
 
 POSITIVE_TERMS = [
-    # Legacy transparent lexicon terms. SnowNLP is now the main score, but this
+    # Legacy transparent lexicon terms. SnowNLP is now the secondary score, but this
     # simple count remains useful as a lightweight interpretable field.
     "好", "方便", "便利", "推荐", "值得", "喜欢", "美", "震撼", "舒服", "干净",
     "热情", "新鲜", "便宜", "顺利", "梦幻", "完善", "直达",
@@ -132,6 +138,7 @@ REVIEWED_CODEBOOK_REQUIRED_COLUMNS = {
 VALID_REVIEW_DECISIONS = {"no change", "fix", "delete"}
 EVIDENCE_CODE_TYPES = {"friction", "topic", "sentiment"}
 ENJOYMENT_EVIDENCE_CODES = {"positive_sentiment", "recommendation_intent"}
+MIN_THEME_SLICE_ROWS = 10
 
 CITY_ALIASES = {
     # Tokens that may appear in file names or explicit city columns.
@@ -587,6 +594,11 @@ def discover_input_files(input_dir: Path) -> list[Path]:
     return sorted(set(files))
 
 
+def _is_xhs_source(path: Path) -> bool:
+    name = path.name.lower()
+    return any(token in name for token in ["xhs", "xiaohongshu", "小红书"])
+
+
 def discover_theme_files(input_dir: Path) -> list[Path]:
     # Theme annotations are processed CSVs from the companion repo.
     processed_dir = input_dir / "data" / "processed"
@@ -820,6 +832,7 @@ def _code_summary(
     code_family: str,
     group_cols: list[str] | None = None,
     codes: list[str] | None = None,
+    min_denominator: int | None = None,
 ) -> pd.DataFrame:
     # Summarize one code family at a time for the requested grouping columns.
     group_cols = group_cols or ["city", "source_platform"]
@@ -830,6 +843,9 @@ def _code_summary(
         if not isinstance(keys, tuple):
             keys = (keys,)
         denominator = len(group)
+        denominator_status = "ok"
+        if min_denominator is not None and denominator < min_denominator:
+            denominator_status = "suppressed_small_n"
         for code in codes:
             count = int(group[code].sum()) if code in group.columns else 0
             rows.append({
@@ -839,7 +855,10 @@ def _code_summary(
                 "label": codebook[code]["label"],
                 "count": count,
                 "denominator_posts": denominator,
-                "pct_posts": round(100 * count / denominator, 3) if denominator else 0.0,
+                "pct_posts": None if denominator_status == "suppressed_small_n" else (
+                    round(100 * count / denominator, 3) if denominator else 0.0
+                ),
+                "denominator_status": denominator_status,
             })
     return pd.DataFrame(rows)
 
@@ -847,7 +866,8 @@ def _code_summary(
 def _friction_summary(
     tagged: pd.DataFrame, codebook: dict, group_cols: list[str] | None = None
 ) -> pd.DataFrame:
-    summary = _code_summary(tagged, codebook, "friction", group_cols)
+    min_denominator = MIN_THEME_SLICE_ROWS if group_cols and "theme" in group_cols else None
+    summary = _code_summary(tagged, codebook, "friction", group_cols, min_denominator=min_denominator)
     if summary.empty:
         return summary
     return summary.rename(columns={"code": "friction_code", "label": "friction_label"}).drop(
@@ -858,19 +878,29 @@ def _friction_summary(
 def _topic_summary(
     tagged: pd.DataFrame, codebook: dict, group_cols: list[str] | None = None
 ) -> pd.DataFrame:
-    return _code_summary(tagged, codebook, "topic", group_cols)
+    min_denominator = MIN_THEME_SLICE_ROWS if group_cols and "theme" in group_cols else None
+    return _code_summary(tagged, codebook, "topic", group_cols, min_denominator=min_denominator)
 
 
 def _enjoyment_evidence_summary(
     tagged: pd.DataFrame, codebook: dict, group_cols: list[str] | None = None
 ) -> pd.DataFrame:
     codes = [code for code in ENJOYMENT_EVIDENCE_CODES if code in codebook]
-    return _code_summary(tagged, codebook, "sentiment", group_cols, codes)
+    min_denominator = MIN_THEME_SLICE_ROWS if group_cols and "theme" in group_cols else None
+    return _code_summary(tagged, codebook, "sentiment", group_cols, codes, min_denominator=min_denominator)
 
 
 def _theme_summary(df: pd.DataFrame) -> pd.DataFrame:
     # Summarize colleague theme annotations by city/platform.
-    columns = ["city", "source_platform", "theme", "count", "pct_posts", "sentiment_norm_mean"]
+    columns = [
+        "city",
+        "source_platform",
+        "theme",
+        "count",
+        "pct_posts",
+        "sentiment_norm_mean",
+        "theme_slice_status",
+    ]
     if df.empty:
         return pd.DataFrame(columns=columns)
     score_col = "snownlp_positive_prob" if "snownlp_positive_prob" in df.columns else "sentiment_norm"
@@ -878,13 +908,17 @@ def _theme_summary(df: pd.DataFrame) -> pd.DataFrame:
     for (city, platform), group in df.groupby(["city", "source_platform"], dropna=False):
         denominator = len(group)
         for theme, theme_group in group.groupby("theme", dropna=False):
+            slice_status = "ok" if len(theme_group) >= MIN_THEME_SLICE_ROWS else "suppressed_small_n"
             rows.append({
                 "city": city,
                 "source_platform": platform,
                 "theme": theme,
                 "count": len(theme_group),
-                "pct_posts": round(100 * len(theme_group) / denominator, 3) if denominator else 0.0,
-                "sentiment_norm_mean": round(float(theme_group[score_col].mean()), 6),
+                "pct_posts": None if slice_status == "suppressed_small_n" else (
+                    round(100 * len(theme_group) / denominator, 3) if denominator else 0.0
+                ),
+                "sentiment_norm_mean": None if slice_status == "suppressed_small_n" else round(float(theme_group[score_col].mean()), 6),
+                "theme_slice_status": slice_status,
             })
     return pd.DataFrame(rows, columns=columns)
 
@@ -1015,11 +1049,23 @@ def _review_language_comparison(
 
 def _write_readiness(report: dict, path: Path) -> None:
     # Emit a human-readable markdown summary that mirrors the JSON report.
+    is_xhs_only = report["analysis_variant"] == "xiaohongshu_only"
+    unit_caveat = (
+        "- Unit of analysis is one Xiaohongshu note, not a full travel itinerary or confirmed visit."
+        if is_xhs_only
+        else "- Unit of analysis is one social-media source row: one Xiaohongshu note or one Douyin comment, not a full travel itinerary or confirmed visit."
+    )
+    douyin_caveats = [] if is_xhs_only else [
+        "- Douyin comments come from `tourism-data/data/processed/fukui_douyin_comments_from_md.csv` because the current source was parsed from markdown; keep that row-level file external.",
+        "- Douyin comment ids are local parser ids, not platform comment ids; use input hashes and parser notes for provenance.",
+        "- Douyin comment dates are inferred from relative timestamps anchored to the parsed CSV reference date, so they are not exact publication dates.",
+    ]
     lines = [
         "# Chinese Social Media Analysis Readiness",
         "",
-        "This layer treats Xiaohongshu notes and Douyin comments as Chinese-language tourism text, analogous to the role Google reviews play for English-language review analysis. It is not a nationality inference.",
+        f"This layer treats {report['analysis_scope_label']} as Chinese-language tourism text. It is not a nationality inference.",
         "",
+        f"- Analysis variant: `{report['analysis_variant']}`",
         f"- Input directory: `{report['input_dir']}`",
         f"- Input files discovered: {report['input_files_discovered']}",
         f"- Input SHA256: `{report['input_sha256']}`",
@@ -1037,19 +1083,20 @@ def _write_readiness(report: dict, path: Path) -> None:
         f"- Reviewed codebook SHA256: `{report['reviewed_codebook_sha256']}`",
         f"- Reviewed codebook rows promoted: {report['reviewed_codebook_rows_promoted']}",
         f"- Runtime codebook counts by family: {report['runtime_codebook_counts_by_family']}",
+        f"- Minimum theme slice rows for rates: {report['minimum_theme_slice_rows_for_rates']}",
         f"- Douyin provenance sources validated: {report['douyin_provenance_sources_validated']}",
         f"- Douyin provenance report: `{report['douyin_provenance_report']}`",
         "",
         "## Caveats",
         "",
-        "- Unit of analysis is one social-media source row: one Xiaohongshu note or one Douyin comment, not a full travel itinerary or confirmed visit.",
-        "- Douyin comments come from `tourism-data/data/processed/fukui_douyin_comments_from_md.csv` because the current source was parsed from markdown; keep that row-level file external.",
-        "- Douyin comment ids are local parser ids, not platform comment ids; use input hashes and parser notes for provenance.",
-        "- Douyin comment dates are inferred from relative timestamps anchored to the parsed CSV reference date, so they are not exact publication dates.",
+        unit_caveat,
+        *douyin_caveats,
         "- Primary Chinese sentiment rows require post body text or comment text; rows without that text are smoke-test material only.",
         "- Chinese friction/topic/positive-evidence tags are substring keyword matches from reviewed Chinese codebook rows; they are audit evidence, not a validated causal explanation.",
-        "- Chinese sentiment fields use SnowNLP as the canonical current baseline (`sentiment_norm`, `sentiment_score`, and `sentiment_category`); reviewed term matches remain transparent evidence columns.",
+        "- Chinese sentiment fields use SnowNLP as a secondary baseline (`sentiment_norm`, `sentiment_score`, and `sentiment_category`); reviewed term matches remain transparent evidence columns.",
         "- Positive/recommendation evidence is labeled as enjoyment evidence for presentation scanning only; do not treat it as a psychometric enjoyment scale.",
+        f"- Theme rates and sentiment means are suppressed for slices with fewer than {MIN_THEME_SLICE_ROWS} rows; counts remain visible for audit.",
+        "- XHS-only outputs are a labeled source-sensitivity variant when Douyin comments are too weak for a claim.",
         "- Compare Chinese social-media rates with Google review-language rates descriptively because source platform behavior and text length differ.",
         "- Theme labels (fan / travel / ordinary) come from the companion tourism-data processed CSVs, joined on note id; rows without a label are `unclassified`.",
         "- `post_date` is parsed from the Xiaohongshu author cell; `post_date_precision` marks exact vs year-inferred vs relative-inferred values (inference anchored to the scrape commit date).",
@@ -1064,11 +1111,31 @@ def build_chinese_social_outputs(
     output_dir: Path = OUTPUT_DIR,
     input_files: list[Path] | None = None,
     review_friction_path: Path = MULTILINGUAL_FRICTION_PATH,
+    xhs_only: bool = False,
 ) -> dict:
     # Orchestrate the full build: ingest, deduplicate, annotate, score, tag,
     # summarize, validate, and write every derived output.
     output_dir.mkdir(parents=True, exist_ok=True)
+    discovered_inputs = input_files is None
     input_files = input_files if input_files is not None else discover_input_files(input_dir)
+    if xhs_only:
+        input_files = [path for path in input_files if _is_xhs_source(path)]
+    if not input_files:
+        variant = "XHS-only" if xhs_only else "Chinese social"
+        raise InputSchemaError(
+            f"{variant} input files not found under {input_dir}. "
+            "Provide real Chinese social source files; this pipeline has no demo or fallback mode."
+        )
+    if discovered_inputs and not xhs_only:
+        has_xhs = any(_is_xhs_source(path) for path in input_files)
+        has_douyin = any("douyin" in path.name.lower() or "抖音" in path.name.lower() for path in input_files)
+        if not (has_xhs and has_douyin):
+            raise InputSchemaError(
+                f"Combined Chinese social inputs incomplete under {input_dir}: "
+                f"has_xhs={has_xhs}, has_douyin={has_douyin}. "
+                "Run `make chinese-social-xhs-only` for the labeled XHS-only variant, "
+                "or provide the missing source files."
+            )
     codebook = load_chinese_codebook()
     reviewed_terms = _reviewed_terms_from_codebook(codebook)
 
@@ -1192,6 +1259,8 @@ def build_chinese_social_outputs(
 
     report = {
         "schema_version": "chinese_social_manifest.v2",
+        "analysis_variant": "xiaohongshu_only" if xhs_only else "xiaohongshu_and_douyin",
+        "analysis_scope_label": "Chinese-language Xiaohongshu text only" if xhs_only else "Chinese-language Xiaohongshu notes and Douyin comments",
         "input_dir": str(input_dir),
         "input_files": [str(path) for path in input_files],
         "input_sha256": input_hashes,
@@ -1214,6 +1283,7 @@ def build_chinese_social_outputs(
         "reviewed_codebook_rows_promoted": promoted_rows,
         "runtime_codebook_counts_by_family": runtime_counts_by_family,
         "codebook_evidence_status": "reviewed_chinese_template_promoted_for_friction_topic_sentiment_evidence",
+        "minimum_theme_slice_rows_for_rates": MIN_THEME_SLICE_ROWS,
         "douyin_provenance_sources_validated": len(douyin_provenance),
         "douyin_provenance_report": str(douyin_provenance_path),
         "douyin_provenance": douyin_provenance,
@@ -1241,8 +1311,10 @@ def build_chinese_social_outputs(
         command=" ".join(sys.argv),
         filters={
             "input_dir": str(input_dir),
-            "primary_scope": "Chinese-language posts",
+            "analysis_variant": report["analysis_variant"],
+            "primary_scope": report["analysis_scope_label"],
             "fan_subset": "all_posts and excluding_fan",
+            "minimum_theme_slice_rows_for_rates": MIN_THEME_SLICE_ROWS,
         },
         inputs=[
             *(file_record(path, "social_source_input", required=True) for path in input_files if path.exists()),
@@ -1269,10 +1341,13 @@ def build_chinese_social_outputs(
             "source_platform_counts": report["source_platform_counts"],
             "post_date_precision_counts": report["post_date_precision_counts"],
             "runtime_codebook_counts_by_family": runtime_counts_by_family,
+            "minimum_theme_slice_rows_for_rates": MIN_THEME_SLICE_ROWS,
         },
         caveats=[
             "Group labels describe content language/source platform, not nationality.",
             "SnowNLP is a secondary model baseline; reviewed term matches remain transparent evidence.",
+            "Theme slice rates are suppressed when the slice has fewer than 10 rows; counts remain visible.",
+            "XHS-only outputs are an explicit alternate variant for source-sensitivity checks, not a replacement for the combined baseline unless documented.",
             "Douyin comment IDs are local parser IDs, not platform comment IDs.",
             "Relative and year-inferred dates are not exact monthly trend evidence.",
             "Chinese social-media rates and Google review rates are descriptive cross-platform comparisons.",
@@ -1292,23 +1367,30 @@ def parse_args() -> argparse.Namespace:
     # input files, and an override for the comparison dataset.
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--input-dir", type=Path, default=DEFAULT_INPUT_DIR)
-    parser.add_argument("--output-dir", type=Path, default=OUTPUT_DIR)
+    parser.add_argument("--output-dir", type=Path, default=None)
     parser.add_argument("--input-file", type=Path, action="append", default=None, help="Specific CSV file to include; can be repeated.")
     parser.add_argument("--review-friction-path", type=Path, default=MULTILINGUAL_FRICTION_PATH)
+    parser.add_argument(
+        "--xhs-only",
+        action="store_true",
+        help="Build the labeled Xiaohongshu-only source-sensitivity variant.",
+    )
     return parser.parse_args()
 
 
 def main() -> int:
     # Run the pipeline and log the retention/output location for quick CLI use.
     args = parse_args()
+    output_dir = args.output_dir or (XHS_ONLY_OUTPUT_DIR if args.xhs_only else OUTPUT_DIR)
     report = build_chinese_social_outputs(
         input_dir=args.input_dir,
-        output_dir=args.output_dir,
+        output_dir=output_dir,
         input_files=args.input_file,
         review_friction_path=args.review_friction_path,
+        xhs_only=args.xhs_only,
     )
     logger.info("Rows retained: %s", report["rows_retained"])
-    logger.info("Output written: %s", args.output_dir)
+    logger.info("Output written: %s", output_dir)
     return 0
 
 

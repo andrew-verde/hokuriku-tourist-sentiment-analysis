@@ -44,10 +44,15 @@ Current local review cache after sync:
 
 Chinese social inputs are external and should remain external:
 
-- Source repo: `/Users/andrewgreen/Repositories/tourism-data`
+- Source repo: sibling `tourism-data` checkout, or `TOURISM_DATA_DIR` override
 - Expected raw social inputs: `data/raw/social/*xhs*.csv`, `data/raw/social/*douyin*.csv`
 - Current parsed Douyin comment source: `data/processed/fukui_douyin_comments_from_md.csv`
 - Current visible Fukui XHS files exist; manual full-text XHS pull is WIP.
+- `make chinese-social` must fail when no real Chinese source files are found;
+  there is no demo/fallback input mode for academic outputs.
+- `make chinese-social-xhs-only` and `make chinese-insights-xhs-only` write
+  labeled `_xhs_only` outputs for Xiaohongshu-only source-sensitivity checks
+  when Douyin comments are too weak for a claim.
 
 ## Project Readiness Checklist
 
@@ -65,12 +70,14 @@ Chinese social inputs are external and should remain external:
   Once manual review is complete, use `docs/manual_keyword_review_followup.md`
   as the agent implementation checklist.
 - [x] Chinese social sentiment/topic pipeline: `scripts/build_chinese_social_media_dataset.py`
-  builds cleaned Chinese social outputs with SnowNLP baseline sentiment from
+  builds cleaned Chinese social outputs with SnowNLP secondary baseline sentiment from
   one `make chinese-social` trigger for Xiaohongshu rows and parsed Douyin
   comments. Reviewed Chinese friction/topic/sentiment codebook rows now feed
   runtime evidence matching, Douyin comment exports fail loud on missing parser
-  provenance fields, and aggregate topic/positive-evidence outputs are wired for
-  presentation comparisons.
+  provenance fields, missing discovered Chinese inputs fail loud, theme-sliced
+  rates are suppressed below 10 rows, and aggregate topic/positive-evidence
+  outputs are wired for presentation comparisons. A labeled XHS-only alternate
+  path is available for source-sensitivity checks.
 - [x] JP-EN Google review library sentiment: `scripts/build_sentiment_analysis.py`
   filters by Fukui prefecture metadata, scores English reviews with VADER,
   scores Japanese reviews with oseti, writes ignored row-level output, and tracks

@@ -618,7 +618,7 @@ def _write_readiness(report: dict, path: Path) -> None:
         "",
         "- Monthly trend analysis is not worthwhile yet for the Chinese layer. "
         "Most Chinese rows use inferred dates, and Douyin comment dates are anchored to scrape/parser context rather than exact platform timestamps.",
-        "- Current output is aggregate baseline only: source volumes, Google rating mean, and Chinese SnowNLP sentiment summary by platform.",
+        "- Current output is aggregate baseline only: source volumes, Google rating mean, and Chinese SnowNLP secondary sentiment summary by platform.",
         "- Current statistical tests are limited to descriptive sentiment-category shares and within-Chinese platform evidence tests. Cross-source friction/enjoyment tests are explicitly skipped until EN/JP keyword evidence is ready.",
         "",
         "## If Monthly Trends Are Reintroduced",
@@ -633,7 +633,7 @@ def _write_readiness(report: dict, path: Path) -> None:
         "## Caveats",
         "",
         "- Group membership is content language/source platform, not nationality.",
-        "- Chinese sentiment uses SnowNLP as the current baseline; Google ratings are a separate measurement instrument.",
+        "- Chinese sentiment uses SnowNLP as a secondary baseline; Google ratings are a separate measurement instrument.",
         "- Cross-source sentiment category tests compare platformed discourse categories, not direct visitor satisfaction.",
         "- Chinese social rows are Xiaohongshu notes or Douyin comments; Google rows are reviews.",
         "- Neighboring prefectures remain scaffolded for later work, but current default output is Fukui-only.",

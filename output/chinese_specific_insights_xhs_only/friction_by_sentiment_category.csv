@@ -1,0 +1,18 @@
+sentiment_category,code_family,code,label,count,denominator_rows,pct_sentiment_category_rows
+negative,friction,transport_access,Transport / Access,7,30,23.333
+negative,friction,cleanliness_comfort,Cleanliness / Comfort,4,30,13.333
+negative,friction,waiting_crowding,Waiting / Crowding,4,30,13.333
+negative,friction,opening_hours_availability,Opening Hours / Availability,3,30,10.0
+negative,friction,wayfinding_signage,Wayfinding / Signage,3,30,10.0
+negative,friction,price_value,Price / Value,2,30,6.667
+negative,friction,staff_communication,Staff Communication,2,30,6.667
+neutral,friction,waiting_crowding,Waiting / Crowding,1,2,50.0
+positive,friction,transport_access,Transport / Access,50,117,42.735
+positive,friction,booking_ticketing,Booking / Ticketing,12,117,10.256
+positive,friction,price_value,Price / Value,12,117,10.256
+positive,friction,waiting_crowding,Waiting / Crowding,11,117,9.402
+positive,friction,cleanliness_comfort,Cleanliness / Comfort,8,117,6.838
+positive,friction,accessibility_mobility,Accessibility / Mobility,5,117,4.274
+positive,friction,opening_hours_availability,Opening Hours / Availability,5,117,4.274
+positive,friction,wayfinding_signage,Wayfinding / Signage,5,117,4.274
+positive,friction,staff_communication,Staff Communication,4,117,3.419

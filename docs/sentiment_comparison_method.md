@@ -22,10 +22,11 @@ The sheet may be exported as UTF-8 CSV before analysis. Required columns:
 note_id,title,note_url,author,author_url,body_text,capture_notes
 ```
 
-The current Douyin source is a parsed markdown comment export:
+The current Douyin source is a parsed markdown comment export under the sibling
+`tourism-data` checkout or the `TOURISM_DATA_DIR` override:
 
 ```text
-/Users/andrewgreen/Repositories/tourism-data/data/processed/fukui_douyin_comments_from_md.csv
+data/processed/fukui_douyin_comments_from_md.csv
 ```
 
 Required Douyin comment columns:
@@ -41,6 +42,38 @@ only to an approximate `post_date` with `post_date_precision ==
 platform comment ids. Parsed Douyin comment exports must preserve parser-line
 provenance and `parse_notes` must explicitly carry the local-id caveat; otherwise
 the Chinese social build fails.
+
+The Chinese social build must fail when no real Chinese input files are found.
+Header-only files are allowed only when explicitly passed for collection-stage
+schema checks; the normal discovered-input path has no demo or fallback mode.
+
+## Chinese Input Variants
+
+Default Chinese outputs combine Xiaohongshu note text and parsed Douyin
+comments and write to:
+
+```text
+output/chinese_social_media_analysis/
+output/chinese_specific_insights/
+```
+
+Because the current Douyin source is short comment text with local parser ids
+and no platform post ids, an explicit Xiaohongshu-only source-sensitivity path
+is available:
+
+```bash
+make chinese-social-xhs-only
+make chinese-insights-xhs-only
+```
+
+Those outputs write to labeled `_xhs_only` folders and must be described as
+`Chinese-language Fukui Xiaohongshu rows only`. Use them when Douyin comments
+are too weak for a claim, or when checking whether combined-corpus results are
+driven by the much larger Douyin comment denominator.
+
+Theme-sliced rates and sentiment means are suppressed for slices below 10 rows.
+Counts remain in CSV outputs for audit, but small slices should not be charted
+or interpreted as stable rates.
 
 Japanese-language and English-language reviews use the synced Google review
 table:
@@ -107,11 +140,12 @@ oseti_positive_count
 oseti_negative_count
 ```
 
-Use `SnowNLP` for Chinese-language posts as the primary pre-built Chinese
+Use `SnowNLP` for Chinese-language posts as a secondary baseline Chinese
 sentiment library. It returns `sentiments`, interpreted as estimated positive
 sentiment probability in `[0, 1]`. SnowNLP documentation warns that its built-in
 sentiment model is mainly trained on product review data, so results need domain
-caveats for tourism narratives and fandom language.
+caveats for tourism narratives and fandom language. Reviewed codebook evidence
+remains the transparent primary evidence layer.
 
 Do not label SnowNLP scores as VADER scores. Store them as:
 
@@ -476,7 +510,7 @@ Use this interpretation boundary in reports:
 ```text
 Sentiment scores come from different language-specific tools: VADER for
 English-language Google reviews, oseti for Japanese-language Google reviews,
-and SnowNLP for Chinese-language Xiaohongshu posts. Category shares and
+and secondary SnowNLP checks for Chinese-language social rows. Category shares and
 distribution tests are reproducible under this pipeline, but raw score levels
 are not evidence that one language/source group is intrinsically more positive
 or negative. Source platform, text length, topic mix, and posting intent differ.

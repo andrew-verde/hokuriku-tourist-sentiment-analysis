@@ -12,6 +12,7 @@ data/interim/
 
 # Analysis outputs: never commit without explicit review.
 output/chinese_social_media_analysis/
+output/chinese_social_media_analysis_xhs_only/
 output/checkpoints/
 output/google_review_sync_manifest.json
 output/multilingual_review_analysis/

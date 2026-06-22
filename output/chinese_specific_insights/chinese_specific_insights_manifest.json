@@ -1,7 +1,7 @@
 {
   "schema_version": "research_provenance.v1",
   "kind": "chinese_specific_insights",
-  "generated_at": "2026-06-21T14:31:57+00:00",
+  "generated_at": "2026-06-22T04:02:58+00:00",
   "command": "python scripts/build_chinese_specific_insights.py",
   "inputs": [
     {
@@ -9,7 +9,7 @@
       "path": "/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/output/chinese_social_media_analysis/tagged_chinese_social_posts.csv",
       "exists": true,
       "bytes": 1257000,
-      "sha256": "d1787e8d16ad371e27aa0cb1f2dceed48dce8a36c99c992e301dbc86a27eec24"
+      "sha256": "3ef79f7007acb96cfa2d9b30afadd74c47a2f6979e1b53b991ca89b3ee36e494"
     },
     {
       "role": "aggregate_runtime_codebook_summary",
@@ -22,8 +22,8 @@
       "role": "aggregate_topic_evidence",
       "path": "/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/output/chinese_social_media_analysis/chinese_topic_by_city_platform.csv",
       "exists": true,
-      "bytes": 1538,
-      "sha256": "617e5807837bd7603c88b3fa33d25c6e34ac67a553e933d8338b79c2709f2123"
+      "bytes": 1617,
+      "sha256": "33405a22fdeac986418f7fd868ce23a6d2a893c488ce3fa89c6a7360baddaeec"
     }
   ],
   "outputs": [
@@ -66,8 +66,8 @@
       "role": "theme_sentiment_summary",
       "path": "/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/output/chinese_specific_insights/theme_sentiment_summary.csv",
       "exists": true,
-      "bytes": 516,
-      "sha256": "23988885daacc8bdb24d7adfca3347f93ce56c4c39fd74ce7f229c660ac965ae"
+      "bytes": 567,
+      "sha256": "8647c2d22bad28de94a3dbd380705c80ff684ffcee112f4014737fe9768c884e"
     },
     {
       "role": "topic_by_sentiment_category",
@@ -108,32 +108,36 @@
       "role": "figure_theme_sentiment",
       "path": "/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/output/chinese_specific_insights/figure_theme_sentiment.svg",
       "exists": true,
-      "bytes": 1331,
-      "sha256": "835b818405cbd16c2d363686b118cea037b75fe4dae8424b824db129f6cc8818"
+      "bytes": 1058,
+      "sha256": "101800088921810e1f65d806abd1a3c0c80f4dfcd8fc2a559d51e35901727acd"
     },
     {
       "role": "readiness",
       "path": "/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/output/chinese_specific_insights/chinese_specific_insights_readiness.md",
       "exists": true,
-      "bytes": 3180,
-      "sha256": "671646c37886d50f17a58a61a2514aaa5f528989f50ab0798dce1365cf953acf"
+      "bytes": 3378,
+      "sha256": "53fd2dbc51ba4bf1de22407559289fbdd7a3f7d845b498e05da81ebaab820119"
     }
   ],
   "filters": {
-    "scope": "Chinese-language Fukui social-media rows"
+    "scope": "Chinese-language Fukui social-media rows",
+    "minimum_theme_slice_rows_for_rates": 10
   },
   "metrics": {
+    "analysis_label": "Chinese-language Fukui social-media rows",
     "rows_represented": 1670,
     "source_platform_mix": {
       "douyin": 1521,
       "xiaohongshu": 149
     },
+    "minimum_theme_slice_rows_for_rates": 10,
     "data_view_count": 8,
     "figure_count": 4
   },
   "caveats": [
     "Keyword evidence is reviewed substring matching, not a causal explanation.",
-    "SnowNLP sentiment is a baseline secondary sentiment tool for Chinese-language social text.",
+    "SnowNLP sentiment is a secondary baseline sentiment tool for Chinese-language social text.",
+    "Theme rates and sentiment means are suppressed below n=10; counts remain visible.",
     "No row-level text, author, URL, or source record columns are written to this output folder."
   ]
 }

@@ -13,8 +13,7 @@ def _write_inputs(base: Path) -> Path:
     input_dir = base / "chinese_social_media_analysis"
     input_dir.mkdir()
 
-    tagged = pd.DataFrame(
-        [
+    tagged_rows = [
             {
                 "city": "Fukui",
                 "source_platform": "xiaohongshu",
@@ -27,20 +26,23 @@ def _write_inputs(base: Path) -> Path:
                 "transport_access": True,
                 "scenic_nature": True,
             },
+    ]
+    for index in range(10):
+        tagged_rows.append(
             {
                 "city": "Fukui",
                 "source_platform": "douyin",
-                "sentiment_category": "negative",
-                "sentiment_norm": 0.21,
+                "sentiment_category": "negative" if index == 0 else "positive",
+                "sentiment_norm": 0.21 if index == 0 else 0.72,
                 "theme": "unclassified",
                 "reviewed_positive_terms_matched": "",
-                "reviewed_negative_terms_matched": "贵",
+                "reviewed_negative_terms_matched": "贵" if index == 0 else "",
                 "reviewed_recommendation_terms_matched": "",
                 "transport_access": False,
                 "scenic_nature": False,
-            },
-        ]
-    )
+            }
+        )
+    tagged = pd.DataFrame(tagged_rows)
     tagged.to_csv(input_dir / "tagged_chinese_social_posts.csv", index=False)
 
     codebook = pd.DataFrame(
@@ -117,7 +119,7 @@ def test_build_chinese_specific_insights_writes_safe_figures_and_views(tmp_path)
 
     report = build_chinese_specific_insights(input_dir=input_dir, output_dir=output_dir)
 
-    assert report["metrics"]["rows_represented"] == 2
+    assert report["metrics"]["rows_represented"] == 11
     assert (output_dir / "figure_keyword_occurrence_by_category.svg").exists()
     assert (output_dir / "figure_top_sentiment_keywords.svg").exists()
     assert (output_dir / "chinese_specific_insights_readiness.md").exists()
@@ -137,4 +139,19 @@ def test_build_chinese_specific_insights_writes_safe_figures_and_views(tmp_path)
     manifest = json.loads((output_dir / "chinese_specific_insights_manifest.json").read_text(encoding="utf-8"))
     assert manifest["kind"] == "chinese_specific_insights"
     assert manifest["metrics"]["figure_count"] == 4
+    assert manifest["metrics"]["minimum_theme_slice_rows_for_rates"] == 10
+    assert "secondary baseline" in " ".join(manifest["caveats"])
     assert "No row-level text" in " ".join(manifest["caveats"])
+
+    theme_summary = pd.read_csv(output_dir / "theme_sentiment_summary.csv")
+    travel = theme_summary[
+        (theme_summary["theme"] == "travel")
+        & (theme_summary["source_platform"] == "all")
+    ].iloc[0]
+    assert travel["theme_slice_status"] == "suppressed_small_n"
+    assert pd.isna(travel["positive_pct"])
+    unclassified = theme_summary[
+        (theme_summary["theme"] == "unclassified")
+        & (theme_summary["source_platform"] == "all")
+    ].iloc[0]
+    assert unclassified["theme_slice_status"] == "ok"

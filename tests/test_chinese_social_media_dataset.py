@@ -43,9 +43,47 @@ def test_chinese_social_builder_handles_schema_only_csv(tmp_path):
         "legacy_yaml_codebook",
     }
     assert report["input_files_discovered"] == 1
+    assert report["analysis_variant"] == "xiaohongshu_and_douyin"
     assert report["rows_retained"] == 0
     assert (tmp_path / "out" / "chinese_social_posts.csv").exists()
     assert (tmp_path / "out" / "chinese_social_readiness.md").exists()
+
+
+def test_chinese_social_builder_fails_when_no_input_files_discovered(tmp_path):
+    try:
+        build_chinese_social_outputs(
+            input_dir=tmp_path,
+            output_dir=tmp_path / "out",
+            review_friction_path=tmp_path / "missing_review_friction.csv",
+        )
+    except InputSchemaError as error:
+        message = str(error)
+        assert "input files not found" in message
+        assert "no demo or fallback mode" in message
+    else:
+        raise AssertionError("Expected InputSchemaError")
+
+
+def test_combined_discovery_fails_when_douyin_missing(tmp_path):
+    social_dir = tmp_path / "data" / "raw" / "social"
+    social_dir.mkdir(parents=True)
+    (social_dir / "fukui_xhs_reviews.csv").write_text(
+        "note_id,title,note_url,author,author_url\n"
+        "n1,福井交通不便,https://xhs.example/n1,a,\n",
+        encoding="utf-8",
+    )
+
+    try:
+        build_chinese_social_outputs(
+            input_dir=tmp_path,
+            output_dir=tmp_path / "out",
+            review_friction_path=tmp_path / "missing_review_friction.csv",
+        )
+    except InputSchemaError as error:
+        assert "Combined Chinese social inputs incomplete" in str(error)
+        assert "chinese-social-xhs-only" in str(error)
+    else:
+        raise AssertionError("Expected InputSchemaError")
 
 
 def test_normalize_social_csv_maps_xhs_schema_to_review_like_rows(tmp_path):
@@ -138,6 +176,36 @@ def test_chinese_social_builder_tags_and_compares_populated_rows(tmp_path):
 
     codebook_summary = pd.read_csv(tmp_path / "out" / "chinese_reviewed_codebook_runtime_summary.csv")
     assert {"friction", "topic", "sentiment"}.issubset(set(codebook_summary["code_family"]))
+
+
+def test_xhs_only_variant_excludes_douyin_and_labels_outputs(tmp_path):
+    xhs = tmp_path / "fukui_xhs_reviews.csv"
+    xhs.write_text(
+        "note_id,title,note_url,author,author_url\n"
+        "n1,福井交通不便 公交班次少,https://xhs.example/n1,a,\n",
+        encoding="utf-8",
+    )
+    douyin = tmp_path / "fukui_douyin_comments_from_md.csv"
+    douyin.write_text(
+        "source_record_id,douyin_post_id,author,comment_text,relative_time,parse_confidence,parse_notes,source_start_line,source_end_line\n"
+        "comment_000001,,旅行者,福井小众游超赞,2月前,medium,local_record_id_not_platform_comment_id,10,12\n",
+        encoding="utf-8",
+    )
+
+    report = build_chinese_social_outputs(
+        input_dir=tmp_path,
+        output_dir=tmp_path / "out_xhs_only",
+        input_files=[xhs, douyin],
+        review_friction_path=tmp_path / "missing_review_friction.csv",
+        xhs_only=True,
+    )
+
+    assert report["analysis_variant"] == "xiaohongshu_only"
+    assert report["n_total_xhs_rows"] == 1
+    assert report["n_total_douyin_rows"] == 0
+    assert report["source_platform_counts"] == {"xiaohongshu": 1}
+    readiness = (tmp_path / "out_xhs_only" / "chinese_social_readiness.md").read_text(encoding="utf-8")
+    assert "xiaohongshu_only" in readiness
 
 
 def test_normalize_social_csv_maps_douyin_comment_export(tmp_path):
@@ -275,6 +343,7 @@ def test_theme_annotations_join_from_processed_csv(tmp_path):
     report = build_chinese_social_outputs(
         input_dir=tmp_path,
         output_dir=tmp_path / "out",
+        input_files=[raw],
         review_friction_path=tmp_path / "missing.csv",
     )
     assert report["rows_retained"] == 2
@@ -304,6 +373,7 @@ def test_unmatched_rows_fall_back_to_unclassified_theme(tmp_path):
     report = build_chinese_social_outputs(
         input_dir=tmp_path,
         output_dir=tmp_path / "out",
+        input_files=[social_dir / "fukui_xhs_reviews.csv"],
         review_friction_path=tmp_path / "missing.csv",
     )
     assert report["theme_counts"] == {"unclassified": 1}

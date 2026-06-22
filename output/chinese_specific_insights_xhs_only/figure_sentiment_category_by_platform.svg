@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="200" viewBox="0 0 1000 200">
+<rect width="100%" height="100%" fill="#fbfaf7"/>
+<text x="32" y="38" font-family="Arial, sans-serif" font-size="24" font-weight="700" fill="#1f2933">SnowNLP Sentiment Share by Platform</text>
+<text x="32" y="66" font-family="Arial, sans-serif" font-size="14" fill="#52616b">Percentage of Chinese rows in each sentiment category; total n=149</text>
+<text x="206" y="120" text-anchor="end" font-family="Arial, sans-serif" font-size="14" fill="#1f2933">xiaohongshu (n=149)</text>
+<rect x="220.00" y="104" width="138.92" height="22" fill="#9a031e"/>
+<text x="289.46" y="120" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#ffffff">20.1%</text>
+<rect x="358.92" y="104" width="9.26" height="22" fill="#8d99ae"/>
+<rect x="368.18" y="104" width="541.81" height="22" fill="#2f6f73"/>
+<text x="639.09" y="120" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#ffffff">78.5%</text>
+<rect x="220" y="164" width="10" height="10" fill="#9a031e"/>
+<text x="236" y="174" font-family="Arial, sans-serif" font-size="12" fill="#52616b">negative</text>
+<rect x="336" y="164" width="10" height="10" fill="#8d99ae"/>
+<text x="352" y="174" font-family="Arial, sans-serif" font-size="12" fill="#52616b">neutral</text>
+<rect x="452" y="164" width="10" height="10" fill="#2f6f73"/>
+<text x="468" y="174" font-family="Arial, sans-serif" font-size="12" fill="#52616b">positive</text>
+</svg>

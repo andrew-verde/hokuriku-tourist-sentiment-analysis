@@ -1,0 +1,4 @@
+source_platform,sentiment_category,count,pct_platform_rows
+xiaohongshu,negative,30,20.134
+xiaohongshu,neutral,2,1.342
+xiaohongshu,positive,117,78.523

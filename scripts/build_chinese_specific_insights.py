@@ -60,6 +60,7 @@ SENTIMENT_GROUP_LABELS = {
     "negative_sentiment": "Negative",
     "recommendation_intent": "Recommendation",
 }
+MIN_THEME_SLICE_ROWS = 10
 
 
 class ChineseInsightError(RuntimeError):
@@ -259,33 +260,60 @@ def build_sentiment_category_by_platform(tagged: pd.DataFrame) -> pd.DataFrame:
 
 
 def build_theme_sentiment_summary(tagged: pd.DataFrame) -> pd.DataFrame:
+    def _mean_or_na(values: pd.Series) -> float | pd.NA:
+        if len(values) < MIN_THEME_SLICE_ROWS:
+            return pd.NA
+        return round(float(values.mean()), 6)
+
+    def _count_positive(values: pd.Series) -> int:
+        return int((values == "positive").sum())
+
+    def _count_negative(values: pd.Series) -> int:
+        return int((values == "negative").sum())
+
     summary = (
         tagged.groupby(["theme", "source_platform"], dropna=False)
         .agg(
             rows=("theme", "size"),
-            sentiment_norm_mean=("sentiment_norm", "mean"),
-            positive_rows=("sentiment_category", lambda values: int((values == "positive").sum())),
-            negative_rows=("sentiment_category", lambda values: int((values == "negative").sum())),
+            sentiment_norm_mean=("sentiment_norm", _mean_or_na),
+            positive_rows=("sentiment_category", _count_positive),
+            negative_rows=("sentiment_category", _count_negative),
         )
         .reset_index()
     )
-    summary["sentiment_norm_mean"] = summary["sentiment_norm_mean"].round(6)
-    summary["positive_pct"] = summary.apply(lambda row: _pct(float(row["positive_rows"]), float(row["rows"])), axis=1)
-    summary["negative_pct"] = summary.apply(lambda row: _pct(float(row["negative_rows"]), float(row["rows"])), axis=1)
+    summary["theme_slice_status"] = summary["rows"].map(
+        lambda value: "ok" if int(value) >= MIN_THEME_SLICE_ROWS else "suppressed_small_n"
+    )
+    summary["positive_pct"] = summary.apply(
+        lambda row: pd.NA if row["theme_slice_status"] == "suppressed_small_n" else _pct(float(row["positive_rows"]), float(row["rows"])),
+        axis=1,
+    )
+    summary["negative_pct"] = summary.apply(
+        lambda row: pd.NA if row["theme_slice_status"] == "suppressed_small_n" else _pct(float(row["negative_rows"]), float(row["rows"])),
+        axis=1,
+    )
     all_theme = (
         tagged.groupby(["theme"], dropna=False)
         .agg(
             rows=("theme", "size"),
-            sentiment_norm_mean=("sentiment_norm", "mean"),
-            positive_rows=("sentiment_category", lambda values: int((values == "positive").sum())),
-            negative_rows=("sentiment_category", lambda values: int((values == "negative").sum())),
+            sentiment_norm_mean=("sentiment_norm", _mean_or_na),
+            positive_rows=("sentiment_category", _count_positive),
+            negative_rows=("sentiment_category", _count_negative),
         )
         .reset_index()
     )
     all_theme["source_platform"] = "all"
-    all_theme["sentiment_norm_mean"] = all_theme["sentiment_norm_mean"].round(6)
-    all_theme["positive_pct"] = all_theme.apply(lambda row: _pct(float(row["positive_rows"]), float(row["rows"])), axis=1)
-    all_theme["negative_pct"] = all_theme.apply(lambda row: _pct(float(row["negative_rows"]), float(row["rows"])), axis=1)
+    all_theme["theme_slice_status"] = all_theme["rows"].map(
+        lambda value: "ok" if int(value) >= MIN_THEME_SLICE_ROWS else "suppressed_small_n"
+    )
+    all_theme["positive_pct"] = all_theme.apply(
+        lambda row: pd.NA if row["theme_slice_status"] == "suppressed_small_n" else _pct(float(row["positive_rows"]), float(row["rows"])),
+        axis=1,
+    )
+    all_theme["negative_pct"] = all_theme.apply(
+        lambda row: pd.NA if row["theme_slice_status"] == "suppressed_small_n" else _pct(float(row["negative_rows"]), float(row["rows"])),
+        axis=1,
+    )
     combined = pd.concat([summary, all_theme], ignore_index=True)
     return combined.sort_values(["rows", "theme"], ascending=[False, True]).reset_index(drop=True)
 
@@ -520,10 +548,12 @@ def _write_readiness(path: Path, outputs: dict[str, Path], metrics: dict[str, ob
     lines = [
         "# Chinese-Specific Insight Outputs",
         "",
-        "These outputs summarize Chinese-language Fukui social-media rows only. They are aggregate views for presentation and exploratory review, not nationality claims.",
+        f"These outputs cover {metrics['analysis_label']}. They are aggregate views for presentation and exploratory review, not nationality claims.",
         "",
+        f"- Analysis label: `{metrics['analysis_label']}`",
         f"- Rows represented: {metrics['rows_represented']}",
         f"- Source platform mix: {metrics['source_platform_mix']}",
+        f"- Minimum theme slice rows for rates: {metrics['minimum_theme_slice_rows_for_rates']}",
         f"- Output folder: `{path.parent}`",
         "",
         "## Figures",
@@ -546,8 +576,9 @@ def _write_readiness(path: Path, outputs: dict[str, Path], metrics: dict[str, ob
             "## Caveats",
             "",
             "- Keyword evidence uses reviewed substring matches and should be described as evidence counts, not inferred motives.",
-            "- Sentiment categories use SnowNLP as the current baseline; reviewed positive/negative/recommendation keyword matches are transparent secondary evidence.",
-            "- Theme labels come from companion processed annotation files; unmatched rows are `unclassified`, currently almost entirely parsed Douyin comments.",
+            "- Sentiment categories use SnowNLP as a secondary baseline; reviewed positive/negative/recommendation keyword matches are transparent evidence.",
+            f"- Theme rates and sentiment means are suppressed below n={MIN_THEME_SLICE_ROWS}; counts remain in CSV outputs.",
+            "- Theme labels come from companion processed annotation files; unmatched rows are `unclassified`, currently almost entirely parsed Douyin comments in the combined variant.",
             "- Outputs intentionally omit row-level source text, authors, URLs, and record IDs.",
         ]
     )
@@ -562,6 +593,7 @@ def _write_safe_csv(df: pd.DataFrame, path: Path) -> None:
 def build_chinese_specific_insights(
     input_dir: Path = DEFAULT_INPUT_DIR,
     output_dir: Path = DEFAULT_OUTPUT_DIR,
+    analysis_label: str = "Chinese-language Fukui social-media rows",
 ) -> dict[str, object]:
     output_dir.mkdir(parents=True, exist_ok=True)
 
@@ -660,6 +692,7 @@ def build_chinese_specific_insights(
     theme_rows = theme_sentiment[
         (theme_sentiment["source_platform"] == "all")
         & (theme_sentiment["theme"].astype(str) != "unclassified")
+        & (theme_sentiment["theme_slice_status"].astype(str) == "ok")
     ].copy()
     unclassified_rows = int(
         theme_sentiment.loc[
@@ -674,15 +707,17 @@ def build_chinese_specific_insights(
         "Classified Chinese Social Themes",
         (
             f"Rows with explicit theme labels n={_fmt_n(int(theme_rows['rows'].sum()))}; "
-            f"unclassified n={_fmt_n(unclassified_rows)} remains in the CSV"
+            f"unclassified n={_fmt_n(unclassified_rows)} remains in the CSV; low-n themes suppressed"
         ),
         "theme",
         "rows",
     )
 
     metrics = {
+        "analysis_label": analysis_label,
         "rows_represented": int(len(tagged)),
         "source_platform_mix": {str(k): int(v) for k, v in tagged["source_platform"].value_counts().items()},
+        "minimum_theme_slice_rows_for_rates": MIN_THEME_SLICE_ROWS,
         "data_view_count": len(data_views),
         "figure_count": 4,
     }
@@ -701,11 +736,15 @@ def build_chinese_specific_insights(
             for name, path in outputs.items()
             if name != "manifest"
         ],
-        filters={"scope": "Chinese-language Fukui social-media rows"},
+        filters={
+            "scope": analysis_label,
+            "minimum_theme_slice_rows_for_rates": MIN_THEME_SLICE_ROWS,
+        },
         metrics=metrics,
         caveats=[
             "Keyword evidence is reviewed substring matching, not a causal explanation.",
-            "SnowNLP sentiment is a baseline secondary sentiment tool for Chinese-language social text.",
+            "SnowNLP sentiment is a secondary baseline sentiment tool for Chinese-language social text.",
+            f"Theme rates and sentiment means are suppressed below n={MIN_THEME_SLICE_ROWS}; counts remain visible.",
             "No row-level text, author, URL, or source record columns are written to this output folder.",
         ],
     )
@@ -719,9 +758,14 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--input-dir", type=Path, default=DEFAULT_INPUT_DIR)
     parser.add_argument("--output-dir", type=Path, default=DEFAULT_OUTPUT_DIR)
+    parser.add_argument("--analysis-label", default="Chinese-language Fukui social-media rows")
     args = parser.parse_args()
 
-    build_chinese_specific_insights(input_dir=args.input_dir, output_dir=args.output_dir)
+    build_chinese_specific_insights(
+        input_dir=args.input_dir,
+        output_dir=args.output_dir,
+        analysis_label=args.analysis_label,
+    )
 
 
 if __name__ == "__main__":

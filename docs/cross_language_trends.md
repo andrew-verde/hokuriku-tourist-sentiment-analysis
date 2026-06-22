@@ -166,7 +166,7 @@ categories, not direct visitor satisfaction or nationality differences.
 - A large share of Fukui Xiaohongshu chatter is idol fan-pilgrimage content
   (theme `fan`, 22/105 after dedup) — analytically interesting, but a different
   travel motivation than general tourism; hence the dual-subset reporting.
-- Chinese sentiment uses SnowNLP as the current baseline, not a validated
+- Chinese sentiment uses SnowNLP as a secondary baseline, not a validated
   project-specific sentiment model; Google star ratings and SnowNLP probability
   are different instruments.
 - Cross-source sentiment category tests compare platformed discourse categories

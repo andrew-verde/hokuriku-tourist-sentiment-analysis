@@ -1,0 +1,142 @@
+{
+  "schema_version": "research_provenance.v1",
+  "kind": "chinese_specific_insights",
+  "generated_at": "2026-06-22T04:03:09+00:00",
+  "command": "python scripts/build_chinese_specific_insights.py",
+  "inputs": [
+    {
+      "role": "ignored_tagged_chinese_social_rows",
+      "path": "output/chinese_social_media_analysis_xhs_only/tagged_chinese_social_posts.csv",
+      "exists": true,
+      "bytes": 316563,
+      "sha256": "9df811d7a126894dad267e5b45359d425be9bfd0d86a3a0f579bf81eb3127897"
+    },
+    {
+      "role": "aggregate_runtime_codebook_summary",
+      "path": "output/chinese_social_media_analysis_xhs_only/chinese_reviewed_codebook_runtime_summary.csv",
+      "exists": true,
+      "bytes": 3500,
+      "sha256": "5f0c4d1335ba1cadaa1a7ddd2edd23350000f0943f838b67db762985fdfaf7eb"
+    },
+    {
+      "role": "aggregate_topic_evidence",
+      "path": "output/chinese_social_media_analysis_xhs_only/chinese_topic_by_city_platform.csv",
+      "exists": true,
+      "bytes": 883,
+      "sha256": "4f65e5bb180a0c14312317abffa71e381efbddfccc0c78edb52bf2e7656bc0dd"
+    }
+  ],
+  "outputs": [
+    {
+      "role": "keyword_inventory_by_category",
+      "path": "output/chinese_specific_insights_xhs_only/keyword_inventory_by_category.csv",
+      "exists": true,
+      "bytes": 1300,
+      "sha256": "8fb3ce59c702e0f1514a2ad856798f35ef3a4cf5629673503e6c1d628f656eb1"
+    },
+    {
+      "role": "keyword_occurrence_by_category",
+      "path": "output/chinese_specific_insights_xhs_only/keyword_occurrence_by_category.csv",
+      "exists": true,
+      "bytes": 637,
+      "sha256": "d796ee3a1fb0df189265173f283ce9279414e9632e7b1b43a5dfc01643a47e72"
+    },
+    {
+      "role": "sentiment_keyword_counts",
+      "path": "output/chinese_specific_insights_xhs_only/sentiment_keyword_counts.csv",
+      "exists": true,
+      "bytes": 2587,
+      "sha256": "5452a563160eb98ebd44ad6df51a70fa9778ac69b454869c7cb9600394157db1"
+    },
+    {
+      "role": "keywords_by_snownlp_sentiment_category",
+      "path": "output/chinese_specific_insights_xhs_only/keywords_by_snownlp_sentiment_category.csv",
+      "exists": true,
+      "bytes": 1899,
+      "sha256": "8e37951f150c4b88069b10fd1009b9c08fce1445fb082db82addb8353c488d7c"
+    },
+    {
+      "role": "sentiment_category_by_platform",
+      "path": "output/chinese_specific_insights_xhs_only/sentiment_category_by_platform.csv",
+      "exists": true,
+      "bytes": 150,
+      "sha256": "ef9bee3964348167e32b01cf8b3e20214eb0d88e7777f1cf4e8ef74fbd4ecb35"
+    },
+    {
+      "role": "theme_sentiment_summary",
+      "path": "output/chinese_specific_insights_xhs_only/theme_sentiment_summary.csv",
+      "exists": true,
+      "bytes": 496,
+      "sha256": "f14d444e27a642aa72df5e41c83b5a71f38179506fa6cd896b04a56901560468"
+    },
+    {
+      "role": "topic_by_sentiment_category",
+      "path": "output/chinese_specific_insights_xhs_only/topic_by_sentiment_category.csv",
+      "exists": true,
+      "bytes": 1594,
+      "sha256": "e8782e57cbe1bd272b0fd8cc7d6911298c50c4a0acc1ea9259d09cc7f72ac134"
+    },
+    {
+      "role": "friction_by_sentiment_category",
+      "path": "output/chinese_specific_insights_xhs_only/friction_by_sentiment_category.csv",
+      "exists": true,
+      "bytes": 1274,
+      "sha256": "866799328df1c6128e591b904008965e1a848b6570d8308160a4875317ae3a1a"
+    },
+    {
+      "role": "figure_keyword_occurrence_by_category",
+      "path": "output/chinese_specific_insights_xhs_only/figure_keyword_occurrence_by_category.svg",
+      "exists": true,
+      "bytes": 5664,
+      "sha256": "e1b47720dbce9fe28dd0d29cdd802821d80e36828c078fbf785807481e4e463f"
+    },
+    {
+      "role": "figure_top_sentiment_keywords",
+      "path": "output/chinese_specific_insights_xhs_only/figure_top_sentiment_keywords.svg",
+      "exists": true,
+      "bytes": 6517,
+      "sha256": "01ed91623f82cda3b26afc8e540b1230acdddfada2487666de7e5778cb52226b"
+    },
+    {
+      "role": "figure_sentiment_category_by_platform",
+      "path": "output/chinese_specific_insights_xhs_only/figure_sentiment_category_by_platform.svg",
+      "exists": true,
+      "bytes": 1506,
+      "sha256": "638621e399bc49bd3c658a51dfe030c9502db38326e459304a30f2f5796f1bb3"
+    },
+    {
+      "role": "figure_theme_sentiment",
+      "path": "output/chinese_specific_insights_xhs_only/figure_theme_sentiment.svg",
+      "exists": true,
+      "bytes": 1054,
+      "sha256": "ea81663723ea0952b35a206810c409ced45d4a8ccd48be8503c8b73c749059f7"
+    },
+    {
+      "role": "readiness",
+      "path": "output/chinese_specific_insights_xhs_only/chinese_specific_insights_readiness.md",
+      "exists": true,
+      "bytes": 2446,
+      "sha256": "01f5f9a075e6bd36f5aefe7b9df67613f7145ab017294ed63ad0b44eda2c97ad"
+    }
+  ],
+  "filters": {
+    "scope": "Chinese-language Fukui Xiaohongshu rows only",
+    "minimum_theme_slice_rows_for_rates": 10
+  },
+  "metrics": {
+    "analysis_label": "Chinese-language Fukui Xiaohongshu rows only",
+    "rows_represented": 149,
+    "source_platform_mix": {
+      "xiaohongshu": 149
+    },
+    "minimum_theme_slice_rows_for_rates": 10,
+    "data_view_count": 8,
+    "figure_count": 4
+  },
+  "caveats": [
+    "Keyword evidence is reviewed substring matching, not a causal explanation.",
+    "SnowNLP sentiment is a secondary baseline sentiment tool for Chinese-language social text.",
+    "Theme rates and sentiment means are suppressed below n=10; counts remain visible.",
+    "No row-level text, author, URL, or source record columns are written to this output folder."
+  ]
+}
