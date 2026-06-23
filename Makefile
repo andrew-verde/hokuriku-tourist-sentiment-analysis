@@ -1,6 +1,6 @@
 PYTHON = .venv/bin/python3
 
-.PHONY: help test chinese-codebook-template reviewed-codebook-config reviewed-codebook-status chinese-social chinese-social-xhs-only chinese-insights chinese-insights-xhs-only multilingual-reviews cross-language-trends sentiment-env sentiment-analysis hypothesis-h1 hypothesis-h2 hypothesis-h3 hypothesis-tests presentation-safe
+.PHONY: help test chinese-codebook-template reviewed-codebook-config reviewed-codebook-status chinese-social chinese-social-xhs-only chinese-social-with-douyin chinese-insights chinese-insights-xhs-only multilingual-reviews cross-language-trends sentiment-env sentiment-analysis hypothesis-h1 hypothesis-h2 hypothesis-h3 hypothesis-tests presentation-safe
 
 help:
 	@echo "Hokuriku tourist sentiment analysis"
@@ -8,8 +8,9 @@ help:
 	@echo "  make chinese-codebook-template Export reviewed Chinese codebook CSV"
 	@echo "  make reviewed-codebook-status Show JP/EN review completion counts"
 	@echo "  make reviewed-codebook-config Import completed reviewed JP/EN codebook YAML"
-	@echo "  make chinese-social          Build Chinese XHS/Douyin cleaned outputs"
-	@echo "  make chinese-social-xhs-only Build labeled XHS-only Chinese outputs"
+	@echo "  make chinese-social          Build main Chinese XHS-only cleaned outputs"
+	@echo "  make chinese-social-xhs-only Build compatibility XHS-only Chinese outputs"
+	@echo "  make chinese-social-with-douyin Build explicit XHS/Douyin source-sensitivity outputs"
 	@echo "  make chinese-insights        Build tracked Chinese-specific figure/data outputs"
 	@echo "  make chinese-insights-xhs-only Build labeled XHS-only figure/data outputs"
 	@echo "  make multilingual-reviews    Sync local Google review data from english-fukui-tourism"
@@ -37,6 +38,9 @@ chinese-social:
 
 chinese-social-xhs-only:
 	$(PYTHON) scripts/build_chinese_social_media_dataset.py --xhs-only --output-dir output/chinese_social_media_analysis_xhs_only
+
+chinese-social-with-douyin:
+	$(PYTHON) scripts/build_chinese_social_media_dataset.py --include-douyin
 
 chinese-insights:
 	$(PYTHON) scripts/build_chinese_specific_insights.py

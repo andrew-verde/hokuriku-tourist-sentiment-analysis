@@ -48,6 +48,7 @@ DEFAULT_INPUT_DIR = Path(
 )
 OUTPUT_DIR = ROOT / "output" / "chinese_social_media_analysis"
 XHS_ONLY_OUTPUT_DIR = ROOT / "output" / "chinese_social_media_analysis_xhs_only"
+DOUYIN_INCLUDED_OUTPUT_DIR = ROOT / "output" / "chinese_social_media_analysis_with_douyin"
 # YAML is the legacy friction source; the reviewed CSV is the current audit
 # source for promoted Chinese evidence terms.
 CODEBOOK_PATH = ROOT / "config" / "chinese_social_friction_codebook.yaml"
@@ -562,12 +563,12 @@ def validate_douyin_comment_source(path: Path, source: pd.DataFrame) -> dict:
     }
 
 
-def discover_input_files(input_dir: Path) -> list[Path]:
+def discover_input_files(input_dir: Path, include_douyin: bool = False) -> list[Path]:
     """Find raw social scrape CSVs in the companion tourism-data checkout.
 
-    Raw scrapes are preferred for source text. The current Douyin comment export
-    is parsed from markdown into data/processed and is also an ingestion source.
-    Other processed CSVs are consumed only as annotations.
+    Raw scrapes are preferred for source text. Douyin is temporarily excluded
+    from the main pipeline and is discovered only for explicit source-sensitivity
+    runs. Other processed CSVs are consumed only as annotations.
     """
     if not input_dir.exists():
         return []
@@ -583,12 +584,14 @@ def discover_input_files(input_dir: Path) -> list[Path]:
             continue
         for path in directory.glob("*.csv"):
             name = path.name.lower()
-            if any(token in name for token in ["xhs", "xiaohongshu", "douyin", "小红书", "抖音"]):
+            has_xhs_token = any(token in name for token in ["xhs", "xiaohongshu", "小红书"])
+            has_douyin_token = any(token in name for token in ["douyin", "抖音"])
+            if has_xhs_token or (include_douyin and has_douyin_token):
                 if use_repo_workbook and DEFAULT_XHS_MANUAL_WORKBOOK.exists() and any(token in name for token in ["xhs", "xiaohongshu", "小红书"]):
                     continue
                 files.append(path)
     processed_dir = input_dir / "data" / "processed"
-    if processed_dir.exists():
+    if include_douyin and processed_dir.exists():
         for path in processed_dir.glob("*douyin*comments*.csv"):
             files.append(path)
     return sorted(set(files))
@@ -1096,7 +1099,7 @@ def _write_readiness(report: dict, path: Path) -> None:
         "- Chinese sentiment fields use SnowNLP as a secondary baseline (`sentiment_norm`, `sentiment_score`, and `sentiment_category`); reviewed term matches remain transparent evidence columns.",
         "- Positive/recommendation evidence is labeled as enjoyment evidence for presentation scanning only; do not treat it as a psychometric enjoyment scale.",
         f"- Theme rates and sentiment means are suppressed for slices with fewer than {MIN_THEME_SLICE_ROWS} rows; counts remain visible for audit.",
-        "- XHS-only outputs are a labeled source-sensitivity variant when Douyin comments are too weak for a claim.",
+        "- Current main outputs exclude Douyin; use the explicit Douyin-inclusive target only for documented source-sensitivity checks.",
         "- Compare Chinese social-media rates with Google review-language rates descriptively because source platform behavior and text length differ.",
         "- Theme labels (fan / travel / ordinary) come from the companion tourism-data processed CSVs, joined on note id; rows without a label are `unclassified`.",
         "- `post_date` is parsed from the Xiaohongshu author cell; `post_date_precision` marks exact vs year-inferred vs relative-inferred values (inference anchored to the scrape commit date).",
@@ -1111,13 +1114,13 @@ def build_chinese_social_outputs(
     output_dir: Path = OUTPUT_DIR,
     input_files: list[Path] | None = None,
     review_friction_path: Path = MULTILINGUAL_FRICTION_PATH,
-    xhs_only: bool = False,
+    xhs_only: bool = True,
 ) -> dict:
     # Orchestrate the full build: ingest, deduplicate, annotate, score, tag,
     # summarize, validate, and write every derived output.
     output_dir.mkdir(parents=True, exist_ok=True)
     discovered_inputs = input_files is None
-    input_files = input_files if input_files is not None else discover_input_files(input_dir)
+    input_files = input_files if input_files is not None else discover_input_files(input_dir, include_douyin=not xhs_only)
     if xhs_only:
         input_files = [path for path in input_files if _is_xhs_source(path)]
     if not input_files:
@@ -1133,7 +1136,7 @@ def build_chinese_social_outputs(
             raise InputSchemaError(
                 f"Combined Chinese social inputs incomplete under {input_dir}: "
                 f"has_xhs={has_xhs}, has_douyin={has_douyin}. "
-                "Run `make chinese-social-xhs-only` for the labeled XHS-only variant, "
+                "Run `make chinese-social` for the current Xiaohongshu-only main pipeline, "
                 "or provide the missing source files."
             )
     codebook = load_chinese_codebook()
@@ -1347,7 +1350,7 @@ def build_chinese_social_outputs(
             "Group labels describe content language/source platform, not nationality.",
             "SnowNLP is a secondary model baseline; reviewed term matches remain transparent evidence.",
             "Theme slice rates are suppressed when the slice has fewer than 10 rows; counts remain visible.",
-            "XHS-only outputs are an explicit alternate variant for source-sensitivity checks, not a replacement for the combined baseline unless documented.",
+            "The current main Chinese pipeline excludes Douyin; Douyin-inclusive outputs are an explicit source-sensitivity variant.",
             "Douyin comment IDs are local parser IDs, not platform comment IDs.",
             "Relative and year-inferred dates are not exact monthly trend evidence.",
             "Chinese social-media rates and Google review rates are descriptive cross-platform comparisons.",
@@ -1373,7 +1376,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--xhs-only",
         action="store_true",
-        help="Build the labeled Xiaohongshu-only source-sensitivity variant.",
+        help="Build Xiaohongshu-only outputs. This is the default and is kept for compatibility.",
+    )
+    parser.add_argument(
+        "--include-douyin",
+        action="store_true",
+        help="Opt in to the temporary Douyin-inclusive source-sensitivity variant.",
     )
     return parser.parse_args()
 
@@ -1381,13 +1389,14 @@ def parse_args() -> argparse.Namespace:
 def main() -> int:
     # Run the pipeline and log the retention/output location for quick CLI use.
     args = parse_args()
-    output_dir = args.output_dir or (XHS_ONLY_OUTPUT_DIR if args.xhs_only else OUTPUT_DIR)
+    xhs_only = not args.include_douyin
+    output_dir = args.output_dir or (OUTPUT_DIR if xhs_only else DOUYIN_INCLUDED_OUTPUT_DIR)
     report = build_chinese_social_outputs(
         input_dir=args.input_dir,
         output_dir=output_dir,
         input_files=args.input_file,
         review_friction_path=args.review_friction_path,
-        xhs_only=args.xhs_only,
+        xhs_only=xhs_only,
     )
     logger.info("Rows retained: %s", report["rows_retained"])
     logger.info("Output written: %s", output_dir)

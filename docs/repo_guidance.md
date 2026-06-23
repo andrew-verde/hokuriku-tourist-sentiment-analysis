@@ -7,7 +7,8 @@ analysis project for a near-term team presentation.
 
 Compare what different language/source groups discuss about Fukui tourism:
 
-- Chinese-language Xiaohongshu/Douyin posts from `tourism-data`
+- Chinese-language Xiaohongshu posts from `tourism-data`; Douyin is temporarily
+  excluded from the main pipeline and kept for explicit source-sensitivity runs
 - Japanese-language Google reviews from the local `english-fukui-tourism` review cache
 - English-language Google reviews from the same Google review cache
 
@@ -45,14 +46,16 @@ Current local review cache after sync:
 Chinese social inputs are external and should remain external:
 
 - Source repo: sibling `tourism-data` checkout, or `TOURISM_DATA_DIR` override
-- Expected raw social inputs: `data/raw/social/*xhs*.csv`, `data/raw/social/*douyin*.csv`
-- Current parsed Douyin comment source: `data/processed/fukui_douyin_comments_from_md.csv`
+- Expected main social inputs: `data/raw/social/*xhs*.csv` or the reviewed manual XHS workbook
+- Douyin source-sensitivity inputs only: `data/raw/social/*douyin*.csv` and `data/processed/fukui_douyin_comments_from_md.csv`
 - Current visible Fukui XHS files exist; manual full-text XHS pull is WIP.
 - `make chinese-social` must fail when no real Chinese source files are found;
-  there is no demo/fallback input mode for academic outputs.
+  there is no demo/fallback input mode for academic outputs. It currently
+  excludes Douyin from the main pipeline.
 - `make chinese-social-xhs-only` and `make chinese-insights-xhs-only` write
-  labeled `_xhs_only` outputs for Xiaohongshu-only source-sensitivity checks
-  when Douyin comments are too weak for a claim.
+  labeled `_xhs_only` compatibility outputs for Xiaohongshu-only checks.
+- `make chinese-social-with-douyin` is the explicit opt-in path for
+  Douyin-inclusive source-sensitivity outputs.
 
 ## Project Readiness Checklist
 
@@ -70,13 +73,14 @@ Chinese social inputs are external and should remain external:
   library-score/codebook positive-evidence disagreement rates.
 - [x] Chinese social sentiment/topic pipeline: `scripts/build_chinese_social_media_dataset.py`
   builds cleaned Chinese social outputs with SnowNLP secondary baseline sentiment from
-  one `make chinese-social` trigger for Xiaohongshu rows and parsed Douyin
-  comments. Reviewed Chinese friction/topic/sentiment codebook rows now feed
-  runtime evidence matching, Douyin comment exports fail loud on missing parser
-  provenance fields, missing discovered Chinese inputs fail loud, theme-sliced
+  one `make chinese-social` trigger for Xiaohongshu rows. Reviewed Chinese
+  friction/topic/sentiment codebook rows now feed runtime evidence matching,
+  Douyin comment exports fail loud on missing parser provenance fields when the
+  explicit Douyin-inclusive variant is used, missing discovered Chinese inputs fail loud, theme-sliced
   rates are suppressed below 10 rows, and aggregate topic/positive-evidence
-  outputs are wired for presentation comparisons. A labeled XHS-only alternate
-  path is available for source-sensitivity checks.
+  outputs are wired for presentation comparisons. Douyin is temporarily excluded
+  from the main pipeline; an explicit opt-in path is available for
+  source-sensitivity checks.
 - [x] JP-EN Google review library sentiment: `scripts/build_sentiment_analysis.py`
   filters by Fukui prefecture metadata, scores English reviews with VADER,
   scores Japanese reviews with oseti, matches reviewed JP/EN keyword evidence,
@@ -107,8 +111,8 @@ Default pipeline should become:
 
 1. Sync Google review artifacts with `make multilingual-reviews`.
 2. Build Chinese social rows from `tourism-data` with `make chinese-social`.
-   Keep Xiaohongshu and Douyin in the same runtime path so codebook matching,
-   SnowNLP scoring, denominator reporting, and caveats stay comparable.
+   Keep the main path Xiaohongshu-only for clarity until Douyin annotations and
+   provenance are strong enough for the main theme analysis.
 3. Promote reviewed codebook CSV/Excel files into versioned configs.
 4. Run Fukui-only language/source tagging:
    - Chinese-language posts: topic/friction/enjoyment keywords plus Chinese sentiment

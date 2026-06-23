@@ -10,7 +10,7 @@ series use.
 Inputs:
 
   - `make multilingual-reviews` -> output/multilingual_review_analysis/reviews_multilingual.csv
-  - `make chinese-social-xhs-only` -> output/chinese_social_media_analysis_xhs_only/tagged_chinese_social_posts.csv
+  - `make chinese-social` -> output/chinese_social_media_analysis/tagged_chinese_social_posts.csv
 
 Google review scope is filtered by checkpoint POI prefecture metadata. The
 default is Fukui; the same scaffold can later run for Ishikawa or Toyama once
@@ -43,7 +43,7 @@ logger = setup_logger(__name__)
 
 ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_REVIEWS_PATH = ROOT / "output" / "multilingual_review_analysis" / "reviews_multilingual.csv"
-DEFAULT_CHINESE_PATH = ROOT / "output" / "chinese_social_media_analysis_xhs_only" / "tagged_chinese_social_posts.csv"
+DEFAULT_CHINESE_PATH = ROOT / "output" / "chinese_social_media_analysis" / "tagged_chinese_social_posts.csv"
 DEFAULT_POI_METADATA_PATH = ROOT / "output" / "checkpoints" / "poi_metadata.json"
 DEFAULT_SENTIMENT_SUMMARY_PATH = ROOT / "output" / "sentiment_aggregates" / "source_group_sentiment_summary.csv"
 DEFAULT_OUTPUT_DIR = ROOT / "output" / "cross_language_trends"
@@ -801,7 +801,7 @@ def build_cross_language_trends(
     # Main orchestration function: validate inputs, load scoped rows, write
     # aggregate outputs, and record a manifest/readiness note.
     _require_input(reviews_path, "multilingual-reviews")
-    _require_input(chinese_path, "chinese-social-xhs-only")
+    _require_input(chinese_path, "chinese-social")
     output_dir.mkdir(parents=True, exist_ok=True)
 
     reviews = load_review_rows(reviews_path, poi_metadata_path, prefecture)

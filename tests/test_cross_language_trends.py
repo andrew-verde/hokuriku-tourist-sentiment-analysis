@@ -42,7 +42,7 @@ def _write_inputs(tmp_path: Path) -> tuple[Path, Path, Path, Path]:
         "city,source_platform,text_content,post_date,post_date_precision,sentiment_norm,sentiment_category,theme,any_friction,any_enjoyment_evidence\n"
         "Fukui,xiaohongshu,福井交通不便,2025-08-14,exact,0.1,negative,travel,True,False\n"
         "Fukui,xiaohongshu,走Riku走过的道路,2025-08-30,year_inferred,0.9,positive,fan,False,True\n"
-        "Fukui,douyin,无日期帖子,,none,0.5,neutral,ordinary,False,False\n"
+        "Fukui,xiaohongshu,无日期帖子,,none,0.5,neutral,ordinary,False,False\n"
         "Toyama,xiaohongshu,富山帖子,2025-08-14,exact,0.8,positive,travel,False,True\n",
         encoding="utf-8",
     )
@@ -71,7 +71,7 @@ def test_baseline_filters_reviews_by_prefecture_metadata_and_keeps_scales_separa
     )
 
     baseline = pd.read_csv(tmp_path / "out" / "cross_language_baseline_snapshot.csv")
-    assert set(baseline["group"]) == {"english", "japanese", "chinese_social_xiaohongshu", "chinese_social_douyin"}
+    assert set(baseline["group"]) == {"english", "japanese", "chinese_social_xiaohongshu"}
     assert set(baseline["prefecture"]) == {"Fukui"}
     assert report["review_rows_retained"] == 3
     assert report["chinese_rows_retained"] == 3
@@ -91,12 +91,12 @@ def test_baseline_filters_reviews_by_prefecture_metadata_and_keeps_scales_separa
     assert (
         tests[tests["test_name"] == "within_chinese_platform_any_friction_prevalence"]
         .iloc[0]["status"]
-        == "ok"
+        == "skipped"
     )
     assert (
         tests[tests["test_name"] == "within_chinese_platform_any_enjoyment_evidence_prevalence"]
         .iloc[0]["status"]
-        == "ok"
+        == "skipped"
     )
     friction = tests[tests["test_name"] == "cross_source_friction_prevalence"].iloc[0]
     assert friction["status"] == "ok"
@@ -122,7 +122,7 @@ def test_baseline_filters_reviews_by_prefecture_metadata_and_keeps_scales_separa
 
     xhs = baseline[baseline["group"] == "chinese_social_xiaohongshu"].iloc[0]
     # Chinese social rows keep SnowNLP sentiment means but do not get Google ratings.
-    assert xhs["volume"] == 2
+    assert xhs["volume"] == 3
     assert pd.isna(xhs["rating_mean"])
     assert xhs["sentiment_norm_mean"] == 0.5
 
@@ -161,7 +161,7 @@ def test_missing_inputs_fail_with_make_target_hint(tmp_path):
             sentiment_summary_path=sentiment_summary,
             output_dir=tmp_path / "out",
         )
-    with pytest.raises(MissingInputError, match="make chinese-social-xhs-only"):
+    with pytest.raises(MissingInputError, match="make chinese-social"):
         build_cross_language_trends(
             reviews_path=reviews,
             chinese_path=tmp_path / "absent.csv",

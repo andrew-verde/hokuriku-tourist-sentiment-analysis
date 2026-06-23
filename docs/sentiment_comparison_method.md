@@ -7,9 +7,9 @@ and source platform, not nationality.
 
 ## Source Inputs
 
-Chinese-language social rows use Xiaohongshu note rows and Douyin comment rows
-from the companion `tourism-data` repo through one `make chinese-social`
-runtime path. The Xiaohongshu manual source is the `fukui_xhs_reviews` sheet
+Chinese-language social rows currently use Xiaohongshu note rows from the
+companion `tourism-data` repo through the main `make chinese-social` runtime
+path. The Xiaohongshu manual source is the `fukui_xhs_reviews` sheet
 from:
 
 ```text
@@ -23,7 +23,9 @@ note_id,title,note_url,author,author_url,body_text,capture_notes
 ```
 
 The current Douyin source is a parsed markdown comment export under the sibling
-`tourism-data` checkout or the `TOURISM_DATA_DIR` override:
+`tourism-data` checkout or the `TOURISM_DATA_DIR` override, but it is
+temporarily excluded from the main pipeline and should be used only through the
+explicit Douyin-inclusive source-sensitivity target:
 
 ```text
 data/processed/fukui_douyin_comments_from_md.csv
@@ -49,17 +51,17 @@ schema checks; the normal discovered-input path has no demo or fallback mode.
 
 ## Chinese Input Variants
 
-Default Chinese outputs combine Xiaohongshu note text and parsed Douyin
-comments and write to:
+Default Chinese outputs use Xiaohongshu note text only and write to:
 
 ```text
 output/chinese_social_media_analysis/
 output/chinese_specific_insights/
 ```
 
-Because the current Douyin source is short comment text with local parser ids
-and no platform post ids, an explicit Xiaohongshu-only source-sensitivity path
-is available:
+Because the current Douyin source is short comment text with local parser ids,
+no platform post ids, and no companion theme annotations, it is excluded from
+the main theme annotation analysis until further notice. A compatibility
+Xiaohongshu-only output path remains available:
 
 ```bash
 make chinese-social-xhs-only
@@ -67,9 +69,16 @@ make chinese-insights-xhs-only
 ```
 
 Those outputs write to labeled `_xhs_only` folders and must be described as
-`Chinese-language Fukui Xiaohongshu rows only`. Use them when Douyin comments
-are too weak for a claim, or when checking whether combined-corpus results are
-driven by the much larger Douyin comment denominator.
+`Chinese-language Fukui Xiaohongshu rows only`.
+
+The Douyin-inclusive variant is now opt-in only:
+
+```bash
+make chinese-social-with-douyin
+```
+
+Use it only for documented source-sensitivity checks, not for the main theme
+annotation analysis.
 
 Theme-sliced rates and sentiment means are suppressed for slices below 10 rows.
 Counts remain in CSV outputs for audit, but small slices should not be charted

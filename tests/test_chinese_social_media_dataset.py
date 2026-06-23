@@ -43,7 +43,7 @@ def test_chinese_social_builder_handles_schema_only_csv(tmp_path):
         "legacy_yaml_codebook",
     }
     assert report["input_files_discovered"] == 1
-    assert report["analysis_variant"] == "xiaohongshu_and_douyin"
+    assert report["analysis_variant"] == "xiaohongshu_only"
     assert report["rows_retained"] == 0
     assert (tmp_path / "out" / "chinese_social_posts.csv").exists()
     assert (tmp_path / "out" / "chinese_social_readiness.md").exists()
@@ -78,10 +78,11 @@ def test_combined_discovery_fails_when_douyin_missing(tmp_path):
             input_dir=tmp_path,
             output_dir=tmp_path / "out",
             review_friction_path=tmp_path / "missing_review_friction.csv",
+            xhs_only=False,
         )
     except InputSchemaError as error:
         assert "Combined Chinese social inputs incomplete" in str(error)
-        assert "chinese-social-xhs-only" in str(error)
+        assert "make chinese-social" in str(error)
     else:
         raise AssertionError("Expected InputSchemaError")
 
@@ -134,8 +135,10 @@ def test_chinese_social_builder_tags_and_compares_populated_rows(tmp_path):
         output_dir=tmp_path / "out",
         input_files=[xhs, douyin],
         review_friction_path=review_friction,
+        xhs_only=False,
     )
 
+    assert report["analysis_variant"] == "xiaohongshu_and_douyin"
     assert report["rows_retained"] == 3
 
     tagged = pd.read_csv(tmp_path / "out" / "tagged_chinese_social_posts.csv")
@@ -178,7 +181,7 @@ def test_chinese_social_builder_tags_and_compares_populated_rows(tmp_path):
     assert {"friction", "topic", "sentiment"}.issubset(set(codebook_summary["code_family"]))
 
 
-def test_xhs_only_variant_excludes_douyin_and_labels_outputs(tmp_path):
+def test_default_variant_excludes_douyin_and_labels_outputs(tmp_path):
     xhs = tmp_path / "fukui_xhs_reviews.csv"
     xhs.write_text(
         "note_id,title,note_url,author,author_url\n"
@@ -194,17 +197,16 @@ def test_xhs_only_variant_excludes_douyin_and_labels_outputs(tmp_path):
 
     report = build_chinese_social_outputs(
         input_dir=tmp_path,
-        output_dir=tmp_path / "out_xhs_only",
+        output_dir=tmp_path / "out",
         input_files=[xhs, douyin],
         review_friction_path=tmp_path / "missing_review_friction.csv",
-        xhs_only=True,
     )
 
     assert report["analysis_variant"] == "xiaohongshu_only"
     assert report["n_total_xhs_rows"] == 1
     assert report["n_total_douyin_rows"] == 0
     assert report["source_platform_counts"] == {"xiaohongshu": 1}
-    readiness = (tmp_path / "out_xhs_only" / "chinese_social_readiness.md").read_text(encoding="utf-8")
+    readiness = (tmp_path / "out" / "chinese_social_readiness.md").read_text(encoding="utf-8")
     assert "xiaohongshu_only" in readiness
 
 
@@ -313,7 +315,10 @@ def test_discover_input_files_searches_raw_social_layout(tmp_path):
 
     files = discover_input_files(tmp_path)
 
-    assert [path.name for path in files] == ["fukui_douyin_comments_from_md.csv", "fukui_xhs_reviews.csv"]
+    assert [path.name for path in files] == ["fukui_xhs_reviews.csv"]
+
+    files_with_douyin = discover_input_files(tmp_path, include_douyin=True)
+    assert [path.name for path in files_with_douyin] == ["fukui_douyin_comments_from_md.csv", "fukui_xhs_reviews.csv"]
 
 
 def test_theme_annotations_join_from_processed_csv(tmp_path):

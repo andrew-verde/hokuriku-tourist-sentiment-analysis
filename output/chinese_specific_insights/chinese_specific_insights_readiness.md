@@ -3,8 +3,8 @@
 These outputs cover Chinese-language Fukui social-media rows. They are aggregate views for presentation and exploratory review, not nationality claims.
 
 - Analysis label: `Chinese-language Fukui social-media rows`
-- Rows represented: 1670
-- Source platform mix: {'douyin': 1521, 'xiaohongshu': 149}
+- Rows represented: 200
+- Source platform mix: {'xiaohongshu': 200}
 - Minimum theme slice rows for rates: 10
 - Output folder: `/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/output/chinese_specific_insights`
 
@@ -29,5 +29,5 @@ These outputs cover Chinese-language Fukui social-media rows. They are aggregate
 - Keyword evidence uses reviewed substring matches and should be described as evidence counts, not inferred motives.
 - Sentiment categories use SnowNLP as a secondary baseline; reviewed positive/negative/recommendation keyword matches are transparent evidence.
 - Theme rates and sentiment means are suppressed below n=10; counts remain in CSV outputs.
-- Theme labels come from companion processed annotation files; unmatched rows are `unclassified`, currently almost entirely parsed Douyin comments in the combined variant.
+- Theme labels come from companion processed annotation files; unmatched rows are `unclassified`. Douyin is excluded from the main theme analysis until further notice.
 - Outputs intentionally omit row-level source text, authors, URLs, and record IDs.

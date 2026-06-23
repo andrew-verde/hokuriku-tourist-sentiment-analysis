@@ -578,7 +578,7 @@ def _write_readiness(path: Path, outputs: dict[str, Path], metrics: dict[str, ob
             "- Keyword evidence uses reviewed substring matches and should be described as evidence counts, not inferred motives.",
             "- Sentiment categories use SnowNLP as a secondary baseline; reviewed positive/negative/recommendation keyword matches are transparent evidence.",
             f"- Theme rates and sentiment means are suppressed below n={MIN_THEME_SLICE_ROWS}; counts remain in CSV outputs.",
-            "- Theme labels come from companion processed annotation files; unmatched rows are `unclassified`, currently almost entirely parsed Douyin comments in the combined variant.",
+            "- Theme labels come from companion processed annotation files; unmatched rows are `unclassified`. Douyin is excluded from the main theme analysis until further notice.",
             "- Outputs intentionally omit row-level source text, authors, URLs, and record IDs.",
         ]
     )

@@ -5,7 +5,8 @@ Fukui-first cross-language tourism text project.
 Project brief and readiness map: [docs/repo_guidance.md](docs/repo_guidance.md).
 
 Scope:
-- Chinese Xiaohongshu note text and Douyin comment text from `tourism-data`
+- Chinese Xiaohongshu note text from `tourism-data`; Douyin is temporarily
+  excluded from the main pipeline and kept for explicit source-sensitivity runs
 - English/Japanese review text when explicitly provided as cleaned inputs
 - Transparent keyword/topic/sentiment codebooks
 - Secondary library sentiment checks: VADER for English, oseti for Japanese,
@@ -51,10 +52,10 @@ Install the pinned JP-EN sentiment runtime:
 make sentiment-env
 ```
 
-Build Chinese social outputs from local `tourism-data`. This single target
-normalizes Xiaohongshu rows and the parsed Fukui Douyin comment CSV into the
-same Chinese social row schema before applying SnowNLP plus reviewed
-friction/topic/positive-evidence codebook matching:
+Build Chinese social outputs from local `tourism-data`. The main target now
+normalizes Xiaohongshu rows only before applying SnowNLP plus reviewed
+friction/topic/positive-evidence codebook matching. Douyin is temporarily
+excluded from the main pipeline for clarity:
 
 ```bash
 TOURISM_DATA_DIR=/Users/andrewgreen/Repositories/tourism-data make chinese-social
@@ -74,8 +75,9 @@ keywords, platform sentiment shares, and theme volume. The figure generator uses
 package is required. The companion CSV files preserve the denominators behind
 each figure and omit row-level text, authors, URLs, and source record IDs.
 Theme figures show classified themes only; the backing CSV keeps
-`unclassified`, which is high in the current snapshot because parsed Douyin
-comments do not yet have companion theme annotations.
+`unclassified` for Xiaohongshu rows without joined companion theme annotations.
+Parsed Douyin comments are not used in the main theme annotation analysis until
+further notice.
 
 Sync Google review artifacts from the local `english-fukui-tourism` clone. If
 that directory is absent, the script uses the current local clone path
@@ -196,8 +198,8 @@ Raw social files, outside Git:
 
 ```text
 data/raw/social/*xhs*.csv
-data/raw/social/*douyin*.csv
-data/processed/fukui_douyin_comments_from_md.csv
+data/raw/social/*douyin*.csv for explicit source-sensitivity runs only
+data/processed/fukui_douyin_comments_from_md.csv for explicit source-sensitivity runs only
 data/processed/*.csv for theme annotations
 ```
 

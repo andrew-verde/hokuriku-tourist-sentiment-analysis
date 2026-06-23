@@ -35,8 +35,8 @@ Group membership is content language, never nationality.
 ## Pipeline
 
 ```
-tourism-data/data/raw/social/*.csv ─────────────┐
-tourism-data/data/processed/fukui_douyin_*.csv ─┤ (Douyin comment source)
+tourism-data/data/raw/social/*xhs*.csv ─────────┐
+repo docs/codebook_reviews/source/*.xlsx ───────┤ (manual XHS workbook)
 tourism-data/data/processed/*.csv ──────────────┤ (theme annotations)
                                                 ▼
                          make chinese-social
@@ -61,7 +61,7 @@ make sentiment-analysis ─────► make presentation-safe
 - `chinese_friction_by_city_platform.csv`
 - `chinese_topic_by_city_platform.csv`
 - `chinese_enjoyment_evidence_by_city_platform.csv`
-- `douyin_provenance_report.json`
+- `douyin_provenance_report.json` (empty for the current main XHS-only build)
 - `chinese_reviewed_codebook_runtime_summary.csv`
 
 `make chinese-insights` turns those Chinese-only outputs into tracked
@@ -86,8 +86,9 @@ The main keyword-occurrence figure focuses on reviewed topic evidence split by
 positive vs negative SnowNLP category, so positive-sentiment evidence terms do
 not crowd out concrete Fukui topics.
 The theme figure shows classified themes only; the CSV retains `unclassified`.
-At the current snapshot, `unclassified` is high because the companion theme
-annotations cover Xiaohongshu note IDs but not the parsed Douyin comment rows.
+At the current snapshot, `unclassified` means no companion theme annotation was
+joined for that Xiaohongshu row. Parsed Douyin comments are excluded from the
+main theme annotation analysis until further notice.
 
 `make presentation-safe` is deliberately narrower than the cross-language
 baseline. It consumes tracked JP-EN sentiment aggregate files plus the ignored
@@ -110,9 +111,11 @@ Presentation safeguards:
 ## Expected growth
 
 The colleague may add more scrape files (more keywords, Ishikawa/Toyama,
-Douyin). The ingestion stage discovers any `*xhs*`/`*douyin*` CSV under
-`data/raw/social/`, the current `*douyin*comments*.csv` parsed export under
-`data/processed/`, and any theme-bearing CSV under `data/processed/`.
+Douyin). The main ingestion stage currently discovers Xiaohongshu sources and
+any theme-bearing CSV under `data/processed/`. Douyin CSVs under
+`data/raw/social/` and the current `*douyin*comments*.csv` parsed export under
+`data/processed/` are used only by the explicit Douyin-inclusive
+source-sensitivity target.
 Re-run `make chinese-social` then `make cross-language-trends` after each
 upstream update.
 
@@ -126,8 +129,9 @@ trend output is reintroduced, first scrub:
   recovered dates
 - exclusion rules for `year_inferred`, `relative_inferred`, and missing Chinese
   dates
-- per-platform Chinese denominators by month; Xiaohongshu notes and Douyin
-  comments must stay stratified unless a weighting rationale is documented
+- per-platform Chinese denominators by month; any future Douyin reintroduction
+  must stay stratified from Xiaohongshu unless a weighting rationale is
+  documented
 - Google review collection windows, `review_date` parse coverage, and
   `poi_metadata.json` SHA/filter provenance
 - prefecture scope for every group; default stays Fukui until Ishikawa/Toyama
@@ -145,8 +149,8 @@ Currently valid:
   Chinese-language social rows using positive/neutral/negative categories
 - pairwise category-share tests comparing each Google review language group
   with all Chinese social rows
-- within-Chinese source-platform tests for Xiaohongshu vs Douyin sentiment
-  categories, `any_friction`, and `any_enjoyment_evidence`
+- within-Chinese source-platform tests only when an explicit Douyin-inclusive
+  source-sensitivity input is supplied
 
 Explicitly skipped:
 
@@ -159,9 +163,10 @@ categories, not direct visitor satisfaction or nationality differences.
 
 ## Known limitations
 
-- Chinese rows mix Xiaohongshu notes and Douyin comments. They are not full
-  itineraries, platform-native POI reviews, or confirmed visits.
-- Douyin comment rows use local parser IDs, not platform comment IDs; relative
+- Main Chinese rows are Xiaohongshu notes, not full itineraries,
+  platform-native POI reviews, or confirmed visits.
+- Douyin comment rows are temporarily deferred from the main pipeline. In the
+  opt-in variant, they use local parser IDs, not platform comment IDs; relative
   timestamps are approximate and cannot support monthly trend comparisons.
 - A large share of Fukui Xiaohongshu chatter is idol fan-pilgrimage content
   (theme `fan`, 22/105 after dedup) — analytically interesting, but a different
