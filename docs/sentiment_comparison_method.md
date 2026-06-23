@@ -187,10 +187,9 @@ Japanese-language sentiment should use a dual-path design:
 The evidence path supports audit and sensitivity checks. It should not silently
 override the primary `oseti` score. If the two paths disagree, preserve both and
 report the disagreement rate by language group and topic/friction category.
-The JP-EN library sentiment comparison may run before Japanese and English
-reviewed codebooks are complete, as long as readiness output clearly marks the
-codebook evidence path as pending. Once reviewed codebooks are complete, promote
-them into runtime configs and add the evidence columns without changing the
+The JP-EN library sentiment comparison now runs with reviewed Japanese and
+English codebooks promoted into runtime config. The reviewed evidence columns
+support audit/sensitivity checks and disagreement reporting without changing the
 library-score definitions.
 
 JP/EN runtime-config promotion is intentionally fail-loud:
@@ -250,6 +249,11 @@ vader_neu
 vader_pos
 vader_compound
 sentiment_category
+reviewed_positive_terms_matched
+reviewed_negative_terms_matched
+reviewed_recommendation_terms_matched
+reviewed_friction_terms_matched
+reviewed_enjoyment_terms_matched
 ```
 
 Japanese ignored row-level output:
@@ -272,6 +276,16 @@ reviewed_negative_terms_matched
 reviewed_recommendation_terms_matched
 reviewed_friction_terms_matched
 reviewed_enjoyment_terms_matched
+```
+
+Both English and Japanese ignored row-level outputs also include binary evidence
+fields:
+
+```text
+any_friction
+any_enjoyment_evidence
+any_recommendation_evidence
+any_positive_evidence
 ```
 
 ## Sentiment Categories

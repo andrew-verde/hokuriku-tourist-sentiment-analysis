@@ -1,11 +1,11 @@
 evidence_family,code,label,count,denominator_posts,pct_posts
-topic,temples_spiritual,Temples / Spiritual,67,149,44.966
-topic,history_culture,History / Culture,56,149,37.584
-topic,scenic_nature,Scenic Nature,50,149,33.557
-topic,fan_pilgrimage_pop_culture,Fan Pilgrimage / Pop Culture,47,149,31.544
-topic,food_local_cuisine,Food / Local Cuisine,38,149,25.503
-topic,hot_springs_relaxation,Hot Springs / Relaxation,37,149,24.832
-topic,accommodation,Accommodation,27,149,18.121
-topic,seasonal_events,Seasonal Events,25,149,16.779
-topic,crafts_shopping,Crafts / Shopping,24,149,16.107
-topic,dinosaurs_museums,Dinosaurs / Museums,22,149,14.765
+topic,temples_spiritual,Temples / Spiritual,90,200,45.0
+topic,history_culture,History / Culture,77,200,38.5
+topic,fan_pilgrimage_pop_culture,Fan Pilgrimage / Pop Culture,70,200,35.0
+topic,scenic_nature,Scenic Nature,67,200,33.5
+topic,food_local_cuisine,Food / Local Cuisine,49,200,24.5
+topic,dinosaurs_museums,Dinosaurs / Museums,43,200,21.5
+topic,hot_springs_relaxation,Hot Springs / Relaxation,43,200,21.5
+topic,seasonal_events,Seasonal Events,37,200,18.5
+topic,accommodation,Accommodation,35,200,17.5
+topic,crafts_shopping,Crafts / Shopping,34,200,17.0

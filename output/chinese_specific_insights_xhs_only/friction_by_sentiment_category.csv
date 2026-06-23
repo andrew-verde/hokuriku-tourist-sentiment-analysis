@@ -1,18 +1,20 @@
 sentiment_category,code_family,code,label,count,denominator_rows,pct_sentiment_category_rows
-negative,friction,transport_access,Transport / Access,7,30,23.333
-negative,friction,cleanliness_comfort,Cleanliness / Comfort,4,30,13.333
-negative,friction,waiting_crowding,Waiting / Crowding,4,30,13.333
-negative,friction,opening_hours_availability,Opening Hours / Availability,3,30,10.0
-negative,friction,wayfinding_signage,Wayfinding / Signage,3,30,10.0
-negative,friction,price_value,Price / Value,2,30,6.667
-negative,friction,staff_communication,Staff Communication,2,30,6.667
+negative,friction,transport_access,Transport / Access,9,36,25.0
+negative,friction,cleanliness_comfort,Cleanliness / Comfort,4,36,11.111
+negative,friction,waiting_crowding,Waiting / Crowding,4,36,11.111
+negative,friction,opening_hours_availability,Opening Hours / Availability,3,36,8.333
+negative,friction,price_value,Price / Value,3,36,8.333
+negative,friction,wayfinding_signage,Wayfinding / Signage,3,36,8.333
+negative,friction,staff_communication,Staff Communication,2,36,5.556
+negative,friction,itinerary_fit_time_cost,Itinerary Fit / Time & Cost,1,36,2.778
 neutral,friction,waiting_crowding,Waiting / Crowding,1,2,50.0
-positive,friction,transport_access,Transport / Access,50,117,42.735
-positive,friction,booking_ticketing,Booking / Ticketing,12,117,10.256
-positive,friction,price_value,Price / Value,12,117,10.256
-positive,friction,waiting_crowding,Waiting / Crowding,11,117,9.402
-positive,friction,cleanliness_comfort,Cleanliness / Comfort,8,117,6.838
-positive,friction,accessibility_mobility,Accessibility / Mobility,5,117,4.274
-positive,friction,opening_hours_availability,Opening Hours / Availability,5,117,4.274
-positive,friction,wayfinding_signage,Wayfinding / Signage,5,117,4.274
-positive,friction,staff_communication,Staff Communication,4,117,3.419
+positive,friction,transport_access,Transport / Access,80,162,49.383
+positive,friction,booking_ticketing,Booking / Ticketing,20,162,12.346
+positive,friction,price_value,Price / Value,17,162,10.494
+positive,friction,waiting_crowding,Waiting / Crowding,17,162,10.494
+positive,friction,cleanliness_comfort,Cleanliness / Comfort,11,162,6.79
+positive,friction,accessibility_mobility,Accessibility / Mobility,7,162,4.321
+positive,friction,opening_hours_availability,Opening Hours / Availability,7,162,4.321
+positive,friction,wayfinding_signage,Wayfinding / Signage,7,162,4.321
+positive,friction,staff_communication,Staff Communication,5,162,3.086
+positive,friction,itinerary_fit_time_cost,Itinerary Fit / Time & Cost,2,162,1.235

@@ -17,12 +17,12 @@
 <text x="675.69" y="171" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#ffffff">72.4%</text>
 <text x="930" y="171" font-family="Arial, sans-serif" font-size="12" fill="#52616b">n=1,800</text>
 <text x="231" y="219" text-anchor="end" font-family="Arial, sans-serif" font-size="13" fill="#1f2933">Chinese-language social rows</text>
-<rect x="245.00" y="202" width="132.97" height="24" fill="#9a031e"/>
-<text x="311.49" y="219" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#ffffff">19.7%</text>
-<rect x="377.98" y="202" width="32.33" height="24" fill="#8d99ae"/>
-<rect x="410.31" y="202" width="509.69" height="24" fill="#2f6f73"/>
-<text x="665.15" y="219" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#ffffff">75.5%</text>
-<text x="930" y="219" font-family="Arial, sans-serif" font-size="12" fill="#52616b">n=1,670</text>
+<rect x="245.00" y="202" width="121.50" height="24" fill="#9a031e"/>
+<text x="305.75" y="219" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#ffffff">18.0%</text>
+<rect x="366.50" y="202" width="6.75" height="24" fill="#8d99ae"/>
+<rect x="373.25" y="202" width="546.75" height="24" fill="#2f6f73"/>
+<text x="646.62" y="219" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#ffffff">81.0%</text>
+<text x="930" y="219" font-family="Arial, sans-serif" font-size="12" fill="#52616b">n=200</text>
 <rect x="245" y="266" width="10" height="10" fill="#9a031e"/>
 <text x="261" y="276" font-family="Arial, sans-serif" font-size="12" fill="#52616b">negative</text>
 <rect x="367" y="266" width="10" height="10" fill="#8d99ae"/>

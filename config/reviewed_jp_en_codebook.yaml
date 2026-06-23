@@ -1,0 +1,5906 @@
+schema_version: reviewed_codebook_runtime.v1
+generated_at: '2026-06-23T09:06:26+00:00'
+command: scripts/import_reviewed_codebook_config.py
+source:
+  path: /home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/docs/codebook_reviews/source/multilingual_keyword_codebook_review.xlsx
+  sha256: 653e9cb53aa200cc67b1350ca3611f081ffda42ccb2e4a33d53f38c919ab7d60
+languages:
+  Japanese:
+    codes:
+      transport_access:
+        code_family: friction
+        label: Transport / Access
+        keywords:
+        - アクセスが悪
+        - 交通の便が悪
+        - 交通が不便
+        - 公共交通
+        - バスが少な
+        - バスの本数が少ない
+        - 電車が少な
+        - 便が少な
+        - 本数が少な
+        - 乗り継ぎ
+        - 遠い
+        - 行きにく
+        - 車がない
+        - 車でないと不便
+        - 駅から遠
+        - 移動が大変
+        - タクシーが少な
+        - タクシーがつかまらない
+        - タクシー待ち
+        reviewed_rows:
+        - source_sheet: Japanese
+          source_row_id: '2'
+          review_decision: no change
+          keyword_original: アクセスが悪
+          keyword_final: アクセスが悪
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '3'
+          review_decision: no change
+          keyword_original: 交通の便が悪
+          keyword_final: 交通の便が悪
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '4'
+          review_decision: no change
+          keyword_original: 交通が不便
+          keyword_final: 交通が不便
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '5'
+          review_decision: no change
+          keyword_original: 公共交通
+          keyword_final: 公共交通
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '6'
+          review_decision: no change
+          keyword_original: バスが少な
+          keyword_final: バスが少な
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '7'
+          review_decision: FIX
+          keyword_original: バスの本数
+          keyword_final: バスの本数が少ない
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '8'
+          review_decision: no change
+          keyword_original: 電車が少な
+          keyword_final: 電車が少な
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '9'
+          review_decision: no change
+          keyword_original: 便が少な
+          keyword_final: 便が少な
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '10'
+          review_decision: no change
+          keyword_original: 本数が少な
+          keyword_final: 本数が少な
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '11'
+          review_decision: no change
+          keyword_original: 乗り継ぎ
+          keyword_final: 乗り継ぎ
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '12'
+          review_decision: no change
+          keyword_original: 遠い
+          keyword_final: 遠い
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '13'
+          review_decision: no change
+          keyword_original: 行きにく
+          keyword_final: 行きにく
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '14'
+          review_decision: no change
+          keyword_original: 車がない
+          keyword_final: 車がない
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '15'
+          review_decision: FIX
+          keyword_original: 車でないと
+          keyword_final: 車でないと不便
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '16'
+          review_decision: no change
+          keyword_original: 駅から遠
+          keyword_final: 駅から遠
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '17'
+          review_decision: no change
+          keyword_original: 移動が大変
+          keyword_final: 移動が大変
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '18'
+          review_decision: no change
+          keyword_original: タクシーが少な
+          keyword_final: タクシーが少な
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '19'
+          review_decision: FIX
+          keyword_original: タクシーがつかまら
+          keyword_final: タクシーがつかまらない
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '20'
+          review_decision: no change
+          keyword_original: タクシー待ち
+          keyword_final: タクシー待ち
+          reviewer: 青山
+          reviewed_at: ''
+      wayfinding_signage:
+        code_family: friction
+        label: Wayfinding / Signage
+        keywords:
+        - 案内がわかりにく
+        - 案内表示
+        - 表示がわかりにく
+        - 看板
+        - 標識
+        - 道案内
+        - 道がわかりにく
+        - 迷った
+        - 場所がわかりにく
+        - 入口がわかりにく
+        - 地図
+        reviewed_rows:
+        - source_sheet: Japanese
+          source_row_id: '21'
+          review_decision: no change
+          keyword_original: 案内がわかりにく
+          keyword_final: 案内がわかりにく
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '22'
+          review_decision: no change
+          keyword_original: 案内表示
+          keyword_final: 案内表示
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '23'
+          review_decision: no change
+          keyword_original: 表示がわかりにく
+          keyword_final: 表示がわかりにく
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '24'
+          review_decision: no change
+          keyword_original: 看板
+          keyword_final: 看板
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '25'
+          review_decision: no change
+          keyword_original: 標識
+          keyword_final: 標識
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '26'
+          review_decision: no change
+          keyword_original: 道案内
+          keyword_final: 道案内
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '27'
+          review_decision: no change
+          keyword_original: 道がわかりにく
+          keyword_final: 道がわかりにく
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '28'
+          review_decision: no change
+          keyword_original: 迷った
+          keyword_final: 迷った
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '29'
+          review_decision: no change
+          keyword_original: 場所がわかりにく
+          keyword_final: 場所がわかりにく
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '30'
+          review_decision: no change
+          keyword_original: 入口がわかりにく
+          keyword_final: 入口がわかりにく
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '31'
+          review_decision: no change
+          keyword_original: 地図
+          keyword_final: 地図
+          reviewer: 青山
+          reviewed_at: ''
+      language_information_gap:
+        code_family: friction
+        label: Language Information Gap
+        keywords:
+        - 英語
+        - 外国語
+        - 多言語
+        - 翻訳
+        - インバウンド
+        - 外国人向け
+        - 外国人対応
+        reviewed_rows:
+        - source_sheet: Japanese
+          source_row_id: '32'
+          review_decision: no change
+          keyword_original: 英語
+          keyword_final: 英語
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '33'
+          review_decision: no change
+          keyword_original: 外国語
+          keyword_final: 外国語
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '34'
+          review_decision: no change
+          keyword_original: 多言語
+          keyword_final: 多言語
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '35'
+          review_decision: no change
+          keyword_original: 翻訳
+          keyword_final: 翻訳
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '36'
+          review_decision: no change
+          keyword_original: インバウンド
+          keyword_final: インバウンド
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '37'
+          review_decision: no change
+          keyword_original: 外国人向け
+          keyword_final: 外国人向け
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '38'
+          review_decision: no change
+          keyword_original: 外国人対応
+          keyword_final: 外国人対応
+          reviewer: 青山
+          reviewed_at: ''
+      staff_communication:
+        code_family: friction
+        label: Staff Communication
+        keywords:
+        - 接客が悪
+        - 接客に不満
+        - 対応が悪
+        - スタッフの対応
+        - 店員の対応
+        - 職員の対応
+        - 説明不足
+        - 不親切
+        - 態度が悪
+        - 案内不足
+        reviewed_rows:
+        - source_sheet: Japanese
+          source_row_id: '39'
+          review_decision: no change
+          keyword_original: 接客が悪
+          keyword_final: 接客が悪
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '40'
+          review_decision: no change
+          keyword_original: 接客に不満
+          keyword_final: 接客に不満
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '41'
+          review_decision: no change
+          keyword_original: 対応が悪
+          keyword_final: 対応が悪
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '42'
+          review_decision: no change
+          keyword_original: スタッフの対応
+          keyword_final: スタッフの対応
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '43'
+          review_decision: no change
+          keyword_original: 店員の対応
+          keyword_final: 店員の対応
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '44'
+          review_decision: no change
+          keyword_original: 職員の対応
+          keyword_final: 職員の対応
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '45'
+          review_decision: no change
+          keyword_original: 説明不足
+          keyword_final: 説明不足
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '46'
+          review_decision: no change
+          keyword_original: 不親切
+          keyword_final: 不親切
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '47'
+          review_decision: no change
+          keyword_original: 態度が悪
+          keyword_final: 態度が悪
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '48'
+          review_decision: no change
+          keyword_original: 案内不足
+          keyword_final: 案内不足
+          reviewer: 青山
+          reviewed_at: ''
+      booking_ticketing:
+        code_family: friction
+        label: Booking / Ticketing
+        keywords:
+        - 予約できる
+        - 予約が取れない
+        - 予約が必要
+        - チケットが買えない
+        - 入場券が買えない
+        - 売り切れていた
+        - 満席
+        - 事前予約
+        - 現金のみ
+        - キャッシュレス未対応
+        - クレジットが使えない
+        - 支払いが不便
+        - 決済が不便
+        reviewed_rows:
+        - source_sheet: Japanese
+          source_row_id: '49'
+          review_decision: FIX
+          keyword_original: 予約でき
+          keyword_final: 予約できる
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '50'
+          review_decision: FIX
+          keyword_original: 予約が取れ
+          keyword_final: 予約が取れない
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '51'
+          review_decision: no change
+          keyword_original: 予約が必要
+          keyword_final: 予約が必要
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '52'
+          review_decision: FIX
+          keyword_original: チケットが買え
+          keyword_final: チケットが買えない
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '53'
+          review_decision: FIX
+          keyword_original: 入場券が買え
+          keyword_final: 入場券が買えない
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '54'
+          review_decision: FIX
+          keyword_original: 売り切れ
+          keyword_final: 売り切れていた
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '55'
+          review_decision: no change
+          keyword_original: 満席
+          keyword_final: 満席
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '56'
+          review_decision: no change
+          keyword_original: 事前予約
+          keyword_final: 事前予約
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '57'
+          review_decision: no change
+          keyword_original: 現金のみ
+          keyword_final: 現金のみ
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '58'
+          review_decision: no change
+          keyword_original: キャッシュレス未対応
+          keyword_final: キャッシュレス未対応
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '59'
+          review_decision: FIX
+          keyword_original: クレジットが使え
+          keyword_final: クレジットが使えない
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '60'
+          review_decision: no change
+          keyword_original: 支払いが不便
+          keyword_final: 支払いが不便
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '61'
+          review_decision: no change
+          keyword_original: 決済が不便
+          keyword_final: 決済が不便
+          reviewer: 青山
+          reviewed_at: ''
+      waiting_crowding:
+        code_family: friction
+        label: Waiting / Crowding
+        keywords:
+        - 混雑
+        - 混んでいた
+        - 人が多
+        - 行列
+        - 待ち時間
+        - 待った
+        - 並んでいた
+        - 渋滞
+        - 駐車場待ち
+        - 長蛇
+        reviewed_rows:
+        - source_sheet: Japanese
+          source_row_id: '62'
+          review_decision: no change
+          keyword_original: 混雑
+          keyword_final: 混雑
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '63'
+          review_decision: FIX
+          keyword_original: 混んで
+          keyword_final: 混んでいた
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '64'
+          review_decision: no change
+          keyword_original: 人が多
+          keyword_final: 人が多
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '65'
+          review_decision: no change
+          keyword_original: 行列
+          keyword_final: 行列
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '66'
+          review_decision: no change
+          keyword_original: 待ち時間
+          keyword_final: 待ち時間
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '67'
+          review_decision: no change
+          keyword_original: 待った
+          keyword_final: 待った
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '68'
+          review_decision: FIX
+          keyword_original: 並ん
+          keyword_final: 並んでいた
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '69'
+          review_decision: no change
+          keyword_original: 渋滞
+          keyword_final: 渋滞
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '70'
+          review_decision: no change
+          keyword_original: 駐車場待ち
+          keyword_final: 駐車場待ち
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '71'
+          review_decision: no change
+          keyword_original: 長蛇
+          keyword_final: 長蛇
+          reviewer: 青山
+          reviewed_at: ''
+      price_value:
+        code_family: friction
+        label: Price / Value
+        keywords:
+        - 料金が高
+        - 値段が高
+        - 価格が高
+        - 割高
+        - コスパが悪
+        - 入場料が高
+        - 駐車料金が高
+        - 有料だった
+        - 費用が高
+        reviewed_rows:
+        - source_sheet: Japanese
+          source_row_id: '72'
+          review_decision: no change
+          keyword_original: 料金が高
+          keyword_final: 料金が高
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '73'
+          review_decision: no change
+          keyword_original: 値段が高
+          keyword_final: 値段が高
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '74'
+          review_decision: no change
+          keyword_original: 価格が高
+          keyword_final: 価格が高
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '75'
+          review_decision: no change
+          keyword_original: 割高
+          keyword_final: 割高
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '76'
+          review_decision: no change
+          keyword_original: コスパが悪
+          keyword_final: コスパが悪
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '77'
+          review_decision: no change
+          keyword_original: 入場料が高
+          keyword_final: 入場料が高
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '78'
+          review_decision: no change
+          keyword_original: 駐車料金が高
+          keyword_final: 駐車料金が高
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '79'
+          review_decision: FIX
+          keyword_original: 有料なの
+          keyword_final: 有料だった
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '80'
+          review_decision: no change
+          keyword_original: 費用が高
+          keyword_final: 費用が高
+          reviewer: 青山
+          reviewed_at: ''
+      cleanliness_comfort:
+        code_family: friction
+        label: Cleanliness / Comfort
+        keywords:
+        - 汚い
+        - 不衛生
+        - 清潔でない
+        - 清潔感がない
+        - トイレが汚
+        - トイレが少な
+        - 臭い
+        - 暑すぎ
+        - 寒すぎ
+        - 休憩
+        - ベンチが少な
+        - 日陰がない
+        - 雨宿りできない
+        - 施設が古
+        - 老朽
+        reviewed_rows:
+        - source_sheet: Japanese
+          source_row_id: '81'
+          review_decision: no change
+          keyword_original: 汚い
+          keyword_final: 汚い
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '82'
+          review_decision: no change
+          keyword_original: 不衛生
+          keyword_final: 不衛生
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '83'
+          review_decision: no change
+          keyword_original: 清潔でない
+          keyword_final: 清潔でない
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '84'
+          review_decision: no change
+          keyword_original: 清潔感がない
+          keyword_final: 清潔感がない
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '85'
+          review_decision: no change
+          keyword_original: トイレが汚
+          keyword_final: トイレが汚
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '86'
+          review_decision: no change
+          keyword_original: トイレが少な
+          keyword_final: トイレが少な
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '87'
+          review_decision: no change
+          keyword_original: 臭い
+          keyword_final: 臭い
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '88'
+          review_decision: no change
+          keyword_original: 暑すぎ
+          keyword_final: 暑すぎ
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '89'
+          review_decision: no change
+          keyword_original: 寒すぎ
+          keyword_final: 寒すぎ
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '90'
+          review_decision: no change
+          keyword_original: 休憩
+          keyword_final: 休憩
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '91'
+          review_decision: no change
+          keyword_original: ベンチが少な
+          keyword_final: ベンチが少な
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '92'
+          review_decision: no change
+          keyword_original: 日陰がない
+          keyword_final: 日陰がない
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '93'
+          review_decision: FIX
+          keyword_original: 雨宿りでき
+          keyword_final: 雨宿りできない
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '94'
+          review_decision: no change
+          keyword_original: 施設が古
+          keyword_final: 施設が古
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '95'
+          review_decision: no change
+          keyword_original: 老朽
+          keyword_final: 老朽
+          reviewer: 青山
+          reviewed_at: ''
+      opening_hours_availability:
+        code_family: friction
+        label: Opening Hours / Availability
+        keywords:
+        - 休み
+        - 休館
+        - 定休日
+        - 閉まってる
+        - 営業時間
+        - 時間が短
+        - 遅くまでお店が営業していない
+        - 開いていな
+        - 利用できな
+        - 中止
+        reviewed_rows:
+        - source_sheet: Japanese
+          source_row_id: '96'
+          review_decision: no change
+          keyword_original: 休み
+          keyword_final: 休み
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '97'
+          review_decision: no change
+          keyword_original: 休館
+          keyword_final: 休館
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '98'
+          review_decision: no change
+          keyword_original: 定休日
+          keyword_final: 定休日
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '99'
+          review_decision: FIX
+          keyword_original: 閉まって
+          keyword_final: 閉まってる
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '100'
+          review_decision: no change
+          keyword_original: 営業時間
+          keyword_final: 営業時間
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '101'
+          review_decision: no change
+          keyword_original: 時間が短
+          keyword_final: 時間が短
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '102'
+          review_decision: FIX
+          keyword_original: 早く閉
+          keyword_final: 遅くまでお店が営業していない
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '103'
+          review_decision: no change
+          keyword_original: 開いていな
+          keyword_final: 開いていな
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '104'
+          review_decision: no change
+          keyword_original: 利用できな
+          keyword_final: 利用できな
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '105'
+          review_decision: no change
+          keyword_original: 中止
+          keyword_final: 中止
+          reviewer: 青山
+          reviewed_at: ''
+      itinerary_fit_time_cost:
+        code_family: friction
+        label: Itinerary Fit / Time & Cost
+        keywords:
+        - 時間が足りない
+        - 時間がかかる
+        - 見るものが少な
+        - 何もない
+        - 周辺に何もない
+        - ついでに行きにく
+        - 効率が悪
+        - 日程が組みにく
+        - 予定が立てにく
+        - 回りにく
+        reviewed_rows:
+        - source_sheet: Japanese
+          source_row_id: '106'
+          review_decision: FIX
+          keyword_original: 時間が足り
+          keyword_final: 時間が足りない
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '107'
+          review_decision: FIX
+          keyword_original: 時間がかか
+          keyword_final: 時間がかかる
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '108'
+          review_decision: no change
+          keyword_original: 見るものが少な
+          keyword_final: 見るものが少な
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '109'
+          review_decision: no change
+          keyword_original: 何もない
+          keyword_final: 何もない
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '110'
+          review_decision: FIX
+          keyword_original: 周辺に何も
+          keyword_final: 周辺に何もない
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '111'
+          review_decision: no change
+          keyword_original: ついでに行きにく
+          keyword_final: ついでに行きにく
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '112'
+          review_decision: no change
+          keyword_original: 効率が悪
+          keyword_final: 効率が悪
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '113'
+          review_decision: no change
+          keyword_original: 日程が組みにく
+          keyword_final: 日程が組みにく
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '114'
+          review_decision: no change
+          keyword_original: 予定が立てにく
+          keyword_final: 予定が立てにく
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '115'
+          review_decision: no change
+          keyword_original: 回りにく
+          keyword_final: 回りにく
+          reviewer: 青山
+          reviewed_at: ''
+      accessibility_mobility:
+        code_family: friction
+        label: Accessibility / Mobility
+        keywords:
+        - 階段
+        - 段差
+        - 坂
+        - 急な坂
+        - 急階段
+        - バリアフリー
+        - 車椅子
+        - ベビーカー
+        - 高齢者
+        - 足が悪
+        - 歩きにく
+        - 滑り
+        - 狭い
+        reviewed_rows:
+        - source_sheet: Japanese
+          source_row_id: '116'
+          review_decision: no change
+          keyword_original: 階段
+          keyword_final: 階段
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '117'
+          review_decision: no change
+          keyword_original: 段差
+          keyword_final: 段差
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '118'
+          review_decision: no change
+          keyword_original: 坂
+          keyword_final: 坂
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '119'
+          review_decision: no change
+          keyword_original: 急な坂
+          keyword_final: 急な坂
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '120'
+          review_decision: no change
+          keyword_original: 急階段
+          keyword_final: 急階段
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '121'
+          review_decision: no change
+          keyword_original: バリアフリー
+          keyword_final: バリアフリー
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '122'
+          review_decision: no change
+          keyword_original: 車椅子
+          keyword_final: 車椅子
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '123'
+          review_decision: no change
+          keyword_original: ベビーカー
+          keyword_final: ベビーカー
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '124'
+          review_decision: no change
+          keyword_original: 高齢者
+          keyword_final: 高齢者
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '125'
+          review_decision: no change
+          keyword_original: 足が悪
+          keyword_final: 足が悪
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '126'
+          review_decision: no change
+          keyword_original: 歩きにく
+          keyword_final: 歩きにく
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '127'
+          review_decision: no change
+          keyword_original: 滑り
+          keyword_final: 滑り
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '128'
+          review_decision: no change
+          keyword_original: 狭い
+          keyword_final: 狭い
+          reviewer: 青山
+          reviewed_at: ''
+      food_amenities_gap:
+        code_family: friction
+        label: Food / Amenities Gap
+        keywords:
+        - 飲食店が少な
+        - 飲食店がない
+        - 食事するところが少な
+        - 食事するところがない
+        - 食べるところが少な
+        - 食べるところがない
+        - レストランが少な
+        - レストランがない
+        - カフェが少な
+        - カフェがない
+        - 売店が少な
+        - 売店がない
+        - お土産が少な
+        - コンビニがない
+        - 施設が少な
+        - 店が少な
+        - 店舗が少な
+        reviewed_rows:
+        - source_sheet: Japanese
+          source_row_id: '129'
+          review_decision: no change
+          keyword_original: 飲食店が少な
+          keyword_final: 飲食店が少な
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '130'
+          review_decision: no change
+          keyword_original: 飲食店がない
+          keyword_final: 飲食店がない
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '131'
+          review_decision: no change
+          keyword_original: 食事するところが少な
+          keyword_final: 食事するところが少な
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '132'
+          review_decision: no change
+          keyword_original: 食事するところがない
+          keyword_final: 食事するところがない
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '133'
+          review_decision: no change
+          keyword_original: 食べるところが少な
+          keyword_final: 食べるところが少な
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '134'
+          review_decision: no change
+          keyword_original: 食べるところがない
+          keyword_final: 食べるところがない
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '135'
+          review_decision: no change
+          keyword_original: レストランが少な
+          keyword_final: レストランが少な
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '136'
+          review_decision: no change
+          keyword_original: レストランがない
+          keyword_final: レストランがない
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '137'
+          review_decision: no change
+          keyword_original: カフェが少な
+          keyword_final: カフェが少な
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '138'
+          review_decision: no change
+          keyword_original: カフェがない
+          keyword_final: カフェがない
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '139'
+          review_decision: no change
+          keyword_original: 売店が少な
+          keyword_final: 売店が少な
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '140'
+          review_decision: no change
+          keyword_original: 売店がない
+          keyword_final: 売店がない
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '141'
+          review_decision: no change
+          keyword_original: お土産が少な
+          keyword_final: お土産が少な
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '142'
+          review_decision: no change
+          keyword_original: コンビニがない
+          keyword_final: コンビニがない
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '143'
+          review_decision: no change
+          keyword_original: 施設が少な
+          keyword_final: 施設が少な
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '144'
+          review_decision: no change
+          keyword_original: 店が少な
+          keyword_final: 店が少な
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '145'
+          review_decision: no change
+          keyword_original: 店舗が少な
+          keyword_final: 店舗が少な
+          reviewer: 青山
+          reviewed_at: ''
+      scenic_nature:
+        code_family: topic
+        label: Scenic Nature
+        keywords:
+        - 景色
+        - 眺め
+        - 絶景
+        - 風景
+        - きれい
+        - 綺麗
+        - 美しい
+        - 自然
+        - 海
+        - 山
+        - 川
+        - 湖
+        - 森林
+        - 桜
+        - 紅葉
+        - 雪景色
+        - 写真映え
+        reviewed_rows:
+        - source_sheet: Japanese
+          source_row_id: '146'
+          review_decision: no change
+          keyword_original: 景色
+          keyword_final: 景色
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '147'
+          review_decision: no change
+          keyword_original: 眺め
+          keyword_final: 眺め
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '148'
+          review_decision: no change
+          keyword_original: 絶景
+          keyword_final: 絶景
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '149'
+          review_decision: no change
+          keyword_original: 風景
+          keyword_final: 風景
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '150'
+          review_decision: no change
+          keyword_original: きれい
+          keyword_final: きれい
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '151'
+          review_decision: no change
+          keyword_original: 綺麗
+          keyword_final: 綺麗
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '152'
+          review_decision: no change
+          keyword_original: 美しい
+          keyword_final: 美しい
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '153'
+          review_decision: no change
+          keyword_original: 自然
+          keyword_final: 自然
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '154'
+          review_decision: no change
+          keyword_original: 海
+          keyword_final: 海
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '155'
+          review_decision: no change
+          keyword_original: 山
+          keyword_final: 山
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '156'
+          review_decision: no change
+          keyword_original: 川
+          keyword_final: 川
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '157'
+          review_decision: no change
+          keyword_original: 湖
+          keyword_final: 湖
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '158'
+          review_decision: no change
+          keyword_original: 森林
+          keyword_final: 森林
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '159'
+          review_decision: no change
+          keyword_original: 桜
+          keyword_final: 桜
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '160'
+          review_decision: no change
+          keyword_original: 紅葉
+          keyword_final: 紅葉
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '161'
+          review_decision: no change
+          keyword_original: 雪景色
+          keyword_final: 雪景色
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '162'
+          review_decision: no change
+          keyword_original: 写真映え
+          keyword_final: 写真映え
+          reviewer: 青山
+          reviewed_at: ''
+      temples_spiritual:
+        code_family: topic
+        label: Temples / Spiritual
+        keywords:
+        - 寺
+        - 寺院
+        - 神社
+        - 参拝
+        - 禅
+        - 座禅
+        - 修行
+        - 御朱印
+        - 僧侶
+        - 永平寺
+        - 心が落ち着く
+        - 静か
+        reviewed_rows:
+        - source_sheet: Japanese
+          source_row_id: '163'
+          review_decision: no change
+          keyword_original: 寺
+          keyword_final: 寺
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '164'
+          review_decision: no change
+          keyword_original: 寺院
+          keyword_final: 寺院
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '165'
+          review_decision: no change
+          keyword_original: 神社
+          keyword_final: 神社
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '166'
+          review_decision: no change
+          keyword_original: 参拝
+          keyword_final: 参拝
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '167'
+          review_decision: no change
+          keyword_original: 禅
+          keyword_final: 禅
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '168'
+          review_decision: no change
+          keyword_original: 座禅
+          keyword_final: 座禅
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '169'
+          review_decision: no change
+          keyword_original: 修行
+          keyword_final: 修行
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '170'
+          review_decision: no change
+          keyword_original: 御朱印
+          keyword_final: 御朱印
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '171'
+          review_decision: no change
+          keyword_original: 僧侶
+          keyword_final: 僧侶
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '172'
+          review_decision: no change
+          keyword_original: 永平寺
+          keyword_final: 永平寺
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '173'
+          review_decision: no change
+          keyword_original: 心が落ち着く
+          keyword_final: 心が落ち着く
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '174'
+          review_decision: no change
+          keyword_original: 静か
+          keyword_final: 静か
+          reviewer: 青山
+          reviewed_at: ''
+      history_culture:
+        code_family: topic
+        label: History / Culture
+        keywords:
+        - 城
+        - 城跡
+        - 歴史
+        - 史跡
+        - 遺跡
+        - 武家
+        - 伝統
+        - 文化財
+        - 古い町並み
+        - 資料館
+        - 建築
+        reviewed_rows:
+        - source_sheet: Japanese
+          source_row_id: '175'
+          review_decision: no change
+          keyword_original: 城
+          keyword_final: 城
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '176'
+          review_decision: no change
+          keyword_original: 城跡
+          keyword_final: 城跡
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '177'
+          review_decision: no change
+          keyword_original: 歴史
+          keyword_final: 歴史
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '178'
+          review_decision: no change
+          keyword_original: 史跡
+          keyword_final: 史跡
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '179'
+          review_decision: no change
+          keyword_original: 遺跡
+          keyword_final: 遺跡
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '180'
+          review_decision: no change
+          keyword_original: 武家
+          keyword_final: 武家
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '181'
+          review_decision: no change
+          keyword_original: 伝統
+          keyword_final: 伝統
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '182'
+          review_decision: no change
+          keyword_original: 文化財
+          keyword_final: 文化財
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '183'
+          review_decision: no change
+          keyword_original: 古い町並み
+          keyword_final: 古い町並み
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '184'
+          review_decision: no change
+          keyword_original: 資料館
+          keyword_final: 資料館
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '185'
+          review_decision: no change
+          keyword_original: 建築
+          keyword_final: 建築
+          reviewer: 青山
+          reviewed_at: ''
+      dinosaurs_museums:
+        code_family: topic
+        label: Dinosaurs / Museums
+        keywords:
+        - 恐竜
+        - 化石
+        - 博物館
+        - 美術館
+        - 展示
+        - ミュージアム
+        - 体験展示
+        - 子ども連れ
+        reviewed_rows:
+        - source_sheet: Japanese
+          source_row_id: '186'
+          review_decision: no change
+          keyword_original: 恐竜
+          keyword_final: 恐竜
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '187'
+          review_decision: no change
+          keyword_original: 化石
+          keyword_final: 化石
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '188'
+          review_decision: no change
+          keyword_original: 博物館
+          keyword_final: 博物館
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '189'
+          review_decision: no change
+          keyword_original: 美術館
+          keyword_final: 美術館
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '190'
+          review_decision: no change
+          keyword_original: 展示
+          keyword_final: 展示
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '191'
+          review_decision: no change
+          keyword_original: ミュージアム
+          keyword_final: ミュージアム
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '192'
+          review_decision: no change
+          keyword_original: 体験展示
+          keyword_final: 体験展示
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '193'
+          review_decision: no change
+          keyword_original: 子ども連れ
+          keyword_final: 子ども連れ
+          reviewer: 青山
+          reviewed_at: ''
+      food_local_cuisine:
+        code_family: topic
+        label: Food / Local Cuisine
+        keywords:
+        - 海鮮
+        - そば
+        - 越前そば
+        - カニ
+        - 蟹
+        - ソースカツ丼
+        - 寿司
+        - 地元グルメ
+        - ランチ
+        - カフェ
+        - 美味しい
+        - 新鮮
+        reviewed_rows:
+        - source_sheet: Japanese
+          source_row_id: '194'
+          review_decision: no change
+          keyword_original: 海鮮
+          keyword_final: 海鮮
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '195'
+          review_decision: no change
+          keyword_original: そば
+          keyword_final: そば
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '196'
+          review_decision: no change
+          keyword_original: 越前そば
+          keyword_final: 越前そば
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '197'
+          review_decision: no change
+          keyword_original: カニ
+          keyword_final: カニ
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '198'
+          review_decision: no change
+          keyword_original: 蟹
+          keyword_final: 蟹
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '199'
+          review_decision: no change
+          keyword_original: ソースカツ丼
+          keyword_final: ソースカツ丼
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '200'
+          review_decision: no change
+          keyword_original: 寿司
+          keyword_final: 寿司
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '201'
+          review_decision: no change
+          keyword_original: 地元グルメ
+          keyword_final: 地元グルメ
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '202'
+          review_decision: no change
+          keyword_original: ランチ
+          keyword_final: ランチ
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '203'
+          review_decision: no change
+          keyword_original: カフェ
+          keyword_final: カフェ
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '204'
+          review_decision: no change
+          keyword_original: 美味しい
+          keyword_final: 美味しい
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '205'
+          review_decision: no change
+          keyword_original: 新鮮
+          keyword_final: 新鮮
+          reviewer: 青山
+          reviewed_at: ''
+      hot_springs_relaxation:
+        code_family: topic
+        label: Hot Springs / Relaxation
+        keywords:
+        - 温泉
+        - 足湯
+        - 露天風呂
+        - 旅館
+        - 癒し
+        - リラックス
+        - のんびり
+        - サウナ
+        - 日帰り入浴
+        reviewed_rows:
+        - source_sheet: Japanese
+          source_row_id: '206'
+          review_decision: no change
+          keyword_original: 温泉
+          keyword_final: 温泉
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '207'
+          review_decision: no change
+          keyword_original: 足湯
+          keyword_final: 足湯
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '208'
+          review_decision: no change
+          keyword_original: 露天風呂
+          keyword_final: 露天風呂
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '209'
+          review_decision: no change
+          keyword_original: 旅館
+          keyword_final: 旅館
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '210'
+          review_decision: no change
+          keyword_original: 癒し
+          keyword_final: 癒し
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '211'
+          review_decision: no change
+          keyword_original: リラックス
+          keyword_final: リラックス
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '212'
+          review_decision: no change
+          keyword_original: のんびり
+          keyword_final: のんびり
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '213'
+          review_decision: no change
+          keyword_original: サウナ
+          keyword_final: サウナ
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '214'
+          review_decision: no change
+          keyword_original: 日帰り入浴
+          keyword_final: 日帰り入浴
+          reviewer: 青山
+          reviewed_at: ''
+      crafts_shopping:
+        code_family: topic
+        label: Crafts / Shopping
+        keywords:
+        - お土産
+        - 工芸
+        - 伝統工芸
+        - 越前焼
+        - 刃物
+        - 漆器
+        - 和紙
+        - 紙漉き
+        - 体験
+        - 市場
+        - 物産
+        reviewed_rows:
+        - source_sheet: Japanese
+          source_row_id: '215'
+          review_decision: no change
+          keyword_original: お土産
+          keyword_final: お土産
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '216'
+          review_decision: no change
+          keyword_original: 工芸
+          keyword_final: 工芸
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '217'
+          review_decision: no change
+          keyword_original: 伝統工芸
+          keyword_final: 伝統工芸
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '218'
+          review_decision: no change
+          keyword_original: 越前焼
+          keyword_final: 越前焼
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '219'
+          review_decision: no change
+          keyword_original: 刃物
+          keyword_final: 刃物
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '220'
+          review_decision: no change
+          keyword_original: 漆器
+          keyword_final: 漆器
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '221'
+          review_decision: no change
+          keyword_original: 和紙
+          keyword_final: 和紙
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '222'
+          review_decision: no change
+          keyword_original: 紙漉き
+          keyword_final: 紙漉き
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '223'
+          review_decision: no change
+          keyword_original: 体験
+          keyword_final: 体験
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '224'
+          review_decision: no change
+          keyword_original: 市場
+          keyword_final: 市場
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '225'
+          review_decision: no change
+          keyword_original: 物産
+          keyword_final: 物産
+          reviewer: 青山
+          reviewed_at: ''
+      fan_pilgrimage_pop_culture:
+        code_family: topic
+        label: Fan Pilgrimage / Pop Culture
+        keywords:
+        - 聖地巡礼
+        - 推し
+        - ファン
+        - アニメ
+        - 漫画
+        - ドラマ
+        - ロケ地
+        - 前田陸
+        - Riku
+        - メンバー
+        reviewed_rows:
+        - source_sheet: Japanese
+          source_row_id: '226'
+          review_decision: no change
+          keyword_original: 聖地巡礼
+          keyword_final: 聖地巡礼
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '227'
+          review_decision: no change
+          keyword_original: 推し
+          keyword_final: 推し
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '228'
+          review_decision: no change
+          keyword_original: ファン
+          keyword_final: ファン
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '229'
+          review_decision: no change
+          keyword_original: アニメ
+          keyword_final: アニメ
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '230'
+          review_decision: no change
+          keyword_original: 漫画
+          keyword_final: 漫画
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '231'
+          review_decision: no change
+          keyword_original: ドラマ
+          keyword_final: ドラマ
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '232'
+          review_decision: no change
+          keyword_original: ロケ地
+          keyword_final: ロケ地
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '233'
+          review_decision: no change
+          keyword_original: 前田陸
+          keyword_final: 前田陸
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '234'
+          review_decision: no change
+          keyword_original: Riku
+          keyword_final: Riku
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '235'
+          review_decision: no change
+          keyword_original: メンバー
+          keyword_final: メンバー
+          reviewer: 青山
+          reviewed_at: ''
+      accommodation:
+        code_family: topic
+        label: Accommodation
+        keywords:
+        - ホテル
+        - 旅館
+        - 宿泊
+        - 客室
+        - 朝食
+        - フロント
+        - マリオット
+        - 泊まる
+        reviewed_rows:
+        - source_sheet: Japanese
+          source_row_id: '236'
+          review_decision: no change
+          keyword_original: ホテル
+          keyword_final: ホテル
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '237'
+          review_decision: no change
+          keyword_original: 旅館
+          keyword_final: 旅館
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '238'
+          review_decision: no change
+          keyword_original: 宿泊
+          keyword_final: 宿泊
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '239'
+          review_decision: no change
+          keyword_original: 客室
+          keyword_final: 客室
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '240'
+          review_decision: no change
+          keyword_original: 朝食
+          keyword_final: 朝食
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '241'
+          review_decision: no change
+          keyword_original: フロント
+          keyword_final: フロント
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '242'
+          review_decision: no change
+          keyword_original: マリオット
+          keyword_final: マリオット
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '243'
+          review_decision: no change
+          keyword_original: 泊まる
+          keyword_final: 泊まる
+          reviewer: 青山
+          reviewed_at: ''
+      seasonal_events:
+        code_family: topic
+        label: Seasonal Events
+        keywords:
+        - 祭り
+        - 花火
+        - イルミネーション
+        - 季節限定
+        - 春
+        - 夏
+        - 秋
+        - 冬
+        - イベント
+        - 期間限定
+        reviewed_rows:
+        - source_sheet: Japanese
+          source_row_id: '244'
+          review_decision: no change
+          keyword_original: 祭り
+          keyword_final: 祭り
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '245'
+          review_decision: no change
+          keyword_original: 花火
+          keyword_final: 花火
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '246'
+          review_decision: no change
+          keyword_original: イルミネーション
+          keyword_final: イルミネーション
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '247'
+          review_decision: no change
+          keyword_original: 季節限定
+          keyword_final: 季節限定
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '248'
+          review_decision: no change
+          keyword_original: 春
+          keyword_final: 春
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '249'
+          review_decision: no change
+          keyword_original: 夏
+          keyword_final: 夏
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '250'
+          review_decision: no change
+          keyword_original: 秋
+          keyword_final: 秋
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '251'
+          review_decision: no change
+          keyword_original: 冬
+          keyword_final: 冬
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '252'
+          review_decision: no change
+          keyword_original: イベント
+          keyword_final: イベント
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '253'
+          review_decision: no change
+          keyword_original: 期間限定
+          keyword_final: 期間限定
+          reviewer: 青山
+          reviewed_at: ''
+      positive_sentiment:
+        code_family: sentiment
+        label: Positive Sentiment
+        keywords:
+        - 最高
+        - 良かった
+        - 素晴らしい
+        - おすすめ
+        - 満足
+        - 感動
+        - 美味しい
+        - 快適
+        - 楽しい
+        - また行きたい
+        - 価値がある
+        reviewed_rows:
+        - source_sheet: Japanese
+          source_row_id: '254'
+          review_decision: no change
+          keyword_original: 最高
+          keyword_final: 最高
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '255'
+          review_decision: no change
+          keyword_original: 良かった
+          keyword_final: 良かった
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '256'
+          review_decision: no change
+          keyword_original: 素晴らしい
+          keyword_final: 素晴らしい
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '257'
+          review_decision: no change
+          keyword_original: おすすめ
+          keyword_final: おすすめ
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '258'
+          review_decision: no change
+          keyword_original: 満足
+          keyword_final: 満足
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '259'
+          review_decision: no change
+          keyword_original: 感動
+          keyword_final: 感動
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '260'
+          review_decision: no change
+          keyword_original: 美味しい
+          keyword_final: 美味しい
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '261'
+          review_decision: no change
+          keyword_original: 快適
+          keyword_final: 快適
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '262'
+          review_decision: no change
+          keyword_original: 楽しい
+          keyword_final: 楽しい
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '263'
+          review_decision: no change
+          keyword_original: また行きたい
+          keyword_final: また行きたい
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '264'
+          review_decision: no change
+          keyword_original: 価値がある
+          keyword_final: 価値がある
+          reviewer: 青山
+          reviewed_at: ''
+      negative_sentiment:
+        code_family: sentiment
+        label: Negative Sentiment
+        keywords:
+        - 残念
+        - つまらない
+        - 悪い
+        - 不満
+        - 高い
+        - 混雑
+        - 閉まって
+        - わかりにくい
+        - 行きにくい
+        - 期待外れ
+        - おすすめしない
+        reviewed_rows:
+        - source_sheet: Japanese
+          source_row_id: '265'
+          review_decision: no change
+          keyword_original: 残念
+          keyword_final: 残念
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '266'
+          review_decision: no change
+          keyword_original: つまらない
+          keyword_final: つまらない
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '267'
+          review_decision: no change
+          keyword_original: 悪い
+          keyword_final: 悪い
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '268'
+          review_decision: no change
+          keyword_original: 不満
+          keyword_final: 不満
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '269'
+          review_decision: no change
+          keyword_original: 高い
+          keyword_final: 高い
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '270'
+          review_decision: no change
+          keyword_original: 混雑
+          keyword_final: 混雑
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '271'
+          review_decision: no change
+          keyword_original: 閉まって
+          keyword_final: 閉まって
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '272'
+          review_decision: no change
+          keyword_original: わかりにくい
+          keyword_final: わかりにくい
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '273'
+          review_decision: no change
+          keyword_original: 行きにくい
+          keyword_final: 行きにくい
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '274'
+          review_decision: no change
+          keyword_original: 期待外れ
+          keyword_final: 期待外れ
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '275'
+          review_decision: no change
+          keyword_original: おすすめしない
+          keyword_final: おすすめしない
+          reviewer: 青山
+          reviewed_at: ''
+      recommendation_intent:
+        code_family: sentiment
+        label: Recommendation / Intent
+        keywords:
+        - おすすめ
+        - 行くべき
+        - また行きたい
+        - 再訪
+        - ぜひ
+        - 必見
+        - 訪れる価値
+        - 一度は行きたい
+        reviewed_rows:
+        - source_sheet: Japanese
+          source_row_id: '276'
+          review_decision: no change
+          keyword_original: おすすめ
+          keyword_final: おすすめ
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '277'
+          review_decision: no change
+          keyword_original: 行くべき
+          keyword_final: 行くべき
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '278'
+          review_decision: no change
+          keyword_original: また行きたい
+          keyword_final: また行きたい
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '279'
+          review_decision: no change
+          keyword_original: 再訪
+          keyword_final: 再訪
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '280'
+          review_decision: no change
+          keyword_original: ぜひ
+          keyword_final: ぜひ
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '281'
+          review_decision: no change
+          keyword_original: 必見
+          keyword_final: 必見
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '282'
+          review_decision: no change
+          keyword_original: 訪れる価値
+          keyword_final: 訪れる価値
+          reviewer: 青山
+          reviewed_at: ''
+        - source_sheet: Japanese
+          source_row_id: '283'
+          review_decision: no change
+          keyword_original: 一度は行きたい
+          keyword_final: 一度は行きたい
+          reviewer: 青山
+          reviewed_at: ''
+  English:
+    codes:
+      transport_access:
+        code_family: friction
+        label: Transport / Access
+        keywords:
+        - no bus
+        - no train
+        - no direct
+        - no direct route
+        - infrequent bus
+        - infrequent train
+        - limited service
+        - hard to get to
+        - difficult to get to
+        - hard to get here
+        - hard to get there
+        - hard to reach
+        - difficult to reach
+        - difficult to access
+        - hard to access
+        - remote location
+        - far from station
+        - far from the station
+        - far from town
+        - no public transport
+        - no public transportation
+        - need a car
+        - rent a car
+        - car rental required
+        - inconvenient transport
+        - inconvenient access
+        - transportation is limited
+        - transportation issue
+        - transportation && limited
+        - transportation && schedule
+        - bus && limited
+        - bus && infrequent
+        - bus && interval
+        - bus && schedule
+        - next bus
+        - taxi && service area
+        - taxi && pick you up
+        - walk all the way back
+        - getting here is difficult
+        - getting there is difficult
+        reviewed_rows:
+        - source_sheet: English
+          source_row_id: '2'
+          review_decision: No change
+          keyword_original: no bus
+          keyword_final: no bus
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '3'
+          review_decision: No change
+          keyword_original: no train
+          keyword_final: no train
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '4'
+          review_decision: No change
+          keyword_original: no direct
+          keyword_final: no direct
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '5'
+          review_decision: No change
+          keyword_original: no direct route
+          keyword_final: no direct route
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '6'
+          review_decision: No change
+          keyword_original: infrequent bus
+          keyword_final: infrequent bus
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '7'
+          review_decision: No change
+          keyword_original: infrequent train
+          keyword_final: infrequent train
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '8'
+          review_decision: No change
+          keyword_original: limited service
+          keyword_final: limited service
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '9'
+          review_decision: No change
+          keyword_original: hard to get to
+          keyword_final: hard to get to
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '10'
+          review_decision: No change
+          keyword_original: difficult to get to
+          keyword_final: difficult to get to
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '11'
+          review_decision: No change
+          keyword_original: hard to get here
+          keyword_final: hard to get here
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '12'
+          review_decision: No change
+          keyword_original: hard to get there
+          keyword_final: hard to get there
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '13'
+          review_decision: No change
+          keyword_original: hard to reach
+          keyword_final: hard to reach
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '14'
+          review_decision: No change
+          keyword_original: difficult to reach
+          keyword_final: difficult to reach
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '15'
+          review_decision: No change
+          keyword_original: difficult to access
+          keyword_final: difficult to access
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '16'
+          review_decision: No change
+          keyword_original: hard to access
+          keyword_final: hard to access
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '17'
+          review_decision: No change
+          keyword_original: remote location
+          keyword_final: remote location
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '18'
+          review_decision: No change
+          keyword_original: far from station
+          keyword_final: far from station
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '19'
+          review_decision: No change
+          keyword_original: far from the station
+          keyword_final: far from the station
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '20'
+          review_decision: No change
+          keyword_original: far from town
+          keyword_final: far from town
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '21'
+          review_decision: No change
+          keyword_original: no public transport
+          keyword_final: no public transport
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '22'
+          review_decision: No change
+          keyword_original: no public transportation
+          keyword_final: no public transportation
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '23'
+          review_decision: No change
+          keyword_original: need a car
+          keyword_final: need a car
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '24'
+          review_decision: No change
+          keyword_original: rent a car
+          keyword_final: rent a car
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '25'
+          review_decision: No change
+          keyword_original: car rental required
+          keyword_final: car rental required
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '26'
+          review_decision: No change
+          keyword_original: inconvenient transport
+          keyword_final: inconvenient transport
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '27'
+          review_decision: No change
+          keyword_original: inconvenient access
+          keyword_final: inconvenient access
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '28'
+          review_decision: No change
+          keyword_original: transportation is limited
+          keyword_final: transportation is limited
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '29'
+          review_decision: No change
+          keyword_original: transportation issue
+          keyword_final: transportation issue
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '30'
+          review_decision: No change
+          keyword_original: transportation && limited
+          keyword_final: transportation && limited
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '31'
+          review_decision: No change
+          keyword_original: transportation && schedule
+          keyword_final: transportation && schedule
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '32'
+          review_decision: No change
+          keyword_original: bus && limited
+          keyword_final: bus && limited
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '33'
+          review_decision: No change
+          keyword_original: bus && infrequent
+          keyword_final: bus && infrequent
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '34'
+          review_decision: No change
+          keyword_original: bus && interval
+          keyword_final: bus && interval
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '35'
+          review_decision: No change
+          keyword_original: bus && schedule
+          keyword_final: bus && schedule
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '36'
+          review_decision: No change
+          keyword_original: next bus
+          keyword_final: next bus
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '37'
+          review_decision: No change
+          keyword_original: taxi && service area
+          keyword_final: taxi && service area
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '38'
+          review_decision: No change
+          keyword_original: taxi && pick you up
+          keyword_final: taxi && pick you up
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '39'
+          review_decision: No change
+          keyword_original: walk all the way back
+          keyword_final: walk all the way back
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '40'
+          review_decision: FIX
+          keyword_original: getting here is
+          keyword_final: getting here is difficult
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '41'
+          review_decision: FIX
+          keyword_original: getting there is
+          keyword_final: getting there is difficult
+          reviewer: Andrew
+          reviewed_at: ''
+      wayfinding_signage:
+        code_family: friction
+        label: Wayfinding / Signage
+        keywords:
+        - no signs
+        - no sign
+        - no signage
+        - no signpost
+        - poorly marked
+        - not well signed
+        - hard to find
+        - difficult to find
+        - confusing directions
+        - unclear directions
+        - no directions
+        - no map available
+        - easy to get lost
+        - got lost
+        - we got lost
+        - difficult to navigate
+        - hard to navigate
+        reviewed_rows:
+        - source_sheet: English
+          source_row_id: '42'
+          review_decision: No change
+          keyword_original: no signs
+          keyword_final: no signs
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '43'
+          review_decision: No change
+          keyword_original: no sign
+          keyword_final: no sign
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '44'
+          review_decision: No change
+          keyword_original: no signage
+          keyword_final: no signage
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '45'
+          review_decision: No change
+          keyword_original: no signpost
+          keyword_final: no signpost
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '46'
+          review_decision: No change
+          keyword_original: poorly marked
+          keyword_final: poorly marked
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '47'
+          review_decision: No change
+          keyword_original: not well signed
+          keyword_final: not well signed
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '48'
+          review_decision: No change
+          keyword_original: hard to find
+          keyword_final: hard to find
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '49'
+          review_decision: No change
+          keyword_original: difficult to find
+          keyword_final: difficult to find
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '50'
+          review_decision: No change
+          keyword_original: confusing directions
+          keyword_final: confusing directions
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '51'
+          review_decision: No change
+          keyword_original: unclear directions
+          keyword_final: unclear directions
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '52'
+          review_decision: No change
+          keyword_original: no directions
+          keyword_final: no directions
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '53'
+          review_decision: No change
+          keyword_original: no map available
+          keyword_final: no map available
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '54'
+          review_decision: No change
+          keyword_original: easy to get lost
+          keyword_final: easy to get lost
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '55'
+          review_decision: No change
+          keyword_original: got lost
+          keyword_final: got lost
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '56'
+          review_decision: No change
+          keyword_original: we got lost
+          keyword_final: we got lost
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '57'
+          review_decision: No change
+          keyword_original: difficult to navigate
+          keyword_final: difficult to navigate
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '58'
+          review_decision: No change
+          keyword_original: hard to navigate
+          keyword_final: hard to navigate
+          reviewer: Andrew
+          reviewed_at: ''
+      language_information_gap:
+        code_family: friction
+        label: Language Information Gap
+        keywords:
+        - no english
+        - japanese only
+        - only in japanese
+        - all in japanese
+        - no english sign
+        - no english signs
+        - no english information
+        - no english guide
+        - no english menu
+        - no translation
+        - language barrier
+        - can't read
+        - cannot read
+        - couldn't read
+        - not in english
+        - information only in japanese
+        - no english speaking
+        - doesn't speak english
+        - don't speak english
+        reviewed_rows:
+        - source_sheet: English
+          source_row_id: '59'
+          review_decision: No change
+          keyword_original: no english
+          keyword_final: no english
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '60'
+          review_decision: No change
+          keyword_original: japanese only
+          keyword_final: japanese only
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '61'
+          review_decision: No change
+          keyword_original: only in japanese
+          keyword_final: only in japanese
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '62'
+          review_decision: No change
+          keyword_original: all in japanese
+          keyword_final: all in japanese
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '63'
+          review_decision: No change
+          keyword_original: no english sign
+          keyword_final: no english sign
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '64'
+          review_decision: No change
+          keyword_original: no english signs
+          keyword_final: no english signs
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '65'
+          review_decision: No change
+          keyword_original: no english information
+          keyword_final: no english information
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '66'
+          review_decision: No change
+          keyword_original: no english guide
+          keyword_final: no english guide
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '67'
+          review_decision: No change
+          keyword_original: no english menu
+          keyword_final: no english menu
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '68'
+          review_decision: No change
+          keyword_original: no translation
+          keyword_final: no translation
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '69'
+          review_decision: No change
+          keyword_original: language barrier
+          keyword_final: language barrier
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '70'
+          review_decision: No change
+          keyword_original: can't read
+          keyword_final: can't read
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '71'
+          review_decision: No change
+          keyword_original: cannot read
+          keyword_final: cannot read
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '72'
+          review_decision: No change
+          keyword_original: couldn't read
+          keyword_final: couldn't read
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '73'
+          review_decision: No change
+          keyword_original: not in english
+          keyword_final: not in english
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '74'
+          review_decision: No change
+          keyword_original: information only in japanese
+          keyword_final: information only in japanese
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '75'
+          review_decision: No change
+          keyword_original: no english speaking
+          keyword_final: no english speaking
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '76'
+          review_decision: No change
+          keyword_original: doesn't speak english
+          keyword_final: doesn't speak english
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '77'
+          review_decision: No change
+          keyword_original: don't speak english
+          keyword_final: don't speak english
+          reviewer: Andrew
+          reviewed_at: ''
+      staff_communication:
+        code_family: friction
+        label: Staff Communication
+        keywords:
+        - rude staff
+        - unhelpful staff
+        - unfriendly staff
+        - dismissive staff
+        - rude employee
+        - unhelpful employee
+        - staff was rude
+        - staff were rude
+        - staff is rude
+        - staff not helpful
+        - staff ignored
+        - staff couldn't help
+        - couldn't communicate with staff
+        - language problem with staff
+        - staff doesn't speak english
+        - staff don't speak english
+        reviewed_rows:
+        - source_sheet: English
+          source_row_id: '78'
+          review_decision: No change
+          keyword_original: rude staff
+          keyword_final: rude staff
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '79'
+          review_decision: No change
+          keyword_original: unhelpful staff
+          keyword_final: unhelpful staff
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '80'
+          review_decision: No change
+          keyword_original: unfriendly staff
+          keyword_final: unfriendly staff
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '81'
+          review_decision: No change
+          keyword_original: dismissive staff
+          keyword_final: dismissive staff
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '82'
+          review_decision: No change
+          keyword_original: rude employee
+          keyword_final: rude employee
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '83'
+          review_decision: No change
+          keyword_original: unhelpful employee
+          keyword_final: unhelpful employee
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '84'
+          review_decision: No change
+          keyword_original: staff was rude
+          keyword_final: staff was rude
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '85'
+          review_decision: No change
+          keyword_original: staff were rude
+          keyword_final: staff were rude
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '86'
+          review_decision: No change
+          keyword_original: staff is rude
+          keyword_final: staff is rude
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '87'
+          review_decision: No change
+          keyword_original: staff not helpful
+          keyword_final: staff not helpful
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '88'
+          review_decision: No change
+          keyword_original: staff ignored
+          keyword_final: staff ignored
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '89'
+          review_decision: No change
+          keyword_original: staff couldn't help
+          keyword_final: staff couldn't help
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '90'
+          review_decision: No change
+          keyword_original: couldn't communicate with staff
+          keyword_final: couldn't communicate with staff
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '91'
+          review_decision: No change
+          keyword_original: language problem with staff
+          keyword_final: language problem with staff
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '92'
+          review_decision: No change
+          keyword_original: staff doesn't speak english
+          keyword_final: staff doesn't speak english
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '93'
+          review_decision: No change
+          keyword_original: staff don't speak english
+          keyword_final: staff don't speak english
+          reviewer: Andrew
+          reviewed_at: ''
+      booking_ticketing:
+        code_family: friction
+        label: Booking / Ticketing
+        keywords:
+        - sold out
+        - fully booked
+        - cash only
+        - no card
+        - card not accepted
+        - no credit card
+        - must book in advance
+        - need to book in advance
+        - advance booking required
+        - reservation required
+        - must reserve
+        - difficult to book
+        - hard to book
+        - couldn't book
+        - no online booking
+        - no reservation system
+        - book tickets before
+        - book online before
+        reviewed_rows:
+        - source_sheet: English
+          source_row_id: '94'
+          review_decision: No change
+          keyword_original: sold out
+          keyword_final: sold out
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '95'
+          review_decision: No change
+          keyword_original: fully booked
+          keyword_final: fully booked
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '96'
+          review_decision: No change
+          keyword_original: cash only
+          keyword_final: cash only
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '97'
+          review_decision: No change
+          keyword_original: no card
+          keyword_final: no card
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '98'
+          review_decision: No change
+          keyword_original: card not accepted
+          keyword_final: card not accepted
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '99'
+          review_decision: No change
+          keyword_original: no credit card
+          keyword_final: no credit card
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '100'
+          review_decision: No change
+          keyword_original: must book in advance
+          keyword_final: must book in advance
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '101'
+          review_decision: No change
+          keyword_original: need to book in advance
+          keyword_final: need to book in advance
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '102'
+          review_decision: No change
+          keyword_original: advance booking required
+          keyword_final: advance booking required
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '103'
+          review_decision: No change
+          keyword_original: reservation required
+          keyword_final: reservation required
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '104'
+          review_decision: No change
+          keyword_original: must reserve
+          keyword_final: must reserve
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '105'
+          review_decision: No change
+          keyword_original: difficult to book
+          keyword_final: difficult to book
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '106'
+          review_decision: No change
+          keyword_original: hard to book
+          keyword_final: hard to book
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '107'
+          review_decision: No change
+          keyword_original: couldn't book
+          keyword_final: couldn't book
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '108'
+          review_decision: No change
+          keyword_original: no online booking
+          keyword_final: no online booking
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '109'
+          review_decision: No change
+          keyword_original: no reservation system
+          keyword_final: no reservation system
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '110'
+          review_decision: No change
+          keyword_original: book tickets before
+          keyword_final: book tickets before
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '111'
+          review_decision: No change
+          keyword_original: book online before
+          keyword_final: book online before
+          reviewer: Andrew
+          reviewed_at: ''
+      waiting_crowding:
+        code_family: friction
+        label: Waiting / Crowding
+        keywords:
+        - long wait
+        - long queue
+        - queue up
+        - queuing
+        - long line
+        - wait for a long
+        - wait for hours
+        - had to wait
+        - crowded
+        - too crowded
+        - very crowded
+        - extremely crowded
+        - overcrowded
+        - gets very crowded
+        - gets crowded
+        - quite crowded
+        - always crowded
+        - too many people
+        - packed
+        - shoulder to shoulder
+        - overtourism
+        - congestion
+        - impossible to move
+        - busy && too
+        - busy && very
+        - delay && hours
+        - delayed && hours
+        reviewed_rows:
+        - source_sheet: English
+          source_row_id: '112'
+          review_decision: No change
+          keyword_original: long wait
+          keyword_final: long wait
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '113'
+          review_decision: No change
+          keyword_original: long queue
+          keyword_final: long queue
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '114'
+          review_decision: No change
+          keyword_original: queue up
+          keyword_final: queue up
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '115'
+          review_decision: No change
+          keyword_original: queuing
+          keyword_final: queuing
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '116'
+          review_decision: No change
+          keyword_original: long line
+          keyword_final: long line
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '117'
+          review_decision: No change
+          keyword_original: wait for a long
+          keyword_final: wait for a long
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '118'
+          review_decision: No change
+          keyword_original: wait for hours
+          keyword_final: wait for hours
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '119'
+          review_decision: No change
+          keyword_original: had to wait
+          keyword_final: had to wait
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '120'
+          review_decision: No change
+          keyword_original: crowded
+          keyword_final: crowded
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '121'
+          review_decision: No change
+          keyword_original: too crowded
+          keyword_final: too crowded
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '122'
+          review_decision: No change
+          keyword_original: very crowded
+          keyword_final: very crowded
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '123'
+          review_decision: No change
+          keyword_original: extremely crowded
+          keyword_final: extremely crowded
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '124'
+          review_decision: No change
+          keyword_original: overcrowded
+          keyword_final: overcrowded
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '125'
+          review_decision: No change
+          keyword_original: gets very crowded
+          keyword_final: gets very crowded
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '126'
+          review_decision: No change
+          keyword_original: gets crowded
+          keyword_final: gets crowded
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '127'
+          review_decision: No change
+          keyword_original: quite crowded
+          keyword_final: quite crowded
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '128'
+          review_decision: No change
+          keyword_original: always crowded
+          keyword_final: always crowded
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '129'
+          review_decision: No change
+          keyword_original: too many people
+          keyword_final: too many people
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '130'
+          review_decision: No change
+          keyword_original: packed
+          keyword_final: packed
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '131'
+          review_decision: No change
+          keyword_original: shoulder to shoulder
+          keyword_final: shoulder to shoulder
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '132'
+          review_decision: No change
+          keyword_original: overtourism
+          keyword_final: overtourism
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '133'
+          review_decision: No change
+          keyword_original: congestion
+          keyword_final: congestion
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '134'
+          review_decision: No change
+          keyword_original: impossible to move
+          keyword_final: impossible to move
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '135'
+          review_decision: No change
+          keyword_original: busy && too
+          keyword_final: busy && too
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '136'
+          review_decision: No change
+          keyword_original: busy && very
+          keyword_final: busy && very
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '137'
+          review_decision: No change
+          keyword_original: delay && hours
+          keyword_final: delay && hours
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '138'
+          review_decision: No change
+          keyword_original: delayed && hours
+          keyword_final: delayed && hours
+          reviewer: Andrew
+          reviewed_at: ''
+      price_value:
+        code_family: friction
+        label: Price / Value
+        keywords:
+        - expensive
+        - overpriced
+        - pricey
+        - not worth the price
+        - not worth the cost
+        - poor value
+        - costs too much
+        - too expensive
+        - steep price
+        - overcharged
+        - rip off
+        - rip-off
+        - not worth the money
+        - not worth going
+        - too much for what it is
+        - entrance fee is high
+        - entry fee is high
+        - admission is high
+        - admission is expensive
+        - tourist trap
+        - waste your time
+        - don't waste your time
+        - do not waste your time
+        reviewed_rows:
+        - source_sheet: English
+          source_row_id: '139'
+          review_decision: No change
+          keyword_original: expensive
+          keyword_final: expensive
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '140'
+          review_decision: No change
+          keyword_original: overpriced
+          keyword_final: overpriced
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '141'
+          review_decision: No change
+          keyword_original: pricey
+          keyword_final: pricey
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '142'
+          review_decision: No change
+          keyword_original: not worth the price
+          keyword_final: not worth the price
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '143'
+          review_decision: No change
+          keyword_original: not worth the cost
+          keyword_final: not worth the cost
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '144'
+          review_decision: No change
+          keyword_original: poor value
+          keyword_final: poor value
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '145'
+          review_decision: No change
+          keyword_original: costs too much
+          keyword_final: costs too much
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '146'
+          review_decision: No change
+          keyword_original: too expensive
+          keyword_final: too expensive
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '147'
+          review_decision: No change
+          keyword_original: steep price
+          keyword_final: steep price
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '148'
+          review_decision: No change
+          keyword_original: overcharged
+          keyword_final: overcharged
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '149'
+          review_decision: No change
+          keyword_original: rip off
+          keyword_final: rip off
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '150'
+          review_decision: No change
+          keyword_original: rip-off
+          keyword_final: rip-off
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '151'
+          review_decision: No change
+          keyword_original: not worth the money
+          keyword_final: not worth the money
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '152'
+          review_decision: No change
+          keyword_original: not worth going
+          keyword_final: not worth going
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '153'
+          review_decision: No change
+          keyword_original: too much for what it is
+          keyword_final: too much for what it is
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '154'
+          review_decision: No change
+          keyword_original: entrance fee is high
+          keyword_final: entrance fee is high
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '155'
+          review_decision: No change
+          keyword_original: entry fee is high
+          keyword_final: entry fee is high
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '156'
+          review_decision: No change
+          keyword_original: admission is high
+          keyword_final: admission is high
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '157'
+          review_decision: No change
+          keyword_original: admission is expensive
+          keyword_final: admission is expensive
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '158'
+          review_decision: No change
+          keyword_original: tourist trap
+          keyword_final: tourist trap
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '159'
+          review_decision: No change
+          keyword_original: waste your time
+          keyword_final: waste your time
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '160'
+          review_decision: No change
+          keyword_original: don't waste your time
+          keyword_final: don't waste your time
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '161'
+          review_decision: No change
+          keyword_original: do not waste your time
+          keyword_final: do not waste your time
+          reviewer: Andrew
+          reviewed_at: ''
+      cleanliness_comfort:
+        code_family: friction
+        label: Cleanliness / Comfort
+        keywords:
+        - dirty
+        - unclean
+        - filthy
+        - smelly
+        - bad smell
+        - foul smell
+        - poor maintenance
+        - run down
+        - dilapidated
+        - shabby
+        - poorly maintained
+        - needs maintenance
+        - no shelter
+        - no seating
+        - no shade
+        - no benches
+        - toilets were dirty
+        - bathrooms were dirty
+        - restrooms were dirty
+        - bathroom was dirty
+        reviewed_rows:
+        - source_sheet: English
+          source_row_id: '162'
+          review_decision: No change
+          keyword_original: dirty
+          keyword_final: dirty
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '163'
+          review_decision: No change
+          keyword_original: unclean
+          keyword_final: unclean
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '164'
+          review_decision: No change
+          keyword_original: filthy
+          keyword_final: filthy
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '165'
+          review_decision: No change
+          keyword_original: smelly
+          keyword_final: smelly
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '166'
+          review_decision: No change
+          keyword_original: bad smell
+          keyword_final: bad smell
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '167'
+          review_decision: No change
+          keyword_original: foul smell
+          keyword_final: foul smell
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '168'
+          review_decision: No change
+          keyword_original: poor maintenance
+          keyword_final: poor maintenance
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '169'
+          review_decision: No change
+          keyword_original: run down
+          keyword_final: run down
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '170'
+          review_decision: No change
+          keyword_original: dilapidated
+          keyword_final: dilapidated
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '171'
+          review_decision: No change
+          keyword_original: shabby
+          keyword_final: shabby
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '172'
+          review_decision: No change
+          keyword_original: poorly maintained
+          keyword_final: poorly maintained
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '173'
+          review_decision: No change
+          keyword_original: needs maintenance
+          keyword_final: needs maintenance
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '174'
+          review_decision: No change
+          keyword_original: no shelter
+          keyword_final: no shelter
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '175'
+          review_decision: No change
+          keyword_original: no seating
+          keyword_final: no seating
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '176'
+          review_decision: No change
+          keyword_original: no shade
+          keyword_final: no shade
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '177'
+          review_decision: No change
+          keyword_original: no benches
+          keyword_final: no benches
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '178'
+          review_decision: No change
+          keyword_original: toilets were dirty
+          keyword_final: toilets were dirty
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '179'
+          review_decision: No change
+          keyword_original: bathrooms were dirty
+          keyword_final: bathrooms were dirty
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '180'
+          review_decision: No change
+          keyword_original: restrooms were dirty
+          keyword_final: restrooms were dirty
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '181'
+          review_decision: No change
+          keyword_original: bathroom was dirty
+          keyword_final: bathroom was dirty
+          reviewer: Andrew
+          reviewed_at: ''
+      opening_hours_availability:
+        code_family: friction
+        label: Opening Hours / Availability
+        keywords:
+        - was closed
+        - were closed
+        - it was closed
+        - already closed
+        - shops were closed
+        - closed when we arrived
+        - closed when we got there
+        - closed during
+        - check hours
+        - verify hours
+        - wasn't open
+        - weren't open
+        - closes early
+        - closed early
+        - limited hours
+        - short hours
+        - only open certain days
+        - only open on
+        - seasonal closure
+        - off season
+        - closed until
+        - closed for renovation
+        - closed for maintenance
+        - closed because of
+        - closed for winter
+        - under construction
+        - under renovation
+        - can't go in
+        - cannot go in
+        - couldn't go in
+        - update google timing
+        - google && open && closed
+        reviewed_rows:
+        - source_sheet: English
+          source_row_id: '182'
+          review_decision: No change
+          keyword_original: was closed
+          keyword_final: was closed
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '183'
+          review_decision: No change
+          keyword_original: were closed
+          keyword_final: were closed
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '184'
+          review_decision: No change
+          keyword_original: it was closed
+          keyword_final: it was closed
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '185'
+          review_decision: No change
+          keyword_original: already closed
+          keyword_final: already closed
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '186'
+          review_decision: No change
+          keyword_original: shops were closed
+          keyword_final: shops were closed
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '187'
+          review_decision: No change
+          keyword_original: closed when we arrived
+          keyword_final: closed when we arrived
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '188'
+          review_decision: No change
+          keyword_original: closed when we got there
+          keyword_final: closed when we got there
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '189'
+          review_decision: No change
+          keyword_original: closed during
+          keyword_final: closed during
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '190'
+          review_decision: No change
+          keyword_original: check hours
+          keyword_final: check hours
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '191'
+          review_decision: No change
+          keyword_original: verify hours
+          keyword_final: verify hours
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '192'
+          review_decision: No change
+          keyword_original: wasn't open
+          keyword_final: wasn't open
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '193'
+          review_decision: No change
+          keyword_original: weren't open
+          keyword_final: weren't open
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '194'
+          review_decision: No change
+          keyword_original: closes early
+          keyword_final: closes early
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '195'
+          review_decision: No change
+          keyword_original: closed early
+          keyword_final: closed early
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '196'
+          review_decision: No change
+          keyword_original: limited hours
+          keyword_final: limited hours
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '197'
+          review_decision: No change
+          keyword_original: short hours
+          keyword_final: short hours
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '198'
+          review_decision: No change
+          keyword_original: only open certain days
+          keyword_final: only open certain days
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '199'
+          review_decision: No change
+          keyword_original: only open on
+          keyword_final: only open on
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '200'
+          review_decision: No change
+          keyword_original: seasonal closure
+          keyword_final: seasonal closure
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '201'
+          review_decision: No change
+          keyword_original: off season
+          keyword_final: off season
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '202'
+          review_decision: No change
+          keyword_original: closed until
+          keyword_final: closed until
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '203'
+          review_decision: No change
+          keyword_original: closed for renovation
+          keyword_final: closed for renovation
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '204'
+          review_decision: No change
+          keyword_original: closed for maintenance
+          keyword_final: closed for maintenance
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '205'
+          review_decision: No change
+          keyword_original: closed because of
+          keyword_final: closed because of
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '206'
+          review_decision: No change
+          keyword_original: closed for winter
+          keyword_final: closed for winter
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '207'
+          review_decision: No change
+          keyword_original: under construction
+          keyword_final: under construction
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '208'
+          review_decision: No change
+          keyword_original: under renovation
+          keyword_final: under renovation
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '209'
+          review_decision: No change
+          keyword_original: can't go in
+          keyword_final: can't go in
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '210'
+          review_decision: No change
+          keyword_original: cannot go in
+          keyword_final: cannot go in
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '211'
+          review_decision: No change
+          keyword_original: couldn't go in
+          keyword_final: couldn't go in
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '212'
+          review_decision: No change
+          keyword_original: update google timing
+          keyword_final: update google timing
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '213'
+          review_decision: No change
+          keyword_original: google && open && closed
+          keyword_final: google && open && closed
+          reviewer: Andrew
+          reviewed_at: ''
+      itinerary_fit_time_cost:
+        code_family: friction
+        label: Itinerary Fit / Time & Cost
+        keywords:
+        - not enough to do
+        - not much to do
+        - nothing else nearby
+        - nothing else to do
+        - too short visit
+        - only takes a few minutes
+        - not worth a separate trip
+        - not worth the long journey
+        - long way for
+        - very long way
+        - too far to justify
+        - out of the way for just
+        - hard to justify
+        - nothing to see
+        - nothing more
+        - not worth visiting
+        - not worth the trip
+        - not worth the visit
+        - not all that interesting
+        - nothing special
+        - not much there
+        - not much things
+        - small display
+        - limited selection
+        reviewed_rows:
+        - source_sheet: English
+          source_row_id: '214'
+          review_decision: No change
+          keyword_original: not enough to do
+          keyword_final: not enough to do
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '215'
+          review_decision: No change
+          keyword_original: not much to do
+          keyword_final: not much to do
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '216'
+          review_decision: No change
+          keyword_original: nothing else nearby
+          keyword_final: nothing else nearby
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '217'
+          review_decision: No change
+          keyword_original: nothing else to do
+          keyword_final: nothing else to do
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '218'
+          review_decision: No change
+          keyword_original: too short visit
+          keyword_final: too short visit
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '219'
+          review_decision: No change
+          keyword_original: only takes a few minutes
+          keyword_final: only takes a few minutes
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '220'
+          review_decision: delete
+          keyword_original: only 15 minutes
+          keyword_final: ''
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '221'
+          review_decision: delete
+          keyword_original: only 20 minutes
+          keyword_final: ''
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '222'
+          review_decision: No change
+          keyword_original: not worth a separate trip
+          keyword_final: not worth a separate trip
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '223'
+          review_decision: No change
+          keyword_original: not worth the long journey
+          keyword_final: not worth the long journey
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '224'
+          review_decision: No change
+          keyword_original: long way for
+          keyword_final: long way for
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '225'
+          review_decision: No change
+          keyword_original: very long way
+          keyword_final: very long way
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '226'
+          review_decision: No change
+          keyword_original: too far to justify
+          keyword_final: too far to justify
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '227'
+          review_decision: No change
+          keyword_original: out of the way for just
+          keyword_final: out of the way for just
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '228'
+          review_decision: No change
+          keyword_original: hard to justify
+          keyword_final: hard to justify
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '229'
+          review_decision: No change
+          keyword_original: nothing to see
+          keyword_final: nothing to see
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '230'
+          review_decision: No change
+          keyword_original: nothing more
+          keyword_final: nothing more
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '231'
+          review_decision: No change
+          keyword_original: not worth visiting
+          keyword_final: not worth visiting
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '232'
+          review_decision: No change
+          keyword_original: not worth the trip
+          keyword_final: not worth the trip
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '233'
+          review_decision: No change
+          keyword_original: not worth the visit
+          keyword_final: not worth the visit
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '234'
+          review_decision: No change
+          keyword_original: not all that interesting
+          keyword_final: not all that interesting
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '235'
+          review_decision: No change
+          keyword_original: nothing special
+          keyword_final: nothing special
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '236'
+          review_decision: No change
+          keyword_original: not much there
+          keyword_final: not much there
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '237'
+          review_decision: No change
+          keyword_original: not much things
+          keyword_final: not much things
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '238'
+          review_decision: No change
+          keyword_original: small display
+          keyword_final: small display
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '239'
+          review_decision: No change
+          keyword_original: limited selection
+          keyword_final: limited selection
+          reviewer: Andrew
+          reviewed_at: ''
+      accessibility_mobility:
+        code_family: friction
+        label: Accessibility / Mobility
+        keywords:
+        - not wheelchair
+        - no wheelchair access
+        - wheelchair difficult
+        - wheelchair not accessible
+        - not accessible for wheelchair
+        - many steps
+        - lots of steps
+        - very steep
+        - steep climb
+        - steep stairs
+        - stairs && steep
+        - stairs && steepest
+        - stairs && narrow
+        - uneven ground
+        - uneven path
+        - no elevator
+        - no lift
+        - difficult for elderly
+        - hard for elderly
+        - difficult for disabled
+        - not suitable for strollers
+        - hard with a stroller
+        - slippery
+        - slippery path
+        - rough terrain
+        - many stairs
+        - a lot of walking
+        reviewed_rows:
+        - source_sheet: English
+          source_row_id: '240'
+          review_decision: No change
+          keyword_original: not wheelchair
+          keyword_final: not wheelchair
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '241'
+          review_decision: No change
+          keyword_original: no wheelchair access
+          keyword_final: no wheelchair access
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '242'
+          review_decision: No change
+          keyword_original: wheelchair difficult
+          keyword_final: wheelchair difficult
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '243'
+          review_decision: No change
+          keyword_original: wheelchair not accessible
+          keyword_final: wheelchair not accessible
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '244'
+          review_decision: No change
+          keyword_original: not accessible for wheelchair
+          keyword_final: not accessible for wheelchair
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '245'
+          review_decision: No change
+          keyword_original: many steps
+          keyword_final: many steps
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '246'
+          review_decision: No change
+          keyword_original: lots of steps
+          keyword_final: lots of steps
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '247'
+          review_decision: No change
+          keyword_original: very steep
+          keyword_final: very steep
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '248'
+          review_decision: No change
+          keyword_original: steep climb
+          keyword_final: steep climb
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '249'
+          review_decision: No change
+          keyword_original: steep stairs
+          keyword_final: steep stairs
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '250'
+          review_decision: No change
+          keyword_original: stairs && steep
+          keyword_final: stairs && steep
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '251'
+          review_decision: No change
+          keyword_original: stairs && steepest
+          keyword_final: stairs && steepest
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '252'
+          review_decision: No change
+          keyword_original: stairs && narrow
+          keyword_final: stairs && narrow
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '253'
+          review_decision: No change
+          keyword_original: uneven ground
+          keyword_final: uneven ground
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '254'
+          review_decision: No change
+          keyword_original: uneven path
+          keyword_final: uneven path
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '255'
+          review_decision: No change
+          keyword_original: no elevator
+          keyword_final: no elevator
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '256'
+          review_decision: No change
+          keyword_original: no lift
+          keyword_final: no lift
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '257'
+          review_decision: No change
+          keyword_original: difficult for elderly
+          keyword_final: difficult for elderly
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '258'
+          review_decision: No change
+          keyword_original: hard for elderly
+          keyword_final: hard for elderly
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '259'
+          review_decision: No change
+          keyword_original: difficult for disabled
+          keyword_final: difficult for disabled
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '260'
+          review_decision: No change
+          keyword_original: not suitable for strollers
+          keyword_final: not suitable for strollers
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '261'
+          review_decision: No change
+          keyword_original: hard with a stroller
+          keyword_final: hard with a stroller
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '262'
+          review_decision: No change
+          keyword_original: slippery
+          keyword_final: slippery
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '263'
+          review_decision: No change
+          keyword_original: slippery path
+          keyword_final: slippery path
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '264'
+          review_decision: No change
+          keyword_original: rough terrain
+          keyword_final: rough terrain
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '265'
+          review_decision: No change
+          keyword_original: many stairs
+          keyword_final: many stairs
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '266'
+          review_decision: No change
+          keyword_original: a lot of walking
+          keyword_final: a lot of walking
+          reviewer: Andrew
+          reviewed_at: ''
+      food_amenities_gap:
+        code_family: friction
+        label: Food / Amenities Gap
+        keywords:
+        - no food options
+        - no food nearby
+        - no restaurants nearby
+        - no restaurant nearby
+        - nowhere to eat
+        - nothing to eat
+        - no cafe nearby
+        - no cafes nearby
+        - limited food options
+        - limited dining options
+        - no english menu
+        - no vegetarian options
+        - no vegan options
+        - bring your own food
+        - pack your own lunch
+        - no shops nearby
+        - no souvenir shop
+        - no amenities
+        - no facilities nearby
+        - no convenience store
+        - shops && closed down
+        - restaurants && closed
+        - food && limited
+        reviewed_rows:
+        - source_sheet: English
+          source_row_id: '267'
+          review_decision: No change
+          keyword_original: no food options
+          keyword_final: no food options
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '268'
+          review_decision: No change
+          keyword_original: no food nearby
+          keyword_final: no food nearby
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '269'
+          review_decision: No change
+          keyword_original: no restaurants nearby
+          keyword_final: no restaurants nearby
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '270'
+          review_decision: No change
+          keyword_original: no restaurant nearby
+          keyword_final: no restaurant nearby
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '271'
+          review_decision: No change
+          keyword_original: nowhere to eat
+          keyword_final: nowhere to eat
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '272'
+          review_decision: No change
+          keyword_original: nothing to eat
+          keyword_final: nothing to eat
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '273'
+          review_decision: No change
+          keyword_original: no cafe nearby
+          keyword_final: no cafe nearby
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '274'
+          review_decision: No change
+          keyword_original: no cafes nearby
+          keyword_final: no cafes nearby
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '275'
+          review_decision: No change
+          keyword_original: limited food options
+          keyword_final: limited food options
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '276'
+          review_decision: No change
+          keyword_original: limited dining options
+          keyword_final: limited dining options
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '277'
+          review_decision: No change
+          keyword_original: no english menu
+          keyword_final: no english menu
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '278'
+          review_decision: No change
+          keyword_original: no vegetarian options
+          keyword_final: no vegetarian options
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '279'
+          review_decision: No change
+          keyword_original: no vegan options
+          keyword_final: no vegan options
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '280'
+          review_decision: No change
+          keyword_original: bring your own food
+          keyword_final: bring your own food
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '281'
+          review_decision: No change
+          keyword_original: pack your own lunch
+          keyword_final: pack your own lunch
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '282'
+          review_decision: No change
+          keyword_original: no shops nearby
+          keyword_final: no shops nearby
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '283'
+          review_decision: No change
+          keyword_original: no souvenir shop
+          keyword_final: no souvenir shop
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '284'
+          review_decision: No change
+          keyword_original: no amenities
+          keyword_final: no amenities
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '285'
+          review_decision: No change
+          keyword_original: no facilities nearby
+          keyword_final: no facilities nearby
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '286'
+          review_decision: No change
+          keyword_original: no convenience store
+          keyword_final: no convenience store
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '287'
+          review_decision: No change
+          keyword_original: shops && closed down
+          keyword_final: shops && closed down
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '288'
+          review_decision: No change
+          keyword_original: restaurants && closed
+          keyword_final: restaurants && closed
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '289'
+          review_decision: No change
+          keyword_original: food && limited
+          keyword_final: food && limited
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '290'
+          review_decision: delete
+          keyword_original: merchandise && outdated
+          keyword_final: ''
+          reviewer: Andrew
+          reviewed_at: ''
+      scenic_nature:
+        code_family: topic
+        label: Scenic Nature
+        keywords:
+        - scenic
+        - beautiful view
+        - ocean view
+        - sea view
+        - mountain view
+        - cliffs
+        - waterfall
+        - river
+        - lake
+        - forest
+        - sunset
+        - cherry blossoms
+        - autumn leaves
+        - snow scenery
+        - photogenic
+        reviewed_rows:
+        - source_sheet: English
+          source_row_id: '371'
+          review_decision: No change
+          keyword_original: scenic
+          keyword_final: scenic
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '372'
+          review_decision: No change
+          keyword_original: beautiful view
+          keyword_final: beautiful view
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '373'
+          review_decision: No change
+          keyword_original: ocean view
+          keyword_final: ocean view
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '374'
+          review_decision: No change
+          keyword_original: sea view
+          keyword_final: sea view
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '375'
+          review_decision: No change
+          keyword_original: mountain view
+          keyword_final: mountain view
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '376'
+          review_decision: No change
+          keyword_original: cliffs
+          keyword_final: cliffs
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '377'
+          review_decision: No change
+          keyword_original: waterfall
+          keyword_final: waterfall
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '378'
+          review_decision: No change
+          keyword_original: river
+          keyword_final: river
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '379'
+          review_decision: No change
+          keyword_original: lake
+          keyword_final: lake
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '380'
+          review_decision: No change
+          keyword_original: forest
+          keyword_final: forest
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '381'
+          review_decision: No change
+          keyword_original: sunset
+          keyword_final: sunset
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '382'
+          review_decision: No change
+          keyword_original: cherry blossoms
+          keyword_final: cherry blossoms
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '383'
+          review_decision: No change
+          keyword_original: autumn leaves
+          keyword_final: autumn leaves
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '384'
+          review_decision: No change
+          keyword_original: snow scenery
+          keyword_final: snow scenery
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '385'
+          review_decision: No change
+          keyword_original: photogenic
+          keyword_final: photogenic
+          reviewer: Andrew
+          reviewed_at: ''
+      temples_spiritual:
+        code_family: topic
+        label: Temples / Spiritual
+        keywords:
+        - temple
+        - shrine
+        - zen
+        - meditation
+        - pilgrimage
+        - prayer
+        - monk
+        - spiritual
+        - peaceful
+        - Eiheiji
+        - worship
+        - goshuin
+        reviewed_rows:
+        - source_sheet: English
+          source_row_id: '386'
+          review_decision: No change
+          keyword_original: temple
+          keyword_final: temple
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '387'
+          review_decision: No change
+          keyword_original: shrine
+          keyword_final: shrine
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '388'
+          review_decision: No change
+          keyword_original: zen
+          keyword_final: zen
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '389'
+          review_decision: No change
+          keyword_original: meditation
+          keyword_final: meditation
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '390'
+          review_decision: No change
+          keyword_original: pilgrimage
+          keyword_final: pilgrimage
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '391'
+          review_decision: No change
+          keyword_original: prayer
+          keyword_final: prayer
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '392'
+          review_decision: No change
+          keyword_original: monk
+          keyword_final: monk
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '393'
+          review_decision: No change
+          keyword_original: spiritual
+          keyword_final: spiritual
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '394'
+          review_decision: No change
+          keyword_original: peaceful
+          keyword_final: peaceful
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '395'
+          review_decision: No change
+          keyword_original: Eiheiji
+          keyword_final: Eiheiji
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '396'
+          review_decision: No change
+          keyword_original: worship
+          keyword_final: worship
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '397'
+          review_decision: No change
+          keyword_original: goshuin
+          keyword_final: goshuin
+          reviewer: Andrew
+          reviewed_at: ''
+      history_culture:
+        code_family: topic
+        label: History / Culture
+        keywords:
+        - castle
+        - historic site
+        - ruins
+        - samurai
+        - traditional
+        - heritage
+        - old town
+        - museum
+        - local history
+        - architecture
+        - craft tradition
+        reviewed_rows:
+        - source_sheet: English
+          source_row_id: '398'
+          review_decision: No change
+          keyword_original: castle
+          keyword_final: castle
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '399'
+          review_decision: No change
+          keyword_original: historic site
+          keyword_final: historic site
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '400'
+          review_decision: No change
+          keyword_original: ruins
+          keyword_final: ruins
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '401'
+          review_decision: No change
+          keyword_original: samurai
+          keyword_final: samurai
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '402'
+          review_decision: No change
+          keyword_original: traditional
+          keyword_final: traditional
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '403'
+          review_decision: No change
+          keyword_original: heritage
+          keyword_final: heritage
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '404'
+          review_decision: No change
+          keyword_original: old town
+          keyword_final: old town
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '405'
+          review_decision: No change
+          keyword_original: museum
+          keyword_final: museum
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '406'
+          review_decision: No change
+          keyword_original: local history
+          keyword_final: local history
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '407'
+          review_decision: No change
+          keyword_original: architecture
+          keyword_final: architecture
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '408'
+          review_decision: No change
+          keyword_original: craft tradition
+          keyword_final: craft tradition
+          reviewer: Andrew
+          reviewed_at: ''
+      dinosaurs_museums:
+        code_family: topic
+        label: Dinosaurs / Museums
+        keywords:
+        - dinosaur
+        - fossil
+        - museum
+        - exhibition
+        - gallery
+        - science museum
+        - interactive exhibit
+        reviewed_rows:
+        - source_sheet: English
+          source_row_id: '409'
+          review_decision: No change
+          keyword_original: dinosaur
+          keyword_final: dinosaur
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '410'
+          review_decision: No change
+          keyword_original: fossil
+          keyword_final: fossil
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '411'
+          review_decision: No change
+          keyword_original: museum
+          keyword_final: museum
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '412'
+          review_decision: No change
+          keyword_original: exhibition
+          keyword_final: exhibition
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '413'
+          review_decision: No change
+          keyword_original: gallery
+          keyword_final: gallery
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '414'
+          review_decision: No change
+          keyword_original: science museum
+          keyword_final: science museum
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '415'
+          review_decision: No change
+          keyword_original: interactive exhibit
+          keyword_final: interactive exhibit
+          reviewer: Andrew
+          reviewed_at: ''
+      food_local_cuisine:
+        code_family: topic
+        label: Food / Local Cuisine
+        keywords:
+        - seafood
+        - soba
+        - echizen crab
+        - crab
+        - sauce katsudon
+        - sushi
+        - local food
+        - restaurant
+        - cafe
+        - delicious
+        - fresh
+        reviewed_rows:
+        - source_sheet: English
+          source_row_id: '416'
+          review_decision: No change
+          keyword_original: seafood
+          keyword_final: seafood
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '417'
+          review_decision: No change
+          keyword_original: soba
+          keyword_final: soba
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '418'
+          review_decision: No change
+          keyword_original: echizen crab
+          keyword_final: echizen crab
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '419'
+          review_decision: No change
+          keyword_original: crab
+          keyword_final: crab
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '420'
+          review_decision: No change
+          keyword_original: sauce katsudon
+          keyword_final: sauce katsudon
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '421'
+          review_decision: No change
+          keyword_original: sushi
+          keyword_final: sushi
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '422'
+          review_decision: No change
+          keyword_original: local food
+          keyword_final: local food
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '423'
+          review_decision: No change
+          keyword_original: restaurant
+          keyword_final: restaurant
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '424'
+          review_decision: No change
+          keyword_original: cafe
+          keyword_final: cafe
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '425'
+          review_decision: No change
+          keyword_original: delicious
+          keyword_final: delicious
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '426'
+          review_decision: No change
+          keyword_original: fresh
+          keyword_final: fresh
+          reviewer: Andrew
+          reviewed_at: ''
+      hot_springs_relaxation:
+        code_family: topic
+        label: Hot Springs / Relaxation
+        keywords:
+        - onsen
+        - hot spring
+        - bath
+        - spa
+        - relaxing
+        - ryokan
+        - sauna
+        - soak
+        - healing
+        reviewed_rows:
+        - source_sheet: English
+          source_row_id: '427'
+          review_decision: No change
+          keyword_original: onsen
+          keyword_final: onsen
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '428'
+          review_decision: No change
+          keyword_original: hot spring
+          keyword_final: hot spring
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '429'
+          review_decision: No change
+          keyword_original: bath
+          keyword_final: bath
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '430'
+          review_decision: No change
+          keyword_original: spa
+          keyword_final: spa
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '431'
+          review_decision: No change
+          keyword_original: relaxing
+          keyword_final: relaxing
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '432'
+          review_decision: No change
+          keyword_original: ryokan
+          keyword_final: ryokan
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '433'
+          review_decision: No change
+          keyword_original: sauna
+          keyword_final: sauna
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '434'
+          review_decision: No change
+          keyword_original: soak
+          keyword_final: soak
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '435'
+          review_decision: No change
+          keyword_original: healing
+          keyword_final: healing
+          reviewer: Andrew
+          reviewed_at: ''
+      crafts_shopping:
+        code_family: topic
+        label: Crafts / Shopping
+        keywords:
+        - souvenir
+        - craft
+        - Echizen ware
+        - pottery
+        - knife
+        - lacquerware
+        - washi
+        - paper making
+        - workshop
+        - market
+        reviewed_rows:
+        - source_sheet: English
+          source_row_id: '436'
+          review_decision: No change
+          keyword_original: souvenir
+          keyword_final: souvenir
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '437'
+          review_decision: No change
+          keyword_original: craft
+          keyword_final: craft
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '438'
+          review_decision: No change
+          keyword_original: Echizen ware
+          keyword_final: Echizen ware
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '439'
+          review_decision: No change
+          keyword_original: pottery
+          keyword_final: pottery
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '440'
+          review_decision: No change
+          keyword_original: knife
+          keyword_final: knife
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '441'
+          review_decision: No change
+          keyword_original: lacquerware
+          keyword_final: lacquerware
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '442'
+          review_decision: No change
+          keyword_original: washi
+          keyword_final: washi
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '443'
+          review_decision: No change
+          keyword_original: paper making
+          keyword_final: paper making
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '444'
+          review_decision: No change
+          keyword_original: workshop
+          keyword_final: workshop
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '445'
+          review_decision: No change
+          keyword_original: market
+          keyword_final: market
+          reviewer: Andrew
+          reviewed_at: ''
+      fan_pilgrimage_pop_culture:
+        code_family: topic
+        label: Fan Pilgrimage / Pop Culture
+        keywords:
+        - anime
+        - manga
+        - idol
+        - drama location
+        - film location
+        - pilgrimage
+        - sacred place
+        - Riku
+        - Maeda Riku
+        - member
+        reviewed_rows:
+        - source_sheet: English
+          source_row_id: '446'
+          review_decision: No change
+          keyword_original: anime
+          keyword_final: anime
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '447'
+          review_decision: No change
+          keyword_original: manga
+          keyword_final: manga
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '448'
+          review_decision: No change
+          keyword_original: idol
+          keyword_final: idol
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '449'
+          review_decision: No change
+          keyword_original: drama location
+          keyword_final: drama location
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '450'
+          review_decision: No change
+          keyword_original: film location
+          keyword_final: film location
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '451'
+          review_decision: No change
+          keyword_original: pilgrimage
+          keyword_final: pilgrimage
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '452'
+          review_decision: No change
+          keyword_original: sacred place
+          keyword_final: sacred place
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '453'
+          review_decision: No change
+          keyword_original: Riku
+          keyword_final: Riku
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '454'
+          review_decision: No change
+          keyword_original: Maeda Riku
+          keyword_final: Maeda Riku
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '455'
+          review_decision: No change
+          keyword_original: member
+          keyword_final: member
+          reviewer: Andrew
+          reviewed_at: ''
+      accommodation:
+        code_family: topic
+        label: Accommodation
+        keywords:
+        - hotel
+        - Marriott
+        - ryokan
+        - guesthouse
+        - stay overnight
+        - room
+        - breakfast
+        - front desk
+        reviewed_rows:
+        - source_sheet: English
+          source_row_id: '456'
+          review_decision: No change
+          keyword_original: hotel
+          keyword_final: hotel
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '457'
+          review_decision: No change
+          keyword_original: Marriott
+          keyword_final: Marriott
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '458'
+          review_decision: No change
+          keyword_original: ryokan
+          keyword_final: ryokan
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '459'
+          review_decision: No change
+          keyword_original: guesthouse
+          keyword_final: guesthouse
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '460'
+          review_decision: No change
+          keyword_original: stay overnight
+          keyword_final: stay overnight
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '461'
+          review_decision: No change
+          keyword_original: room
+          keyword_final: room
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '462'
+          review_decision: No change
+          keyword_original: breakfast
+          keyword_final: breakfast
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '463'
+          review_decision: No change
+          keyword_original: front desk
+          keyword_final: front desk
+          reviewer: Andrew
+          reviewed_at: ''
+      seasonal_events:
+        code_family: topic
+        label: Seasonal Events
+        keywords:
+        - festival
+        - fireworks
+        - illumination
+        - seasonal
+        - winter
+        - spring
+        - summer
+        - autumn
+        - event
+        - limited time
+        reviewed_rows:
+        - source_sheet: English
+          source_row_id: '464'
+          review_decision: No change
+          keyword_original: festival
+          keyword_final: festival
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '465'
+          review_decision: No change
+          keyword_original: fireworks
+          keyword_final: fireworks
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '466'
+          review_decision: No change
+          keyword_original: illumination
+          keyword_final: illumination
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '467'
+          review_decision: No change
+          keyword_original: seasonal
+          keyword_final: seasonal
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '468'
+          review_decision: No change
+          keyword_original: winter
+          keyword_final: winter
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '469'
+          review_decision: No change
+          keyword_original: spring
+          keyword_final: spring
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '470'
+          review_decision: No change
+          keyword_original: summer
+          keyword_final: summer
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '471'
+          review_decision: No change
+          keyword_original: autumn
+          keyword_final: autumn
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '472'
+          review_decision: No change
+          keyword_original: event
+          keyword_final: event
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '473'
+          review_decision: No change
+          keyword_original: limited time
+          keyword_final: limited time
+          reviewer: Andrew
+          reviewed_at: ''
+      positive_sentiment:
+        code_family: sentiment
+        label: Positive Sentiment
+        keywords:
+        - amazing
+        - wonderful
+        - excellent
+        - loved
+        - favorite
+        - beautiful
+        - delicious
+        - comfortable
+        - peaceful
+        - memorable
+        - recommended
+        - worth it
+        reviewed_rows:
+        - source_sheet: English
+          source_row_id: '474'
+          review_decision: No change
+          keyword_original: amazing
+          keyword_final: amazing
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '475'
+          review_decision: No change
+          keyword_original: wonderful
+          keyword_final: wonderful
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '476'
+          review_decision: No change
+          keyword_original: excellent
+          keyword_final: excellent
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '477'
+          review_decision: No change
+          keyword_original: loved
+          keyword_final: loved
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '478'
+          review_decision: No change
+          keyword_original: favorite
+          keyword_final: favorite
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '479'
+          review_decision: No change
+          keyword_original: beautiful
+          keyword_final: beautiful
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '480'
+          review_decision: No change
+          keyword_original: delicious
+          keyword_final: delicious
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '481'
+          review_decision: No change
+          keyword_original: comfortable
+          keyword_final: comfortable
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '482'
+          review_decision: No change
+          keyword_original: peaceful
+          keyword_final: peaceful
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '483'
+          review_decision: No change
+          keyword_original: memorable
+          keyword_final: memorable
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '484'
+          review_decision: No change
+          keyword_original: recommended
+          keyword_final: recommended
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '485'
+          review_decision: No change
+          keyword_original: worth it
+          keyword_final: worth it
+          reviewer: Andrew
+          reviewed_at: ''
+      negative_sentiment:
+        code_family: sentiment
+        label: Negative Sentiment
+        keywords:
+        - disappointed
+        - boring
+        - bad
+        - poor
+        - uncomfortable
+        - confusing
+        - expensive
+        - crowded
+        - closed
+        - hard to reach
+        - not worth it
+        - waste of time
+        reviewed_rows:
+        - source_sheet: English
+          source_row_id: '486'
+          review_decision: No change
+          keyword_original: disappointed
+          keyword_final: disappointed
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '487'
+          review_decision: No change
+          keyword_original: boring
+          keyword_final: boring
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '488'
+          review_decision: No change
+          keyword_original: bad
+          keyword_final: bad
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '489'
+          review_decision: No change
+          keyword_original: poor
+          keyword_final: poor
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '490'
+          review_decision: No change
+          keyword_original: uncomfortable
+          keyword_final: uncomfortable
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '491'
+          review_decision: No change
+          keyword_original: confusing
+          keyword_final: confusing
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '492'
+          review_decision: No change
+          keyword_original: expensive
+          keyword_final: expensive
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '493'
+          review_decision: No change
+          keyword_original: crowded
+          keyword_final: crowded
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '494'
+          review_decision: No change
+          keyword_original: closed
+          keyword_final: closed
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '495'
+          review_decision: No change
+          keyword_original: hard to reach
+          keyword_final: hard to reach
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '496'
+          review_decision: No change
+          keyword_original: not worth it
+          keyword_final: not worth it
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '497'
+          review_decision: No change
+          keyword_original: waste of time
+          keyword_final: waste of time
+          reviewer: Andrew
+          reviewed_at: ''
+      recommendation_intent:
+        code_family: sentiment
+        label: Recommendation / Intent
+        keywords:
+        - recommend
+        - must visit
+        - must see
+        - would return
+        - come back
+        - visit again
+        - worth a visit
+        - do not miss
+        reviewed_rows:
+        - source_sheet: English
+          source_row_id: '498'
+          review_decision: No change
+          keyword_original: recommend
+          keyword_final: recommend
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '499'
+          review_decision: No change
+          keyword_original: must visit
+          keyword_final: must visit
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '500'
+          review_decision: No change
+          keyword_original: must see
+          keyword_final: must see
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '501'
+          review_decision: No change
+          keyword_original: would return
+          keyword_final: would return
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '502'
+          review_decision: No change
+          keyword_original: come back
+          keyword_final: come back
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '503'
+          review_decision: No change
+          keyword_original: visit again
+          keyword_final: visit again
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '504'
+          review_decision: No change
+          keyword_original: worth a visit
+          keyword_final: worth a visit
+          reviewer: Andrew
+          reviewed_at: ''
+        - source_sheet: English
+          source_row_id: '505'
+          review_decision: No change
+          keyword_original: do not miss
+          keyword_final: do not miss
+          reviewer: Andrew
+          reviewed_at: ''

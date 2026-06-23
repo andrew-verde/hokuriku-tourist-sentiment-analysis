@@ -1,24 +1,24 @@
 sentiment_category,code_family,code,label,count,denominator_rows,pct_sentiment_category_rows
-negative,topic,fan_pilgrimage_pop_culture,Fan Pilgrimage / Pop Culture,14,30,46.667
-negative,topic,temples_spiritual,Temples / Spiritual,9,30,30.0
-negative,topic,food_local_cuisine,Food / Local Cuisine,8,30,26.667
-negative,topic,accommodation,Accommodation,6,30,20.0
-negative,topic,history_culture,History / Culture,6,30,20.0
-negative,topic,hot_springs_relaxation,Hot Springs / Relaxation,6,30,20.0
-negative,topic,scenic_nature,Scenic Nature,5,30,16.667
-negative,topic,crafts_shopping,Crafts / Shopping,4,30,13.333
-negative,topic,seasonal_events,Seasonal Events,4,30,13.333
-negative,topic,dinosaurs_museums,Dinosaurs / Museums,1,30,3.333
+negative,topic,fan_pilgrimage_pop_culture,Fan Pilgrimage / Pop Culture,18,36,50.0
+negative,topic,temples_spiritual,Temples / Spiritual,11,36,30.556
+negative,topic,food_local_cuisine,Food / Local Cuisine,9,36,25.0
+negative,topic,history_culture,History / Culture,7,36,19.444
+negative,topic,accommodation,Accommodation,6,36,16.667
+negative,topic,hot_springs_relaxation,Hot Springs / Relaxation,6,36,16.667
+negative,topic,scenic_nature,Scenic Nature,5,36,13.889
+negative,topic,crafts_shopping,Crafts / Shopping,4,36,11.111
+negative,topic,seasonal_events,Seasonal Events,4,36,11.111
+negative,topic,dinosaurs_museums,Dinosaurs / Museums,1,36,2.778
 neutral,topic,fan_pilgrimage_pop_culture,Fan Pilgrimage / Pop Culture,1,2,50.0
 neutral,topic,food_local_cuisine,Food / Local Cuisine,1,2,50.0
 neutral,topic,history_culture,History / Culture,1,2,50.0
-positive,topic,temples_spiritual,Temples / Spiritual,58,117,49.573
-positive,topic,history_culture,History / Culture,49,117,41.88
-positive,topic,scenic_nature,Scenic Nature,45,117,38.462
-positive,topic,fan_pilgrimage_pop_culture,Fan Pilgrimage / Pop Culture,32,117,27.35
-positive,topic,hot_springs_relaxation,Hot Springs / Relaxation,31,117,26.496
-positive,topic,food_local_cuisine,Food / Local Cuisine,29,117,24.786
-positive,topic,accommodation,Accommodation,21,117,17.949
-positive,topic,dinosaurs_museums,Dinosaurs / Museums,21,117,17.949
-positive,topic,seasonal_events,Seasonal Events,21,117,17.949
-positive,topic,crafts_shopping,Crafts / Shopping,20,117,17.094
+positive,topic,temples_spiritual,Temples / Spiritual,79,162,48.765
+positive,topic,history_culture,History / Culture,69,162,42.593
+positive,topic,scenic_nature,Scenic Nature,62,162,38.272
+positive,topic,fan_pilgrimage_pop_culture,Fan Pilgrimage / Pop Culture,51,162,31.481
+positive,topic,dinosaurs_museums,Dinosaurs / Museums,42,162,25.926
+positive,topic,food_local_cuisine,Food / Local Cuisine,39,162,24.074
+positive,topic,hot_springs_relaxation,Hot Springs / Relaxation,37,162,22.84
+positive,topic,seasonal_events,Seasonal Events,33,162,20.37
+positive,topic,crafts_shopping,Crafts / Shopping,30,162,18.519
+positive,topic,accommodation,Accommodation,29,162,17.901

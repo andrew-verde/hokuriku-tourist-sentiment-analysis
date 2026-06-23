@@ -1,9 +1,9 @@
 theme,source_platform,rows,sentiment_norm_mean,positive_rows,negative_rows,theme_slice_status,positive_pct,negative_pct
 travel,xiaohongshu,94,0.85318,80,13,ok,85.106,13.83
 travel,all,94,0.85318,80,13,ok,85.106,13.83
+unclassified,xiaohongshu,52,0.876469,46,6,ok,88.462,11.538
+unclassified,all,52,0.876469,46,6,ok,88.462,11.538
 fan,xiaohongshu,49,0.68101,33,15,ok,67.347,30.612
 fan,all,49,0.68101,33,15,ok,67.347,30.612
 ordinary,xiaohongshu,5,,3,2,suppressed_small_n,,
 ordinary,all,5,,3,2,suppressed_small_n,,
-unclassified,xiaohongshu,1,,1,0,suppressed_small_n,,
-unclassified,all,1,,1,0,suppressed_small_n,,

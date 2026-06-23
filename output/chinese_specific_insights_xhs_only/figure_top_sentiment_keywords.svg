@@ -1,61 +1,61 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1000" height="760" viewBox="0 0 1000 760">
 <rect width="100%" height="100%" fill="#fbfaf7"/>
 <text x="32" y="38" font-family="Arial, sans-serif" font-size="24" font-weight="700" fill="#1f2933">Most Common Reviewed Sentiment Keywords by Group</text>
-<text x="32" y="66" font-family="Arial, sans-serif" font-size="14" fill="#52616b">Top matched terms within each reviewed sentiment-evidence group; n=149 Chinese rows</text>
+<text x="32" y="66" font-family="Arial, sans-serif" font-size="14" fill="#52616b">Top matched terms within each reviewed sentiment-evidence group; n=200 Chinese rows</text>
 <text x="286" y="118" text-anchor="end" font-family="Arial, sans-serif" font-size="13" fill="#1f2933">Positive: 好</text>
 <rect x="300" y="103" width="630.00" height="18" rx="3" fill="#2f6f73"/>
-<text x="938.0" y="118" font-family="Arial, sans-serif" font-size="12" fill="#1f2933">94</text>
+<text x="938.0" y="118" font-family="Arial, sans-serif" font-size="12" fill="#1f2933">130</text>
 <text x="286" y="152" text-anchor="end" font-family="Arial, sans-serif" font-size="13" fill="#1f2933">Positive: 美</text>
-<rect x="300" y="137" width="422.23" height="18" rx="3" fill="#2f6f73"/>
-<text x="730.2340425531916" y="152" font-family="Arial, sans-serif" font-size="12" fill="#1f2933">63</text>
+<rect x="300" y="137" width="397.38" height="18" rx="3" fill="#2f6f73"/>
+<text x="705.3846153846154" y="152" font-family="Arial, sans-serif" font-size="12" fill="#1f2933">82</text>
 <text x="286" y="186" text-anchor="end" font-family="Arial, sans-serif" font-size="13" fill="#1f2933">Positive: 推荐</text>
-<rect x="300" y="171" width="247.98" height="18" rx="3" fill="#2f6f73"/>
-<text x="555.9787234042553" y="186" font-family="Arial, sans-serif" font-size="12" fill="#1f2933">37</text>
+<rect x="300" y="171" width="222.92" height="18" rx="3" fill="#2f6f73"/>
+<text x="530.9230769230769" y="186" font-family="Arial, sans-serif" font-size="12" fill="#1f2933">46</text>
 <text x="286" y="220" text-anchor="end" font-family="Arial, sans-serif" font-size="13" fill="#1f2933">Positive: 喜欢</text>
-<rect x="300" y="205" width="147.45" height="18" rx="3" fill="#2f6f73"/>
-<text x="455.44680851063833" y="220" font-family="Arial, sans-serif" font-size="12" fill="#1f2933">22</text>
+<rect x="300" y="205" width="169.62" height="18" rx="3" fill="#2f6f73"/>
+<text x="477.61538461538464" y="220" font-family="Arial, sans-serif" font-size="12" fill="#1f2933">35</text>
 <text x="286" y="254" text-anchor="end" font-family="Arial, sans-serif" font-size="13" fill="#1f2933">Positive: 好吃</text>
-<rect x="300" y="239" width="140.74" height="18" rx="3" fill="#2f6f73"/>
-<text x="448.74468085106383" y="254" font-family="Arial, sans-serif" font-size="12" fill="#1f2933">21</text>
+<rect x="300" y="239" width="140.54" height="18" rx="3" fill="#2f6f73"/>
+<text x="448.53846153846155" y="254" font-family="Arial, sans-serif" font-size="12" fill="#1f2933">29</text>
 <text x="286" y="288" text-anchor="end" font-family="Arial, sans-serif" font-size="13" fill="#1f2933">Positive: 很好</text>
-<rect x="300" y="273" width="113.94" height="18" rx="3" fill="#2f6f73"/>
-<text x="421.93617021276594" y="288" font-family="Arial, sans-serif" font-size="12" fill="#1f2933">17</text>
+<rect x="300" y="273" width="116.31" height="18" rx="3" fill="#2f6f73"/>
+<text x="424.3076923076923" y="288" font-family="Arial, sans-serif" font-size="12" fill="#1f2933">24</text>
 <text x="286" y="322" text-anchor="end" font-family="Arial, sans-serif" font-size="13" fill="#1f2933">Recommendation: 推荐</text>
-<rect x="300" y="307" width="247.98" height="18" rx="3" fill="#bc6c25"/>
-<text x="555.9787234042553" y="322" font-family="Arial, sans-serif" font-size="12" fill="#1f2933">37</text>
+<rect x="300" y="307" width="222.92" height="18" rx="3" fill="#bc6c25"/>
+<text x="530.9230769230769" y="322" font-family="Arial, sans-serif" font-size="12" fill="#1f2933">46</text>
 <text x="286" y="356" text-anchor="end" font-family="Arial, sans-serif" font-size="13" fill="#1f2933">Recommendation: 一定要去</text>
-<rect x="300" y="341" width="13.40" height="18" rx="3" fill="#bc6c25"/>
-<text x="321.40425531914894" y="356" font-family="Arial, sans-serif" font-size="12" fill="#1f2933">2</text>
+<rect x="300" y="341" width="14.54" height="18" rx="3" fill="#bc6c25"/>
+<text x="322.53846153846155" y="356" font-family="Arial, sans-serif" font-size="12" fill="#1f2933">3</text>
 <text x="286" y="390" text-anchor="end" font-family="Arial, sans-serif" font-size="13" fill="#1f2933">Recommendation: 值得去</text>
-<rect x="300" y="375" width="13.40" height="18" rx="3" fill="#bc6c25"/>
-<text x="321.40425531914894" y="390" font-family="Arial, sans-serif" font-size="12" fill="#1f2933">2</text>
+<rect x="300" y="375" width="14.54" height="18" rx="3" fill="#bc6c25"/>
+<text x="322.53846153846155" y="390" font-family="Arial, sans-serif" font-size="12" fill="#1f2933">3</text>
 <text x="286" y="424" text-anchor="end" font-family="Arial, sans-serif" font-size="13" fill="#1f2933">Recommendation: 必去</text>
-<rect x="300" y="409" width="13.40" height="18" rx="3" fill="#bc6c25"/>
-<text x="321.40425531914894" y="424" font-family="Arial, sans-serif" font-size="12" fill="#1f2933">2</text>
-<text x="286" y="458" text-anchor="end" font-family="Arial, sans-serif" font-size="13" fill="#1f2933">Recommendation: 值得一看</text>
-<rect x="300" y="443" width="6.70" height="18" rx="3" fill="#bc6c25"/>
-<text x="314.70212765957444" y="458" font-family="Arial, sans-serif" font-size="12" fill="#1f2933">1</text>
-<text x="286" y="492" text-anchor="end" font-family="Arial, sans-serif" font-size="13" fill="#1f2933">Recommendation: 还会再来</text>
-<rect x="300" y="477" width="6.70" height="18" rx="3" fill="#bc6c25"/>
-<text x="314.70212765957444" y="492" font-family="Arial, sans-serif" font-size="12" fill="#1f2933">1</text>
-<text x="286" y="526" text-anchor="end" font-family="Arial, sans-serif" font-size="13" fill="#1f2933">Negative: 贵</text>
-<rect x="300" y="511" width="87.13" height="18" rx="3" fill="#5b6c94"/>
-<text x="395.1276595744681" y="526" font-family="Arial, sans-serif" font-size="12" fill="#1f2933">13</text>
-<text x="286" y="560" text-anchor="end" font-family="Arial, sans-serif" font-size="13" fill="#1f2933">Negative: 差</text>
-<rect x="300" y="545" width="67.02" height="18" rx="3" fill="#5b6c94"/>
-<text x="375.02127659574467" y="560" font-family="Arial, sans-serif" font-size="12" fill="#1f2933">10</text>
+<rect x="300" y="409" width="9.69" height="18" rx="3" fill="#bc6c25"/>
+<text x="317.6923076923077" y="424" font-family="Arial, sans-serif" font-size="12" fill="#1f2933">2</text>
+<text x="286" y="458" text-anchor="end" font-family="Arial, sans-serif" font-size="13" fill="#1f2933">Recommendation: 不要错过</text>
+<rect x="300" y="443" width="4.85" height="18" rx="3" fill="#bc6c25"/>
+<text x="312.84615384615387" y="458" font-family="Arial, sans-serif" font-size="12" fill="#1f2933">1</text>
+<text x="286" y="492" text-anchor="end" font-family="Arial, sans-serif" font-size="13" fill="#1f2933">Recommendation: 值得一看</text>
+<rect x="300" y="477" width="4.85" height="18" rx="3" fill="#bc6c25"/>
+<text x="312.84615384615387" y="492" font-family="Arial, sans-serif" font-size="12" fill="#1f2933">1</text>
+<text x="286" y="526" text-anchor="end" font-family="Arial, sans-serif" font-size="13" fill="#1f2933">Negative: 差</text>
+<rect x="300" y="511" width="92.08" height="18" rx="3" fill="#5b6c94"/>
+<text x="400.0769230769231" y="526" font-family="Arial, sans-serif" font-size="12" fill="#1f2933">19</text>
+<text x="286" y="560" text-anchor="end" font-family="Arial, sans-serif" font-size="13" fill="#1f2933">Negative: 贵</text>
+<rect x="300" y="545" width="82.38" height="18" rx="3" fill="#5b6c94"/>
+<text x="390.38461538461536" y="560" font-family="Arial, sans-serif" font-size="12" fill="#1f2933">17</text>
 <text x="286" y="594" text-anchor="end" font-family="Arial, sans-serif" font-size="13" fill="#1f2933">Negative: 一般</text>
-<rect x="300" y="579" width="60.32" height="18" rx="3" fill="#5b6c94"/>
-<text x="368.3191489361702" y="594" font-family="Arial, sans-serif" font-size="12" fill="#1f2933">9</text>
+<rect x="300" y="579" width="72.69" height="18" rx="3" fill="#5b6c94"/>
+<text x="380.6923076923077" y="594" font-family="Arial, sans-serif" font-size="12" fill="#1f2933">15</text>
 <text x="286" y="628" text-anchor="end" font-family="Arial, sans-serif" font-size="13" fill="#1f2933">Negative: 关门</text>
-<rect x="300" y="613" width="26.81" height="18" rx="3" fill="#5b6c94"/>
-<text x="334.8085106382979" y="628" font-family="Arial, sans-serif" font-size="12" fill="#1f2933">4</text>
+<rect x="300" y="613" width="29.08" height="18" rx="3" fill="#5b6c94"/>
+<text x="337.0769230769231" y="628" font-family="Arial, sans-serif" font-size="12" fill="#1f2933">6</text>
 <text x="286" y="662" text-anchor="end" font-family="Arial, sans-serif" font-size="13" fill="#1f2933">Negative: 不方便</text>
-<rect x="300" y="647" width="20.11" height="18" rx="3" fill="#5b6c94"/>
-<text x="328.1063829787234" y="662" font-family="Arial, sans-serif" font-size="12" fill="#1f2933">3</text>
-<text x="286" y="696" text-anchor="end" font-family="Arial, sans-serif" font-size="13" fill="#1f2933">Negative: 人多</text>
-<rect x="300" y="681" width="13.40" height="18" rx="3" fill="#5b6c94"/>
-<text x="321.40425531914894" y="696" font-family="Arial, sans-serif" font-size="12" fill="#1f2933">2</text>
+<rect x="300" y="647" width="19.38" height="18" rx="3" fill="#5b6c94"/>
+<text x="327.38461538461536" y="662" font-family="Arial, sans-serif" font-size="12" fill="#1f2933">4</text>
+<text x="286" y="696" text-anchor="end" font-family="Arial, sans-serif" font-size="13" fill="#1f2933">Negative: 失望</text>
+<rect x="300" y="681" width="14.54" height="18" rx="3" fill="#5b6c94"/>
+<text x="322.53846153846155" y="696" font-family="Arial, sans-serif" font-size="12" fill="#1f2933">3</text>
 <rect x="300" y="728" width="10" height="10" fill="#2f6f73"/>
 <text x="316" y="738" font-family="Arial, sans-serif" font-size="12" fill="#52616b">Positive</text>
 <rect x="382" y="728" width="10" height="10" fill="#bc6c25"/>

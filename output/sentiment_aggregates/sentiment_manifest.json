@@ -1,6 +1,6 @@
 {
   "schema_version": "sentiment_manifest.v2",
-  "generated_at": "2026-06-20T10:51:10+00:00",
+  "generated_at": "2026-06-23T09:10:42+00:00",
   "command": "scripts/build_sentiment_analysis.py --groups japanese,english --prefecture Fukui",
   "filters": {
     "city": null,
@@ -11,7 +11,7 @@
     ]
   },
   "primary_unit": "one Google review row",
-  "codebook_evidence_status": "pending",
+  "codebook_evidence_status": "active",
   "dependency_versions": {
     "pandas": "3.0.3",
     "numpy": "2.4.6",
@@ -34,11 +34,13 @@
     "path": "/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/output/multilingual_review_analysis/reviews_multilingual.csv",
     "sha256": "6bc06f34848954674506f6fefb84ffd9689b4cc9b2c90780fd5c8fc45eafaa56",
     "poi_metadata_path": "/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/output/checkpoints/poi_metadata.json",
-    "poi_metadata_sha256": "34b088a57c0e61d23471cf3745ca2ec6e2811dce71aa7ab2a5a508fa5178e79a"
+    "poi_metadata_sha256": "34b088a57c0e61d23471cf3745ca2ec6e2811dce71aa7ab2a5a508fa5178e79a",
+    "reviewed_codebook_path": "/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/config/reviewed_jp_en_codebook.yaml",
+    "reviewed_codebook_sha256": "8626d2c47effd2e51d9d95e67a03a7fb2db317857f60ea0b9b97f351a0bb3944"
   },
   "outputs": {
     "row_level_path": "/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/output/sentiment_row_level/google_reviews_fukui_japanese-english.csv",
-    "row_level_sha256": "3af51c8f32cdfe24207f32071ef3c74d9ff0271cd306bce7462bcbc4913de542",
+    "row_level_sha256": "72df51c468c6e829c9b121b9c71233e98a3ebc2a9c424d5eda63b83e1883eeed",
     "summary_path": "/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/output/sentiment_aggregates/source_group_sentiment_summary.csv",
     "tests_path": "/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/output/sentiment_aggregates/source_group_sentiment_tests.csv",
     "readiness_path": "/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/output/sentiment_aggregates/sentiment_readiness.md"
@@ -73,6 +75,16 @@
       "neutral_0_20_neutral_pct": 0.051402,
       "neutral_0_20_positive_count": 194,
       "neutral_0_20_positive_pct": 0.906542,
+      "any_friction_count": 35,
+      "any_friction_pct": 0.163551,
+      "any_enjoyment_evidence_count": 114,
+      "any_enjoyment_evidence_pct": 0.53271,
+      "any_recommendation_evidence_count": 34,
+      "any_recommendation_evidence_pct": 0.158879,
+      "any_positive_evidence_count": 94,
+      "any_positive_evidence_pct": 0.439252,
+      "library_vs_reviewed_positive_disagreement_count": 85,
+      "library_vs_reviewed_positive_disagreement_pct": 0.397196,
       "rating_distribution_json": "{\"1\": 8, \"2\": 2, \"3\": 12, \"4\": 38, \"5\": 154}"
     },
     {
@@ -104,13 +116,23 @@
       "neutral_0_20_neutral_pct": 0.278889,
       "neutral_0_20_positive_count": 1195,
       "neutral_0_20_positive_pct": 0.663889,
+      "any_friction_count": 263,
+      "any_friction_pct": 0.146111,
+      "any_enjoyment_evidence_count": 396,
+      "any_enjoyment_evidence_pct": 0.22,
+      "any_recommendation_evidence_count": 91,
+      "any_recommendation_evidence_pct": 0.050556,
+      "any_positive_evidence_count": 366,
+      "any_positive_evidence_pct": 0.203333,
+      "library_vs_reviewed_positive_disagreement_count": 977,
+      "library_vs_reviewed_positive_disagreement_pct": 0.542778,
       "rating_distribution_json": "{\"1\": 44, \"2\": 38, \"3\": 236, \"4\": 567, \"5\": 915}"
     }
   ],
   "provenance": {
     "schema_version": "research_provenance.v1",
     "kind": "jp_en_sentiment_analysis",
-    "generated_at": "2026-06-20T10:51:10+00:00",
+    "generated_at": "2026-06-23T09:10:42+00:00",
     "command": "scripts/build_sentiment_analysis.py --groups japanese,english --prefecture Fukui",
     "inputs": [
       {
@@ -126,6 +148,13 @@
         "exists": true,
         "bytes": 26466,
         "sha256": "34b088a57c0e61d23471cf3745ca2ec6e2811dce71aa7ab2a5a508fa5178e79a"
+      },
+      {
+        "role": "reviewed_jp_en_codebook_config",
+        "path": "/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/config/reviewed_jp_en_codebook.yaml",
+        "exists": true,
+        "bytes": 187983,
+        "sha256": "8626d2c47effd2e51d9d95e67a03a7fb2db317857f60ea0b9b97f351a0bb3944"
       }
     ],
     "outputs": [
@@ -133,15 +162,15 @@
         "role": "ignored_row_level_scored_reviews",
         "path": "/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/output/sentiment_row_level/google_reviews_fukui_japanese-english.csv",
         "exists": true,
-        "bytes": 376515,
-        "sha256": "3af51c8f32cdfe24207f32071ef3c74d9ff0271cd306bce7462bcbc4913de542"
+        "bytes": 451502,
+        "sha256": "72df51c468c6e829c9b121b9c71233e98a3ebc2a9c424d5eda63b83e1883eeed"
       },
       {
         "role": "tracked_aggregate_summary",
         "path": "/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/output/sentiment_aggregates/source_group_sentiment_summary.csv",
         "exists": true,
-        "bytes": 1096,
-        "sha256": "68cbc72f688e9e1991348dfb3c0cfa8fefe2b66089f74ce81b7b2c28d947b3ff"
+        "bytes": 1522,
+        "sha256": "dbe8f4b59457e0b8ec152c9e896ff26859d549fe34bb33e222ece00f99e0aefc"
       },
       {
         "role": "tracked_statistical_tests",
@@ -154,8 +183,8 @@
         "role": "tracked_readiness_markdown",
         "path": "/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/output/sentiment_aggregates/sentiment_readiness.md",
         "exists": true,
-        "bytes": 3700,
-        "sha256": "d2884a8bbc94b2a79a947ea4699c11c485aeb3cb40315e7ff47ea9be52f61af8"
+        "bytes": 3937,
+        "sha256": "d5897894d0d4ca1afc64ccad3daf2e4a2c56b89e3004aedc24ee0925260155f2"
       }
     ],
     "filters": {
@@ -201,6 +230,16 @@
           "neutral_0_20_neutral_pct": 0.051402,
           "neutral_0_20_positive_count": 194,
           "neutral_0_20_positive_pct": 0.906542,
+          "any_friction_count": 35,
+          "any_friction_pct": 0.163551,
+          "any_enjoyment_evidence_count": 114,
+          "any_enjoyment_evidence_pct": 0.53271,
+          "any_recommendation_evidence_count": 34,
+          "any_recommendation_evidence_pct": 0.158879,
+          "any_positive_evidence_count": 94,
+          "any_positive_evidence_pct": 0.439252,
+          "library_vs_reviewed_positive_disagreement_count": 85,
+          "library_vs_reviewed_positive_disagreement_pct": 0.397196,
           "rating_distribution_json": "{\"1\": 8, \"2\": 2, \"3\": 12, \"4\": 38, \"5\": 154}"
         },
         {
@@ -232,9 +271,20 @@
           "neutral_0_20_neutral_pct": 0.278889,
           "neutral_0_20_positive_count": 1195,
           "neutral_0_20_positive_pct": 0.663889,
+          "any_friction_count": 263,
+          "any_friction_pct": 0.146111,
+          "any_enjoyment_evidence_count": 396,
+          "any_enjoyment_evidence_pct": 0.22,
+          "any_recommendation_evidence_count": 91,
+          "any_recommendation_evidence_pct": 0.050556,
+          "any_positive_evidence_count": 366,
+          "any_positive_evidence_pct": 0.203333,
+          "library_vs_reviewed_positive_disagreement_count": 977,
+          "library_vs_reviewed_positive_disagreement_pct": 0.542778,
           "rating_distribution_json": "{\"1\": 44, \"2\": 38, \"3\": 236, \"4\": 567, \"5\": 915}"
         }
       ],
+      "codebook_evidence_status": "active",
       "bootstrap_seed": 20260618,
       "bootstrap_iterations": 2000
     },
@@ -243,7 +293,7 @@
       "VADER and oseti scores are tool-specific; raw sentiment-score t-tests/ANOVA are not run.",
       "Welch rating tests use common-scale Google review_rating as companion outcome/validation evidence.",
       "POI-level and cluster-bootstrap rows are sensitivity checks.",
-      "Reviewed JP/EN codebook evidence path is pending."
+      "Reviewed JP/EN codebook evidence is an audit/sensitivity path, not a replacement for VADER/oseti."
     ],
     "extra": {
       "dependency_versions": {

@@ -20,6 +20,7 @@ from typing import Callable
 
 import numpy as np
 import pandas as pd
+import yaml
 from scipy import stats
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
@@ -47,6 +48,7 @@ DEFAULT_REVIEWS_PATH = ROOT / "output" / "multilingual_review_analysis" / "revie
 DEFAULT_POI_METADATA_PATH = ROOT / "output" / "checkpoints" / "poi_metadata.json"
 DEFAULT_ROW_OUTPUT_DIR = ROOT / "output" / "sentiment_row_level"
 DEFAULT_AGG_OUTPUT_DIR = ROOT / "output" / "sentiment_aggregates"
+DEFAULT_REVIEWED_CODEBOOK_PATH = ROOT / "config" / "reviewed_jp_en_codebook.yaml"
 SENTIMENT_LOCK_PATH = ROOT / "requirements-sentiment.lock.txt"
 SENTIMENT_ENV_DOC_PATH = ROOT / "docs" / "sentiment_environment.md"
 
@@ -114,8 +116,25 @@ class PipelinePaths:
     """File and directory locations used by the sentiment pipeline."""
     reviews_path: Path = DEFAULT_REVIEWS_PATH
     poi_metadata_path: Path = DEFAULT_POI_METADATA_PATH
+    reviewed_codebook_path: Path = DEFAULT_REVIEWED_CODEBOOK_PATH
     row_output_dir: Path = DEFAULT_ROW_OUTPUT_DIR
     aggregate_output_dir: Path = DEFAULT_AGG_OUTPUT_DIR
+
+
+EVIDENCE_COLUMNS = [
+    "reviewed_positive_terms_matched",
+    "reviewed_negative_terms_matched",
+    "reviewed_recommendation_terms_matched",
+    "reviewed_friction_terms_matched",
+    "reviewed_enjoyment_terms_matched",
+]
+
+BINARY_EVIDENCE_COLUMNS = [
+    "any_friction",
+    "any_enjoyment_evidence",
+    "any_recommendation_evidence",
+    "any_positive_evidence",
+]
 
 
 def sentiment_category(score: float, band: float = PRIMARY_BAND) -> str:
@@ -286,10 +305,78 @@ def load_reviews(
     return filtered
 
 
+def load_reviewed_evidence_codebook(path: Path) -> dict[str, dict[str, list[str]]]:
+    if not path.exists():
+        raise MissingInputError(
+            f"Required reviewed JP/EN codebook config not found: {path}\n"
+            "Generate it with `make reviewed-codebook-config` after manual review is complete."
+        )
+    raw = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+    languages = raw.get("languages")
+    if not isinstance(languages, dict):
+        raise MissingColumnsError(f"Reviewed codebook config missing languages object: {path}")
+
+    evidence: dict[str, dict[str, list[str]]] = {}
+    for language, language_config in languages.items():
+        key = str(language).lower()
+        evidence[key] = {column: [] for column in EVIDENCE_COLUMNS}
+        codes = language_config.get("codes", {}) if isinstance(language_config, dict) else {}
+        for code, entry in codes.items():
+            if not isinstance(entry, dict):
+                continue
+            keywords = [str(keyword).strip() for keyword in entry.get("keywords", []) if str(keyword).strip()]
+            family = str(entry.get("code_family", "")).lower()
+            code_name = str(code)
+            if family == "friction":
+                evidence[key]["reviewed_friction_terms_matched"].extend(keywords)
+            if code_name == "positive_sentiment":
+                evidence[key]["reviewed_positive_terms_matched"].extend(keywords)
+                evidence[key]["reviewed_enjoyment_terms_matched"].extend(keywords)
+            elif code_name == "negative_sentiment":
+                evidence[key]["reviewed_negative_terms_matched"].extend(keywords)
+            elif code_name == "recommendation_intent":
+                evidence[key]["reviewed_recommendation_terms_matched"].extend(keywords)
+                evidence[key]["reviewed_enjoyment_terms_matched"].extend(keywords)
+
+        for column, keywords in evidence[key].items():
+            # Deduplicate without changing reviewed order; duplicated terms can
+            # legitimately appear across topic/sentiment families.
+            evidence[key][column] = list(dict.fromkeys(keywords))
+    return evidence
+
+
+def _match_reviewed_terms(text: str, keywords: list[str], language: str) -> list[str]:
+    if not text or not keywords:
+        return []
+    if language == "english":
+        haystack = text.casefold()
+        return [keyword for keyword in keywords if keyword.casefold() in haystack]
+    return [keyword for keyword in keywords if keyword in text]
+
+
+def reviewed_evidence_for_text(
+    text: str,
+    language: str,
+    codebook: dict[str, dict[str, list[str]]] | None,
+) -> dict[str, object]:
+    language_key = str(language).lower()
+    language_terms = (codebook or {}).get(language_key, {})
+    evidence = {
+        column: "|".join(_match_reviewed_terms(text, language_terms.get(column, []), language_key))
+        for column in EVIDENCE_COLUMNS
+    }
+    evidence["any_friction"] = bool(evidence["reviewed_friction_terms_matched"])
+    evidence["any_enjoyment_evidence"] = bool(evidence["reviewed_enjoyment_terms_matched"])
+    evidence["any_recommendation_evidence"] = bool(evidence["reviewed_recommendation_terms_matched"])
+    evidence["any_positive_evidence"] = bool(evidence["reviewed_positive_terms_matched"])
+    return evidence
+
+
 def score_reviews(
     reviews: pd.DataFrame,
     english_scorer: Callable[[str], dict[str, object]] | None = None,
     japanese_scorer: Callable[[str], dict[str, object]] | None = None,
+    reviewed_codebook: dict[str, dict[str, list[str]]] | None = None,
 ) -> pd.DataFrame:
     if english_scorer is None:
         # Build the analyzer once and reuse it for every English row.
@@ -323,6 +410,7 @@ def score_reviews(
         else:
             raise MissingGroupError(f"Scoring not implemented for language_group: {language}")
         base.update(scored)
+        base.update(reviewed_evidence_for_text(text, str(language), reviewed_codebook))
         base["sentiment_category"] = sentiment_category(float(base["sentiment_score"]))
         for label, band in SENSITIVITY_BANDS.items():
             # Sensitivity categories let the paper/report show whether results
@@ -379,6 +467,22 @@ def build_summary(scored: pd.DataFrame, source_groups: pd.Series) -> pd.DataFram
                 count = int((chunk[f"sentiment_category_{label}"] == category).sum())
                 row[f"{label}_{category}_count"] = count
                 row[f"{label}_{category}_pct"] = round(count / total, 6) if total else np.nan
+        for column in BINARY_EVIDENCE_COLUMNS:
+            count = int(chunk[column].fillna(False).astype(bool).sum()) if column in chunk.columns else 0
+            row[f"{column}_count"] = count
+            row[f"{column}_pct"] = round(count / total, 6) if total else np.nan
+        positive_or_recommend = (
+            chunk["any_positive_evidence"].fillna(False).astype(bool)
+            | chunk["any_recommendation_evidence"].fillna(False).astype(bool)
+            if {"any_positive_evidence", "any_recommendation_evidence"} <= set(chunk.columns)
+            else pd.Series(False, index=chunk.index)
+        )
+        library_positive = chunk["sentiment_category"] == "positive"
+        disagreement = library_positive != positive_or_recommend
+        row["library_vs_reviewed_positive_disagreement_count"] = int(disagreement.sum())
+        row["library_vs_reviewed_positive_disagreement_pct"] = (
+            round(float(disagreement.mean()), 6) if total else np.nan
+        )
         rating_counts = rating.value_counts(dropna=True).sort_index()
         # JSON keeps the whole star-rating distribution inside one CSV cell.
         row["rating_distribution_json"] = json.dumps(
@@ -877,6 +981,8 @@ def write_readiness(report: dict, summary: pd.DataFrame, tests: pd.DataFrame, pa
         f"- input_sha256: `{report['input']['sha256']}`",
         f"- poi_metadata: `{report['input']['poi_metadata_path']}`",
         f"- poi_metadata_sha256: `{report['input']['poi_metadata_sha256']}`",
+        f"- reviewed_codebook: `{report['input']['reviewed_codebook_path']}`",
+        f"- reviewed_codebook_sha256: `{report['input']['reviewed_codebook_sha256']}`",
         f"- row_level_output: `{report['outputs']['row_level_path']}`",
         f"- row_level_sha256: `{report['outputs']['row_level_sha256']}`",
         f"- filters: city == `{report['filters']['city']}`, "
@@ -922,7 +1028,7 @@ def write_readiness(report: dict, summary: pd.DataFrame, tests: pd.DataFrame, pa
         "- Raw sentiment-score t-tests/ANOVA are skipped because VADER compound and oseti document scores are not the same measurement scale.",
         "- `review_rating` is a common Google 1-to-5 scale, so Welch rating tests are companion outcome/validation evidence.",
         "- POI-level and cluster-bootstrap rows are sensitivity checks, not replacement primary models.",
-        "- Reviewed JP/EN codebook evidence path is pending and does not block this library comparison.",
+        "- Reviewed JP/EN keyword evidence is an audit/sensitivity path, not a replacement for VADER/oseti.",
         "",
     ])
     path.write_text("\n".join(lines), encoding="utf-8")
@@ -941,6 +1047,8 @@ def build_sentiment_analysis(
     # Keep the provenance hashes with the run so outputs can be traced back to inputs.
     input_hash = sha256_file(paths.reviews_path) if paths.reviews_path.exists() else None
     metadata_hash = sha256_file(paths.poi_metadata_path) if prefecture and paths.poi_metadata_path.exists() else None
+    codebook_hash = sha256_file(paths.reviewed_codebook_path) if paths.reviewed_codebook_path.exists() else None
+    reviewed_codebook = load_reviewed_evidence_codebook(paths.reviewed_codebook_path)
     reviews = load_reviews(
         paths.reviews_path,
         groups,
@@ -948,7 +1056,12 @@ def build_sentiment_analysis(
         prefecture=prefecture,
         poi_metadata_path=paths.poi_metadata_path,
     )
-    scored = score_reviews(reviews, english_scorer=english_scorer, japanese_scorer=japanese_scorer)
+    scored = score_reviews(
+        reviews,
+        english_scorer=english_scorer,
+        japanese_scorer=japanese_scorer,
+        reviewed_codebook=reviewed_codebook,
+    )
 
     paths.row_output_dir.mkdir(parents=True, exist_ok=True)
     paths.aggregate_output_dir.mkdir(parents=True, exist_ok=True)
@@ -980,7 +1093,7 @@ def build_sentiment_analysis(
         "command": command or " ".join(sys.argv),
         "filters": {"city": city, "prefecture": prefecture, "groups": groups},
         "primary_unit": "one Google review row",
-        "codebook_evidence_status": "pending",
+        "codebook_evidence_status": "active",
         "dependency_versions": dependency_versions(),
         "dependency_reproducibility": {
             "sentiment_lock": str(SENTIMENT_LOCK_PATH),
@@ -996,6 +1109,8 @@ def build_sentiment_analysis(
             "sha256": input_hash,
             "poi_metadata_path": str(paths.poi_metadata_path) if prefecture else None,
             "poi_metadata_sha256": metadata_hash,
+            "reviewed_codebook_path": str(paths.reviewed_codebook_path),
+            "reviewed_codebook_sha256": codebook_hash,
         },
         "outputs": {
             "row_level_path": str(row_path),
@@ -1015,6 +1130,7 @@ def build_sentiment_analysis(
         inputs=[
             file_record(paths.reviews_path, "reviews_multilingual", required=True),
             file_record(paths.poi_metadata_path, "poi_metadata", required=bool(prefecture)),
+            file_record(paths.reviewed_codebook_path, "reviewed_jp_en_codebook_config", required=True),
         ],
         outputs=[
             file_record(row_path, "ignored_row_level_scored_reviews", required=True),
@@ -1029,6 +1145,7 @@ def build_sentiment_analysis(
                 if "scope_method" in reviews.columns else []
             ),
             "denominators": report["denominators"],
+            "codebook_evidence_status": report["codebook_evidence_status"],
             "bootstrap_seed": BOOTSTRAP_SEED,
             "bootstrap_iterations": BOOTSTRAP_ITERATIONS,
         },
@@ -1037,7 +1154,7 @@ def build_sentiment_analysis(
             "VADER and oseti scores are tool-specific; raw sentiment-score t-tests/ANOVA are not run.",
             "Welch rating tests use common-scale Google review_rating as companion outcome/validation evidence.",
             "POI-level and cluster-bootstrap rows are sensitivity checks.",
-            "Reviewed JP/EN codebook evidence path is pending.",
+            "Reviewed JP/EN codebook evidence is an audit/sensitivity path, not a replacement for VADER/oseti.",
         ],
         extra={
             "dependency_versions": report["dependency_versions"],
@@ -1052,6 +1169,7 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--reviews-path", type=Path, default=DEFAULT_REVIEWS_PATH)
     parser.add_argument("--poi-metadata-path", type=Path, default=DEFAULT_POI_METADATA_PATH)
+    parser.add_argument("--reviewed-codebook-path", type=Path, default=DEFAULT_REVIEWED_CODEBOOK_PATH)
     parser.add_argument("--row-output-dir", type=Path, default=DEFAULT_ROW_OUTPUT_DIR)
     parser.add_argument("--aggregate-output-dir", type=Path, default=DEFAULT_AGG_OUTPUT_DIR)
     parser.add_argument("--groups", default="japanese,english")
@@ -1065,6 +1183,7 @@ def main() -> int:
     paths = PipelinePaths(
         reviews_path=args.reviews_path,
         poi_metadata_path=args.poi_metadata_path,
+        reviewed_codebook_path=args.reviewed_codebook_path,
         row_output_dir=args.row_output_dir,
         aggregate_output_dir=args.aggregate_output_dir,
     )

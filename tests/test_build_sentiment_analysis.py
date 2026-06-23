@@ -70,6 +70,44 @@ def _write_poi_metadata(path: Path) -> None:
     )
 
 
+def _write_reviewed_codebook(path: Path) -> None:
+    path.write_text(
+        """
+schema_version: reviewed_codebook_runtime.v1
+languages:
+  English:
+    codes:
+      positive_sentiment:
+        code_family: sentiment
+        keywords: [Great]
+      negative_sentiment:
+        code_family: sentiment
+        keywords: [Bad]
+      recommendation_intent:
+        code_family: sentiment
+        keywords: [view]
+      transport_access:
+        code_family: friction
+        keywords: [access]
+  Japanese:
+    codes:
+      positive_sentiment:
+        code_family: sentiment
+        keywords: [良い]
+      negative_sentiment:
+        code_family: sentiment
+        keywords: [悪い]
+      recommendation_intent:
+        code_family: sentiment
+        keywords: [です]
+      transport_access:
+        code_family: friction
+        keywords: [不便]
+""".strip(),
+        encoding="utf-8",
+    )
+
+
 def _english_scorer(text: str) -> dict[str, float]:
     # Test scorer: deterministic stand-in for VADER so tests do not depend on
     # external model behavior.
@@ -118,11 +156,14 @@ def test_build_outputs_aggregate_excludes_forbidden_row_level_fields(tmp_path):
     # Main privacy regression test: row-level outputs can keep IDs/text, but
     # tracked aggregate outputs must not expose those fields.
     reviews = tmp_path / "reviews_multilingual.csv"
+    codebook = tmp_path / "reviewed_jp_en_codebook.yaml"
     _write_reviews(reviews)
+    _write_reviewed_codebook(codebook)
 
     report = build_sentiment_analysis(
         paths=PipelinePaths(
             reviews_path=reviews,
+            reviewed_codebook_path=codebook,
             row_output_dir=tmp_path / "row",
             aggregate_output_dir=tmp_path / "agg",
         ),
@@ -138,6 +179,11 @@ def test_build_outputs_aggregate_excludes_forbidden_row_level_fields(tmp_path):
     # details needed for audit/debugging.
     assert "review_id" in row_level.columns
     assert "oseti_sentence_scores" in row_level.columns
+    assert "reviewed_positive_terms_matched" in row_level.columns
+    assert "reviewed_friction_terms_matched" in row_level.columns
+    assert "any_positive_evidence" in row_level.columns
+    assert row_level.loc[row_level["review_id"] == "r1", "reviewed_positive_terms_matched"].iloc[0] == "Great"
+    assert bool(row_level.loc[row_level["review_id"] == "r2", "any_friction"].iloc[0])
 
     summary = pd.read_csv(tmp_path / "agg" / "source_group_sentiment_summary.csv")
     tests = pd.read_csv(tmp_path / "agg" / "source_group_sentiment_tests.csv")
@@ -159,6 +205,8 @@ def test_build_outputs_aggregate_excludes_forbidden_row_level_fields(tmp_path):
     assert not (forbidden & set(summary.columns))
     assert not (forbidden & set(tests.columns))
     assert summary["n_reviews"].sum() == 4
+    assert "any_positive_evidence_count" in summary.columns
+    assert "library_vs_reviewed_positive_disagreement_pct" in summary.columns
     assert "mann_whitney_u_sentiment_score" in set(tests["test_name"])
     assert "raw_score_parametric_tests_not_run" in set(tests["test_name"])
     assert "welch_t_review_rating" in set(tests["test_name"])
@@ -180,15 +228,17 @@ def test_build_outputs_aggregate_excludes_forbidden_row_level_fields(tmp_path):
     readiness = (tmp_path / "agg" / "sentiment_readiness.md").read_text(encoding="utf-8")
     assert report["input"]["sha256"] in readiness
     assert report["outputs"]["row_level_sha256"] in readiness
-    assert "codebook_evidence_status: pending" in readiness
+    assert report["input"]["reviewed_codebook_sha256"] in readiness
+    assert "codebook_evidence_status: active" in readiness
     assert "Raw sentiment-score t-tests/ANOVA are skipped" in readiness
 
     manifest = json.loads((tmp_path / "agg" / "sentiment_manifest.json").read_text(encoding="utf-8"))
     assert manifest["schema_version"] == "sentiment_manifest.v2"
+    assert manifest["codebook_evidence_status"] == "active"
     assert manifest["provenance"]["schema_version"] == "research_provenance.v1"
     assert {record["role"] for record in manifest["provenance"]["inputs"]} >= {
         "reviews_multilingual",
-        "poi_metadata",
+        "reviewed_jp_en_codebook_config",
     }
     output_roles = {record["role"] for record in manifest["provenance"]["outputs"]}
     assert "tracked_aggregate_summary" in output_roles
@@ -232,10 +282,13 @@ def test_scoring_wrappers_can_be_monkeypatched_without_external_models(tmp_path)
     # Injected scorer functions let this test validate pipeline wiring without
     # importing VADER/oseti.
     reviews = tmp_path / "reviews_multilingual.csv"
+    codebook = tmp_path / "reviewed_jp_en_codebook.yaml"
     _write_reviews(reviews)
+    _write_reviewed_codebook(codebook)
     build_sentiment_analysis(
         paths=PipelinePaths(
             reviews_path=reviews,
+            reviewed_codebook_path=codebook,
             row_output_dir=tmp_path / "row",
             aggregate_output_dir=tmp_path / "agg",
         ),
@@ -256,13 +309,16 @@ def test_prefecture_filter_uses_poi_metadata_not_city_name(tmp_path):
     # proves prefecture filtering comes from POI metadata.
     reviews = tmp_path / "reviews_multilingual.csv"
     metadata = tmp_path / "poi_metadata.json"
+    codebook = tmp_path / "reviewed_jp_en_codebook.yaml"
     _write_reviews(reviews)
     _write_poi_metadata(metadata)
+    _write_reviewed_codebook(codebook)
 
     report = build_sentiment_analysis(
         paths=PipelinePaths(
             reviews_path=reviews,
             poi_metadata_path=metadata,
+            reviewed_codebook_path=codebook,
             row_output_dir=tmp_path / "row",
             aggregate_output_dir=tmp_path / "agg",
         ),

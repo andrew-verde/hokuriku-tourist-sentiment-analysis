@@ -10,7 +10,7 @@ series use.
 Inputs:
 
   - `make multilingual-reviews` -> output/multilingual_review_analysis/reviews_multilingual.csv
-  - `make chinese-social`       -> output/chinese_social_media_analysis/tagged_chinese_social_posts.csv
+  - `make chinese-social-xhs-only` -> output/chinese_social_media_analysis_xhs_only/tagged_chinese_social_posts.csv
 
 Google review scope is filtered by checkpoint POI prefecture metadata. The
 default is Fukui; the same scaffold can later run for Ishikawa or Toyama once
@@ -43,7 +43,7 @@ logger = setup_logger(__name__)
 
 ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_REVIEWS_PATH = ROOT / "output" / "multilingual_review_analysis" / "reviews_multilingual.csv"
-DEFAULT_CHINESE_PATH = ROOT / "output" / "chinese_social_media_analysis" / "tagged_chinese_social_posts.csv"
+DEFAULT_CHINESE_PATH = ROOT / "output" / "chinese_social_media_analysis_xhs_only" / "tagged_chinese_social_posts.csv"
 DEFAULT_POI_METADATA_PATH = ROOT / "output" / "checkpoints" / "poi_metadata.json"
 DEFAULT_SENTIMENT_SUMMARY_PATH = ROOT / "output" / "sentiment_aggregates" / "source_group_sentiment_summary.csv"
 DEFAULT_OUTPUT_DIR = ROOT / "output" / "cross_language_trends"
@@ -510,6 +510,141 @@ def _binary_prevalence_test(
     }
 
 
+def _review_binary_count_rows(
+    sentiment_summary_path: Path,
+    prefecture: str,
+    evidence_column: str,
+) -> tuple[list[dict], dict | None]:
+    if not sentiment_summary_path.exists():
+        return [], {
+            "reason": "JP/EN sentiment summary missing; run `make sentiment-analysis` first",
+            "sentiment_summary_path": str(sentiment_summary_path),
+        }
+    summary = pd.read_csv(sentiment_summary_path)
+    count_column = f"{evidence_column}_count"
+    if count_column not in summary.columns:
+        return [], {
+            "reason": "JP/EN sentiment summary lacks reviewed evidence counts; rerun sentiment analysis after reviewed codebook import",
+            "sentiment_summary_path": str(sentiment_summary_path),
+            "missing_column": count_column,
+        }
+    if "prefecture_normalized" in summary.columns:
+        summary = summary[summary["prefecture_normalized"].astype(str) == prefecture].copy()
+    rows = []
+    for _, item in summary.iterrows():
+        language = str(item.get("language_group", "")).lower()
+        if language not in REVIEW_GROUPS:
+            continue
+        denominator = int(item.get("n_reviews", item.get("n_scored", 0)))
+        present = int(item.get(count_column, 0))
+        rows.append({
+            "group": f"google_review_{language}",
+            "source_kind": "google_review",
+            "row_unit": "one Google review",
+            "denominator": denominator,
+            "present": present,
+            "not_present": max(denominator - present, 0),
+        })
+    if not rows:
+        return [], {
+            "reason": "JP/EN sentiment summary contains no scoped English/Japanese evidence rows",
+            "sentiment_summary_path": str(sentiment_summary_path),
+            "prefecture": prefecture,
+        }
+    return rows, None
+
+
+def _chinese_binary_count_rows(chinese: pd.DataFrame, evidence_column: str) -> list[dict]:
+    if chinese.empty or evidence_column not in chinese.columns:
+        return []
+    values = chinese[evidence_column].map(_coerce_bool).fillna(False).astype(bool)
+    present = int(values.sum())
+    denominator = int(len(values))
+    return [{
+        "group": "chinese_social_all",
+        "source_kind": "chinese_social_media",
+        "row_unit": "one Xiaohongshu note row",
+        "denominator": denominator,
+        "present": present,
+        "not_present": max(denominator - present, 0),
+    }]
+
+
+def _binary_prevalence_count_test(
+    count_rows: list[dict],
+    groups: list[str],
+    test_name: str,
+    comparison: str,
+    details: dict | None = None,
+) -> dict:
+    selected = [row for row in count_rows if row["group"] in groups]
+    if len(selected) < len(groups):
+        return {
+            "test_name": test_name,
+            "comparison": comparison,
+            "status": "skipped",
+            "statistic": None,
+            "p_value": None,
+            "effect": None,
+            "details_json": json.dumps({
+                "reason": "required groups missing",
+                "requested_groups": groups,
+                "available_groups": [row["group"] for row in count_rows],
+                **(details or {}),
+            }),
+        }
+    table = pd.DataFrame(
+        [[row["not_present"], row["present"]] for row in selected],
+        index=[row["group"] for row in selected],
+        columns=["not_present", "present"],
+    )
+    table = table.loc[:, table.sum(axis=0) > 0]
+    table = table.loc[table.sum(axis=1) > 0, :]
+    base_details = {
+        "observed": table.to_dict(),
+        "denominators": {row["group"]: row["denominator"] for row in selected},
+        "row_units": {row["group"]: row["row_unit"] for row in selected},
+        "interpretation": "Descriptive cross-source discourse prevalence test using reviewed keyword evidence; platform/source contexts differ.",
+        **(details or {}),
+    }
+    if table.shape[0] < 2 or table.shape[1] < 2:
+        return {
+            "test_name": test_name,
+            "comparison": comparison,
+            "status": "skipped",
+            "statistic": None,
+            "p_value": None,
+            "effect": None,
+            "details_json": json.dumps({"reason": "fewer than two non-empty groups/outcomes", **base_details}),
+        }
+    if table.shape == (2, 2):
+        oddsratio, p_value = stats.fisher_exact(table)
+        return {
+            "test_name": test_name,
+            "comparison": comparison,
+            "status": "ok",
+            "statistic": float(oddsratio),
+            "p_value": float(p_value),
+            "effect": None,
+            "details_json": json.dumps({"method": "fisher_exact", **base_details}),
+        }
+    chi2, p_value, dof, expected = stats.chi2_contingency(table)
+    return {
+        "test_name": test_name,
+        "comparison": comparison,
+        "status": "ok",
+        "statistic": float(chi2),
+        "p_value": float(p_value),
+        "effect": _cramers_v(table),
+        "details_json": json.dumps({
+            "method": "chi_square",
+            "dof": int(dof),
+            "expected": pd.DataFrame(expected, index=table.index, columns=table.columns).round(6).to_dict(),
+            **base_details,
+        }),
+    }
+
+
 def comparison_statistical_tests(
     chinese: pd.DataFrame,
     sentiment_summary_path: Path,
@@ -580,22 +715,35 @@ def comparison_statistical_tests(
         {"current_scope": "within Chinese social rows only"},
     ))
     for test_name, evidence_column in [
-        ("cross_source_friction_prevalence_not_run", "any_friction"),
-        ("cross_source_enjoyment_recommendation_prevalence_not_run", "any_enjoyment_evidence"),
+        ("cross_source_friction_prevalence", "any_friction"),
+        ("cross_source_enjoyment_recommendation_prevalence", "any_enjoyment_evidence"),
     ]:
-        rows.append({
-            "test_name": test_name,
-            "comparison": "google_review_languages_vs_chinese_social",
-            "status": "skipped",
-            "statistic": None,
-            "p_value": None,
-            "effect": None,
-            "details_json": json.dumps({
-                "reason": "Reviewed EN/JP keyword evidence is not ready, so cross-source evidence prevalence would not use aligned codebooks.",
-                "chinese_column_ready": evidence_column in chinese.columns,
-                "required_next_step": "Promote reviewed English/Japanese keyword evidence into runtime outputs, then compare aligned binary evidence rates.",
-            }),
-        })
+        review_binary_rows, missing_binary_reason = _review_binary_count_rows(
+            sentiment_summary_path, prefecture, evidence_column
+        )
+        binary_rows = review_binary_rows + _chinese_binary_count_rows(chinese, evidence_column)
+        extra = {
+            "evidence_column": evidence_column,
+            "chinese_layer": "Xiaohongshu-only by default; Douyin can be supplied later with --chinese-path",
+        }
+        if missing_binary_reason:
+            rows.append({
+                "test_name": test_name,
+                "comparison": "google_review_languages_vs_chinese_social",
+                "status": "skipped",
+                "statistic": None,
+                "p_value": None,
+                "effect": None,
+                "details_json": json.dumps({**missing_binary_reason, **extra}),
+            })
+        else:
+            rows.append(_binary_prevalence_count_test(
+                binary_rows,
+                ["google_review_english", "google_review_japanese", "chinese_social_all"],
+                test_name,
+                "google_review_english_vs_google_review_japanese_vs_chinese_social_xhs",
+                extra,
+            ))
     return pd.DataFrame(rows, columns=TEST_COLUMNS)
 
 
@@ -605,7 +753,7 @@ def _write_readiness(report: dict, path: Path) -> None:
         "# Cross-Language Baseline Readiness (Group Project)",
         "",
         "Fukui-first aggregate comparison for English-language Google reviews, "
-        "Japanese-language Google reviews, and Chinese-language social-media posts. "
+        "Japanese-language Google reviews, and Chinese-language Xiaohongshu posts. "
         "Monthly trend output is disabled for now.",
         "",
         f"- Active prefecture: {report['prefecture']}",
@@ -618,8 +766,8 @@ def _write_readiness(report: dict, path: Path) -> None:
         "",
         "- Monthly trend analysis is not worthwhile yet for the Chinese layer. "
         "Most Chinese rows use inferred dates, and Douyin comment dates are anchored to scrape/parser context rather than exact platform timestamps.",
-        "- Current output is aggregate baseline only: source volumes, Google rating mean, and Chinese SnowNLP secondary sentiment summary by platform.",
-        "- Current statistical tests are limited to descriptive sentiment-category shares and within-Chinese platform evidence tests. Cross-source friction/enjoyment tests are explicitly skipped until EN/JP keyword evidence is ready.",
+        "- Current output is aggregate baseline only: source volumes, Google rating mean, Chinese SnowNLP secondary sentiment summary, and reviewed keyword evidence prevalence.",
+        "- Current cross-source evidence tests use reviewed EN/JP keyword evidence and Chinese-language XHS evidence. Douyin comments remain deferred because relevance is limited.",
         "",
         "## If Monthly Trends Are Reintroduced",
         "",
@@ -635,7 +783,7 @@ def _write_readiness(report: dict, path: Path) -> None:
         "- Group membership is content language/source platform, not nationality.",
         "- Chinese sentiment uses SnowNLP as a secondary baseline; Google ratings are a separate measurement instrument.",
         "- Cross-source sentiment category tests compare platformed discourse categories, not direct visitor satisfaction.",
-        "- Chinese social rows are Xiaohongshu notes or Douyin comments; Google rows are reviews.",
+        "- Chinese social rows are Xiaohongshu notes by default; Google rows are reviews.",
         "- Neighboring prefectures remain scaffolded for later work, but current default output is Fukui-only.",
         "",
     ]
@@ -653,7 +801,7 @@ def build_cross_language_trends(
     # Main orchestration function: validate inputs, load scoped rows, write
     # aggregate outputs, and record a manifest/readiness note.
     _require_input(reviews_path, "multilingual-reviews")
-    _require_input(chinese_path, "chinese-social")
+    _require_input(chinese_path, "chinese-social-xhs-only")
     output_dir.mkdir(parents=True, exist_ok=True)
 
     reviews = load_review_rows(reviews_path, poi_metadata_path, prefecture)
@@ -726,6 +874,7 @@ def build_cross_language_trends(
             "prefecture": prefecture,
             "review_groups": REVIEW_GROUPS,
             "chinese_group": CHINESE_GROUP,
+            "chinese_default_layer": "xiaohongshu_only",
         },
         inputs=[
             file_record(reviews_path, "reviews_multilingual", required=True),
@@ -758,9 +907,10 @@ def build_cross_language_trends(
             "Group membership is content language/source platform, not nationality.",
             "Chinese SnowNLP sentiment and Google review ratings are separate instruments.",
             "Cross-source sentiment category tests compare platformed discourse categories, not direct satisfaction.",
-            "Cross-source friction/enjoyment tests are skipped until reviewed EN/JP keyword evidence is ready.",
+            "Cross-source friction/enjoyment tests use reviewed keyword evidence and are descriptive across source/platform contexts.",
             "Monthly trend output is disabled until Chinese post dates are exact enough.",
             "Default output is Fukui-only.",
+            "Chinese social default input is Xiaohongshu-only; Douyin can be supplied later with --chinese-path.",
         ],
         extra={
             "neighboring_prefecture_scaffold": NEIGHBORING_PREFECTURE_SCAFFOLD,

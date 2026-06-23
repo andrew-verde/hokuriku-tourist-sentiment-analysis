@@ -1,16 +1,18 @@
 # Sentiment Readiness
 
-- generated_at: 2026-06-20T10:51:10+00:00
+- generated_at: 2026-06-23T09:10:42+00:00
 - command: `scripts/build_sentiment_analysis.py --groups japanese,english --prefecture Fukui`
 - input: `/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/output/multilingual_review_analysis/reviews_multilingual.csv`
 - input_sha256: `6bc06f34848954674506f6fefb84ffd9689b4cc9b2c90780fd5c8fc45eafaa56`
 - poi_metadata: `/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/output/checkpoints/poi_metadata.json`
 - poi_metadata_sha256: `34b088a57c0e61d23471cf3745ca2ec6e2811dce71aa7ab2a5a508fa5178e79a`
+- reviewed_codebook: `/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/config/reviewed_jp_en_codebook.yaml`
+- reviewed_codebook_sha256: `8626d2c47effd2e51d9d95e67a03a7fb2db317857f60ea0b9b97f351a0bb3944`
 - row_level_output: `/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/output/sentiment_row_level/google_reviews_fukui_japanese-english.csv`
-- row_level_sha256: `3af51c8f32cdfe24207f32071ef3c74d9ff0271cd306bce7462bcbc4913de542`
+- row_level_sha256: `72df51c468c6e829c9b121b9c71233e98a3ebc2a9c424d5eda63b83e1883eeed`
 - filters: city == `None`, prefecture == `Fukui`, language_group in ['japanese', 'english']
 - primary_unit: one Google review row
-- codebook_evidence_status: pending
+- codebook_evidence_status: active
 - bootstrap_seed: 20260618
 
 ## Dependency Versions
@@ -60,4 +62,4 @@
 - Raw sentiment-score t-tests/ANOVA are skipped because VADER compound and oseti document scores are not the same measurement scale.
 - `review_rating` is a common Google 1-to-5 scale, so Welch rating tests are companion outcome/validation evidence.
 - POI-level and cluster-bootstrap rows are sensitivity checks, not replacement primary models.
-- Reviewed JP/EN codebook evidence path is pending and does not block this library comparison.
+- Reviewed JP/EN keyword evidence is an audit/sensitivity path, not a replacement for VADER/oseti.

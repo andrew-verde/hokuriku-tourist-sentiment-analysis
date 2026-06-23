@@ -49,4 +49,4 @@ Questions answered by each figure are documented in `presentation_figure_questio
 - VADER and oseti scores are tool-specific; raw sentiment-score t-tests/ANOVA are not run.
 - Welch rating tests use common-scale Google review_rating as companion outcome/validation evidence.
 - POI-level and cluster-bootstrap rows are sensitivity checks.
-- Reviewed JP/EN codebook evidence path is pending.
+- Reviewed JP/EN codebook evidence is an audit/sensitivity path, not a replacement for VADER/oseti.

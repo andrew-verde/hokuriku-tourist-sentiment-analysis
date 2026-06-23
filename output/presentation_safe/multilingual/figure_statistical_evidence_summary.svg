@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="444" viewBox="0 0 1000 444">
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="360" viewBox="0 0 1000 360">
 <rect width="100%" height="100%" fill="#fbfaf7"/>
 <text x="32" y="38" font-family="Arial, sans-serif" font-size="24" font-weight="700" fill="#1f2933">Statistical Backing Readiness</text>
 <text x="32" y="66" font-family="Arial, sans-serif" font-size="14" fill="#52616b">Effect sizes for ok checks; skipped rows mark evidence gaps</text>
@@ -12,15 +12,9 @@
 <rect x="365" y="191" width="148.40" height="20" rx="3" fill="#5b6c94"/>
 <text x="521.3968016469248" y="206" font-family="Arial, sans-serif" font-size="12" fill="#1f2933">effect=0.267</text>
 <text x="351" y="248" text-anchor="end" font-family="Arial, sans-serif" font-size="12" fill="#1f2933">cross source sentiment category independence</text>
-<rect x="365" y="233" width="113.01" height="20" rx="3" fill="#5b6c94"/>
-<text x="486.0085925050253" y="248" font-family="Arial, sans-serif" font-size="12" fill="#1f2933">effect=0.204</text>
+<rect x="365" y="233" width="84.13" height="20" rx="3" fill="#5b6c94"/>
+<text x="457.1305576402233" y="248" font-family="Arial, sans-serif" font-size="12" fill="#1f2933">effect=0.152</text>
 <text x="351" y="290" text-anchor="end" font-family="Arial, sans-serif" font-size="12" fill="#1f2933">within chinese platform sentiment category independe</text>
-<rect x="365" y="275" width="28.07" height="20" rx="3" fill="#5b6c94"/>
-<text x="401.07347133071534" y="290" font-family="Arial, sans-serif" font-size="12" fill="#1f2933">effect=0.051</text>
-<text x="351" y="332" text-anchor="end" font-family="Arial, sans-serif" font-size="12" fill="#1f2933">cross source friction prevalence not run</text>
-<rect x="365" y="317" width="99.90" height="20" rx="3" fill="#8d99ae"/>
-<text x="472.9" y="332" font-family="Arial, sans-serif" font-size="12" fill="#1f2933">skipped</text>
-<text x="351" y="374" text-anchor="end" font-family="Arial, sans-serif" font-size="12" fill="#1f2933">cross source enjoyment recommendation prevalence not</text>
-<rect x="365" y="359" width="99.90" height="20" rx="3" fill="#8d99ae"/>
-<text x="472.9" y="374" font-family="Arial, sans-serif" font-size="12" fill="#1f2933">skipped</text>
+<rect x="365" y="275" width="99.90" height="20" rx="3" fill="#8d99ae"/>
+<text x="472.9" y="290" font-family="Arial, sans-serif" font-size="12" fill="#1f2933">skipped</text>
 </svg>

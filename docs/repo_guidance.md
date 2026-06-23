@@ -56,19 +56,18 @@ Chinese social inputs are external and should remain external:
 
 ## Project Readiness Checklist
 
-- [ ] Human-reviewed keyword codebooks: review templates exist in
+- [x] Human-reviewed keyword codebooks: review templates exist in
   `output/codebook_review/`, Chinese config exists in
   `config/chinese_social_friction_codebook.yaml`, and reviewed Chinese rows exist
   in `docs/codebook_templates/chinese_reviewed_codebook_template.csv`. Current
   Chinese social runtime promotion uses reviewed Chinese friction/topic/sentiment
-  rows and supersedes legacy YAML terms for matching codes. A JP/EN import gate
-  now exists (`make reviewed-codebook-status` /
-  `make reviewed-codebook-config`) and fails loud until manual JP/EN
-  `review_decision` values are complete. Still needed: finish manual JP/EN
-  review decisions, promote reviewed JP/EN decisions into runtime configs, add
-  JP/EN evidence columns, then report library-score/codebook disagreement rates.
-  Once manual review is complete, use `docs/manual_keyword_review_followup.md`
-  as the agent implementation checklist.
+  rows and supersedes legacy YAML terms for matching codes. JP/EN native-speaker
+  review decisions are complete in
+  `docs/codebook_reviews/source/multilingual_keyword_codebook_review.xlsx`, and
+  `make reviewed-codebook-config` promotes them into
+  `config/reviewed_jp_en_codebook.yaml`. JP/EN sentiment output now includes
+  reviewed keyword evidence columns, aggregate evidence rates, and
+  library-score/codebook positive-evidence disagreement rates.
 - [x] Chinese social sentiment/topic pipeline: `scripts/build_chinese_social_media_dataset.py`
   builds cleaned Chinese social outputs with SnowNLP secondary baseline sentiment from
   one `make chinese-social` trigger for Xiaohongshu rows and parsed Douyin
@@ -80,16 +79,18 @@ Chinese social inputs are external and should remain external:
   path is available for source-sensitivity checks.
 - [x] JP-EN Google review library sentiment: `scripts/build_sentiment_analysis.py`
   filters by Fukui prefecture metadata, scores English reviews with VADER,
-  scores Japanese reviews with oseti, writes ignored row-level output, and tracks
-  aggregate summaries/tests/readiness with hashes and dependency versions.
+  scores Japanese reviews with oseti, matches reviewed JP/EN keyword evidence,
+  writes ignored row-level output, and tracks aggregate summaries/tests/readiness
+  with hashes and dependency versions.
 - [x] Statistical comparison suite: JP-EN review-row tests, POI-level sensitivity,
   POI cluster-bootstrap sensitivity, and Fukui-only
   EN/JP/CN aggregate baseline outputs exist. Current valid tests include
   common-scale Google `review_rating` Welch t-test / Welch ANOVA, explicit
   skipped raw-score parametric tests for VADER/oseti/SnowNLP non-equivalence,
-  EN/JP/CN sentiment-category chi-square/Fisher tests, and within-Chinese
-  source-platform tests. Cross-source friction/enjoyment evidence tests remain
-  skipped until JP/EN reviewed codebooks land.
+  EN/JP/CN sentiment-category chi-square/Fisher tests, within-Chinese
+  source-platform tests when multiple Chinese platforms are present, and
+  XHS-first cross-source friction/enjoyment evidence prevalence tests using
+  reviewed keyword evidence.
 - [x] Presentation outputs: `make presentation-safe` builds aggregate-only JP-EN
   chart/table data, captions, readiness notes, hashes, date coverage, and
   POI-category mix under `output/presentation_safe/`. The stage regenerates from

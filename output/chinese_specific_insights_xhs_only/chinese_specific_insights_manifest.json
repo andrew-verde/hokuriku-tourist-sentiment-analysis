@@ -1,15 +1,15 @@
 {
   "schema_version": "research_provenance.v1",
   "kind": "chinese_specific_insights",
-  "generated_at": "2026-06-22T04:03:09+00:00",
+  "generated_at": "2026-06-23T09:11:04+00:00",
   "command": "python scripts/build_chinese_specific_insights.py",
   "inputs": [
     {
       "role": "ignored_tagged_chinese_social_rows",
       "path": "output/chinese_social_media_analysis_xhs_only/tagged_chinese_social_posts.csv",
       "exists": true,
-      "bytes": 316563,
-      "sha256": "9df811d7a126894dad267e5b45359d425be9bfd0d86a3a0f579bf81eb3127897"
+      "bytes": 430280,
+      "sha256": "6e3e0350fb909532fcf701e9a2fbb1c9a9d66b3a6d04b641502dfa6c5e44c2a4"
     },
     {
       "role": "aggregate_runtime_codebook_summary",
@@ -22,8 +22,8 @@
       "role": "aggregate_topic_evidence",
       "path": "output/chinese_social_media_analysis_xhs_only/chinese_topic_by_city_platform.csv",
       "exists": true,
-      "bytes": 883,
-      "sha256": "4f65e5bb180a0c14312317abffa71e381efbddfccc0c78edb52bf2e7656bc0dd"
+      "bytes": 863,
+      "sha256": "c002d43ff4674a0ab0b214a8f0760d97980b9144f68a13f20244afaf2bc02709"
     }
   ],
   "outputs": [
@@ -38,85 +38,85 @@
       "role": "keyword_occurrence_by_category",
       "path": "output/chinese_specific_insights_xhs_only/keyword_occurrence_by_category.csv",
       "exists": true,
-      "bytes": 637,
-      "sha256": "d796ee3a1fb0df189265173f283ce9279414e9632e7b1b43a5dfc01643a47e72"
+      "bytes": 617,
+      "sha256": "0e7c9b7ce89e01540899ed3a0bf1fbc8f75444df8824c049a363c0c5691c08ba"
     },
     {
       "role": "sentiment_keyword_counts",
       "path": "output/chinese_specific_insights_xhs_only/sentiment_keyword_counts.csv",
       "exists": true,
-      "bytes": 2587,
-      "sha256": "5452a563160eb98ebd44ad6df51a70fa9778ac69b454869c7cb9600394157db1"
+      "bytes": 2661,
+      "sha256": "a54ad9fd2c63f0683ddfcefc9a5c050f7548ae95406652f04f55e106b3c790da"
     },
     {
       "role": "keywords_by_snownlp_sentiment_category",
       "path": "output/chinese_specific_insights_xhs_only/keywords_by_snownlp_sentiment_category.csv",
       "exists": true,
-      "bytes": 1899,
-      "sha256": "8e37951f150c4b88069b10fd1009b9c08fce1445fb082db82addb8353c488d7c"
+      "bytes": 2065,
+      "sha256": "5f834553bdbc009a85e9e96465842749e65c90aeb94350f08fd657f6e206c4a5"
     },
     {
       "role": "sentiment_category_by_platform",
       "path": "output/chinese_specific_insights_xhs_only/sentiment_category_by_platform.csv",
       "exists": true,
-      "bytes": 150,
-      "sha256": "ef9bee3964348167e32b01cf8b3e20214eb0d88e7777f1cf4e8ef74fbd4ecb35"
+      "bytes": 144,
+      "sha256": "0f46e5efc950a5616400cf7e4d3b26eda1e74a9d469182ffe46371d7b7dc59f2"
     },
     {
       "role": "theme_sentiment_summary",
       "path": "output/chinese_specific_insights_xhs_only/theme_sentiment_summary.csv",
       "exists": true,
-      "bytes": 496,
-      "sha256": "f14d444e27a642aa72df5e41c83b5a71f38179506fa6cd896b04a56901560468"
+      "bytes": 508,
+      "sha256": "14bf6c5804968fbad63732a3f8411cf638d727b68360f4f16159b1f3bab9421b"
     },
     {
       "role": "topic_by_sentiment_category",
       "path": "output/chinese_specific_insights_xhs_only/topic_by_sentiment_category.csv",
       "exists": true,
-      "bytes": 1594,
-      "sha256": "e8782e57cbe1bd272b0fd8cc7d6911298c50c4a0acc1ea9259d09cc7f72ac134"
+      "bytes": 1599,
+      "sha256": "a57d43516ca30839f76c2897500831ae84c8dda6d9f55d3b33b3b132744d2ff1"
     },
     {
       "role": "friction_by_sentiment_category",
       "path": "output/chinese_specific_insights_xhs_only/friction_by_sentiment_category.csv",
       "exists": true,
-      "bytes": 1274,
-      "sha256": "866799328df1c6128e591b904008965e1a848b6570d8308160a4875317ae3a1a"
+      "bytes": 1438,
+      "sha256": "42d529bb7a9d21f3dd5c43ee219db623acbbaa1e682456d9b3fdb8975f729f0f"
     },
     {
       "role": "figure_keyword_occurrence_by_category",
       "path": "output/chinese_specific_insights_xhs_only/figure_keyword_occurrence_by_category.svg",
       "exists": true,
-      "bytes": 5664,
-      "sha256": "e1b47720dbce9fe28dd0d29cdd802821d80e36828c078fbf785807481e4e463f"
+      "bytes": 5677,
+      "sha256": "b4b2ff9017bf1130b381e12ad4cd507a676471482069332fe6a2b2c6e55d82f0"
     },
     {
       "role": "figure_top_sentiment_keywords",
       "path": "output/chinese_specific_insights_xhs_only/figure_top_sentiment_keywords.svg",
       "exists": true,
       "bytes": 6517,
-      "sha256": "01ed91623f82cda3b26afc8e540b1230acdddfada2487666de7e5778cb52226b"
+      "sha256": "25b25694cb320a3ae61532bdedd2687c1dbabf2793c7264e787b202dcf05abd2"
     },
     {
       "role": "figure_sentiment_category_by_platform",
       "path": "output/chinese_specific_insights_xhs_only/figure_sentiment_category_by_platform.svg",
       "exists": true,
       "bytes": 1506,
-      "sha256": "638621e399bc49bd3c658a51dfe030c9502db38326e459304a30f2f5796f1bb3"
+      "sha256": "9c91c0c4ef00014e9114797dd68b9def443ca36fef467da69e45a4580a422f69"
     },
     {
       "role": "figure_theme_sentiment",
       "path": "output/chinese_specific_insights_xhs_only/figure_theme_sentiment.svg",
       "exists": true,
-      "bytes": 1054,
-      "sha256": "ea81663723ea0952b35a206810c409ced45d4a8ccd48be8503c8b73c749059f7"
+      "bytes": 1055,
+      "sha256": "141c6b2c10ece175b5d0ed032638cf945503e968da5afd49be0a3d271a7a0165"
     },
     {
       "role": "readiness",
       "path": "output/chinese_specific_insights_xhs_only/chinese_specific_insights_readiness.md",
       "exists": true,
       "bytes": 2446,
-      "sha256": "01f5f9a075e6bd36f5aefe7b9df67613f7145ab017294ed63ad0b44eda2c97ad"
+      "sha256": "760ca9ea09058948bedefb7e4048b4145a1477b127450254859180f9b881daec"
     }
   ],
   "filters": {
@@ -125,9 +125,9 @@
   },
   "metrics": {
     "analysis_label": "Chinese-language Fukui Xiaohongshu rows only",
-    "rows_represented": 149,
+    "rows_represented": 200,
     "source_platform_mix": {
-      "xiaohongshu": 149
+      "xiaohongshu": 200
     },
     "minimum_theme_slice_rows_for_rates": 10,
     "data_view_count": 8,

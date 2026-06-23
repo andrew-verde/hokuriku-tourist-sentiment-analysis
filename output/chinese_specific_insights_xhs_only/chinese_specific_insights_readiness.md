@@ -3,8 +3,8 @@
 These outputs cover Chinese-language Fukui Xiaohongshu rows only. They are aggregate views for presentation and exploratory review, not nationality claims.
 
 - Analysis label: `Chinese-language Fukui Xiaohongshu rows only`
-- Rows represented: 149
-- Source platform mix: {'xiaohongshu': 149}
+- Rows represented: 200
+- Source platform mix: {'xiaohongshu': 200}
 - Minimum theme slice rows for rates: 10
 - Output folder: `output/chinese_specific_insights_xhs_only`
 
