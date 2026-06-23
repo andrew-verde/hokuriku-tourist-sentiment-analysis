@@ -118,6 +118,15 @@ H2 Google star-rating Welch tests with POI-level sensitivity
 H3 reviewed evidence prevalence tests with Benjamini-Hochberg FDR
 ```
 
+Run within-language/source sentiment driver tests:
+
+```bash
+make within-language-sentiment
+```
+
+This writes aggregate-only `WL-EN-*`, `WL-JP-*`, and `WL-CN-*` driver outputs
+under `output/within_language_sentiment/`.
+
 Build slide-safe JP-EN aggregate chart/table scaffolding from tracked aggregate
 sentiment outputs and locally generated cross-language baseline tables:
 

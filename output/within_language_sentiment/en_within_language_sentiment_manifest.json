@@ -1,0 +1,51 @@
+{
+  "schema_version": "research_provenance.v1",
+  "kind": "within_language_sentiment_drivers_en",
+  "generated_at": "2026-06-23T10:43:52+00:00",
+  "command": "scripts/test_en_within_language_sentiment_drivers.py",
+  "inputs": [
+    {
+      "role": "ignored_scored_review_audit_file",
+      "path": "/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/output/sentiment_row_level/google_reviews_fukui_japanese-english.csv",
+      "exists": true,
+      "bytes": 451502,
+      "sha256": "72df51c468c6e829c9b121b9c71233e98a3ebc2a9c424d5eda63b83e1883eeed"
+    }
+  ],
+  "outputs": [
+    {
+      "role": "tracked_within_language_sentiment_csv",
+      "path": "/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/output/within_language_sentiment/en_within_language_sentiment_drivers.csv",
+      "exists": true,
+      "bytes": 15747,
+      "sha256": "013c6eab9d537d4cdb6f82ef0a6427a3d81d0f009dcf50436add7d16853c80fa"
+    }
+  ],
+  "filters": {
+    "prefecture": "Fukui",
+    "language_group": "english"
+  },
+  "metrics": {
+    "analysis_family": "WL-EN",
+    "primary_unit": "one Fukui English-language Google review row",
+    "denominators": {
+      "english": 214
+    },
+    "score": "VADER compound via sentiment_score, interpreted within English only",
+    "multiple_testing": "Benjamini-Hochberg FDR within evidence predictors."
+  },
+  "caveats": [
+    "Group labels describe content language/source, not author or reviewer nationality.",
+    "Raw sentiment scores are interpreted only within one tool, language, and source.",
+    "Outputs are aggregate-only and omit row-level text, author fields, URLs, source IDs, review IDs, place IDs, and POI IDs.",
+    "English sentiment_score is VADER compound and is interpreted within English only; it is not compared as a raw scale to oseti or SnowNLP.",
+    "Google review rows are nested in POIs; row-level p-values are descriptive without a clustered model."
+  ],
+  "extra": {
+    "dependency_versions": {
+      "pandas": "3.0.3",
+      "numpy": "2.4.6",
+      "scipy": "1.18.0"
+    }
+  }
+}

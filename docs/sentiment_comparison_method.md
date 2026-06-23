@@ -532,6 +532,38 @@ All H1-H3 outputs carry denominators, input SHA256, command, timestamp, and
 caveats. They must remain aggregate-only: no row-level text, author/source IDs,
 URLs, `review_id`, `place_id`, or `poi_id`.
 
+## Within-Language Sentiment Driver Tests
+
+Within-language/source driver scripts run after the scored row-level inputs
+exist:
+
+```bash
+make within-language-sentiment
+```
+
+Tracked aggregate outputs:
+
+```text
+output/within_language_sentiment/en_within_language_sentiment_drivers.csv
+output/within_language_sentiment/en_within_language_sentiment_manifest.json
+output/within_language_sentiment/jp_within_language_sentiment_drivers.csv
+output/within_language_sentiment/jp_within_language_sentiment_manifest.json
+output/within_language_sentiment/cn_within_source_sentiment_drivers.csv
+output/within_language_sentiment/cn_within_source_sentiment_manifest.json
+```
+
+These tests do not extend the H1-H3 confirmatory JP/EN numbering. They use
+`WL-EN-*`, `WL-JP-*`, and `WL-CN-*` labels because the claim is within one
+sentiment tool/language/source. English rows use VADER `sentiment_score`,
+Japanese rows use oseti `sentiment_score`, and Chinese rows use
+`snownlp_centered_score`; raw means are never interpreted across tools.
+
+WL-EN and WL-JP test friction, enjoyment, recommendation, and positive reviewed
+evidence against within-language sentiment score/category, then add rating
+correlation and POI-category diagnostics. WL-CN tests friction and topic codes
+against SnowNLP sentiment, adds platform diagnostics, and treats theme results
+as diagnostics with `unclassified` excluded from the theme grouping.
+
 Summary columns:
 
 ```text
