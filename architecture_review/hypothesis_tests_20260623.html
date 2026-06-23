@@ -1,0 +1,719 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Hypothesis Test Design - Fukui Cross-Language Tourism Texts</title>
+    <style>
+      :root {
+        --ink: #172033;
+        --muted: #5b677a;
+        --line: #d7dde8;
+        --soft: #f6f8fb;
+        --blue: #214f80;
+        --green: #28624f;
+        --amber: #8a5a14;
+        --red: #963a35;
+        --card: #ffffff;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        background: #f4f6f8;
+        color: var(--ink);
+        font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        line-height: 1.5;
+        letter-spacing: 0;
+      }
+      main {
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 34px 22px 60px;
+      }
+      header, section, article {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        box-shadow: 0 1px 2px rgba(17, 24, 39, 0.05);
+      }
+      header {
+        padding: 28px;
+        margin-bottom: 18px;
+      }
+      section, article {
+        padding: 24px;
+        margin-top: 18px;
+      }
+      h1, h2, h3, h4 {
+        margin: 0;
+        line-height: 1.2;
+      }
+      h1 { font-size: 30px; }
+      h2 { font-size: 22px; margin-bottom: 12px; }
+      h3 { font-size: 18px; margin-bottom: 10px; }
+      h4 { font-size: 15px; margin-top: 16px; margin-bottom: 6px; }
+      p { margin: 8px 0; }
+      ul, ol { margin: 8px 0 0 22px; padding: 0; }
+      li { margin: 4px 0; }
+      code {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        background: #edf1f7;
+        padding: 1px 5px;
+        border-radius: 4px;
+        font-size: 0.94em;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+        font-size: 14px;
+      }
+      th, td {
+        border: 1px solid var(--line);
+        padding: 8px 10px;
+        vertical-align: top;
+        text-align: left;
+      }
+      th {
+        background: #eef3f8;
+        color: #243044;
+      }
+      .subtitle { color: var(--muted); margin-top: 7px; }
+      .grid {
+        display: grid;
+        gap: 14px;
+      }
+      .grid.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .grid.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .pill {
+        display: inline-block;
+        border-radius: 999px;
+        padding: 3px 9px;
+        font-size: 12px;
+        font-weight: 700;
+        margin-right: 5px;
+        margin-top: 6px;
+      }
+      .pill.primary { background: #e4f0ff; color: var(--blue); }
+      .pill.strong { background: #e4f7ef; color: var(--green); }
+      .pill.warn { background: #fff1d6; color: var(--amber); }
+      .pill.limit { background: #ffe8e5; color: var(--red); }
+      .note {
+        background: var(--soft);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 14px;
+      }
+      .advisor {
+        border-left: 4px solid var(--blue);
+        padding-left: 14px;
+      }
+      .risk {
+        border-left: 4px solid var(--red);
+        padding-left: 14px;
+      }
+      .hypothesis {
+        border-top: 4px solid #c8d6e8;
+      }
+      .hypothesis.primary-h {
+        border-top-color: var(--green);
+      }
+      .hypothesis.secondary-h {
+        border-top-color: var(--blue);
+      }
+      .hypothesis.exploratory-h {
+        border-top-color: var(--amber);
+      }
+      .small { font-size: 13px; color: var(--muted); }
+      .compact td, .compact th { padding: 6px 8px; }
+      .checklist li { margin-bottom: 7px; }
+      @media (max-width: 860px) {
+        .grid.two, .grid.three { grid-template-columns: 1fr; }
+        main { padding: 20px 14px 42px; }
+        header, section, article { padding: 18px; }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <h1>Academically Rigorous Hypothesis Test Plan</h1>
+        <p class="subtitle">Fukui-first cross-language tourism text analysis - research advisor draft - 2026-06-23</p>
+        <p>
+          Scope: Chinese-language social posts, Japanese-language Google reviews, and English-language Google reviews.
+          Labels describe content language and source platform, not nationality. Recommended claims must stay source-aware:
+          Google reviews, Xiaohongshu notes, and Douyin comments are different discourse settings.
+        </p>
+        <div>
+          <span class="pill strong">primary: JP vs EN same-platform tests</span>
+          <span class="pill primary">secondary: cross-source category shares</span>
+          <span class="pill warn">exploratory: keyword/topic families</span>
+          <span class="pill limit">do not compare raw VADER/oseti/SnowNLP means as common scale</span>
+        </div>
+      </header>
+
+      <section id="advisor-summary">
+        <h2>Advisor Summary</h2>
+        <div class="advisor">
+          <p>
+            Best confirmatory evidence comes from Japanese-language vs English-language Google reviews because platform,
+            rating system, POI metadata, and review unit are shared. Treat Chinese-language comparisons as descriptive
+            cross-source discourse comparisons unless a tighter source-matching design is added.
+          </p>
+          <p>
+            Use reviewed keyword/codebook evidence as transparent primary content evidence. Use VADER, oseti, and SnowNLP
+            sentiment categories as reproducible secondary signals. Use Google star rating only as a common-scale companion
+            outcome for JP/EN Google reviews.
+          </p>
+        </div>
+      </section>
+
+      <section id="inspected-context">
+        <h2>Inspected Project Context</h2>
+        <div class="grid two">
+          <div class="note">
+            <h3>Project goals</h3>
+            <ul>
+              <li>Fukui-first tourism text analysis across Chinese-language social posts and JP/EN Google reviews.</li>
+              <li>Default comparison labels: content language/source group, never nationality.</li>
+              <li>Academic audit trail required: denominators, filters, commands, hashes, reviewed codebooks, caveats.</li>
+              <li>Primary evidence posture: reviewed keyword codebooks and matched term evidence; model sentiment as secondary check.</li>
+            </ul>
+          </div>
+          <div class="note">
+            <h3>Data shape now visible</h3>
+            <ul>
+              <li>JP/EN scored review rows: <code>output/sentiment_row_level/google_reviews_fukui_japanese-english.csv</code> with row-level text excluded from this document.</li>
+              <li>JP/EN aggregate summary: 214 English-language reviews, 1,800 Japanese-language reviews, Fukui filtered.</li>
+              <li>Chinese combined insight output: 1,670 rows, mostly Douyin comments plus Xiaohongshu rows.</li>
+              <li>Cross-language trend tests currently show a separate Xiaohongshu-oriented denominator of 200 rows.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="risk" style="margin-top: 14px;">
+          <p>
+            Pre-flight requirement: reconcile Chinese denominators across <code>output/chinese_specific_insights</code>,
+            <code>output/chinese_social_media_analysis</code>, and <code>output/cross_language_trends</code> before any
+            confirmatory Chinese-including hypothesis. A denominator mismatch may reflect different source variants
+            (combined vs XHS-only) or stale outputs. Report chosen variant in every table.
+          </p>
+        </div>
+      </section>
+
+      <section id="available-variables">
+        <h2>Available Variables For Testing</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Group</th>
+              <th>Unit</th>
+              <th>Key variables</th>
+              <th>Best-supported tests</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>English-language Google reviews</td>
+              <td>One Google review row, nested in POI</td>
+              <td><code>language_group</code>, <code>poi_id</code>, <code>poi_category</code>, <code>review_date</code>, <code>review_rating</code>, <code>text_length_chars</code>, VADER score/category, reviewed evidence booleans.</td>
+              <td>JP/EN sentiment category, rating, evidence prevalence, POI-mix, text length, temporal diagnostics.</td>
+            </tr>
+            <tr>
+              <td>Japanese-language Google reviews</td>
+              <td>One Google review row, nested in POI</td>
+              <td><code>language_group</code>, <code>poi_id</code>, <code>poi_category</code>, <code>review_date</code>, <code>review_rating</code>, <code>text_length_chars</code>, oseti score/category, reviewed evidence booleans.</td>
+              <td>Same as English, with common Google rating scale and POI cluster diagnostics.</td>
+            </tr>
+            <tr>
+              <td>Chinese-language social rows</td>
+              <td>One Xiaohongshu note or Douyin comment row, source variant matters</td>
+              <td><code>source_platform</code>, <code>theme</code>, <code>text_length_chars</code>, SnowNLP score/category, reviewed topic/friction/enjoyment evidence booleans, post date precision fields.</td>
+              <td>Within-Chinese platform tests, topic/friction prevalence, source-sensitivity, descriptive cross-source category tests.</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section id="test-hierarchy">
+        <h2>Recommended Evidence Hierarchy</h2>
+        <ol class="checklist">
+          <li><strong>Primary confirmatory family:</strong> JP vs EN Google review comparisons. Same platform, common rating scale, POI metadata, review row unit.</li>
+          <li><strong>Secondary descriptive family:</strong> EN vs JP vs Chinese sentiment category shares and reviewed evidence prevalence. Valid as platformed discourse comparison, not visitor satisfaction comparison.</li>
+          <li><strong>Exploratory content family:</strong> keyword/code/topic rates across languages or source platforms. Use family-wise false discovery control and report precision/recall caveats for codebook matching.</li>
+          <li><strong>Validation/sensitivity family:</strong> POI-cluster bootstrap, POI-level aggregation, neutral-band sensitivity, XHS-only vs combined Chinese variants, library-vs-codebook disagreement.</li>
+        </ol>
+      </section>
+
+      <article id="h1" class="hypothesis primary-h">
+        <h2>H1. Sentiment Polarity Distribution: JP vs EN Google Reviews</h2>
+        <span class="pill strong">primary confirmatory</span>
+        <span class="pill strong">same platform</span>
+        <h4>1. Research question</h4>
+        <p>Do English-language and Japanese-language Fukui Google reviews differ in positive/neutral/negative sentiment category prevalence?</p>
+        <h4>2. Null and alternative hypotheses</h4>
+        <p><strong>H0:</strong> Sentiment category distribution is independent of review language group.</p>
+        <p><strong>H1:</strong> Sentiment category distribution differs between English-language and Japanese-language reviews.</p>
+        <h4>3. Variables needed</h4>
+        <p><code>language_group</code>, <code>sentiment_category</code>, <code>poi_id</code>, <code>poi_category</code>, <code>text_length_chars</code>, optional <code>review_date</code> month.</p>
+        <h4>4. Recommended statistical test</h4>
+        <p>Primary: 2 x 3 chi-square test of independence, with Cramer's V effect size. Use Fisher exact or Monte Carlo exact test if expected counts fall below 5. Sensitivity: multinomial logistic regression with language group as predictor and cluster-robust SE by <code>poi_id</code>.</p>
+        <h4>5. Assumptions and diagnostics</h4>
+        <ul>
+          <li>Check expected cell counts and row denominators.</li>
+          <li>Check POI nesting and imbalance: English n is much smaller than Japanese n.</li>
+          <li>Run neutral-band sensitivity at +/-0.10 and +/-0.20.</li>
+          <li>Inspect text length distribution by language; include length if imbalance is large.</li>
+        </ul>
+        <h4>6. Multiple-testing correction</h4>
+        <p>None if preregistered as single primary JP/EN sentiment test. If tested with multiple neutral bands as inferential claims, apply Holm correction across bands.</p>
+        <h4>7. Expected interpretation</h4>
+        <p>A significant result means category shares differ under VADER/oseti threshold rules. Do not interpret as raw sentiment score equivalence or nationality difference.</p>
+        <h4>8. Limitations and threats to validity</h4>
+        <p>VADER and oseti are different tools. Review rows are nested within POIs. Language groups may visit different POI categories and write different length reviews.</p>
+      </article>
+
+      <article id="h2" class="hypothesis primary-h">
+        <h2>H2. Common-Scale Star Rating Difference: JP vs EN Google Reviews</h2>
+        <span class="pill strong">primary companion outcome</span>
+        <span class="pill strong">common measurement scale</span>
+        <h4>1. Research question</h4>
+        <p>Do English-language and Japanese-language Fukui Google reviews differ in Google star ratings?</p>
+        <h4>2. Null and alternative hypotheses</h4>
+        <p><strong>H0:</strong> Mean review rating is equal across English-language and Japanese-language reviews.</p>
+        <p><strong>H1:</strong> Mean review rating differs across language groups.</p>
+        <h4>3. Variables needed</h4>
+        <p><code>language_group</code>, <code>review_rating</code>, <code>poi_id</code>, <code>poi_category</code>, <code>review_date</code>.</p>
+        <h4>4. Recommended statistical test</h4>
+        <p>Welch t-test on review rows. Sensitivity: POI-level Welch t-test on POI-language mean ratings; ordinal logistic model if distribution is strongly ceiling-bound; cluster bootstrap by POI.</p>
+        <h4>5. Assumptions and diagnostics</h4>
+        <ul>
+          <li>Rating scale is common 1-to-5 Google outcome.</li>
+          <li>Check rating distribution, ceiling effects, variance inequality, and POI category mix.</li>
+          <li>Check whether English reviews cover fewer POIs or different POI categories.</li>
+        </ul>
+        <h4>6. Multiple-testing correction</h4>
+        <p>None if this is declared companion outcome. If paired with many category or POI subgroup rating tests, apply Benjamini-Hochberg FDR within rating family.</p>
+        <h4>7. Expected interpretation</h4>
+        <p>Difference estimates are interpretable because both groups use same star scale. This validates or contextualizes text sentiment; it does not replace text analysis.</p>
+        <h4>8. Limitations and threats to validity</h4>
+        <p>Ratings are not pure sentiment text measures. POI selection, date window, review culture, and platform behavior may drive differences.</p>
+      </article>
+
+      <article id="h3" class="hypothesis primary-h">
+        <h2>H3. Reviewed Evidence Prevalence: Friction, Enjoyment, Recommendation</h2>
+        <span class="pill strong">primary content evidence</span>
+        <span class="pill warn">multiple binary outcomes</span>
+        <h4>1. Research question</h4>
+        <p>Do JP and EN Google reviews differ in prevalence of reviewed keyword evidence for friction, enjoyment, recommendation, and positive sentiment?</p>
+        <h4>2. Null and alternative hypotheses</h4>
+        <p><strong>H0:</strong> Reviewed evidence prevalence for each evidence family is equal across JP and EN reviews.</p>
+        <p><strong>H1:</strong> At least one evidence family has different prevalence by language group.</p>
+        <h4>3. Variables needed</h4>
+        <p><code>any_friction</code>, <code>any_enjoyment_evidence</code>, <code>any_recommendation_evidence</code>, <code>any_positive_evidence</code>, <code>language_group</code>, <code>text_length_chars</code>, <code>poi_id</code>, <code>poi_category</code>.</p>
+        <h4>4. Recommended statistical test</h4>
+        <p>For each binary evidence family: two-proportion test or Fisher exact test, plus odds ratio. Preferred model: logistic regression <code>evidence_present ~ language_group + text_length_chars + poi_category</code> with cluster-robust SE by <code>poi_id</code>.</p>
+        <h4>5. Assumptions and diagnostics</h4>
+        <ul>
+          <li>Reviewed codebook matching precision should be sampled manually before strong claims.</li>
+          <li>Check sparse evidence cells and separation in logistic models.</li>
+          <li>Check text length because longer reviews have more chance to contain any keyword.</li>
+          <li>Check language-specific codebook balance: number of reviewed terms and semantic coverage by family.</li>
+        </ul>
+        <h4>6. Multiple-testing correction</h4>
+        <p>Use Benjamini-Hochberg FDR across evidence families. If testing many individual codes inside each family, apply FDR within family and report family as exploratory.</p>
+        <h4>7. Expected interpretation</h4>
+        <p>Evidence prevalence differences support claims about what review language groups mention, not direct psychological satisfaction.</p>
+        <h4>8. Limitations and threats to validity</h4>
+        <p>Substring keyword matching can miss synonyms and can produce false positives. Translation equivalence across Japanese and English terms is not guaranteed.</p>
+      </article>
+
+      <article id="h4" class="hypothesis secondary-h">
+        <h2>H4. Cross-Source Sentiment Category Shares: EN, JP, Chinese</h2>
+        <span class="pill primary">secondary descriptive</span>
+        <span class="pill limit">cross-platform caveat</span>
+        <h4>1. Research question</h4>
+        <p>Do sentiment category shares differ across English-language Google reviews, Japanese-language Google reviews, and Chinese-language social rows?</p>
+        <h4>2. Null and alternative hypotheses</h4>
+        <p><strong>H0:</strong> Positive/neutral/negative category shares are equal across language/source groups.</p>
+        <p><strong>H1:</strong> At least one language/source group has different category shares.</p>
+        <h4>3. Variables needed</h4>
+        <p>Group label, <code>sentiment_category</code>, source variant label, denominator, and row unit. For Chinese rows: <code>source_platform</code>, <code>theme</code>, <code>body_has_text</code>, <code>post_date_precision</code>.</p>
+        <h4>4. Recommended statistical test</h4>
+        <p>3 x 3 chi-square test for category independence with Cramer's V. Pairwise chi-square or Fisher tests only after global test, with FDR correction. Main Chinese variant should be preregistered: non-fan XHS-only for cleaner source comparison, combined Chinese as sensitivity.</p>
+        <h4>5. Assumptions and diagnostics</h4>
+        <ul>
+          <li>Confirm denominators and source variant before testing.</li>
+          <li>Check expected counts, especially neutral Chinese cells.</li>
+          <li>Report row-unit mismatch: review row vs note row vs comment row.</li>
+          <li>Check Chinese source mix: XHS and Douyin should be stratified, not silently pooled.</li>
+        </ul>
+        <h4>6. Multiple-testing correction</h4>
+        <p>Global test first. Pairwise group tests use Benjamini-Hochberg FDR across three pairwise comparisons.</p>
+        <h4>7. Expected interpretation</h4>
+        <p>Result describes platformed sentiment category distributions. It should be phrased as discourse category difference, not satisfaction ranking.</p>
+        <h4>8. Limitations and threats to validity</h4>
+        <p>Tools differ by language. Source platforms differ. Chinese social rows may include fandom, comments, and inferred dates. Raw score comparisons are invalid.</p>
+      </article>
+
+      <article id="h5" class="hypothesis secondary-h">
+        <h2>H5. Positive And Negative Sentiment Prevalence</h2>
+        <span class="pill primary">secondary</span>
+        <span class="pill warn">binary reductions</span>
+        <h4>1. Research question</h4>
+        <p>Are positive-vs-not-positive and negative-vs-not-negative prevalence different across language/source groups?</p>
+        <h4>2. Null and alternative hypotheses</h4>
+        <p><strong>H0:</strong> Binary sentiment prevalence is equal across groups.</p>
+        <p><strong>H1:</strong> Binary sentiment prevalence differs across groups.</p>
+        <h4>3. Variables needed</h4>
+        <p><code>sentiment_category</code> recoded to <code>positive_vs_not</code> and <code>negative_vs_not</code>, language/source group, text length, POI or platform fields.</p>
+        <h4>4. Recommended statistical test</h4>
+        <p>Chi-square/Fisher on binary contingency tables. For JP/EN: logistic regression with cluster-robust SE by POI. For EN/JP/CN: descriptive logistic regression with group indicator and text length, reported with source caveats.</p>
+        <h4>5. Assumptions and diagnostics</h4>
+        <ul>
+          <li>Binary reduction discards neutral category information; compare with H1/H4 category results.</li>
+          <li>Check event counts for negative class; sparse cells may need Fisher exact or penalized logistic regression.</li>
+          <li>Run neutral threshold sensitivity.</li>
+        </ul>
+        <h4>6. Multiple-testing correction</h4>
+        <p>Positive and negative binary tests form one sentiment-prevalence family. Apply Holm correction if both are confirmatory; FDR if exploratory pairwise tests are added.</p>
+        <h4>7. Expected interpretation</h4>
+        <p>Useful for slide-friendly prevalence statements, but category-share results are more complete and should remain primary.</p>
+        <h4>8. Limitations and threats to validity</h4>
+        <p>Positive evidence can be easier to detect than negative evidence in tourism text. Negative comments may be shorter, rarer, or platform-suppressed.</p>
+      </article>
+
+      <article id="h6" class="hypothesis exploratory-h">
+        <h2>H6. Keyword Usage Differences By Reviewed Code Family</h2>
+        <span class="pill warn">exploratory content</span>
+        <span class="pill strong">reviewed evidence</span>
+        <h4>1. Research question</h4>
+        <p>Which reviewed friction, enjoyment, recommendation, and sentiment evidence codes differ most across language/source groups?</p>
+        <h4>2. Null and alternative hypotheses</h4>
+        <p><strong>H0:</strong> Each code's occurrence prevalence is equal across compared groups.</p>
+        <p><strong>H1:</strong> One or more codes have unequal occurrence prevalence across groups.</p>
+        <h4>3. Variables needed</h4>
+        <p>Per-code binary columns or matched-term fields for JP/EN and Chinese, denominator rows, language/source group, text length, POI/platform covariates.</p>
+        <h4>4. Recommended statistical test</h4>
+        <p>For each code: Fisher exact test or logistic regression. Report odds ratios, risk differences, and Wilson confidence intervals. For all codes in a family: global chi-square screen followed by per-code FDR-controlled tests.</p>
+        <h4>5. Assumptions and diagnostics</h4>
+        <ul>
+          <li>Use code families, not literal keywords, for cross-script comparison.</li>
+          <li>Audit translation/equivalence: a Japanese term and English term may not express same intensity.</li>
+          <li>Flag codes with low occurrence and suppress unstable rates below minimum n.</li>
+          <li>Check multi-match inflation: one row can match several terms in same family.</li>
+        </ul>
+        <h4>6. Multiple-testing correction</h4>
+        <p>Mandatory. Use Benjamini-Hochberg FDR within each code family. For high-stakes confirmatory subset, use Holm.</p>
+        <h4>7. Expected interpretation</h4>
+        <p>Results identify content themes more salient in one language/source group. Use effect sizes and confidence intervals, not p-values alone.</p>
+        <h4>8. Limitations and threats to validity</h4>
+        <p>Codebook coverage may differ by language. Substring matches do not equal human-coded intent. Terms may reflect POI mix or source prompt rather than visitor concern.</p>
+      </article>
+
+      <article id="h7" class="hypothesis exploratory-h">
+        <h2>H7. Topic Occurrence Rates Across Language/Source Groups</h2>
+        <span class="pill warn">exploratory</span>
+        <span class="pill limit">needs aligned topic contract</span>
+        <h4>1. Research question</h4>
+        <p>Do language/source groups emphasize different tourism topics such as history/culture, temples/spiritual sites, scenic nature, food, hot springs, dinosaurs/museums, crafts/shopping, accommodation, and seasonal events?</p>
+        <h4>2. Null and alternative hypotheses</h4>
+        <p><strong>H0:</strong> Topic occurrence prevalence is equal across language/source groups for each aligned topic.</p>
+        <p><strong>H1:</strong> At least one aligned topic has different occurrence prevalence by language/source group.</p>
+        <h4>3. Variables needed</h4>
+        <p>Chinese topic booleans already exist. For JP/EN, either reviewed topic booleans must be added, or <code>poi_category</code> must be explicitly labeled as destination-type proxy, not text topic.</p>
+        <h4>4. Recommended statistical test</h4>
+        <p>Preferred future test: per-topic logistic regression <code>topic_present ~ group + text_length_chars</code> with cluster/source sensitivity. Current feasible proxy test: compare Google <code>poi_category</code> mix by language group with chi-square; compare Chinese topic distributions separately, not as direct cross-language topic equality.</p>
+        <h4>5. Assumptions and diagnostics</h4>
+        <ul>
+          <li>Aligned topic codebook must be symmetrical across languages before cross-language topic claims.</li>
+          <li>POI category is not equivalent to what review text mentions.</li>
+          <li>Chinese rows can mention multiple topics; Google review POI category is single metadata label.</li>
+          <li>Fan-pilgrimage topic requires separate reporting because it is source-specific.</li>
+        </ul>
+        <h4>6. Multiple-testing correction</h4>
+        <p>Use FDR across topic families. Predefine top topics to avoid post hoc cherry-picking.</p>
+        <h4>7. Expected interpretation</h4>
+        <p>With aligned topic codebook, results support claims about topical emphasis. With current POI-category proxy only, results support destination mix diagnostics, not textual topic prevalence.</p>
+        <h4>8. Limitations and threats to validity</h4>
+        <p>Main threat is construct mismatch: topic mention, POI category, travel motive, and platform hashtag are different constructs.</p>
+      </article>
+
+      <article id="h8" class="hypothesis secondary-h">
+        <h2>H8. Cross-Source Friction And Enjoyment Evidence Prevalence</h2>
+        <span class="pill primary">secondary descriptive</span>
+        <span class="pill strong">reviewed evidence path</span>
+        <h4>1. Research question</h4>
+        <p>Do EN Google reviews, JP Google reviews, and Chinese-language XHS rows differ in prevalence of friction and enjoyment/recommendation evidence?</p>
+        <h4>2. Null and alternative hypotheses</h4>
+        <p><strong>H0:</strong> Evidence prevalence is equal across language/source groups.</p>
+        <p><strong>H1:</strong> Evidence prevalence differs for at least one language/source group.</p>
+        <h4>3. Variables needed</h4>
+        <p><code>any_friction</code>, <code>any_enjoyment_evidence</code>, language/source group, chosen Chinese source variant, text length, POI/platform fields.</p>
+        <h4>4. Recommended statistical test</h4>
+        <p>3-group chi-square test for each binary outcome. Pairwise Fisher tests with FDR. Sensitivity: JP/EN-only same-platform logistic model and Chinese XHS-only vs combined source comparison.</p>
+        <h4>5. Assumptions and diagnostics</h4>
+        <ul>
+          <li>Confirm reviewed JP/EN codebook config and Chinese runtime codebook are active.</li>
+          <li>Check source variant: XHS-only should be main cross-source comparison; Douyin combined output is sensitivity.</li>
+          <li>Check row-unit mismatch and text length.</li>
+        </ul>
+        <h4>6. Multiple-testing correction</h4>
+        <p>FDR across friction and enjoyment/recommendation binary outcomes. If drilling into individual friction codes, apply FDR within friction-code family.</p>
+        <h4>7. Expected interpretation</h4>
+        <p>Differences indicate source-specific discourse emphasis. Example: XHS may surface itinerary/access planning concerns more than Google reviews because post intent differs.</p>
+        <h4>8. Limitations and threats to validity</h4>
+        <p>Cross-source rows are not exchangeable. XHS notes, Douyin comments, and Google reviews have different prompts, audiences, and lengths.</p>
+      </article>
+
+      <article id="h9" class="hypothesis exploratory-h">
+        <h2>H9. Within-Chinese Platform Effects: Xiaohongshu vs Douyin</h2>
+        <span class="pill warn">source-sensitivity</span>
+        <span class="pill primary">important confound check</span>
+        <h4>1. Research question</h4>
+        <p>Do Xiaohongshu rows and Douyin comment rows differ in sentiment category, friction evidence, enjoyment evidence, and topic rates?</p>
+        <h4>2. Null and alternative hypotheses</h4>
+        <p><strong>H0:</strong> Outcome prevalence/distribution is equal across Chinese source platforms.</p>
+        <p><strong>H1:</strong> Outcome prevalence/distribution differs between source platforms.</p>
+        <h4>3. Variables needed</h4>
+        <p><code>source_platform</code>, <code>sentiment_category</code>, <code>any_friction</code>, <code>any_enjoyment_evidence</code>, topic booleans, <code>theme</code>, <code>text_length_chars</code>, body/text scope fields.</p>
+        <h4>4. Recommended statistical test</h4>
+        <p>Chi-square/Fisher for categorical outcomes; Mann-Whitney for text length; logistic regression for binary evidence with text length and theme controls if sample size supports it.</p>
+        <h4>5. Assumptions and diagnostics</h4>
+        <ul>
+          <li>Check source denominator balance: current combined output is dominated by Douyin comments.</li>
+          <li>Check whether Douyin comments lack theme annotations or have local parser IDs only.</li>
+          <li>Suppress rates for small source-theme slices below n=10.</li>
+        </ul>
+        <h4>6. Multiple-testing correction</h4>
+        <p>FDR across tested Chinese outcomes. Separate source-platform diagnostics from cross-language claims.</p>
+        <h4>7. Expected interpretation</h4>
+        <p>If platform effects are large, cross-language comparisons using pooled Chinese rows are unstable. Use XHS-only or stratified Chinese outputs in main analysis.</p>
+        <h4>8. Limitations and threats to validity</h4>
+        <p>Platform effect is confounded with text type: note vs comment. Douyin timestamps are relative/inferred and comments may be shorter.</p>
+      </article>
+
+      <article id="h10" class="hypothesis exploratory-h">
+        <h2>H10. Topic-Sentiment Association</h2>
+        <span class="pill warn">exploratory</span>
+        <span class="pill primary">content interpretation</span>
+        <h4>1. Research question</h4>
+        <p>Are certain topics or POI categories associated with positive or negative sentiment, and does that association differ by language/source group?</p>
+        <h4>2. Null and alternative hypotheses</h4>
+        <p><strong>H0:</strong> Topic/category presence is not associated with sentiment category after accounting for group.</p>
+        <p><strong>H1:</strong> Topic/category presence is associated with sentiment, or association differs by group.</p>
+        <h4>3. Variables needed</h4>
+        <p>Sentiment category or positive/negative binary, topic booleans for Chinese, <code>poi_category</code> for Google, future JP/EN topic booleans for aligned test, group, text length, source platform.</p>
+        <h4>4. Recommended statistical test</h4>
+        <p>Within Chinese: logistic regression <code>positive_vs_not ~ topic + source_platform + text_length_chars</code>. Within JP/EN: logistic or multinomial model <code>sentiment ~ language_group + poi_category + language_group:poi_category</code> with POI clustering. Cross-language aligned-topic version only after JP/EN topic codebook exists.</p>
+        <h4>5. Assumptions and diagnostics</h4>
+        <ul>
+          <li>Check sparse topic cells and multiple topics per row.</li>
+          <li>Check multicollinearity between topic and source platform/theme.</li>
+          <li>Use marginal effects, not only coefficients.</li>
+        </ul>
+        <h4>6. Multiple-testing correction</h4>
+        <p>FDR across topic terms and interaction tests. Treat interactions as exploratory unless preregistered.</p>
+        <h4>7. Expected interpretation</h4>
+        <p>Can show which content domains carry positive or negative discourse. Strongest as within-source analysis; weaker across source types.</p>
+        <h4>8. Limitations and threats to validity</h4>
+        <p>Topic-sentiment association is not causal. Some topics may appear because of popular POIs or campaigns, not because topic causes sentiment.</p>
+      </article>
+
+      <article id="h11" class="hypothesis primary-h">
+        <h2>H11. POI Category Mix: JP vs EN Google Reviews</h2>
+        <span class="pill strong">primary diagnostic</span>
+        <span class="pill strong">same platform</span>
+        <h4>1. Research question</h4>
+        <p>Do English-language and Japanese-language Google reviews cover different types of Fukui POIs?</p>
+        <h4>2. Null and alternative hypotheses</h4>
+        <p><strong>H0:</strong> POI category distribution is independent of review language group.</p>
+        <p><strong>H1:</strong> POI category distribution differs by review language group.</p>
+        <h4>3. Variables needed</h4>
+        <p><code>language_group</code>, <code>poi_category</code>, <code>poi_id</code>, review count per POI-language group.</p>
+        <h4>4. Recommended statistical test</h4>
+        <p>Chi-square test on <code>language_group x poi_category</code>. Use Fisher/Monte Carlo if sparse. Complement with standardized residuals and category share differences.</p>
+        <h4>5. Assumptions and diagnostics</h4>
+        <ul>
+          <li>Check category counts and rare categories; combine only with documented rationale.</li>
+          <li>Inspect whether few high-volume POIs dominate one language group.</li>
+          <li>Use POI-level counts as sensitivity, not only review rows.</li>
+        </ul>
+        <h4>6. Multiple-testing correction</h4>
+        <p>Global chi-square has no correction. If examining individual category residuals as tests, apply FDR across categories.</p>
+        <h4>7. Expected interpretation</h4>
+        <p>If POI mix differs, sentiment and keyword differences may partly reflect destination mix. Use as diagnostic and possible covariate, not headline outcome.</p>
+        <h4>8. Limitations and threats to validity</h4>
+        <p>POI metadata categories are analysis labels, not necessarily tourist motivations. Reviews are nested within POIs.</p>
+      </article>
+
+      <article id="h12" class="hypothesis exploratory-h">
+        <h2>H12. Text Length And Evidence Detection Bias</h2>
+        <span class="pill warn">diagnostic</span>
+        <span class="pill primary">bias control</span>
+        <h4>1. Research question</h4>
+        <p>Do language/source groups differ in text length, and does text length affect probability of keyword evidence detection?</p>
+        <h4>2. Null and alternative hypotheses</h4>
+        <p><strong>H0:</strong> Text length distribution and evidence detection probability are not associated with language/source group.</p>
+        <p><strong>H1:</strong> Text length differs by group and/or predicts evidence detection.</p>
+        <h4>3. Variables needed</h4>
+        <p><code>text_length_chars</code>, group label, all binary evidence outcomes, source platform, POI ID/category where available.</p>
+        <h4>4. Recommended statistical test</h4>
+        <p>Kruskal-Wallis for text length across three groups; Mann-Whitney for JP/EN. Logistic regression <code>any_evidence ~ text_length_chars + group</code> for detection bias.</p>
+        <h4>5. Assumptions and diagnostics</h4>
+        <ul>
+          <li>Character counts differ by writing system; consider within-language length controls and log length.</li>
+          <li>Inspect extreme lengths and title-only/body-only status for Chinese rows.</li>
+          <li>Check whether including length changes group effect estimates.</li>
+        </ul>
+        <h4>6. Multiple-testing correction</h4>
+        <p>Use as diagnostic. If many evidence outcomes are tested with length, FDR across outcomes.</p>
+        <h4>7. Expected interpretation</h4>
+        <p>Length differences warn that keyword prevalence may partly reflect opportunity to match terms. Adjusted and unadjusted estimates should be shown together.</p>
+        <h4>8. Limitations and threats to validity</h4>
+        <p>Character count is not equal semantic length across Chinese, Japanese, and English. Tokenization would improve diagnostics but adds language-specific choices.</p>
+      </article>
+
+      <article id="h13" class="hypothesis exploratory-h">
+        <h2>H13. Temporal Coverage And Seasonality Diagnostics</h2>
+        <span class="pill warn">diagnostic</span>
+        <span class="pill limit">Chinese dates weak</span>
+        <h4>1. Research question</h4>
+        <p>Do review date coverage and season/month distribution differ between JP and EN Google reviews, and could this confound sentiment/topic comparisons?</p>
+        <h4>2. Null and alternative hypotheses</h4>
+        <p><strong>H0:</strong> Date missingness and month/season distribution are independent of language group.</p>
+        <p><strong>H1:</strong> Date missingness or temporal distribution differs by language group.</p>
+        <h4>3. Variables needed</h4>
+        <p><code>language_group</code>, parseable <code>review_date</code>, month/season, date missing indicator, sentiment category.</p>
+        <h4>4. Recommended statistical test</h4>
+        <p>Chi-square for date missingness and month/season distribution. Optional Kolmogorov-Smirnov test for date distribution among parseable dates. Add month/season as covariate in JP/EN sensitivity models.</p>
+        <h4>5. Assumptions and diagnostics</h4>
+        <ul>
+          <li>Check date parseability by group. Current aggregate shows EN has missing dates while JP has full date coverage.</li>
+          <li>Do not include Chinese monthly trends until exact date scrub requirements are met.</li>
+          <li>Report date range and missing counts in every sentiment table.</li>
+        </ul>
+        <h4>6. Multiple-testing correction</h4>
+        <p>Diagnostic only. If month-specific outcome tests are run, use FDR across months or treat as seasonal model with one global test.</p>
+        <h4>7. Expected interpretation</h4>
+        <p>Temporal imbalance may explain sentiment differences if one group overrepresents peak seasons, events, or recent reviews.</p>
+        <h4>8. Limitations and threats to validity</h4>
+        <p>Collection window and Google sorting may influence observed dates. Chinese dates are often inferred and should not be mixed into confirmatory monthly tests.</p>
+      </article>
+
+      <article id="h14" class="hypothesis exploratory-h">
+        <h2>H14. Library Sentiment vs Reviewed Positive Evidence Disagreement</h2>
+        <span class="pill warn">validation</span>
+        <span class="pill strong">audit trail</span>
+        <h4>1. Research question</h4>
+        <p>Does disagreement between library sentiment category and reviewed positive evidence differ by language group?</p>
+        <h4>2. Null and alternative hypotheses</h4>
+        <p><strong>H0:</strong> Disagreement prevalence is equal across language groups.</p>
+        <p><strong>H1:</strong> Disagreement prevalence differs by language group.</p>
+        <h4>3. Variables needed</h4>
+        <p><code>sentiment_category</code>, <code>any_positive_evidence</code>, <code>library_vs_reviewed_positive_disagreement</code> or computable equivalent, language group, text length, POI ID/category.</p>
+        <h4>4. Recommended statistical test</h4>
+        <p>Two-proportion/Fisher test for JP vs EN disagreement rates. Logistic regression with language and text length, cluster-robust by POI. For Chinese, run separately because SnowNLP domain mismatch is different.</p>
+        <h4>5. Assumptions and diagnostics</h4>
+        <ul>
+          <li>Define disagreement rule before testing, for example library positive category vs absence of reviewed positive/recommendation evidence.</li>
+          <li>Sample rows manually from each disagreement cell for audit, without committing row text.</li>
+          <li>Check if disagreement concentrated in sarcasm, mixed reviews, or short texts.</li>
+        </ul>
+        <h4>6. Multiple-testing correction</h4>
+        <p>FDR if multiple disagreement definitions are tested. Prefer one preregistered definition plus qualitative audit notes.</p>
+        <h4>7. Expected interpretation</h4>
+        <p>High or asymmetric disagreement warns against treating library sentiment as primary evidence. It can guide codebook refinement.</p>
+        <h4>8. Limitations and threats to validity</h4>
+        <p>Absence of keyword evidence is not absence of sentiment. Library tools and codebooks capture different constructs.</p>
+      </article>
+
+      <section id="multiple-testing">
+        <h2>Multiple-Testing Strategy</h2>
+        <table class="compact">
+          <thead>
+            <tr>
+              <th>Family</th>
+              <th>Tests included</th>
+              <th>Correction</th>
+              <th>Claim strength</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Primary JP/EN sentiment</td>
+              <td>H1 category share, H2 rating, H3 evidence families</td>
+              <td>Declare H1 and H2 as planned tests; H3 FDR across evidence outcomes</td>
+              <td>Strongest</td>
+            </tr>
+            <tr>
+              <td>Cross-source sentiment</td>
+              <td>H4 global plus pairwise, H5 positive/negative binary</td>
+              <td>Global first, then FDR or Holm for pairwise tests</td>
+              <td>Descriptive</td>
+            </tr>
+            <tr>
+              <td>Keyword/code exploration</td>
+              <td>H6 and H8 per-code or per-family tests</td>
+              <td>Benjamini-Hochberg FDR within code family</td>
+              <td>Exploratory unless preregistered</td>
+            </tr>
+            <tr>
+              <td>Topic exploration</td>
+              <td>H7 and H10 topic/category tests</td>
+              <td>FDR across topics; interactions exploratory</td>
+              <td>Exploratory or diagnostic</td>
+            </tr>
+            <tr>
+              <td>Diagnostics</td>
+              <td>H11 through H14</td>
+              <td>Usually no correction if used as diagnostics; FDR if converted to claims</td>
+              <td>Validity support</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section id="assumption-checklist">
+        <h2>Pre-Analysis Checklist</h2>
+        <ol class="checklist">
+          <li>Freeze input variant: JP/EN Fukui Google rows, Chinese XHS-only non-fan, Chinese combined sensitivity, or another named subset.</li>
+          <li>Reconcile Chinese denominators across aggregate outputs before running final tests.</li>
+          <li>Record source paths, SHA256 hashes, generated time, commands, filters, and excluded rows.</li>
+          <li>Keep row-level text, authors, URLs, handles, source IDs, and screenshots out of committed outputs.</li>
+          <li>Define primary hypotheses before running exploratory per-code/topic scans.</li>
+          <li>Use cluster-aware sensitivity for Google reviews because rows nest in POIs.</li>
+          <li>Use exact/Fisher tests for sparse cells and suppress unstable small-slice rates.</li>
+          <li>Report effect sizes: Cramer's V, odds ratios, risk differences, confidence intervals, and standardized residuals.</li>
+          <li>Run sensitivity: POI-level aggregation, neutral-band thresholds, XHS-only vs combined Chinese, with/without fan theme.</li>
+          <li>Write claims as language/source discourse differences, not nationality or intrinsic satisfaction differences.</li>
+        </ol>
+      </section>
+
+      <section id="recommended-reporting">
+        <h2>Recommended Reporting Language</h2>
+        <div class="note">
+          <p>
+            "Among Fukui Google reviews, English-language and Japanese-language review rows differed in sentiment category shares under the repository's VADER/oseti category rules. Because reviews are nested within POIs and language groups differ in size and POI mix, the result should be reported with POI-level and cluster-bootstrap sensitivity checks."
+          </p>
+          <p>
+            "Cross-source comparisons involving Chinese-language social rows describe platformed discourse patterns across Google reviews, Xiaohongshu notes, and Douyin comments. They should not be interpreted as direct comparison of visitor satisfaction or nationality."
+          </p>
+          <p>
+            "Reviewed keyword evidence supports transparent claims about mentioned content and friction/enjoyment evidence. Library sentiment tools remain secondary checks, and raw VADER, oseti, and SnowNLP scores are not a common measurement scale."
+          </p>
+        </div>
+      </section>
+
+      <section id="implementation-next">
+        <h2>Next Method Work Before Publication</h2>
+        <ul>
+          <li>Create a small preregistration-style test matrix naming primary, secondary, exploratory, and diagnostic tests.</li>
+          <li>Add or verify a single aggregate test manifest that records denominator, subset, source variant, and row unit for every test.</li>
+          <li>If true cross-language topic tests are desired, build aligned JP/EN topic codebook evidence instead of relying on Google POI category as text-topic proxy.</li>
+          <li>Manually audit random matched and unmatched keyword evidence cells by language/code family, storing only aggregate audit results.</li>
+          <li>Prefer tables that show denominators and effect sizes beside p-values; p-values alone are too brittle for this source mix.</li>
+        </ul>
+      </section>
+    </main>
+  </body>
+</html>

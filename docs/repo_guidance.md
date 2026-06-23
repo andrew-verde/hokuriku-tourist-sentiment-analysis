@@ -90,7 +90,11 @@ Chinese social inputs are external and should remain external:
   EN/JP/CN sentiment-category chi-square/Fisher tests, within-Chinese
   source-platform tests when multiple Chinese platforms are present, and
   XHS-first cross-source friction/enjoyment evidence prevalence tests using
-  reviewed keyword evidence.
+  reviewed keyword evidence. The formal H1-H3 JP-EN scripts now write
+  aggregate-only hypothesis outputs under `output/hypothesis_tests/`: H1
+  sentiment category chi-square with neutral-band sensitivity, H2 common-scale
+  star-rating Welch tests, and H3 reviewed evidence prevalence tests with FDR
+  correction.
 - [x] Presentation outputs: `make presentation-safe` builds aggregate-only JP-EN
   chart/table data, captions, readiness notes, hashes, date coverage, and
   POI-category mix under `output/presentation_safe/`. The stage regenerates from

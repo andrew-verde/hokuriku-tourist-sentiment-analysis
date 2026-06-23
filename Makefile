@@ -1,6 +1,6 @@
 PYTHON = .venv/bin/python3
 
-.PHONY: help test chinese-codebook-template reviewed-codebook-config reviewed-codebook-status chinese-social chinese-social-xhs-only chinese-insights chinese-insights-xhs-only multilingual-reviews cross-language-trends sentiment-env sentiment-analysis presentation-safe
+.PHONY: help test chinese-codebook-template reviewed-codebook-config reviewed-codebook-status chinese-social chinese-social-xhs-only chinese-insights chinese-insights-xhs-only multilingual-reviews cross-language-trends sentiment-env sentiment-analysis hypothesis-h1 hypothesis-h2 hypothesis-h3 hypothesis-tests presentation-safe
 
 help:
 	@echo "Hokuriku tourist sentiment analysis"
@@ -16,6 +16,10 @@ help:
 	@echo "  make cross-language-trends   Build Fukui-first EN/JP/CN baseline tables"
 	@echo "  make sentiment-env           Install pinned JP-EN sentiment runtime"
 	@echo "  make sentiment-analysis      Build JP-EN sentiment aggregate outputs"
+	@echo "  make hypothesis-h1           Run JP-EN sentiment category hypothesis test"
+	@echo "  make hypothesis-h2           Run JP-EN star-rating hypothesis test"
+	@echo "  make hypothesis-h3           Run JP-EN reviewed-evidence hypothesis tests"
+	@echo "  make hypothesis-tests        Run H1, H2, and H3 hypothesis test scripts"
 	@echo "  make presentation-safe       Build slide-safe JP-EN aggregate scaffold"
 	@echo "  make test                    Run pytest"
 
@@ -51,6 +55,17 @@ sentiment-env:
 
 sentiment-analysis:
 	$(PYTHON) scripts/build_sentiment_analysis.py --groups japanese,english --prefecture Fukui
+
+hypothesis-h1:
+	$(PYTHON) scripts/test_h1_sentiment_category_jp_en.py
+
+hypothesis-h2:
+	$(PYTHON) scripts/test_h2_review_rating_jp_en.py
+
+hypothesis-h3:
+	$(PYTHON) scripts/test_h3_reviewed_evidence_jp_en.py
+
+hypothesis-tests: hypothesis-h1 hypothesis-h2 hypothesis-h3
 
 presentation-safe:
 	$(PYTHON) scripts/build_presentation_safe_outputs.py

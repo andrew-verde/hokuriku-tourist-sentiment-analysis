@@ -475,6 +475,54 @@ output/sentiment_aggregates/source_group_sentiment_tests.csv
 output/sentiment_aggregates/sentiment_readiness.md
 ```
 
+## JP-EN Hypothesis Tests H1-H3
+
+The formal JP-EN hypothesis scripts run after the scored-review audit file exists:
+
+```bash
+make sentiment-analysis
+make hypothesis-tests
+```
+
+They use only the base requirements already listed in `requirements.txt`:
+`pandas`, `numpy`, `scipy`, and the Python standard library. No regression or
+new modeling dependency is introduced.
+
+Tracked aggregate outputs:
+
+```text
+output/hypothesis_tests/h1_sentiment_category_jp_en.csv
+output/hypothesis_tests/h1_sentiment_category_jp_en_manifest.json
+output/hypothesis_tests/h2_review_rating_jp_en.csv
+output/hypothesis_tests/h2_review_rating_jp_en_manifest.json
+output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv
+output/hypothesis_tests/h3_reviewed_evidence_jp_en_manifest.json
+```
+
+H1 tests `language_group x sentiment_category` with a 2 x 3 chi-square test,
+Cramer's V, expected counts, standardized residuals, and neutral-band
+sensitivity for `sentiment_category_neutral_0_10` and
+`sentiment_category_neutral_0_20`. Holm-adjusted p-values are reported across
+the primary and neutral-band sensitivity rows when p-values exist.
+
+H2 tests common-scale Google `review_rating` with Welch's t-test on review rows,
+reports mean difference and confidence interval, and adds POI-language mean
+Welch sensitivity plus Mann-Whitney and rating-distribution chi-square
+diagnostics. This is valid as a common 1-to-5 star-rating comparison, not a
+replacement for text sentiment.
+
+H3 tests reviewed evidence prevalence for `any_friction`,
+`any_enjoyment_evidence`, `any_recommendation_evidence`, and
+`any_positive_evidence`. Each evidence family uses a 2 x 2 prevalence table,
+Fisher exact when expected counts are sparse, chi-square otherwise, risk
+difference in percentage points, and Benjamini-Hochberg FDR across the four
+family p-values. Text-length summaries are included because longer reviews have
+more opportunity to match evidence terms.
+
+All H1-H3 outputs carry denominators, input SHA256, command, timestamp, and
+caveats. They must remain aggregate-only: no row-level text, author/source IDs,
+URLs, `review_id`, `place_id`, or `poi_id`.
+
 Summary columns:
 
 ```text

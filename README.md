@@ -100,6 +100,22 @@ Build Fukui JP-EN sentiment aggregates:
 make sentiment-analysis
 ```
 
+Run professor-readable H1/H2/H3 JP-EN hypothesis test scripts from the ignored
+scored-review audit file:
+
+```bash
+make hypothesis-tests
+```
+
+This writes aggregate-only CSV and manifest files under
+`output/hypothesis_tests/` for:
+
+```text
+H1 sentiment category chi-square with neutral-band sensitivity
+H2 Google star-rating Welch tests with POI-level sensitivity
+H3 reviewed evidence prevalence tests with Benjamini-Hochberg FDR
+```
+
 Build slide-safe JP-EN aggregate chart/table scaffolding from tracked aggregate
 sentiment outputs and locally generated cross-language baseline tables:
 

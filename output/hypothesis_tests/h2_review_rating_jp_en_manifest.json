@@ -1,0 +1,56 @@
+{
+  "schema_version": "research_provenance.v1",
+  "kind": "hypothesis_h2_review_rating_jp_en",
+  "generated_at": "2026-06-23T10:18:08+00:00",
+  "command": "scripts/test_h2_review_rating_jp_en.py",
+  "inputs": [
+    {
+      "role": "ignored_scored_review_audit_file",
+      "path": "/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/output/sentiment_row_level/google_reviews_fukui_japanese-english.csv",
+      "exists": true,
+      "bytes": 451502,
+      "sha256": "72df51c468c6e829c9b121b9c71233e98a3ebc2a9c424d5eda63b83e1883eeed"
+    }
+  ],
+  "outputs": [
+    {
+      "role": "tracked_hypothesis_test_csv",
+      "path": "/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/output/hypothesis_tests/h2_review_rating_jp_en.csv",
+      "exists": true,
+      "bytes": 7315,
+      "sha256": "d2fee108d6768ca2d5adc005de24089de12913f53b80daa4660050eb49b9edf8"
+    }
+  ],
+  "filters": {
+    "prefecture": "Fukui",
+    "groups": [
+      "english",
+      "japanese"
+    ]
+  },
+  "metrics": {
+    "hypothesis": "H2",
+    "primary_unit": "one Fukui Google review row",
+    "sensitivity_unit": "one POI-language mean Google rating",
+    "denominators": {
+      "english": 214,
+      "japanese": 1800
+    },
+    "measurement_scale": "common_google_1_to_5_star_rating"
+  },
+  "caveats": [
+    "Group labels describe review language, not reviewer nationality.",
+    "Fukui Google review rows are nested in POIs; row-level p-values are descriptive without a clustered model.",
+    "English-language and Japanese-language review counts may be imbalanced.",
+    "Outputs are aggregate-only and omit row-level text, author fields, URLs, source IDs, review IDs, place IDs, and POI IDs.",
+    "Google review_rating is common-scale companion outcome evidence, not a replacement for text sentiment.",
+    "Ceiling effects are possible on 1-to-5 ratings."
+  ],
+  "extra": {
+    "dependency_versions": {
+      "pandas": "3.0.3",
+      "numpy": "2.4.6",
+      "scipy": "1.18.0"
+    }
+  }
+}
