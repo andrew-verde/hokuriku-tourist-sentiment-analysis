@@ -1,0 +1,7 @@
+source_kind,date_precision,count,pct_rows,usable_for_monthly_trends,scrub_required
+google_review,exact_or_provider_timestamp,1981,98.361,True,"Keep provider review_date, collection_date, POI metadata, and language filter hashes."
+google_review,missing_or_unparseable,33,1.639,False,Exclude or repair before monthly trend output.
+chinese_social_post,exact,112,56.0,True,Keep only rows with exact platform post dates for monthly trend output.
+chinese_social_post,none,52,26.0,False,Recover source post date or exclude from monthly trend output.
+chinese_social_post,year_inferred,33,16.5,False,Recover exact source post date or exclude from monthly trend output.
+chinese_social_post,relative_inferred,3,1.5,False,Recover absolute source post date from capture evidence; current scrape-anchored dates are not monthly-trend evidence.

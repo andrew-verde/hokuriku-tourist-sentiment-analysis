@@ -1,6 +1,6 @@
 PYTHON = .venv/bin/python3
 
-.PHONY: help test chinese-codebook-template reviewed-codebook-config reviewed-codebook-status chinese-social chinese-social-xhs-only chinese-social-with-douyin chinese-insights chinese-insights-xhs-only multilingual-reviews cross-language-trends sentiment-env sentiment-analysis hypothesis-h1 hypothesis-h2 hypothesis-h3 hypothesis-tests within-en-sentiment within-jp-sentiment within-cn-sentiment within-language-sentiment presentation-safe
+.PHONY: help test chinese-codebook-template reviewed-codebook-config reviewed-codebook-status chinese-social chinese-social-xhs-only chinese-social-with-douyin chinese-insights chinese-insights-xhs-only multilingual-reviews cross-language-trends sentiment-env sentiment-analysis hypothesis-h1 hypothesis-h2 hypothesis-h3 hypothesis-tests within-en-sentiment within-jp-sentiment within-cn-sentiment within-language-sentiment presentation-safe statistical-test-figures
 
 help:
 	@echo "Hokuriku tourist sentiment analysis"
@@ -26,6 +26,7 @@ help:
 	@echo "  make within-cn-sentiment     Run Chinese within-source sentiment drivers"
 	@echo "  make within-language-sentiment Run all within-language/source sentiment drivers"
 	@echo "  make presentation-safe       Build slide-safe JP-EN aggregate scaffold"
+	@echo "  make statistical-test-figures Build aggregate-only SVG figures for statistical tests"
 	@echo "  make test                    Run pytest"
 
 chinese-codebook-template:
@@ -88,6 +89,9 @@ within-language-sentiment: within-en-sentiment within-jp-sentiment within-cn-sen
 
 presentation-safe:
 	$(PYTHON) scripts/build_presentation_safe_outputs.py
+
+statistical-test-figures:
+	$(PYTHON) scripts/build_statistical_test_figures.py
 
 test:
 	$(PYTHON) -m pytest

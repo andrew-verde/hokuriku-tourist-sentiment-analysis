@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="304" viewBox="0 0 1120 304">
+<rect width="100%" height="100%" fill="#fbfaf7"/>
+<text x="32.00" y="39.00" text-anchor="start" font-family="Arial, sans-serif" font-size="24" font-weight="700" fill="#172033">H2 Star Rating Distribution</text>
+<text x="32.00" y="66.00" text-anchor="start" font-family="Arial, sans-serif" font-size="14" font-weight="400" fill="#5b677a">Common 1-to-5 Google scale; p=5.7e-08</text>
+<text x="281.00" y="130.00" text-anchor="end" font-family="Arial, sans-serif" font-size="13" font-weight="400" fill="#172033">English-language reviews</text>
+<rect x="295.00" y="112.00" width="26.43" height="25" fill="#963a35"/>
+<rect x="321.43" y="112.00" width="6.61" height="25" fill="#c06c38"/>
+<rect x="328.04" y="112.00" width="39.64" height="25" fill="#d6a14a"/>
+<rect x="367.68" y="112.00" width="125.54" height="25" fill="#6f8f72"/>
+<text x="430.45" y="130.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#ffffff">17.8%</text>
+<rect x="493.22" y="112.00" width="508.78" height="25" fill="#2f6f73"/>
+<text x="747.61" y="130.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#ffffff">72.0%</text>
+<text x="1012.00" y="130.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#5b677a">n=214</text>
+<text x="281.00" y="184.00" text-anchor="end" font-family="Arial, sans-serif" font-size="13" font-weight="400" fill="#172033">Japanese-language reviews</text>
+<rect x="295.00" y="166.00" width="17.28" height="25" fill="#963a35"/>
+<rect x="312.28" y="166.00" width="14.93" height="25" fill="#c06c38"/>
+<rect x="327.21" y="166.00" width="92.70" height="25" fill="#d6a14a"/>
+<text x="373.56" y="184.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#ffffff">13.1%</text>
+<rect x="419.90" y="166.00" width="222.71" height="25" fill="#6f8f72"/>
+<text x="531.26" y="184.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#ffffff">31.5%</text>
+<rect x="642.61" y="166.00" width="359.39" height="25" fill="#2f6f73"/>
+<text x="822.30" y="184.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#ffffff">50.8%</text>
+<text x="1012.00" y="184.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#5b677a">n=1,800</text>
+<rect x="295.00" y="252.00" width="10" height="10" fill="#963a35"/>
+<text x="311.00" y="262.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#5b677a">rating_1</text>
+<rect x="413.00" y="252.00" width="10" height="10" fill="#c06c38"/>
+<text x="429.00" y="262.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#5b677a">rating_2</text>
+<rect x="531.00" y="252.00" width="10" height="10" fill="#d6a14a"/>
+<text x="547.00" y="262.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#5b677a">rating_3</text>
+<rect x="649.00" y="252.00" width="10" height="10" fill="#6f8f72"/>
+<text x="665.00" y="262.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#5b677a">rating_4</text>
+<rect x="767.00" y="252.00" width="10" height="10" fill="#2f6f73"/>
+<text x="783.00" y="262.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#5b677a">rating_5</text>
+<text x="32.00" y="286.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#5b677a">Ceiling effects matter: both groups skew high, but English has more 5-star rows.</text>
+</svg>

@@ -1,0 +1,476 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Statistical Test Index - Fukui Tourism Text Analysis</title>
+    <style>
+      :root {
+        --ink: #172033;
+        --muted: #5b677a;
+        --line: #d7dde8;
+        --soft: #f6f8fb;
+        --blue: #214f80;
+        --green: #28624f;
+        --amber: #8a5a14;
+        --red: #963a35;
+        --card: #ffffff;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        background: #f4f6f8;
+        color: var(--ink);
+        font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        line-height: 1.5;
+        letter-spacing: 0;
+      }
+      main {
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 34px 22px 60px;
+      }
+      header, section, article {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        box-shadow: 0 1px 2px rgba(17, 24, 39, 0.05);
+      }
+      header {
+        padding: 28px;
+        margin-bottom: 18px;
+      }
+      section, article {
+        padding: 24px;
+        margin-top: 18px;
+      }
+      h1, h2, h3, h4 {
+        margin: 0;
+        line-height: 1.2;
+      }
+      h1 { font-size: 30px; }
+      h2 { font-size: 22px; margin-bottom: 12px; }
+      h3 { font-size: 18px; margin-bottom: 10px; }
+      h4 { font-size: 15px; margin-top: 16px; margin-bottom: 6px; }
+      p { margin: 8px 0; }
+      ul, ol { margin: 8px 0 0 22px; padding: 0; }
+      li { margin: 4px 0; }
+      a {
+        color: var(--blue);
+        font-weight: 650;
+        overflow-wrap: anywhere;
+        text-decoration-thickness: 1px;
+      }
+      code {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        background: #edf1f7;
+        padding: 1px 5px;
+        border-radius: 4px;
+        font-size: 0.94em;
+        overflow-wrap: anywhere;
+        white-space: normal;
+        word-break: break-word;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+        font-size: 14px;
+      }
+      th, td {
+        border: 1px solid var(--line);
+        padding: 8px 10px;
+        vertical-align: top;
+        text-align: left;
+      }
+      th {
+        background: #eef3f8;
+        color: #243044;
+      }
+      .subtitle { color: var(--muted); margin-top: 7px; }
+      .grid {
+        display: grid;
+        gap: 14px;
+      }
+      .grid.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .grid.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .cards {
+        align-items: stretch;
+        gap: 14px;
+        margin-top: 18px;
+      }
+      .cards article {
+        margin-top: 0;
+        min-width: 0;
+        padding: 24px;
+      }
+      .cards p {
+        max-width: 60ch;
+      }
+      .facts {
+        margin-left: 18px;
+      }
+      .facts li {
+        margin: 6px 0;
+        padding-left: 2px;
+      }
+      .facts a {
+        display: inline;
+      }
+      .section-intro {
+        color: var(--muted);
+        max-width: 82ch;
+      }
+      .pill {
+        display: inline-block;
+        border-radius: 999px;
+        padding: 3px 9px;
+        font-size: 12px;
+        font-weight: 700;
+        margin-right: 5px;
+        margin-top: 6px;
+      }
+      .pill.primary { background: #e4f0ff; color: var(--blue); }
+      .pill.strong { background: #e4f7ef; color: var(--green); }
+      .pill.warn { background: #fff1d6; color: var(--amber); }
+      .pill.limit { background: #ffe8e5; color: var(--red); }
+      .note {
+        background: var(--soft);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 14px;
+      }
+      .advisor {
+        border-left: 4px solid var(--blue);
+        padding-left: 14px;
+      }
+      .risk {
+        border-left: 4px solid var(--red);
+        padding-left: 14px;
+      }
+      .hypothesis {
+        border-top: 4px solid #c8d6e8;
+      }
+      .hypothesis.primary-h { border-top-color: var(--green); }
+      .hypothesis.secondary-h { border-top-color: var(--blue); }
+      .hypothesis.exploratory-h { border-top-color: var(--amber); }
+      .output-list {
+        display: grid;
+        gap: 5px;
+      }
+      .small { font-size: 13px; color: var(--muted); }
+      .compact td, .compact th { padding: 6px 8px; }
+      .checklist li { margin-bottom: 7px; }
+      @media (max-width: 860px) {
+        .grid.two, .grid.three { grid-template-columns: 1fr; }
+        main { padding: 20px 14px 42px; }
+        header, section, article { padding: 18px; }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <h1>Statistical Test Index</h1>
+        <p class="subtitle">Fukui-first tourism text analysis - public-facing test map - 2026-06-23</p>
+        <p>
+          This page collects the statistical tests currently implemented in the repository and links each referenced
+          aggregate output. It excludes raw row-level text, author fields, source URLs, review IDs, and other local
+          data-bearing artifacts.
+        </p>
+        <div>
+          <span class="pill strong">tracked aggregate outputs</span>
+          <span class="pill primary">reproducible commands</span>
+          <span class="pill warn">descriptive where source/platform differs</span>
+          <span class="pill limit">no raw cross-tool score comparison</span>
+        </div>
+      </header>
+
+      <section id="interpretation-boundary">
+        <h2>Interpretation Boundary</h2>
+        <div class="advisor">
+          <p>
+            English-language Google reviews use VADER, Japanese-language Google reviews use oseti, and Chinese-language
+            social rows use SnowNLP. Category-share tests and within-tool score diagnostics are reproducible, but raw
+            VADER, oseti, and SnowNLP means are not common-scale evidence.
+          </p>
+          <p>
+            JP/EN Google review tests are strongest when they keep platform constant. Chinese-language social comparisons
+            are source-aware discourse comparisons because Xiaohongshu notes and Douyin comments differ from Google reviews.
+          </p>
+        </div>
+      </section>
+
+      <section id="run-map">
+        <h2>Run Map</h2>
+        <table class="compact">
+          <thead>
+            <tr>
+              <th>Command</th>
+              <th>Test family</th>
+              <th>Primary public outputs</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>make sentiment-analysis</code></td>
+              <td>JP/EN aggregate sentiment sensitivity tests</td>
+              <td>
+                <a href="statistical_test_outputs/sentiment_aggregates/source_group_sentiment_tests.csv">source_group_sentiment_tests.csv</a>,
+                <a href="statistical_test_outputs/sentiment_aggregates/sentiment_manifest.json">sentiment_manifest.json</a>,
+                <a href="statistical_test_outputs/sentiment_aggregates/sentiment_readiness.md">sentiment_readiness.md</a>
+              </td>
+            </tr>
+            <tr>
+              <td><code>make hypothesis-tests</code></td>
+              <td>Professor-readable H1-H3 JP/EN tests</td>
+              <td><a href="#jp-en-hypotheses">H1-H3 output links below</a></td>
+            </tr>
+            <tr>
+              <td><code>make within-language-sentiment</code></td>
+              <td>Within-language/source driver tests</td>
+              <td><a href="#within-language">WL output links below</a></td>
+            </tr>
+            <tr>
+              <td><code>make cross-language-trends</code></td>
+              <td>Cross-source baseline category tests</td>
+              <td>
+                <a href="statistical_test_outputs/cross_language_trends/cross_language_statistical_tests.csv">cross_language_statistical_tests.csv</a>,
+                <a href="statistical_test_outputs/cross_language_trends/cross_language_baseline_snapshot.csv">cross_language_baseline_snapshot.csv</a>,
+                <a href="statistical_test_outputs/cross_language_trends/date_scrub_requirements.csv">date_scrub_requirements.csv</a>,
+                <a href="statistical_test_outputs/cross_language_trends/cross_language_trends_readiness.md">cross_language_trends_readiness.md</a>
+                <div class="small">Generated locally under an ignored output directory.</div>
+              </td>
+            </tr>
+            <tr>
+              <td><code>make presentation-safe</code></td>
+              <td>Slide-safe statistical summary</td>
+              <td>
+                <a href="statistical_test_outputs/presentation_safe/jp_en_statistical_sensitivity_summary.csv">jp_en_statistical_sensitivity_summary.csv</a>,
+                <a href="statistical_test_outputs/presentation_safe/jp_en_library_sentiment_chart_data.csv">jp_en_library_sentiment_chart_data.csv</a>,
+                <a href="statistical_test_outputs/presentation_safe/presentation_manifest.json">presentation_manifest.json</a>,
+                <a href="statistical_test_outputs/presentation_safe/presentation_readiness.md">presentation_readiness.md</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section id="figure-pack">
+        <h2>Supplemental Figure Pack</h2>
+        <p class="section-intro">
+          Use <code>make statistical-test-figures</code> to rebuild aggregate-only SVG figures for the hypothesis tests,
+          within-language driver tests, cross-source tests, date-quality diagnostics, and skipped Chinese platform slots.
+        </p>
+        <ul class="facts">
+          <li><a href="statistical_test_figures/statistical_test_figure_questions.md">Figure questions and caveats</a></li>
+          <li><a href="statistical_test_figures/statistical_test_figure_index.csv">Figure index CSV</a></li>
+          <li><a href="statistical_test_figures/statistical_test_figure_manifest.json">Figure provenance manifest</a></li>
+        </ul>
+      </section>
+
+      <section id="jp-en-aggregate">
+        <h2>JP/EN Aggregate Sentiment Tests</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Output</th>
+              <th>Tests Documented</th>
+              <th>Use</th>
+              <th>Caveats</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <a href="statistical_test_outputs/sentiment_aggregates/source_group_sentiment_tests.csv">source_group_sentiment_tests.csv</a><br />
+                <a href="statistical_test_outputs/sentiment_aggregates/sentiment_manifest.json">sentiment_manifest.json</a>
+              </td>
+              <td>
+                Chi-square sentiment category, Mann-Whitney sentiment score, bootstrap mean/median score differences,
+                POI-level and cluster bootstrap sensitivity, rating Welch tests, Welch ANOVA, Spearman rating validation,
+                and explicit skipped raw-score parametric tests.
+              </td>
+              <td>Broad aggregate statistical evidence created by the sentiment analysis pipeline.</td>
+              <td>Score-distribution tests are descriptive sensitivity; VADER and oseti raw scores are not common scale.</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section id="jp-en-hypotheses">
+        <h2>H1-H3 JP/EN Hypothesis Tests</h2>
+        <p class="section-intro">
+          These are the professor-readable same-platform tests. Each card links to the aggregate CSV and manifest used
+          for audit.
+        </p>
+        <div class="grid three cards">
+          <article class="hypothesis primary-h">
+            <h3>H1 Sentiment Category</h3>
+            <p>
+              Tests whether English-language and Japanese-language Fukui Google reviews differ in negative, neutral, and
+              positive sentiment category shares. Includes neutral-band sensitivity.
+            </p>
+            <ul class="facts">
+              <li>Script: <code>scripts/test_h1_sentiment_category_jp_en.py</code></li>
+              <li>Command: <code>make hypothesis-h1</code></li>
+              <li>Output: <a href="statistical_test_outputs/hypothesis_tests/h1_sentiment_category_jp_en.csv">h1_sentiment_category_jp_en.csv</a></li>
+              <li>Manifest: <a href="statistical_test_outputs/hypothesis_tests/h1_sentiment_category_jp_en_manifest.json">h1_sentiment_category_jp_en_manifest.json</a></li>
+              <li>Tests: chi-square, Cramer's V, Holm adjustment across neutral-band sensitivity rows.</li>
+            </ul>
+          </article>
+          <article class="hypothesis primary-h">
+            <h3>H2 Star Rating</h3>
+            <p>
+              Tests Google review ratings as a common 1-to-5 scale. This is a companion outcome, not raw text-sentiment
+              equivalence.
+            </p>
+            <ul class="facts">
+              <li>Script: <code>scripts/test_h2_review_rating_jp_en.py</code></li>
+              <li>Command: <code>make hypothesis-h2</code></li>
+              <li>Output: <a href="statistical_test_outputs/hypothesis_tests/h2_review_rating_jp_en.csv">h2_review_rating_jp_en.csv</a></li>
+              <li>Manifest: <a href="statistical_test_outputs/hypothesis_tests/h2_review_rating_jp_en_manifest.json">h2_review_rating_jp_en_manifest.json</a></li>
+              <li>Tests: Welch t-test, POI-level Welch sensitivity, Mann-Whitney, rating-distribution chi-square.</li>
+            </ul>
+          </article>
+          <article class="hypothesis primary-h">
+            <h3>H3 Reviewed Evidence</h3>
+            <p>
+              Tests reviewed keyword evidence prevalence for friction, enjoyment, recommendation, and positive evidence.
+            </p>
+            <ul class="facts">
+              <li>Script: <code>scripts/test_h3_reviewed_evidence_jp_en.py</code></li>
+              <li>Command: <code>make hypothesis-h3</code></li>
+              <li>Output: <a href="statistical_test_outputs/hypothesis_tests/h3_reviewed_evidence_jp_en.csv">h3_reviewed_evidence_jp_en.csv</a></li>
+              <li>Manifest: <a href="statistical_test_outputs/hypothesis_tests/h3_reviewed_evidence_jp_en_manifest.json">h3_reviewed_evidence_jp_en_manifest.json</a></li>
+              <li>Tests: chi-square or Fisher exact, risk difference, Benjamini-Hochberg FDR.</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+
+      <section id="within-language">
+        <h2>Within-Language And Within-Source Driver Tests</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Family</th>
+              <th>Output Links</th>
+              <th>Tests</th>
+              <th>Interpretation</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>WL-EN English-language Google reviews</td>
+              <td>
+                <div class="output-list">
+                  <a href="statistical_test_outputs/within_language_sentiment/en_within_language_sentiment_drivers.csv">en_within_language_sentiment_drivers.csv</a>
+                  <a href="statistical_test_outputs/within_language_sentiment/en_within_language_sentiment_manifest.json">en_within_language_sentiment_manifest.json</a>
+                </div>
+              </td>
+              <td>Mann-Whitney score tests, Fisher/chi-square sentiment event tests, Spearman rating validation, Kruskal-Wallis POI category diagnostic.</td>
+              <td>VADER scores only within English-language reviews; POI nesting remains descriptive caveat.</td>
+            </tr>
+            <tr>
+              <td>WL-JP Japanese-language Google reviews</td>
+              <td>
+                <div class="output-list">
+                  <a href="statistical_test_outputs/within_language_sentiment/jp_within_language_sentiment_drivers.csv">jp_within_language_sentiment_drivers.csv</a>
+                  <a href="statistical_test_outputs/within_language_sentiment/jp_within_language_sentiment_manifest.json">jp_within_language_sentiment_manifest.json</a>
+                </div>
+              </td>
+              <td>Mann-Whitney score tests, chi-square sentiment event tests, Spearman rating validation, Kruskal-Wallis POI category diagnostic.</td>
+              <td>oseti scores only within Japanese-language reviews; not raw-comparable to VADER or SnowNLP.</td>
+            </tr>
+            <tr>
+              <td>WL-CN Chinese-language social rows</td>
+              <td>
+                <div class="output-list">
+                  <a href="statistical_test_outputs/within_language_sentiment/cn_within_source_sentiment_drivers.csv">cn_within_source_sentiment_drivers.csv</a>
+                  <a href="statistical_test_outputs/within_language_sentiment/cn_within_source_sentiment_manifest.json">cn_within_source_sentiment_manifest.json</a>
+                </div>
+              </td>
+              <td>Mann-Whitney topic/friction score tests, chi-square sentiment event tests, Kruskal-Wallis platform and theme diagnostics.</td>
+              <td>SnowNLP scores only within Chinese-language social rows; theme tests exclude unclassified as unresolved coverage.</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section id="cross-source">
+        <h2>Cross-Source Baseline Tests</h2>
+        <div class="risk">
+          <p>
+            Cross-source tests are descriptive because Google reviews, Xiaohongshu notes, and Douyin comments differ in
+            platform, intent, text length, and date quality. Do not interpret raw sentiment score means across tools.
+          </p>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Output</th>
+              <th>Tests</th>
+              <th>Public Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <a href="statistical_test_outputs/cross_language_trends/cross_language_statistical_tests.csv">cross_language_statistical_tests.csv</a><br />
+                <a href="statistical_test_outputs/cross_language_trends/cross_language_baseline_snapshot.csv">cross_language_baseline_snapshot.csv</a><br />
+                <a href="statistical_test_outputs/cross_language_trends/date_scrub_requirements.csv">date_scrub_requirements.csv</a><br />
+                <a href="statistical_test_outputs/cross_language_trends/cross_language_trends_readiness.md">cross_language_trends_readiness.md</a>
+              </td>
+              <td>Cross-source sentiment category independence and related descriptive source-platform checks.</td>
+              <td>Generated locally under ignored <code>output/cross_language_trends/</code>; links work in a built checkout.</td>
+            </tr>
+            <tr>
+              <td>
+                <a href="statistical_test_outputs/chinese_social_media_analysis/chinese_city_platform_friction_tests.csv">chinese_city_platform_friction_tests.csv</a><br />
+                <a href="statistical_test_outputs/chinese_social_media_analysis_xhs_only/chinese_city_platform_friction_tests.csv">chinese_city_platform_friction_tests.csv (XHS-only)</a>
+              </td>
+              <td>Chinese city/platform friction Fisher exact output slot.</td>
+              <td>Current local files are header-only when comparison groups are unavailable; generated under ignored Chinese output dirs.</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section id="presentation-safe">
+        <h2>Presentation-Safe Statistical Summary</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Output</th>
+              <th>Purpose</th>
+              <th>Caveat</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <a href="statistical_test_outputs/presentation_safe/jp_en_statistical_sensitivity_summary.csv">jp_en_statistical_sensitivity_summary.csv</a><br />
+                <a href="statistical_test_outputs/presentation_safe/jp_en_library_sentiment_chart_data.csv">jp_en_library_sentiment_chart_data.csv</a><br />
+                <a href="statistical_test_outputs/presentation_safe/presentation_manifest.json">presentation_manifest.json</a><br />
+                <a href="statistical_test_outputs/presentation_safe/presentation_readiness.md">presentation_readiness.md</a>
+              </td>
+              <td>Condenses JP/EN test families into slide-safe aggregate rows and visualization-ready chart data.</td>
+              <td>P-values remain descriptive unless a later clustered/covariate model is justified and documented.</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section id="method-docs">
+        <h2>Method References In Repo</h2>
+        <ul>
+          <li><a href="sentiment_comparison_method.md">Sentiment comparison method</a></li>
+          <li><a href="repo_guidance.md">Repository guidance and guardrails</a></li>
+          <li><a href="cross_language_trends.md">Cross-language trend notes</a></li>
+          <li><a href="../architecture_review/hypothesis_tests_20260623.html">Original hypothesis test design HTML</a></li>
+        </ul>
+      </section>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="568" viewBox="0 0 1120 568">
+<rect width="100%" height="100%" fill="#fbfaf7"/>
+<text x="32.00" y="39.00" text-anchor="start" font-family="Arial, sans-serif" font-size="24" font-weight="700" fill="#172033">Within-English Sentiment Drivers</text>
+<text x="32.00" y="66.00" text-anchor="start" font-family="Arial, sans-serif" font-size="14" font-weight="400" fill="#5b677a">Enjoyment/positive evidence has largest VADER-score separation</text>
+<line x1="657.50" x2="657.50" y1="94" y2="506" stroke="#d7dde8" stroke-width="1"/>
+<text x="351.00" y="125.00" text-anchor="end" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">review rating / sentiment score</text>
+<rect x="657.50" y="110.00" width="292.50" height="20" rx="3" fill="#8d99ae"/>
+<text x="958.00" y="125.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">effect=0.348; p=1.7e-07</text>
+<text x="351.00" y="164.00" text-anchor="end" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">any enjoyment evidence / sentiment score</text>
+<rect x="657.50" y="149.00" width="251.23" height="20" rx="3" fill="#5b6c94"/>
+<text x="916.73" y="164.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">effect=0.299; p=1.6e-11</text>
+<text x="351.00" y="203.00" text-anchor="end" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">any positive evidence / sentiment score</text>
+<rect x="657.50" y="188.00" width="234.29" height="20" rx="3" fill="#5b6c94"/>
+<text x="899.79" y="203.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">effect=0.279; p=2.2e-10</text>
+<text x="351.00" y="242.00" text-anchor="end" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">any friction / sentiment score</text>
+<rect x="448.24" y="227.00" width="209.26" height="20" rx="3" fill="#5b6c94"/>
+<text x="440.24" y="242.00" text-anchor="end" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">effect=-0.249; p=0.056</text>
+<text x="351.00" y="281.00" text-anchor="end" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">any friction / sentiment category=positive</text>
+<rect x="488.34" y="266.00" width="169.16" height="20" rx="3" fill="#bc6c25"/>
+<text x="480.34" y="281.00" text-anchor="end" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">effect=-0.201; p=0.001</text>
+<text x="351.00" y="320.00" text-anchor="end" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">any enjoyment evidence / sentiment category=pos...</text>
+<rect x="657.50" y="305.00" width="128.13" height="20" rx="3" fill="#bc6c25"/>
+<text x="793.63" y="320.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">effect=0.152; p=6.4e-04</text>
+<text x="351.00" y="359.00" text-anchor="end" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">any positive evidence / sentiment category=posi...</text>
+<rect x="657.50" y="344.00" width="117.13" height="20" rx="3" fill="#bc6c25"/>
+<text x="782.63" y="359.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">effect=0.139; p=0.001</text>
+<text x="351.00" y="398.00" text-anchor="end" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">any recommendation evidence / sentiment score</text>
+<rect x="657.50" y="383.00" width="114.63" height="20" rx="3" fill="#5b6c94"/>
+<text x="780.13" y="398.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">effect=0.136; p=0.007</text>
+<text x="351.00" y="437.00" text-anchor="end" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">any recommendation evidence / sentiment categor...</text>
+<rect x="657.50" y="422.00" width="59.33" height="20" rx="3" fill="#bc6c25"/>
+<text x="724.83" y="437.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">effect=0.071; p=0.322</text>
+<text x="351.00" y="476.00" text-anchor="end" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">poi category / sentiment score</text>
+<rect x="657.50" y="461.00" width="18.35" height="20" rx="3" fill="#8d99ae"/>
+<text x="683.85" y="476.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">effect=0.022; p=0.073</text>
+<text x="32.00" y="548.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#5b677a">Score effects and event risk differences are within-language/source only.</text>
+</svg>

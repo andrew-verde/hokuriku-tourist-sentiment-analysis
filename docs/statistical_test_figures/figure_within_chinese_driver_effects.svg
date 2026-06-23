@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="646" viewBox="0 0 1120 646">
+<rect width="100%" height="100%" fill="#fbfaf7"/>
+<text x="32.00" y="39.00" text-anchor="start" font-family="Arial, sans-serif" font-size="24" font-weight="700" fill="#172033">Within-Chinese Social Sentiment Drivers</text>
+<text x="32.00" y="66.00" text-anchor="start" font-family="Arial, sans-serif" font-size="14" font-weight="400" fill="#5b677a">Topic tags separate SnowNLP sentiment more than food/friction tags</text>
+<line x1="657.50" x2="657.50" y1="94" y2="584" stroke="#d7dde8" stroke-width="1"/>
+<text x="351.00" y="125.00" text-anchor="end" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">dinosaurs museums / snownlp centered score</text>
+<rect x="657.50" y="110.00" width="292.50" height="20" rx="3" fill="#5b6c94"/>
+<text x="958.00" y="125.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">effect=0.430; p=1.2e-05</text>
+<text x="351.00" y="164.00" text-anchor="end" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">history culture / snownlp centered score</text>
+<rect x="657.50" y="149.00" width="206.90" height="20" rx="3" fill="#5b6c94"/>
+<text x="872.40" y="164.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">effect=0.304; p=9.9e-04</text>
+<text x="351.00" y="203.00" text-anchor="end" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">scenic nature / snownlp centered score</text>
+<rect x="657.50" y="188.00" width="204.09" height="20" rx="3" fill="#5b6c94"/>
+<text x="869.59" y="203.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">effect=0.300; p=0.002</text>
+<text x="351.00" y="242.00" text-anchor="end" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">temples spiritual / snownlp centered score</text>
+<rect x="657.50" y="227.00" width="196.54" height="20" rx="3" fill="#5b6c94"/>
+<text x="862.04" y="242.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">effect=0.289; p=1.2e-05</text>
+<text x="351.00" y="281.00" text-anchor="end" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">fan pilgrimage pop culture / snownlp centered s...</text>
+<rect x="486.21" y="266.00" width="171.29" height="20" rx="3" fill="#5b6c94"/>
+<text x="478.21" y="281.00" text-anchor="end" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">effect=-0.252; p=0.023</text>
+<text x="351.00" y="320.00" text-anchor="end" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">dinosaurs museums / sentiment category=positive</text>
+<rect x="657.50" y="305.00" width="144.60" height="20" rx="3" fill="#bc6c25"/>
+<text x="810.10" y="320.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">effect=0.212; p=0.011</text>
+<text x="351.00" y="359.00" text-anchor="end" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">crafts shopping / snownlp centered score</text>
+<rect x="657.50" y="344.00" width="121.14" height="20" rx="3" fill="#5b6c94"/>
+<text x="786.64" y="359.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">effect=0.178; p=0.002</text>
+<text x="351.00" y="398.00" text-anchor="end" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">scenic nature / sentiment category=positive</text>
+<rect x="657.50" y="383.00" width="118.10" height="20" rx="3" fill="#bc6c25"/>
+<text x="783.60" y="398.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">effect=0.173; p=0.016</text>
+<text x="351.00" y="437.00" text-anchor="end" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">seasonal events / snownlp centered score</text>
+<rect x="657.50" y="422.00" width="114.05" height="20" rx="3" fill="#5b6c94"/>
+<text x="779.55" y="437.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">effect=0.168; p=0.272</text>
+<text x="351.00" y="476.00" text-anchor="end" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">any friction / snownlp centered score</text>
+<rect x="657.50" y="461.00" width="100.65" height="20" rx="3" fill="#5b6c94"/>
+<text x="766.15" y="476.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">effect=0.148; p=1.6e-04</text>
+<text x="351.00" y="515.00" text-anchor="end" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">history culture / sentiment category=positive</text>
+<rect x="657.50" y="500.00" width="95.31" height="20" rx="3" fill="#bc6c25"/>
+<text x="760.81" y="515.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">effect=0.140; p=0.051</text>
+<text x="351.00" y="554.00" text-anchor="end" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">hot springs relaxation / snownlp centered score</text>
+<rect x="657.50" y="539.00" width="90.29" height="20" rx="3" fill="#5b6c94"/>
+<text x="755.79" y="554.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">effect=0.133; p=0.362</text>
+<text x="32.00" y="626.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#5b677a">Score effects and event risk differences are within-language/source only.</text>
+</svg>

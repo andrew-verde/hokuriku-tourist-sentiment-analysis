@@ -1,0 +1,76 @@
+{
+  "schema_version": "research_provenance.v1",
+  "kind": "hypothesis_h3_reviewed_evidence_jp_en",
+  "generated_at": "2026-06-23T10:18:09+00:00",
+  "command": "scripts/test_h3_reviewed_evidence_jp_en.py",
+  "inputs": [
+    {
+      "role": "ignored_scored_review_audit_file",
+      "path": "/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/output/sentiment_row_level/google_reviews_fukui_japanese-english.csv",
+      "exists": true,
+      "bytes": 451502,
+      "sha256": "72df51c468c6e829c9b121b9c71233e98a3ebc2a9c424d5eda63b83e1883eeed"
+    }
+  ],
+  "outputs": [
+    {
+      "role": "tracked_hypothesis_test_csv",
+      "path": "/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv",
+      "exists": true,
+      "bytes": 7713,
+      "sha256": "86a0c42644ba0d28ea7910077dd3937b04804897716a29f9f28a4e401e638fdf"
+    }
+  ],
+  "filters": {
+    "prefecture": "Fukui",
+    "groups": [
+      "english",
+      "japanese"
+    ]
+  },
+  "metrics": {
+    "hypothesis": "H3",
+    "primary_unit": "one Fukui Google review row",
+    "denominators": {
+      "english": 214,
+      "japanese": 1800
+    },
+    "evidence_columns": [
+      "any_friction",
+      "any_enjoyment_evidence",
+      "any_recommendation_evidence",
+      "any_positive_evidence"
+    ],
+    "multiple_testing": "Benjamini-Hochberg FDR across four evidence-family p-values.",
+    "text_length_summary": {
+      "english": {
+        "n": 214,
+        "mean": 274.7289719626168,
+        "median": 176.0,
+        "sd": 267.3708040460199
+      },
+      "japanese": {
+        "n": 1800,
+        "mean": 107.59777777777778,
+        "median": 62.0,
+        "sd": 142.12056119331498
+      }
+    }
+  },
+  "caveats": [
+    "Group labels describe review language, not reviewer nationality.",
+    "Fukui Google review rows are nested in POIs; row-level p-values are descriptive without a clustered model.",
+    "English-language and Japanese-language review counts may be imbalanced.",
+    "Outputs are aggregate-only and omit row-level text, author fields, URLs, source IDs, review IDs, place IDs, and POI IDs.",
+    "Reviewed keyword evidence does not prove motive or satisfaction.",
+    "Longer reviews have more opportunity to match keyword evidence.",
+    "Language-specific codebook coverage may affect prevalence."
+  ],
+  "extra": {
+    "dependency_versions": {
+      "pandas": "3.0.3",
+      "numpy": "2.4.6",
+      "scipy": "1.18.0"
+    }
+  }
+}

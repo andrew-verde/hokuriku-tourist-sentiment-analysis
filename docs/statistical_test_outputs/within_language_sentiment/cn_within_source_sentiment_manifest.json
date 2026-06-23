@@ -1,0 +1,64 @@
+{
+  "schema_version": "research_provenance.v1",
+  "kind": "within_source_sentiment_drivers_cn",
+  "generated_at": "2026-06-23T10:43:53+00:00",
+  "command": "scripts/test_cn_within_source_sentiment_drivers.py",
+  "inputs": [
+    {
+      "role": "ignored_tagged_chinese_social_posts_file",
+      "path": "/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/output/chinese_social_media_analysis/tagged_chinese_social_posts.csv",
+      "exists": true,
+      "bytes": 430280,
+      "sha256": "2f30173fdbb708383eb27d67d8be535a72adb0f97d89bb47d4ec86394637f346"
+    }
+  ],
+  "outputs": [
+    {
+      "role": "tracked_within_language_sentiment_csv",
+      "path": "/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/output/within_language_sentiment/cn_within_source_sentiment_drivers.csv",
+      "exists": true,
+      "bytes": 36993,
+      "sha256": "10af8515f727c5871d6f29a1d65b7358170c674f19005085361b4ba2028e1122"
+    }
+  ],
+  "filters": {
+    "scope": "Fukui when city column is present",
+    "text": "body/comment text present"
+  },
+  "metrics": {
+    "analysis_family": "WL-CN",
+    "primary_unit": "one Chinese-language Fukui social row with body/comment text",
+    "denominators": {
+      "chinese_social_rows": 200
+    },
+    "score": "SnowNLP centered score, interpreted within Chinese source only",
+    "topic_columns": [
+      "scenic_nature",
+      "temples_spiritual",
+      "history_culture",
+      "dinosaurs_museums",
+      "food_local_cuisine",
+      "hot_springs_relaxation",
+      "crafts_shopping",
+      "fan_pilgrimage_pop_culture",
+      "accommodation",
+      "seasonal_events"
+    ],
+    "multiple_testing": "Benjamini-Hochberg FDR within Chinese topic and platform diagnostic families."
+  },
+  "caveats": [
+    "Group labels describe content language/source, not author or reviewer nationality.",
+    "Raw sentiment scores are interpreted only within one tool, language, and source.",
+    "Outputs are aggregate-only and omit row-level text, author fields, URLs, source IDs, review IDs, place IDs, and POI IDs.",
+    "SnowNLP centered scores are interpreted only within Chinese-language social rows.",
+    "Chinese rows mix social platform forms; platform diagnostics are source-sensitivity checks.",
+    "Theme diagnostics treat unclassified as unresolved coverage, not a substantive theme."
+  ],
+  "extra": {
+    "dependency_versions": {
+      "pandas": "3.0.3",
+      "numpy": "2.4.6",
+      "scipy": "1.18.0"
+    }
+  }
+}

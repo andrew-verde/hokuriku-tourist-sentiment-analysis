@@ -1,0 +1,4 @@
+prefecture,city,group,source_kind,volume,rating_mean,sentiment_norm_mean,positive_pct,neutral_pct,negative_pct
+Fukui,Fukui,chinese_social_xiaohongshu,chinese_social_post,200,,0.809818,81.0,1.0,18.0
+Fukui,Fukui,english,google_review,214,4.5327,,,,
+Fukui,Fukui,japanese,google_review,1800,4.2617,,,,
