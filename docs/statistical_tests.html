@@ -195,8 +195,8 @@
             VADER, oseti, and SnowNLP means are not common-scale evidence.
           </p>
           <p>
-            JP/EN Google review tests are strongest when they keep platform constant. Chinese-language social comparisons
-            are source-aware discourse comparisons because Xiaohongshu notes and Douyin comments differ from Google reviews.
+            JP/EN Google review tests are strongest when they keep platform constant. Current Chinese-language social
+            comparisons use Xiaohongshu rows; Douyin remains a deferred source-sensitivity path.
           </p>
         </div>
       </section>
@@ -223,8 +223,8 @@
             </tr>
             <tr>
               <td><code>make hypothesis-tests</code></td>
-              <td>Professor-readable H1-H3 JP/EN tests</td>
-              <td><a href="#jp-en-hypotheses">H1-H3 output links below</a></td>
+              <td>Professor-readable H1-H3 JP/EN descriptive-support tests plus within-POI robustness</td>
+              <td><a href="#jp-en-hypotheses">H1-H3 and within-POI output links below</a></td>
             </tr>
             <tr>
               <td><code>make within-language-sentiment</code></td>
@@ -301,15 +301,15 @@
       <section id="jp-en-hypotheses">
         <h2>H1-H3 JP/EN Hypothesis Tests</h2>
         <p class="section-intro">
-          These are the professor-readable same-platform tests. Each card links to the aggregate CSV and manifest used
-          for audit.
+          These same-platform H1-H3 outputs provide descriptive support. Use the within-POI paired Wilcoxon test
+          as the venue-clustering robustness check.
         </p>
-        <div class="grid three cards">
+        <div class="grid two cards">
           <article class="hypothesis primary-h">
             <h3>H1 Sentiment Category</h3>
             <p>
-              Tests whether English-language and Japanese-language Fukui Google reviews differ in negative, neutral, and
-              positive sentiment category shares. Includes neutral-band sensitivity.
+              Descriptive support for whether English-language and Japanese-language Fukui Google reviews differ in
+              negative, neutral, and positive sentiment category shares. Includes neutral-band sensitivity.
             </p>
             <ul class="facts">
               <li>Script: <code>scripts/test_h1_sentiment_category_jp_en.py</code></li>
@@ -322,8 +322,8 @@
           <article class="hypothesis primary-h">
             <h3>H2 Star Rating</h3>
             <p>
-              Tests Google review ratings as a common 1-to-5 scale. This is a companion outcome, not raw text-sentiment
-              equivalence.
+              Descriptive support using Google review ratings as a common 1-to-5 scale. This is a companion outcome, not
+              raw text-sentiment equivalence.
             </p>
             <ul class="facts">
               <li>Script: <code>scripts/test_h2_review_rating_jp_en.py</code></li>
@@ -336,7 +336,8 @@
           <article class="hypothesis primary-h">
             <h3>H3 Reviewed Evidence</h3>
             <p>
-              Tests reviewed keyword evidence prevalence for friction, enjoyment, recommendation, and positive evidence.
+              Descriptive support for reviewed keyword evidence prevalence for friction, enjoyment, recommendation, and
+              positive evidence.
             </p>
             <ul class="facts">
               <li>Script: <code>scripts/test_h3_reviewed_evidence_jp_en.py</code></li>
@@ -344,6 +345,20 @@
               <li>Output: <a href="statistical_test_outputs/hypothesis_tests/h3_reviewed_evidence_jp_en.csv">h3_reviewed_evidence_jp_en.csv</a></li>
               <li>Manifest: <a href="statistical_test_outputs/hypothesis_tests/h3_reviewed_evidence_jp_en_manifest.json">h3_reviewed_evidence_jp_en_manifest.json</a></li>
               <li>Tests: chi-square or Fisher exact, risk difference, Benjamini-Hochberg FDR.</li>
+            </ul>
+          </article>
+          <article class="hypothesis primary-h">
+            <h3>Within-POI Robustness</h3>
+            <p>
+              Paired Wilcoxon robustness check comparing English-language and Japanese-language means inside shared
+              Fukui POIs. Effective N is paired POIs, not review rows.
+            </p>
+            <ul class="facts">
+              <li>Script: <code>scripts/test_within_poi_paired_jp_en.py</code></li>
+              <li>Command: <code>make hypothesis-within-poi</code></li>
+              <li>Output: <a href="statistical_test_outputs/hypothesis_tests/within_poi_paired_jp_en.csv">within_poi_paired_jp_en.csv</a></li>
+              <li>Manifest: <a href="statistical_test_outputs/hypothesis_tests/within_poi_paired_jp_en_manifest.json">within_poi_paired_jp_en_manifest.json</a></li>
+              <li>Tests: paired Wilcoxon on POI-level rating means and secondary positive-share means.</li>
             </ul>
           </article>
         </div>
@@ -402,8 +417,9 @@
         <h2>Cross-Source Baseline Tests</h2>
         <div class="risk">
           <p>
-            Cross-source tests are descriptive because Google reviews, Xiaohongshu notes, and Douyin comments differ in
-            platform, intent, text length, and date quality. Do not interpret raw sentiment score means across tools.
+            Cross-source tests are descriptive because Google reviews and current Xiaohongshu rows differ in platform,
+            intent, text length, and date quality. Douyin remains deferred; do not interpret raw sentiment score means
+            across tools.
           </p>
         </div>
         <table>

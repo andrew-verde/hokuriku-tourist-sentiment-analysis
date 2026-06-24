@@ -102,11 +102,17 @@ Build Fukui JP-EN sentiment aggregates:
 make sentiment-analysis
 ```
 
-Run professor-readable H1/H2/H3 JP-EN hypothesis test scripts from the ignored
-scored-review audit file:
+Run professor-readable H1/H2/H3 JP-EN descriptive-support scripts and the
+within-POI robustness check from the ignored scored-review audit file:
 
 ```bash
 make hypothesis-tests
+```
+
+Public-facing statistical test index:
+
+```text
+docs/statistical_tests.html
 ```
 
 This writes aggregate-only CSV and manifest files under
@@ -116,6 +122,7 @@ This writes aggregate-only CSV and manifest files under
 H1 sentiment category chi-square with neutral-band sensitivity
 H2 Google star-rating Welch tests with POI-level sensitivity
 H3 reviewed evidence prevalence tests with Benjamini-Hochberg FDR
+within-POI paired Wilcoxon robustness check for venue clustering
 ```
 
 Run within-language/source sentiment driver tests:

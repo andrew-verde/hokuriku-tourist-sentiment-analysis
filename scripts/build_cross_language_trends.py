@@ -309,11 +309,21 @@ def _review_sentiment_count_rows(sentiment_summary_path: Path, prefecture: str) 
 def _chinese_sentiment_count_rows(chinese: pd.DataFrame) -> list[dict]:
     if chinese.empty or "sentiment_category" not in chinese.columns:
         return []
+    platforms = {
+        str(value).strip().lower()
+        for value in chinese.get("source_platform", pd.Series(dtype=str)).dropna().unique()
+    }
+    if platforms == {"xiaohongshu"}:
+        row_unit = "one Xiaohongshu note row"
+    elif platforms == {"douyin"}:
+        row_unit = "one Douyin comment row"
+    else:
+        row_unit = "one Xiaohongshu note or Douyin comment row"
     rows = [
         _category_count_row(
             "chinese_social_all",
             "chinese_social_media",
-            "one Xiaohongshu note or Douyin comment row",
+            row_unit,
             chinese["sentiment_category"],
         )
     ]

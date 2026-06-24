@@ -63,9 +63,27 @@ def _write_cn_input(path: Path) -> None:
     path.write_text(",".join(header) + "\n" + "\n".join(",".join(row) for row in rows) + "\n", encoding="utf-8")
 
 
+def _write_readiness(path: Path) -> None:
+    path.write_text(
+        json.dumps({
+            "analysis_variant": "xiaohongshu_only",
+            "analysis_scope_label": "Chinese-language Xiaohongshu text only",
+            "n_total_xhs_rows": 6,
+            "n_total_douyin_rows": 1,
+            "n_with_body_text": 6,
+            "n_title_only_excluded": 1,
+            "n_non_fan_compared": 4,
+            "source_platform_counts": {"xhs": 4, "douyin": 3},
+            "theme_counts": {"nature": 2, "food": 2, "unclassified": 3},
+        }),
+        encoding="utf-8",
+    )
+
+
 def test_cn_outputs_topic_platform_theme_diagnostics_and_manifest(tmp_path):
     source = tmp_path / "tagged.csv"
     _write_cn_input(source)
+    _write_readiness(tmp_path / "chinese_social_readiness.json")
 
     report = build_cn_within_source_sentiment_drivers(source, tmp_path / "out", command="pytest wl-cn")
 
@@ -93,7 +111,15 @@ def test_cn_outputs_topic_platform_theme_diagnostics_and_manifest(tmp_path):
     assert "group_counts" in json.loads(theme["details_json"])
 
     assert manifest["kind"] == "within_source_sentiment_drivers_cn"
-    assert manifest["metrics"]["denominators"] == {"chinese_social_rows": 6}
+    assert manifest["metrics"]["denominators"] == {
+        "chinese_social_rows": 6,
+        "n_total_xhs_rows": 6,
+        "n_total_douyin_rows": 1,
+        "n_with_body_text": 6,
+        "n_title_only_excluded": 1,
+        "n_non_fan_compared": 4,
+    }
+    assert manifest["metrics"]["chinese_social_readiness"]["analysis_variant"] == "xiaohongshu_only"
 
 
 def test_cn_missing_input_and_columns_fail_loud(tmp_path):

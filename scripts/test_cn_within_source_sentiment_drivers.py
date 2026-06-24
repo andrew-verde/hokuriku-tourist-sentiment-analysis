@@ -65,6 +65,26 @@ CAVEATS = COMMON_WITHIN_CAVEATS + [
 ]
 
 
+def _read_chinese_readiness(input_path: Path) -> dict:
+    readiness_path = input_path.with_name("chinese_social_readiness.json")
+    if not readiness_path.exists():
+        return {}
+    with readiness_path.open(encoding="utf-8") as handle:
+        data = json.load(handle)
+    keys = [
+        "analysis_variant",
+        "analysis_scope_label",
+        "n_total_xhs_rows",
+        "n_total_douyin_rows",
+        "n_with_body_text",
+        "n_title_only_excluded",
+        "n_non_fan_compared",
+        "source_platform_counts",
+        "theme_counts",
+    ]
+    return {key: data[key] for key in keys if key in data}
+
+
 def build_cn_within_source_sentiment_drivers(
     input_path: Path = DEFAULT_CHINESE_INPUT_PATH,
     output_dir: Path = DEFAULT_OUTPUT_DIR,
@@ -79,6 +99,17 @@ def build_cn_within_source_sentiment_drivers(
     generated = generated_at_now()
     source_hash = sha256_file(input_path)
     caveat = "; ".join(CAVEATS)
+    readiness_metrics = _read_chinese_readiness(input_path)
+    denominators = {"chinese_social_rows": int(len(df))}
+    for key in [
+        "n_total_xhs_rows",
+        "n_total_douyin_rows",
+        "n_with_body_text",
+        "n_title_only_excluded",
+        "n_non_fan_compared",
+    ]:
+        if key in readiness_metrics:
+            denominators[key] = readiness_metrics[key]
 
     rows = _cn_rows(df, input_path, source_hash, command, generated, caveat)
     out = pd.DataFrame(rows)
@@ -96,7 +127,8 @@ def build_cn_within_source_sentiment_drivers(
         metrics={
             "analysis_family": "WL-CN",
             "primary_unit": "one Chinese-language Fukui social row with body/comment text",
-            "denominators": {"chinese_social_rows": int(len(df))},
+            "denominators": denominators,
+            "chinese_social_readiness": readiness_metrics,
             "score": "SnowNLP centered score, interpreted within Chinese source only",
             "topic_columns": TOPIC_COLUMNS,
             "multiple_testing": "Benjamini-Hochberg FDR within Chinese topic and platform diagnostic families.",

@@ -6,7 +6,7 @@ Fukui-only JP-EN Google review aggregate scaffold for slides.
 
 - Ready for presentation as a secondary library sentiment check.
 - Not ready as primary JP/EN sentiment evidence until reviewed codebook evidence is promoted.
-- Statistical rows are descriptive sensitivity checks, not confirmatory claims.
+- H1-H3 statistical rows are descriptive support, not confirmatory claims; use the within-POI paired Wilcoxon test as the venue-clustering robustness check.
 - SVG figures are organized under `japanese/`, `english/`, and `multilingual/`.
 
 ## Denominators
@@ -29,7 +29,7 @@ Fukui-only JP-EN Google review aggregate scaffold for slides.
 
 Figure JP-EN library sentiment: Fukui Google reviews only. Bars show VADER English-language and oseti Japanese-language sentiment category shares as secondary checks. Denominators and hashes are in the chart data; language labels are not nationality claims.
 
-Table statistical sensitivity: Review-row, POI-level, and cluster bootstrap checks summarize robustness. Because review rows are nested within POIs and group sizes are imbalanced, use as descriptive sensitivity only.
+Table statistical sensitivity: H1-H3 rows are descriptive support. The within-POI paired Wilcoxon test is the venue-clustering robustness check; report its paired-POI N alongside the result.
 
 ## Figure Folders
 

@@ -1,7 +1,7 @@
 {
   "schema_version": "research_provenance.v1",
   "kind": "within_source_sentiment_drivers_cn",
-  "generated_at": "2026-06-23T10:43:53+00:00",
+  "generated_at": "2026-06-24T01:31:59+00:00",
   "command": "scripts/test_cn_within_source_sentiment_drivers.py",
   "inputs": [
     {
@@ -18,7 +18,7 @@
       "path": "/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/output/within_language_sentiment/cn_within_source_sentiment_drivers.csv",
       "exists": true,
       "bytes": 36993,
-      "sha256": "10af8515f727c5871d6f29a1d65b7358170c674f19005085361b4ba2028e1122"
+      "sha256": "63756339aa8e501c19e0cef5ec358826fe290fa05d0758660a25b9c86f52a875"
     }
   ],
   "filters": {
@@ -29,7 +29,30 @@
     "analysis_family": "WL-CN",
     "primary_unit": "one Chinese-language Fukui social row with body/comment text",
     "denominators": {
-      "chinese_social_rows": 200
+      "chinese_social_rows": 200,
+      "n_total_xhs_rows": 200,
+      "n_total_douyin_rows": 0,
+      "n_with_body_text": 200,
+      "n_title_only_excluded": 0,
+      "n_non_fan_compared": 151
+    },
+    "chinese_social_readiness": {
+      "analysis_variant": "xiaohongshu_only",
+      "analysis_scope_label": "Chinese-language Xiaohongshu text only",
+      "n_total_xhs_rows": 200,
+      "n_total_douyin_rows": 0,
+      "n_with_body_text": 200,
+      "n_title_only_excluded": 0,
+      "n_non_fan_compared": 151,
+      "source_platform_counts": {
+        "xiaohongshu": 200
+      },
+      "theme_counts": {
+        "travel": 94,
+        "unclassified": 52,
+        "fan": 49,
+        "ordinary": 5
+      }
     },
     "score": "SnowNLP centered score, interpreted within Chinese source only",
     "topic_columns": [
