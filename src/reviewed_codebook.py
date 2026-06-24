@@ -1,4 +1,11 @@
-"""Import reviewed keyword codebooks into runtime config structures."""
+"""
+Import reviewed keyword codebooks into runtime config structures.
+
+This module reads reviewed codebook files (Excel or CSV) that contain hand-curated
+keyword lists for sentiment and topic analysis. Each row is validated (checking for
+complete review decisions and valid keyword replacements) and then assembled into a
+structured YAML config that the sentiment analysis pipeline can consume directly.
+"""
 
 from __future__ import annotations
 
@@ -43,12 +50,15 @@ class ReviewedCodebookError(RuntimeError):
 
 
 def clean_text(value: object) -> str:
+    # Normalize text input: treat None as empty string, convert everything else to
+    # a string and strip whitespace.
     if value is None:
         return ""
     return str(value).strip()
 
 
 def sha256_file(path: Path) -> str:
+    # Compute the SHA256 hash of a file (for tracking the codebook source version).
     digest = hashlib.sha256()
     with path.open("rb") as handle:
         for chunk in iter(lambda: handle.read(1024 * 1024), b""):
@@ -62,6 +72,9 @@ def _source_row_to_import_row(
     source_row_id: int | str,
     reviewed_at: str = "",
 ) -> dict[str, str]:
+    # Convert a raw row from the Excel/CSV codebook into a standardized import row.
+    # Apply the review decision to compute the final keyword: "no change" uses the
+    # original keyword, "fix" uses the replacement, and "delete" results in an empty keyword.
     decision = clean_text(raw.get("review_decision"))
     keyword_original = clean_text(raw.get("keyword"))
     replacement = clean_text(raw.get("suggested_replacement_keyword"))
@@ -88,6 +101,8 @@ def _source_row_to_import_row(
 
 
 def _read_csv_rows(path: Path) -> list[dict[str, str]]:
+    # Read a reviewed codebook in CSV format and validate that all required
+    # columns are present. Normalize all cell text.
     with path.open(newline="", encoding="utf-8-sig") as handle:
         reader = csv.DictReader(handle)
         if reader.fieldnames is None:
@@ -99,6 +114,9 @@ def _read_csv_rows(path: Path) -> list[dict[str, str]]:
 
 
 def _read_workbook_rows(path: Path, sheet_names: Iterable[str] | None = None) -> list[dict[str, str]]:
+    # Read a reviewed codebook from an Excel file (.xlsx, .xltx, etc.). Extract
+    # the selected language sheets and validate that all required columns are present
+    # before converting rows to import format.
     try:
         from openpyxl import load_workbook
     except ImportError as error:
@@ -117,16 +135,19 @@ def _read_workbook_rows(path: Path, sheet_names: Iterable[str] | None = None) ->
         rows = list(workbook[sheet_name].iter_rows(values_only=True))
         if not rows:
             continue
+        # Extract column names from the first row and map them to indexes.
         headers = [clean_text(value) for value in rows[0]]
         header_indexes = {name: index for index, name in enumerate(headers) if name}
         missing = sorted(SOURCE_REQUIRED_COLUMNS - set(header_indexes))
         if missing:
             raise ReviewedCodebookError(f"Workbook sheet {sheet_name!r} missing required columns: {missing}")
+        # Process each data row, skipping blank rows.
         for excel_row_number, values in enumerate(rows[1:], start=2):
             raw = {
                 column: values[index] if index < len(values) else ""
                 for column, index in header_indexes.items()
             }
+            # Skip rows with no meaningful content (all key fields are blank).
             if not any(clean_text(raw.get(column)) for column in ("language", "code_family", "code", "keyword")):
                 continue
             imported_rows.append(_source_row_to_import_row(raw, sheet_name, excel_row_number))
@@ -137,6 +158,8 @@ def load_reviewed_codebook_rows(
     path: Path,
     sheet_names: Iterable[str] | None = None,
 ) -> list[dict[str, str]]:
+    # Load reviewed codebook rows from either an Excel file or CSV, depending on
+    # the file extension. For Excel, specify which language sheets to extract.
     if not path.exists():
         raise ReviewedCodebookError(f"Reviewed codebook source not found: {path}")
     suffix = path.suffix.lower()
@@ -148,6 +171,7 @@ def load_reviewed_codebook_rows(
 
 
 def _normal_language(value: str) -> str:
+    # Normalize language names by converting to lowercase for consistent comparison.
     return clean_text(value).lower()
 
 
@@ -156,17 +180,22 @@ def validate_reviewed_codebook_rows(
     languages: Iterable[str],
     require_complete: bool = True,
 ) -> list[dict[str, str]]:
+    # Validate and filter codebook rows by language and code family. Optionally
+    # enforce strict completeness (all rows must have a review decision and valid
+    # replacement keyword).
     requested = {_normal_language(language) for language in languages}
     selected = [
         row for row in rows
         if _normal_language(row.get("language", "")) in requested
         and clean_text(row.get("code_family", "")).lower() in SUPPORTED_CODE_FAMILIES
     ]
+    # Verify that we have at least one row for each requested language.
     present = {_normal_language(row.get("language", "")) for row in selected}
     missing_languages = sorted(requested - present)
     if missing_languages:
         raise ReviewedCodebookError(f"No reviewed codebook rows found for languages: {missing_languages}")
 
+    # Check for blank review decisions (indicate incomplete review work).
     blank_decisions = [row for row in selected if clean_text(row.get("review_decision", "")) == ""]
     if blank_decisions and require_complete:
         examples = [
@@ -178,6 +207,7 @@ def validate_reviewed_codebook_rows(
             + ", ".join(examples)
         )
 
+    # Check that all review decisions are valid (one of: no change, fix, delete).
     invalid_decisions = [
         row for row in selected
         if clean_text(row.get("review_decision", "")).lower()
@@ -193,6 +223,7 @@ def validate_reviewed_codebook_rows(
     if not require_complete:
         return selected
 
+    # If a row is marked "fix", it must have a replacement keyword.
     fix_missing_replacement = [
         row for row in selected
         if clean_text(row.get("review_decision", "")).lower() == "fix"
@@ -205,6 +236,7 @@ def validate_reviewed_codebook_rows(
         ]
         raise ReviewedCodebookError("FIX rows missing keyword_final: " + ", ".join(examples))
 
+    # If a row is marked "no change" or "fix" (i.e., kept), it must have a final keyword.
     kept_missing_keyword = [
         row for row in selected
         if clean_text(row.get("review_decision", "")).lower() in {"no change", "fix"}
@@ -225,6 +257,8 @@ def build_runtime_config(
     languages: Iterable[str],
     command: str,
 ) -> dict:
+    # Validate all rows and build a structured runtime config: a nested dict mapping
+    # language -> code -> keywords + metadata (labels, review decisions, etc.).
     selected = validate_reviewed_codebook_rows(rows, languages=languages, require_complete=True)
     config = {
         "schema_version": "reviewed_codebook_runtime.v1",
@@ -236,13 +270,16 @@ def build_runtime_config(
         },
         "languages": {},
     }
+    # Iterate through validated rows and assemble language -> code -> keywords structure.
     for row in selected:
         language = clean_text(row["language"])
         family = clean_text(row["code_family"]).lower()
         code = clean_text(row["code"])
         if not code:
             raise ReviewedCodebookError(f"Reviewed codebook row missing code: {row.get('source_sheet')}:{row.get('source_row_id')}")
+        # Create language section if needed.
         language_config = config["languages"].setdefault(language, {"codes": {}})
+        # Create code entry if needed, with default structure.
         code_entry = language_config["codes"].setdefault(
             code,
             {
@@ -252,12 +289,16 @@ def build_runtime_config(
                 "reviewed_rows": [],
             },
         )
+        # Verify that a code doesn't have conflicting code_family values.
         if code_entry["code_family"] != family:
             raise ReviewedCodebookError(f"Code has mixed code_family values: {language}/{code}")
+        # Apply the review decision to extract the final keyword.
         decision = clean_text(row.get("review_decision")).lower()
         keyword = clean_text(row.get("keyword_final"))
+        # Add keyword to the code's keyword list (unless deleted, and avoid duplicates).
         if decision != "delete" and keyword and keyword not in code_entry["keywords"]:
             code_entry["keywords"].append(keyword)
+        # Record the review decision and source for auditing.
         code_entry["reviewed_rows"].append({
             "source_sheet": clean_text(row.get("source_sheet")),
             "source_row_id": clean_text(row.get("source_row_id")),
@@ -268,6 +309,7 @@ def build_runtime_config(
             "reviewed_at": clean_text(row.get("reviewed_at")),
         })
 
+    # Verify that every code has at least one kept keyword (otherwise it's useless).
     empty_codes = []
     for language, language_config in config["languages"].items():
         for code, code_entry in language_config["codes"].items():
@@ -279,6 +321,9 @@ def build_runtime_config(
 
 
 def validation_status(rows: list[dict[str, str]], languages: Iterable[str]) -> dict:
+    # Generate a summary report of codebook review progress: count total rows,
+    # blank decisions, and the breakdown of review decisions and code families
+    # per language. Used to report validation status without requiring full completion.
     selected = validate_reviewed_codebook_rows(rows, languages=languages, require_complete=False)
     status: dict[str, dict] = {}
     for row in selected:

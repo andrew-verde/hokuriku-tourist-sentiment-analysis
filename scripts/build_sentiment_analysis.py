@@ -2,6 +2,14 @@
 """
 Build JP-EN Google review sentiment outputs.
 
+This script:
+1. Loads multilingual reviews from a CSV file
+2. Scores each review's text sentiment using VADER (English) or oseti (Japanese)
+3. Extracts reviewed keyword evidence from both languages
+4. Aggregates row-level scores into group-level summaries (counts, means, percentages)
+5. Runs statistical tests (chi-square, Mann-Whitney, t-tests, bootstrap confidence intervals)
+6. Writes outputs: row-level scores (ignored), aggregate summaries/tests (tracked), and readiness markdown
+
 Row-level scored reviews are written under ignored output paths. Tracked
 aggregate outputs contain counts, tests, hashes, dependency versions, and
 readiness notes only.
@@ -139,6 +147,8 @@ BINARY_EVIDENCE_COLUMNS = [
 
 def sentiment_category(score: float, band: float = PRIMARY_BAND) -> str:
     # Convert a numeric sentiment score into the coarse category used in reports.
+    # Scores above +band -> "positive", below -band -> "negative", in between -> "neutral"
+    # The band parameter allows sensitivity analysis: wider bands (0.10, 0.20) create stricter positives/negatives
     if pd.isna(score):
         return "missing"
     if score >= band:
@@ -149,7 +159,7 @@ def sentiment_category(score: float, band: float = PRIMARY_BAND) -> str:
 
 
 def parse_groups(value: str) -> list[str]:
-    # Normalize the comma-separated CLI input and reject an empty request.
+    # Normalize the comma-separated CLI input (e.g., "japanese,english") and reject an empty request.
     groups = [part.strip().lower() for part in value.split(",") if part.strip()]
     if not groups:
         raise SentimentPipelineError("--groups must name at least one language_group")
@@ -158,6 +168,7 @@ def parse_groups(value: str) -> list[str]:
 
 def dependency_versions() -> dict[str, str]:
     # Record the installed package versions that shape the analysis results.
+    # These versions are stored in the provenance manifest so results can be reproduced.
     packages = [
         "pandas",
         "numpy",
@@ -180,6 +191,8 @@ def dependency_versions() -> dict[str, str]:
 
 
 def load_poi_metadata(path: Path) -> pd.DataFrame:
+    # Load POI (point-of-interest) metadata to map reviews to geographic locations.
+    # Used for prefecture-level filtering: reviews have poi_id, metadata maps poi_id -> prefecture.
     try:
         return load_poi_scope_metadata(path)
     except MissingScopeInputError as error:
@@ -206,8 +219,9 @@ def require_dependency(module_name: str, package_name: str | None = None):
 
 
 def score_english_text(text: str, analyzer=None) -> dict[str, float]:
-    # VADER returns four scores; this project stores compound as the single
-    # comparable score and keeps the component scores for audit.
+    # Score English review text using VADER (Valence Aware Dictionary and sEntiment Reasoner).
+    # VADER returns four component scores: negative, neutral, positive proportions, and a compound score (-1 to +1).
+    # We store all components but use "sentiment_score" (compound) as the main comparable score.
     if analyzer is None:
         vader = require_dependency("vaderSentiment.vaderSentiment", "vaderSentiment")
         analyzer = vader.SentimentIntensityAnalyzer()
@@ -216,7 +230,7 @@ def score_english_text(text: str, analyzer=None) -> dict[str, float]:
         "vader_neg": float(scores["neg"]),
         "vader_neu": float(scores["neu"]),
         "vader_pos": float(scores["pos"]),
-        "sentiment_score": float(scores["compound"]),
+        "sentiment_score": float(scores["compound"]),  # Main score: -1 (negative) to +1 (positive)
     }
 
 
@@ -234,8 +248,9 @@ def _sum_polarity_counts(raw_counts: object) -> tuple[int, int]:
 
 
 def score_japanese_text(text: str, analyzer=None) -> dict[str, object]:
-    # oseti returns sentence-level polarity scores, so this wrapper turns them
-    # into the same row-level shape as the English scorer.
+    # Score Japanese review text using oseti (a morphological analyzer-based sentiment scorer for Japanese).
+    # oseti analyzes sentence by sentence, so we average sentence-level scores to get a document (review) score.
+    # The mean score is stored as "sentiment_score" to match the structure of English scoring.
     if analyzer is None:
         oseti = require_dependency("oseti", "oseti")
         try:
@@ -256,7 +271,7 @@ def score_japanese_text(text: str, analyzer=None) -> dict[str, object]:
         "oseti_doc_score": doc_score,
         "oseti_positive_count": positive_count,
         "oseti_negative_count": negative_count,
-        "sentiment_score": doc_score,
+        "sentiment_score": doc_score,  # Main score: mean of sentence-level oseti scores
     }
 
 
@@ -267,45 +282,60 @@ def load_reviews(
     prefecture: str | None = None,
     poi_metadata_path: Path = DEFAULT_POI_METADATA_PATH,
 ) -> pd.DataFrame:
+    # Load the multilingual reviews CSV and filter to requested language groups and geography.
     if not path.exists():
         raise MissingInputError(
             f"Required input not found: {path}\n"
             "Generate it first with `make multilingual-reviews`. This pipeline has no demo mode."
         )
     df = pd.read_csv(path)
+
     # Enforce the minimum shape needed for the downstream filtering and scoring steps.
     missing = sorted(REQUIRED_COLUMNS - set(df.columns))
     if missing:
         raise MissingColumnsError(f"Required columns missing from {path}: {', '.join(missing)}")
+
+    # Check that requested language groups (e.g., "japanese", "english") are present in the data.
     present_groups = set(df["language_group"].dropna().astype(str).str.lower())
     missing_groups = sorted(set(groups) - present_groups)
     if missing_groups:
         raise MissingGroupError(
             f"Requested language_group not present in input: {', '.join(missing_groups)}"
         )
+
+    # Filter to selected language groups.
     filtered = df[df["language_group"].astype(str).str.lower().isin(groups)].copy()
     # `copy()` avoids pandas "view versus copy" ambiguity before we add/convert
     # columns later in this function.
+
+    # If prefecture filter is requested, look up poi_id in metadata to check each review's location.
     if prefecture:
-        # Prefecture filtering depends on POI metadata because the review file only stores poi_id.
         metadata = load_poi_metadata(poi_metadata_path)
         try:
             filtered = scope_reviews_by_poi_prefecture(filtered, metadata, prefecture)
         except MissingScopeColumnsError as error:
             raise MissingColumnsError(str(error)) from error
+
+    # If city filter is requested, keep only rows with matching city value.
     if city:
         filtered = filtered[filtered["city"].astype(str) == city].copy()
+
     filtered["language_group"] = filtered["language_group"].astype(str).str.lower()
     if filtered.empty:
         raise MissingGroupError(
             f"No rows after filters: city == {city!r}, prefecture == {prefecture!r}, "
             f"language_group in {groups!r}"
         )
+
+    # Convert review_rating to numeric (coerce invalid values to NaN).
     filtered["review_rating"] = pd.to_numeric(filtered["review_rating"], errors="coerce")
     return filtered
 
 
 def load_reviewed_evidence_codebook(path: Path) -> dict[str, dict[str, list[str]]]:
+    # Load the manually-reviewed codebook (YAML format) that lists keywords for each evidence family.
+    # Evidence families: friction, positive sentiment, negative sentiment, recommendation intent, enjoyment.
+    # Returns a nested dict: language -> evidence_column -> list of keywords
     if not path.exists():
         raise MissingInputError(
             f"Required reviewed JP/EN codebook config not found: {path}\n"
@@ -321,12 +351,16 @@ def load_reviewed_evidence_codebook(path: Path) -> dict[str, dict[str, list[str]
         key = str(language).lower()
         evidence[key] = {column: [] for column in EVIDENCE_COLUMNS}
         codes = language_config.get("codes", {}) if isinstance(language_config, dict) else {}
+
+        # Extract keywords from each code and organize by family/type.
         for code, entry in codes.items():
             if not isinstance(entry, dict):
                 continue
             keywords = [str(keyword).strip() for keyword in entry.get("keywords", []) if str(keyword).strip()]
             family = str(entry.get("code_family", "")).lower()
             code_name = str(code)
+
+            # Sort keywords into the appropriate evidence columns based on code family/name.
             if family == "friction":
                 evidence[key]["reviewed_friction_terms_matched"].extend(keywords)
             if code_name == "positive_sentiment":
@@ -339,8 +373,7 @@ def load_reviewed_evidence_codebook(path: Path) -> dict[str, dict[str, list[str]
                 evidence[key]["reviewed_enjoyment_terms_matched"].extend(keywords)
 
         for column, keywords in evidence[key].items():
-            # Deduplicate without changing reviewed order; duplicated terms can
-            # legitimately appear across topic/sentiment families.
+            # Deduplicate while preserving reviewed order; some keywords can legitimately appear in multiple families.
             evidence[key][column] = list(dict.fromkeys(keywords))
     return evidence
 
@@ -378,11 +411,16 @@ def score_reviews(
     japanese_scorer: Callable[[str], dict[str, object]] | None = None,
     reviewed_codebook: dict[str, dict[str, list[str]]] | None = None,
 ) -> pd.DataFrame:
+    # Score each review's text by language and extract reviewed keyword evidence.
+    # Returns a DataFrame with one row per review, including all original columns plus sentiment scores and evidence columns.
+
     if english_scorer is None:
-        # Build the analyzer once and reuse it for every English row.
+        # Build the VADER analyzer once and reuse it for every English row.
+        # MeCab/oseti startup is expensive, so we build them once too.
         vader = require_dependency("vaderSentiment.vaderSentiment", "vaderSentiment")
         english_analyzer = vader.SentimentIntensityAnalyzer()
         english_scorer = lambda text: score_english_text(text, analyzer=english_analyzer)
+
     if japanese_scorer is None:
         # Build the Japanese analyzer once. MeCab startup is expensive enough
         # that per-row initialization would be wasteful and harder to reproduce.
@@ -397,26 +435,37 @@ def score_reviews(
 
     rows = []
     for _, row in reviews.iterrows():
-        # Preserve the original review columns and add sentiment-only outputs alongside them.
+        # For each review, preserve original columns and add sentiment + evidence outputs.
         language = row["language_group"]
         text = "" if pd.isna(row["review_text"]) else str(row["review_text"])
         base = {column: row[column] if column in reviews.columns else None for column in OPTIONAL_ROW_COLUMNS}
-        # Length is safe to store because it is metadata about text, not the text.
+
+        # Store text length as metadata (safe to include, not the full text).
         base["text_length_chars"] = len(text)
+
+        # Score the review text using the appropriate language scorer.
         if language == "english":
             scored = english_scorer(text)
         elif language == "japanese":
             scored = japanese_scorer(text)
         else:
             raise MissingGroupError(f"Scoring not implemented for language_group: {language}")
-        base.update(scored)
+
+        base.update(scored)  # Add VADER/oseti scores
+
+        # Match reviewed keywords against the review text.
         base.update(reviewed_evidence_for_text(text, str(language), reviewed_codebook))
+
+        # Create coarse sentiment category (negative/neutral/positive) based on score.
         base["sentiment_category"] = sentiment_category(float(base["sentiment_score"]))
+
+        # For sensitivity analysis, create additional categories using wider neutral bands.
+        # Shows whether conclusions change when the neutral threshold is stricter (0.10, 0.20).
         for label, band in SENSITIVITY_BANDS.items():
-            # Sensitivity categories let the paper/report show whether results
-            # change when the neutral band is widened.
             base[f"sentiment_category_{label}"] = sentiment_category(float(base["sentiment_score"]), band)
+
         rows.append(base)
+
     return pd.DataFrame(rows)
 
 
@@ -429,8 +478,9 @@ def source_group_series(df: pd.DataFrame) -> pd.Series:
 
 
 def build_summary(scored: pd.DataFrame, source_groups: pd.Series) -> pd.DataFrame:
-    # This function is the tracked aggregate layer: counts, means, medians,
-    # percentages, and rating distributions only.
+    # Aggregate row-level sentiment scores into group-level summary statistics.
+    # This function is the tracked aggregate layer: counts, means, medians, percentages, and rating distributions only.
+    # Output: one row per source/language/prefecture/city combination with aggregate metrics.
     work = scored.copy()
     work["source_group"] = source_groups.values
     rows = []
@@ -439,6 +489,7 @@ def build_summary(scored: pd.DataFrame, source_groups: pd.Series) -> pd.DataFram
     if "prefecture_normalized" in work.columns:
         group_columns.append("prefecture_normalized")
     group_columns.append("city")
+
     for keys, chunk in work.groupby(group_columns, dropna=False):
         # Each output row is one source/language/prefecture/city bucket.
         key_map = dict(zip(group_columns, keys))
@@ -501,16 +552,21 @@ def _bootstrap_diff(
     seed: int = BOOTSTRAP_SEED,
     iterations: int = BOOTSTRAP_ITERATIONS,
 ) -> tuple[float, float, float]:
+    # Compute bootstrap confidence intervals for the difference between two groups.
+    # reducer is a function (e.g., np.mean or np.median) that summarizes an array into a single number.
+    # Returns: (observed difference, lower 95% CI, upper 95% CI)
     rng = np.random.default_rng(seed)
-    # Standard row-level bootstrap: resample each side independently, then compare.
     observed = float(reducer(left) - reducer(right))
+
+    # Standard row-level bootstrap: resample each side independently with replacement.
     diffs = []
     for _ in range(iterations):
-        # Resampling with replacement simulates rerunning the study on another
-        # sample of the same size.
+        # Resampling with replacement simulates rerunning the study on another sample of the same size.
         sample_left = rng.choice(left, size=len(left), replace=True)
         sample_right = rng.choice(right, size=len(right), replace=True)
         diffs.append(float(reducer(sample_left) - reducer(sample_right)))
+
+    # Extract the 95% confidence interval from the bootstrap distribution.
     lower, upper = np.percentile(diffs, [2.5, 97.5])
     return observed, float(lower), float(upper)
 
@@ -522,9 +578,15 @@ def _cluster_bootstrap_mean_diff(
     seed: int = BOOTSTRAP_SEED,
     iterations: int = BOOTSTRAP_ITERATIONS,
 ) -> tuple[float, float, float, int, int]:
+    # Cluster bootstrap for mean differences: resample POI clusters (not individual reviews).
+    # Resamples POIs with replacement, keeping all reviews within each POI together.
+    # This preserves the within-POI clustering structure in the confidence interval.
+    # Returns: (observed mean diff, lower 95% CI, upper 95% CI, left n_POIs, right n_POIs)
+
     work = scored[["language_group", "poi_id", "sentiment_score"]].dropna().copy()
     work["poi_id"] = work["poi_id"].astype(str)
-    # Resample by POI cluster so repeated reviews from one place stay together.
+
+    # Organize reviews by POI and language.
     grouped = {
         # Each list item is all review sentiment scores for one POI.
         language: [
@@ -533,24 +595,28 @@ def _cluster_bootstrap_mean_diff(
         ]
         for language, chunk in work.groupby("language_group")
     }
+
     left_clusters = grouped.get(left_name, [])
     right_clusters = grouped.get(right_name, [])
+
     if not left_clusters or not right_clusters:
         return np.nan, np.nan, np.nan, len(left_clusters), len(right_clusters)
 
     left_values = np.concatenate(left_clusters)
     right_values = np.concatenate(right_clusters)
     observed = float(np.mean(left_values) - np.mean(right_values))
+
     rng = np.random.default_rng(seed)
     diffs = []
     for _ in range(iterations):
-        # Sample POIs, then concatenate their review rows. This keeps within-POI
-        # clustering visible in the uncertainty estimate.
+        # Sample POIs with replacement, then concatenate all reviews within sampled POIs.
+        # This keeps within-POI clustering visible in the uncertainty estimate.
         sampled_left = [left_clusters[index] for index in rng.integers(0, len(left_clusters), len(left_clusters))]
         sampled_right = [
             right_clusters[index] for index in rng.integers(0, len(right_clusters), len(right_clusters))
         ]
         diffs.append(float(np.mean(np.concatenate(sampled_left)) - np.mean(np.concatenate(sampled_right))))
+
     lower, upper = np.percentile(diffs, [2.5, 97.5])
     return observed, float(lower), float(upper), len(left_clusters), len(right_clusters)
 
@@ -633,8 +699,9 @@ def _append_raw_score_parametric_skip(rows: list[dict], comparison: str) -> None
 
 
 def build_tests(scored: pd.DataFrame) -> pd.DataFrame:
-    # Returns one row per statistical check. Tests can be "ok" or "skipped" so
-    # reports explain why a check was not meaningful.
+    # Run a suite of statistical tests comparing language groups (Japanese vs. English reviews).
+    # Returns one row per test (chi-square, Mann-Whitney, t-tests, bootstrap CIs, etc.)
+    # Each test row includes: test_name, comparison, status (ok/skipped), statistic, p_value, effect size, details_json.
     rows = []
     languages = sorted(scored["language_group"].dropna().unique())
     if len(languages) != 2:
@@ -650,10 +717,11 @@ def build_tests(scored: pd.DataFrame) -> pd.DataFrame:
         return pd.DataFrame(rows)
 
     left_name, right_name = languages
+    # Extract sentiment scores for each language group (drop NaN values).
     left = scored.loc[scored["language_group"] == left_name, "sentiment_score"].dropna().to_numpy()
     right = scored.loc[scored["language_group"] == right_name, "sentiment_score"].dropna().to_numpy()
-    # `left` and `right` are plain NumPy arrays because scipy functions expect
-    # numeric array-like inputs.
+    # `left` and `right` are plain NumPy arrays because scipy functions expect numeric array-like inputs.
+
     comparison = f"{left_name}_vs_{right_name}"
     score_scale_details = {
         "left": left_name,
@@ -665,14 +733,19 @@ def build_tests(scored: pd.DataFrame) -> pd.DataFrame:
         ),
     }
 
+    # Test 1: Chi-square test on sentiment category independence (negative/neutral/positive).
+    # Create a contingency table: rows=languages, columns=sentiment categories.
     table = pd.crosstab(scored["language_group"], scored["sentiment_category"])
     # crosstab counts how many negative/neutral/positive rows each language has.
-    # Compare category shares first, then add score-based and sensitivity checks.
+
+    # Ensure all expected categories are present (even if 0 count).
     for category in ["negative", "neutral", "positive"]:
         if category not in table.columns:
             table[category] = 0
     table = table[["negative", "neutral", "positive"]]
-    table = table.loc[:, table.sum(axis=0) > 0]
+    table = table.loc[:, table.sum(axis=0) > 0]  # Keep only non-empty categories.
+
+    # Skip if fewer than 2x2 contingency (need both languages AND at least 2 categories).
     if table.shape[0] < 2 or table.shape[1] < 2:
         rows.append({
             "test_name": "sentiment_category_independence",
@@ -687,6 +760,7 @@ def build_tests(scored: pd.DataFrame) -> pd.DataFrame:
             }, ensure_ascii=False),
         })
     elif table.shape == (2, 2):
+        # Exact test for 2x2 contingency.
         oddsratio, p_value = stats.fisher_exact(table)
         rows.append({
             "test_name": "fisher_exact_sentiment_category",
@@ -698,6 +772,8 @@ def build_tests(scored: pd.DataFrame) -> pd.DataFrame:
             "details_json": table.to_json(),
         })
     else:
+        # Chi-square test: tests independence of language_group and sentiment_category.
+        # Effect size: Cramer's V (bounded 0-1, where 0=no association, 1=perfect association).
         chi2, p_value, dof, expected = stats.chi2_contingency(table)
         rows.append({
             "test_name": "chi_square_sentiment_category",
@@ -713,8 +789,9 @@ def build_tests(scored: pd.DataFrame) -> pd.DataFrame:
             }, ensure_ascii=False),
         })
 
+    # Test 2: Mann-Whitney U test on raw sentiment scores (non-parametric, no normality assumption).
+    # Compares the distribution of scores between language groups.
     mann = stats.mannwhitneyu(left, right, alternative="two-sided")
-    # Mann-Whitney compares score distributions without assuming normality.
     rows.append({
         "test_name": "mann_whitney_u_sentiment_score",
         "comparison": comparison,
@@ -725,16 +802,16 @@ def build_tests(scored: pd.DataFrame) -> pd.DataFrame:
         "details_json": json.dumps(score_scale_details),
     })
 
+    # Test 3 & 4: Bootstrap confidence intervals for mean and median differences.
+    # Bootstrap provides CI without assuming normality or equal variances.
     for name, reducer in [("mean", np.mean), ("median", np.median)]:
-        # Bootstrap both mean and median because they answer slightly different
-        # robustness questions.
         observed, lower, upper = _bootstrap_diff(left, right, reducer)
         rows.append({
             "test_name": f"bootstrap_{name}_difference_sentiment_score",
             "comparison": comparison,
             "status": "ok",
             "statistic": observed,
-            "p_value": np.nan,
+            "p_value": np.nan,  # Bootstrap CIs don't produce p-values
             "effect": observed,
             "details_json": json.dumps({
                 **score_scale_details,
@@ -745,14 +822,17 @@ def build_tests(scored: pd.DataFrame) -> pd.DataFrame:
             }),
         })
 
+    # Test 5 & 6: POI-level sensitivity checks (aggregate reviews within POIs before comparing).
+    # Reduces review nesting: instead of comparing individual reviews, we first compute mean score per POI,
+    # then compare POIs. This down-weights POIs with many reviews.
     poi_scores = _poi_level_scores(scored)
-    # POI-level checks reduce nested review rows to one value per POI.
     poi_left = poi_scores.loc[
         poi_scores["language_group"] == left_name, "mean_sentiment_score"
     ].to_numpy()
     poi_right = poi_scores.loc[
         poi_scores["language_group"] == right_name, "mean_sentiment_score"
     ].to_numpy()
+
     if len(poi_left) >= 2 and len(poi_right) >= 2:
         poi_mann = stats.mannwhitneyu(poi_left, poi_right, alternative="two-sided")
         rows.append({
@@ -828,10 +908,14 @@ def build_tests(scored: pd.DataFrame) -> pd.DataFrame:
 
     _append_raw_score_parametric_skip(rows, comparison)
 
+    # Test 7: Welch t-test on review ratings (row-level, common Google 1-to-5 star scale).
+    # Unlike VADER vs oseti scores, ratings are on the same scale, so parametric t-test is justified.
     rating_arrays = _numeric_group_arrays(scored, "review_rating", languages)
     rating_left = rating_arrays[left_name]
     rating_right = rating_arrays[right_name]
+
     if len(rating_left) >= 2 and len(rating_right) >= 2:
+        # Welch t-test: does not assume equal variances (good for unequal group sizes).
         rating_t = stats.ttest_ind(rating_left, rating_right, equal_var=False, alternative="two-sided")
         rows.append({
             "test_name": "welch_t_review_rating",
@@ -866,6 +950,8 @@ def build_tests(scored: pd.DataFrame) -> pd.DataFrame:
             }),
         })
 
+    # Test 8: Welch ANOVA on review ratings (extension of Welch t-test for 2+ groups; here just 2 groups).
+    # More general form, though with 2 groups it's equivalent to the t-test above.
     rating_f, rating_p, rating_df1, rating_df2 = _welch_anova(list(rating_arrays.values()))
     rows.append({
         "test_name": "welch_anova_review_rating",
@@ -936,9 +1022,11 @@ def build_tests(scored: pd.DataFrame) -> pd.DataFrame:
                 }),
             })
 
+    # Test 9: Spearman correlation between review_rating and sentiment_score (validation check).
+    # Sanity check: do reviews with higher Google ratings also have higher sentiment scores?
+    # This is descriptive, not causal.
     rating_work = scored[["language_group", "review_rating", "sentiment_score"]].dropna()
     if len(rating_work) >= 3:
-        # This is a light validation check, not a causal model.
         corr = stats.spearmanr(rating_work["review_rating"], rating_work["sentiment_score"])
         rows.append({
             "test_name": "rating_validation_spearman_score",
@@ -963,7 +1051,8 @@ def build_tests(scored: pd.DataFrame) -> pd.DataFrame:
 
 
 def assert_no_forbidden_aggregate_columns(df: pd.DataFrame) -> None:
-    # Prevent row-level text and IDs from leaking into tracked aggregate outputs.
+    # Privacy/sensitivity guardrail: ensure tracked aggregate outputs don't accidentally include
+    # row-level text (review_text, author, URLs, IDs) that should stay in ignored row-level outputs only.
     try:
         assert_no_forbidden_columns(df.columns, FORBIDDEN_AGGREGATE_COLUMNS, "Aggregate output")
     except ProvenanceError as error:
@@ -971,7 +1060,8 @@ def assert_no_forbidden_aggregate_columns(df: pd.DataFrame) -> None:
 
 
 def write_readiness(report: dict, summary: pd.DataFrame, tests: pd.DataFrame, path: Path) -> None:
-    # Write a human-readable summary of inputs, denominators, and caveats.
+    # Write a human-readable markdown summary of inputs, denominators, test results, and caveats.
+    # Includes file hashes (SHA256) to tie the report to the exact input files used.
     lines = [
         "# Sentiment Readiness",
         "",
@@ -1043,11 +1133,22 @@ def build_sentiment_analysis(
     english_scorer: Callable[[str], dict[str, object]] | None = None,
     japanese_scorer: Callable[[str], dict[str, object]] | None = None,
 ) -> dict:
+    # Main sentiment analysis pipeline:
+    # 1. Load reviews, codebook, and metadata
+    # 2. Score each review using VADER (English) or oseti (Japanese)
+    # 3. Extract reviewed keyword evidence
+    # 4. Build aggregate summary statistics
+    # 5. Run statistical tests
+    # 6. Write outputs and manifests
+
     groups = groups or ["japanese", "english"]
-    # Keep the provenance hashes with the run so outputs can be traced back to inputs.
+
+    # Compute SHA256 hashes of all inputs for provenance tracking.
     input_hash = sha256_file(paths.reviews_path) if paths.reviews_path.exists() else None
     metadata_hash = sha256_file(paths.poi_metadata_path) if prefecture and paths.poi_metadata_path.exists() else None
     codebook_hash = sha256_file(paths.reviewed_codebook_path) if paths.reviewed_codebook_path.exists() else None
+
+    # Load inputs.
     reviewed_codebook = load_reviewed_evidence_codebook(paths.reviewed_codebook_path)
     reviews = load_reviews(
         paths.reviews_path,
@@ -1056,6 +1157,8 @@ def build_sentiment_analysis(
         prefecture=prefecture,
         poi_metadata_path=paths.poi_metadata_path,
     )
+
+    # Score all reviews and extract evidence.
     scored = score_reviews(
         reviews,
         english_scorer=english_scorer,
@@ -1063,13 +1166,17 @@ def build_sentiment_analysis(
         reviewed_codebook=reviewed_codebook,
     )
 
+    # Create output directories.
     paths.row_output_dir.mkdir(parents=True, exist_ok=True)
     paths.aggregate_output_dir.mkdir(parents=True, exist_ok=True)
+
+    # Write row-level scores to ignored path (contains individual review data).
     scope = prefecture or city or "all"
     row_path = paths.row_output_dir / f"google_reviews_{scope.lower()}_{'-'.join(groups)}.csv"
     scored.to_csv(row_path, index=False)
     row_hash = sha256_file(row_path)
 
+    # Build aggregate summaries and run tests.
     summary = build_summary(scored, source_group_series(reviews))
     tests = build_tests(scored)
     # Guardrails run before writing aggregate CSVs, so a privacy leak fails loud.

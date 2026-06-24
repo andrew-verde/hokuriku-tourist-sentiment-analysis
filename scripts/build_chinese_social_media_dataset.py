@@ -33,6 +33,11 @@ from src.provenance import file_record, research_manifest, sha256_file, write_js
 
 load_dotenv()
 
+# This module orchestrates the full pipeline: discovers XHS and Douyin source files,
+# normalizes them into a unified schema, applies SnowNLP sentiment classification and
+# reviewed keyword matching for friction/topic/sentiment evidence codes, then produces
+# aggregate summaries by city/platform and theme, plus statistical tests and cross-language comparisons.
+
 logger = setup_logger(__name__)
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -196,8 +201,8 @@ def load_chinese_codebook(
 
 
 def _clean_text(value: object) -> str:
-    # Normalize missing values, pandas NaN, and repeated whitespace to a
-    # single stable string form before comparisons.
+    """Normalize missing values, pandas NaN, and repeated whitespace to a single stable string form."""
+    # Convert NaN and None to empty string; collapse whitespace sequences to single spaces.
     if pd.isna(value):
         return ""
     text = str(value).strip()
@@ -221,7 +226,7 @@ _DOUYIN_RELATIVE_RE = re.compile(r"^(?P<count>\d+)\s*(?P<unit>分钟前|小时�
 
 
 def scrape_reference_date(path: Path) -> dt.date:
-    """Date the scrape file was committed (preferred) or last modified.
+    """Determine the reference date for XHS/Douyin date parsing from the file's git commit date or modification time.
 
     Anchors year/relative date inference. Override with CN_SCRAPE_REFERENCE_DATE
     (YYYY-MM-DD) when analyzing a file outside its git checkout.
@@ -244,7 +249,8 @@ def scrape_reference_date(path: Path) -> dt.date:
 
 
 def parse_author_and_date(raw: str, reference_date: dt.date) -> tuple[str, str, str]:
-    """Split an author cell into (author, post_date ISO string, precision)."""
+    """Parse XHS author cells which often embed the post date: return (author, post_date ISO string, precision)."""
+    # XHS format is "author_name YYYY-MM-DD" or "author_name MM-DD"; infer the year if missing.
     value = _clean_text(raw)
     if not value:
         return "", "", "none"
@@ -284,11 +290,10 @@ def parse_author_and_date(raw: str, reference_date: dt.date) -> tuple[str, str, 
 
 
 def parse_douyin_relative_time(raw: object, reference_date: dt.date) -> tuple[str, str]:
-    """Parse Douyin relative comment time into an approximate date.
+    """Parse Douyin relative comment times (e.g. '2天前', '1月前') into an approximate date and precision flag.
 
-    Douyin comment exports currently expose relative times only. Month/year
-    offsets are approximate calendar-free offsets so outputs carry precision
-    as relative-inferred, not exact.
+    Douyin comment exports only expose relative times. Month/year offsets are approximate calendar-free
+    offsets so outputs carry precision as 'relative_inferred', not exact.
     """
     value = _clean_text(raw)
     if not value:
@@ -564,11 +569,10 @@ def validate_douyin_comment_source(path: Path, source: pd.DataFrame) -> dict:
 
 
 def discover_input_files(input_dir: Path, include_douyin: bool = False) -> list[Path]:
-    """Find raw social scrape CSVs in the companion tourism-data checkout.
+    """Find XHS and optional Douyin source CSVs in the companion tourism-data project.
 
-    Raw scrapes are preferred for source text. Douyin is temporarily excluded
-    from the main pipeline and is discovered only for explicit source-sensitivity
-    runs. Other processed CSVs are consumed only as annotations.
+    By default, discovers Xiaohongshu raw scrapes and the reviewed manual workbook.
+    Douyin comments are only discovered when explicitly requested via include_douyin=True.
     """
     if not input_dir.exists():
         return []
@@ -611,11 +615,10 @@ def discover_theme_files(input_dir: Path) -> list[Path]:
 
 
 def load_theme_annotations(input_dir: Path) -> pd.DataFrame:
-    """Collect colleague theme classifications keyed by source record id.
+    """Load colleague theme classifications (fan/travel/ordinary) from the tourism-data processed CSVs.
 
-    The processed CSVs in tourism-data carry theme / fan_score / travel_score
-    per note_id (or video_id). Raw scrapes stay the text source of truth;
-    these columns are joined on as annotations only.
+    Themes are joined onto the raw scrapes by source_record_id (note_id or video_id).
+    Raw XHS/Douyin text remains the source of truth; theme columns are annotations only.
     """
     frames = []
     for path in discover_theme_files(input_dir):
@@ -639,10 +642,12 @@ def load_theme_annotations(input_dir: Path) -> pd.DataFrame:
 
 
 def normalize_social_csv(path: Path, reference_date: dt.date | None = None) -> pd.DataFrame:
-    # Turn each source row into the shared review-like schema used by the rest
-    # of the pipeline.
+    """Read a raw XHS or Douyin CSV and normalize all rows into the unified schema (SCHEMA_COLUMNS)."""
+    # Each source format (XHS CSV, XHS Excel, Douyin comment CSV) has different column names.
+    # This function unpacks them into a consistent layout for downstream processing.
     source = _read_input_table(path)
     if is_douyin_comment_source(path, source):
+        # Verify Douyin provenance fields for audit traceability.
         validate_douyin_comment_source(path, source)
     if source.empty:
         return pd.DataFrame(columns=SCHEMA_COLUMNS)
@@ -651,9 +656,9 @@ def normalize_social_csv(path: Path, reference_date: dt.date | None = None) -> p
 
     rows = []
     for _, row in source.iterrows():
-        # Merge title and body/comment fields into one text field for matching.
-        # Body/comment text is preferred when available, title-only rows remain
-        # possible for smoke tests and denominator reporting.
+        # Merge title and body/comment fields into one text field for keyword matching.
+        # Body/comment text is preferred when available; title-only rows are included
+        # for denominator reporting but flagged with text_scope='title_only'.
         title = _clean_text(row.get("title", ""))
         body = (
             _clean_text(row.get("body_text", ""))
@@ -707,8 +712,9 @@ def normalize_social_csv(path: Path, reference_date: dt.date | None = None) -> p
 
 
 def _snownlp_sentiment(text: str) -> tuple[float, float, str]:
-    # SnowNLP returns probability of positive sentiment. Centering maps that
-    # 0..1 value into -1..1 so categories match the EN/JP threshold style.
+    """Run SnowNLP on Chinese text to classify sentiment: return (positive_prob, centered_score, category)."""
+    # SnowNLP returns probability of positive sentiment (0..1). Center it to -1..1 and threshold into
+    # 'positive' (≥0.05), 'negative' (≤-0.05), or 'neutral' (between).
     if not text:
         return 0.5, 0.0, "neutral"
     try:
@@ -739,8 +745,10 @@ def _reviewed_terms_from_codebook(codebook: dict) -> dict[str, list[str]]:
 
 
 def _append_sentiment_fields(df: pd.DataFrame, reviewed_terms: dict[str, list[str]]) -> pd.DataFrame:
-    # This adds both library-based sentiment columns and transparent keyword
-    # evidence columns, keeping the two forms of signal separate.
+    """Add SnowNLP sentiment classification and reviewed keyword evidence columns to the DataFrame."""
+    # Populate sentiment_category (positive/negative/neutral from SnowNLP) and reviewed evidence columns
+    # (reviewed_positive_terms_matched, reviewed_negative_terms_matched, reviewed_recommendation_terms_matched)
+    # which hold pipe-delimited matched keywords.
     scored = df.copy()
     if scored.empty:
         for column in [
@@ -785,11 +793,12 @@ def _append_sentiment_fields(df: pd.DataFrame, reviewed_terms: dict[str, list[st
 
 
 def _tag_chinese_dataframe(df: pd.DataFrame, codebook: dict) -> pd.DataFrame:
-    # Build one boolean column per code, then cache the matched code lists for
-    # each row so summaries can work from either representation.
+    """Create boolean match columns for every codebook code and compute aggregate code lists per row."""
+    # For each code (topic, friction, sentiment), add a boolean column showing whether any of its
+    # keywords appear in the post text. Also cache the matched code names in code_codes list columns.
     tagged = df.copy()
     for code, attrs in codebook.items():
-        # One boolean column per code makes later groupby/count steps simple.
+        # Create one boolean column per code: True if any keyword for that code is found in text_content.
         keywords = attrs["keywords"]
         tagged[code] = tagged["text_content"].apply(
             lambda text, keywords=keywords: any(keyword in str(text) for keyword in keywords)
@@ -837,7 +846,8 @@ def _code_summary(
     codes: list[str] | None = None,
     min_denominator: int | None = None,
 ) -> pd.DataFrame:
-    # Summarize one code family at a time for the requested grouping columns.
+    """Count how many posts have each code (topic/friction/sentiment evidence) per grouping (city/platform/theme)."""
+    # If min_denominator is set, suppress percentages for groups with fewer rows (e.g., small theme slices).
     group_cols = group_cols or ["city", "source_platform"]
     rows = []
     codes = codes or [code for code, attrs in codebook.items() if attrs["type"] == code_family]
@@ -858,6 +868,7 @@ def _code_summary(
                 "label": codebook[code]["label"],
                 "count": count,
                 "denominator_posts": denominator,
+                # Suppress percentages for small n; counts remain visible for audit.
                 "pct_posts": None if denominator_status == "suppressed_small_n" else (
                     round(100 * count / denominator, 3) if denominator else 0.0
                 ),
@@ -936,7 +947,8 @@ def _sentiment_summary(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def _binary_group_test(df: pd.DataFrame, group_col: str, code: str) -> list[dict]:
-    # Compare one boolean code between every pair of groups with Fisher's exact test.
+    """Run pairwise Fisher's exact tests for one code across all pairs of groups (e.g., cities or platforms)."""
+    # This tests whether the prevalence of a friction/topic code differs significantly between pairs of groups.
     rows = []
     groups = sorted(str(value) for value in df[group_col].dropna().unique())
     for a, b in combinations(groups, 2):
@@ -944,12 +956,13 @@ def _binary_group_test(df: pd.DataFrame, group_col: str, code: str) -> list[dict
         gb = df[df[group_col].astype(str) == b]
         a_count = int(ga[code].sum())
         b_count = int(gb[code].sum())
+        # Build 2x2 contingency table: [matched, not-matched] for each group.
         table = [[a_count, len(ga) - a_count], [b_count, len(gb) - b_count]]
-        # The 2x2 table is: matched/not-matched for group A and group B.
         fisher_p = None
         odds_ratio = None
         if len(ga) and len(gb):
             try:
+                # Fisher's exact test returns (odds_ratio, p_value) for a 2x2 table.
                 odds_ratio, fisher_p = stats.fisher_exact(table, alternative="two-sided")
             except Exception:
                 pass
@@ -976,8 +989,8 @@ def _binary_group_test(df: pd.DataFrame, group_col: str, code: str) -> list[dict
 
 
 def _within_chinese_tests(tagged: pd.DataFrame, codebook: dict) -> pd.DataFrame:
-    # Run pairwise Fisher exact tests for friction codes across cities and
-    # across source platforms.
+    """Run all pairwise Fisher's exact tests for friction codes: cities vs cities, and platforms vs platforms."""
+    # This reveals whether friction prevalence differs significantly within the Chinese social data.
     columns = [
         "comparison_type",
         "group_a",
@@ -1004,8 +1017,9 @@ def _within_chinese_tests(tagged: pd.DataFrame, codebook: dict) -> pd.DataFrame:
 def _review_language_comparison(
     friction_summary: pd.DataFrame, review_path: Path, chinese_subset: str = "all_posts"
 ) -> pd.DataFrame:
-    # Compare Chinese friction rates with the existing English/Japanese review
-    # summary using the same friction code names.
+    """Compare Chinese social friction prevalence with Google review friction rates by language and code."""
+    # This cross-language comparison uses the same friction code definitions to ask:
+    # How do friction mentions in Chinese social media compare to friction mentions in English/Japanese reviews?
     columns = [
         "city", "friction_code", "friction_label", "comparison_group", "chinese_subset",
         "chinese_count", "chinese_n", "chinese_pct_posts",

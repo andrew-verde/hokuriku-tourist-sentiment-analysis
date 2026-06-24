@@ -1,4 +1,10 @@
-"""Small helper for creating a consistent project logger."""
+"""
+Small helper for creating a consistent project logger.
+
+This module provides a setup function that creates a logger writing to both
+terminal and a daily log file, with consistent formatting. Used throughout
+the analysis pipeline to record what the scripts are doing.
+"""
 
 import logging
 import os
@@ -24,7 +30,8 @@ def setup_logger(name: str, log_level=logging.INFO) -> logging.Logger:
     if not os.path.exists(log_dir):
         os.makedirs(log_dir)
 
-    # One file per day keeps the log history easy to scan.
+    # One file per day keeps the log history easy to scan and prevents files from
+    # growing indefinitely.
     log_file = os.path.join(log_dir, f'analysis_{datetime.now().strftime("%Y%m%d")}.log')
     file_handler = logging.FileHandler(log_file)
     file_handler.setLevel(log_level)
@@ -44,5 +51,5 @@ def setup_logger(name: str, log_level=logging.INFO) -> logging.Logger:
     if not logger.handlers:
         logger.addHandler(file_handler)
         logger.addHandler(console_handler)
-    
+
     return logger

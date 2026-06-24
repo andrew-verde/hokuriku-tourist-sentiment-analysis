@@ -15,6 +15,11 @@ from pathlib import Path
 
 from src.provenance import file_record, research_manifest, sha256_file, write_json
 
+# This script pulls pre-processed Google review data (checkpoints and multilingual
+# analysis outputs) from a sibling repository and copies them locally. It then
+# records the sync metadata (file hashes, counts, lineage) into a manifest JSON
+# so the analysis pipeline can trace where its input data came from.
+
 ROOT = Path(__file__).resolve().parent.parent
 SOURCE_REPO_CANDIDATES = (
     Path("/Users/andrewgreen/Repositories/andrew-verde/english-fukui-tourism"),
@@ -33,7 +38,8 @@ class SyncInputError(RuntimeError):
 
 
 def default_source_repo() -> Path:
-    # Prefer an explicit override, then the known local repo paths.
+    # Determine where the source repository lives. First check for an environment
+    # variable override, then try known local paths, defaulting to the first option.
     override = os.environ.get("ENGLISH_FUKUI_TOURISM_DIR")
     if override:
         return Path(override)
@@ -61,7 +67,9 @@ def _manifest_path(path: Path, base: Path) -> str:
 
 
 def _copy_dir(src: Path, dst: Path, manifest_base: Path) -> list[dict[str, object]]:
-    # Copy the directory tree, then record file metadata for the manifest.
+    # Copy the entire directory tree from source to destination, then compute
+    # and record file metadata (size, SHA256 hash) for each copied file so the
+    # manifest can verify data integrity later.
     _require_dir(src)
     dst.parent.mkdir(parents=True, exist_ok=True)
     shutil.copytree(src, dst, dirs_exist_ok=True)
@@ -81,7 +89,9 @@ def sync_google_review_data(
     source_repo: Path | None = None,
     output_root: Path = DEFAULT_OUTPUT_ROOT,
 ) -> dict[str, object]:
-    # Only sync the review-analysis folders that this repo actually consumes.
+    # Copy the designated review-analysis folders from the source repo and build
+    # a provenance manifest that records what was synced, from where, and the
+    # integrity hash of every file so downstream steps can verify the data.
     source_repo = source_repo or default_source_repo()
     copied_files: list[dict[str, object]] = []
     manifest_base = output_root.parent
@@ -92,6 +102,7 @@ def sync_google_review_data(
             manifest_base,
         ))
 
+    # Build the manifest that documents this sync operation for the research record.
     manifest = {
         "schema_version": "google_review_sync_manifest.v2",
         "source_repo": str(source_repo),
@@ -99,6 +110,7 @@ def sync_google_review_data(
         "skipped": ["output/official_fukui", "output/hokuriku_merged", "survey outputs"],
         "files": copied_files,
     }
+    # Attach provenance metadata so every output traces back to its source data.
     manifest["provenance"] = research_manifest(
         kind="google_review_sync",
         command=None,
@@ -119,6 +131,7 @@ def sync_google_review_data(
             "Official survey outputs are skipped.",
         ],
     )
+    # Write the manifest to a JSON file for inspection and downstream verification.
     manifest_path = output_root / "google_review_sync_manifest.json"
     write_json(manifest_path, manifest)
     return manifest

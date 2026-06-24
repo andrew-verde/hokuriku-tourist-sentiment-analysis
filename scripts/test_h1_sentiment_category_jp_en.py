@@ -58,6 +58,9 @@ OUTPUT_DIR = Path(__file__).resolve().parent.parent / "output" / "hypothesis_tes
 OUTPUT_CSV = OUTPUT_DIR / "h1_sentiment_category_jp_en.csv"
 OUTPUT_MANIFEST = OUTPUT_DIR / "h1_sentiment_category_jp_en_manifest.json"
 
+# Define three chi-square tests with different neutral-band definitions:
+# - Primary test: neutral band of +/- 0.05
+# - Sensitivity tests: wider neutral bands (+/- 0.10, +/- 0.20) to check robustness
 ANALYSES = [
     ("primary", "sentiment_category", "neutral band +/-0.05"),
     ("sensitivity", "sentiment_category_neutral_0_10", "neutral band +/-0.10"),
@@ -71,6 +74,12 @@ H1_CAVEATS = COMMON_CAVEATS + [
 
 
 def cramers_v(table: pd.DataFrame, chi2: float) -> float:
+    """Compute Cramér's V effect size for a chi-square test result.
+
+    Cramér's V measures association strength in a contingency table, ranging from
+    0 (no association) to 1 (perfect association). It is the standardized square
+    root of the chi-square statistic.
+    """
     n = float(table.to_numpy().sum())
     if n == 0:
         return float("nan")
@@ -89,6 +98,12 @@ def _analysis_rows(
     generated_at: str,
     input_path: Path,
 ) -> tuple[list[dict], float | None]:
+    """Conduct chi-square test of sentiment category independence between English and Japanese reviews.
+
+    Tests the null hypothesis that sentiment category distribution (negative, neutral, positive)
+    is independent of review language group. Outputs one row per category-language combination,
+    plus test summary metrics (chi-square statistic, p-value, Cramér's V effect size).
+    """
     denominators = group_denominators(df)
     source_hash = sha256_file(input_path)
     rows: list[dict] = []
@@ -125,9 +140,12 @@ def _analysis_rows(
         })
         return rows, None
 
+    # Build a 2x3 contingency table: rows are language groups, columns are sentiment categories
     table = pd.crosstab(df["language_group"], df[category_column])
     table = table.reindex(index=list(DEFAULT_GROUPS), columns=CATEGORY_ORDER, fill_value=0)
+    # Remove sentiment categories with zero counts to avoid chi-square validity issues
     nonzero_table = table.loc[:, table.sum(axis=0) > 0]
+    # Chi-square requires at least 2 rows and 2 columns; skip test if not met
     if nonzero_table.shape[0] < 2 or nonzero_table.shape[1] < 2:
         rows.append({
             "hypothesis": "H1",
@@ -160,10 +178,13 @@ def _analysis_rows(
         })
         return rows, None
 
+    # Perform chi-square test of independence between language group and sentiment category
     chi2, p_value, dof, expected = stats.chi2_contingency(nonzero_table)
     expected_frame = pd.DataFrame(expected, index=nonzero_table.index, columns=nonzero_table.columns)
     min_expected = float(np.min(expected))
+    # Flag if minimum expected frequency < 5 (chi-square assumption violation)
     sparse_warning = bool(min_expected < 5)
+    # Compute Cramér's V effect size (0 = no association, 1 = perfect association)
     effect = cramers_v(nonzero_table, float(chi2))
     details = {
         "observed_counts": nonzero_table.to_dict(),
@@ -173,6 +194,7 @@ def _analysis_rows(
     if sparse_warning:
         details["sparse_expected_warning"] = "Minimum expected count below 5; interpret chi-square cautiously."
 
+    # Generate one output row per category-language combination with observed/expected counts
     for language in DEFAULT_GROUPS:
         for category in CATEGORY_ORDER:
             observed = int(table.loc[language, category])
@@ -181,6 +203,8 @@ def _analysis_rows(
                 if category in expected_frame.columns
                 else 0.0
             )
+            # Standardized residual: (observed - expected) / sqrt(expected)
+            # Large residuals indicate deviations from independence
             residual = (
                 (observed - expected_value) / np.sqrt(expected_value)
                 if expected_value > 0
@@ -246,6 +270,8 @@ def build_h1_sentiment_category(
         row_ranges.append((start, len(all_rows)))
         p_values.append(p_value)
 
+    # Apply Holm step-down correction across the three p-values (primary + two sensitivity tests)
+    # This controls the family-wise error rate across multiple testing scenarios
     adjusted = holm_adjust(p_values)
     for (start, end), p_adjusted in zip(row_ranges, adjusted):
         for index in range(start, end):

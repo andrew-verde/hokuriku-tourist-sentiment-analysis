@@ -1,5 +1,16 @@
 #!/usr/bin/env python3
-"""Build aggregate-only SVG figures for the statistical test index."""
+"""Build aggregate-only SVG figures for the statistical test index.
+
+This script:
+1. Loads CSVs containing statistical test results (hypothesis tests, cross-language comparisons, within-language drivers)
+2. Parses test results and effect sizes
+3. Generates publication-quality SVG visualizations:
+   - Forest charts (effect sizes with confidence intervals)
+   - Bar/stacked-percent charts (sentiment shares, evidence prevalence)
+   - Results panels (test verdicts and p-values)
+   - Driver effect charts (within-language predictors)
+4. Writes index markdown and manifest JSON
+"""
 
 from __future__ import annotations
 
@@ -92,9 +103,14 @@ def _input(path: Path, make_target: str) -> Path:
 
 
 def _read_csv(path: Path, required: set[str], make_target: str) -> pd.DataFrame:
+    # Load a CSV test results file, check for forbidden (row-level) columns, verify required columns.
     _input(path, make_target)
     df = pd.read_csv(path)
+
+    # Privacy check: ensure aggregate outputs don't contain row-level text/IDs.
     assert_no_forbidden_columns(df.columns, forbidden=FORBIDDEN_AGGREGATE_COLUMNS, context=str(path))
+
+    # Schema check: verify all required columns are present.
     missing = sorted(required - set(df.columns))
     if missing:
         raise MissingColumnsError(f"Required columns missing from {path}: {', '.join(missing)}")
@@ -102,6 +118,8 @@ def _read_csv(path: Path, required: set[str], make_target: str) -> pd.DataFrame:
 
 
 def _parse_json(value: object) -> dict:
+    # Parse JSON string stored in a CSV cell (e.g., contingency table details, text length stats).
+    # Returns empty dict if value is NaN, malformed, or not a dict.
     if pd.isna(value):
         return {}
     try:
@@ -120,6 +138,7 @@ def _fmt_pct(value: object) -> str:
 
 
 def _fmt_p(value: object) -> str:
+    # Format p-value for display: "p=n/a", "p=0.001", or "p=1e-08" if very small.
     if pd.isna(value):
         return "p=n/a"
     number = float(value)
@@ -129,6 +148,7 @@ def _fmt_p(value: object) -> str:
 
 
 def _fmt_p_number(value: object) -> str:
+    # Format p-value as plain number without "p=" prefix: "n/a", "0.001", or "1e-08".
     if pd.isna(value):
         return "n/a"
     number = float(value)
@@ -138,6 +158,7 @@ def _fmt_p_number(value: object) -> str:
 
 
 def _fmt_effect(value: object, label: str = "effect") -> str:
+    # Format effect size label: "effect=n/a" or "V=0.123" (for Cramer's V) or "rho=0.456" (for Spearman).
     if pd.isna(value):
         return f"{label}=n/a"
     return f"{label}={float(value):.3f}"
@@ -284,6 +305,9 @@ def _forest_chart(
     caption: str | None = None,
     positive_annotation: str | None = None,
 ) -> None:
+    # Generate a forest plot (effect size visualization) showing point estimates and confidence intervals.
+    # Each row: label, point (effect size), ci_low/ci_high (95% CI bounds), p_chip, value_label, color.
+    # Useful for comparing effect sizes across multiple tests/units of analysis.
     width = 1120
     top = 118
     row_height = 62
@@ -298,6 +322,7 @@ def _forest_chart(
     height = axis_y + 72 + caption_space
 
     def sx(value: float) -> float:
+        # Convert value on x-axis to screen coordinates.
         return left + (value - x_min) / (x_max - x_min) * chart_width
 
     zero_x = sx(0.0)
@@ -384,6 +409,9 @@ def _stacked_pct_chart(
     categories: list[tuple[str, str]],
     note: str,
 ) -> None:
+    # Generate a 100% stacked bar chart showing category shares (e.g., negative/neutral/positive sentiment %).
+    # Each row is one group; categories are the segments that stack to 100%.
+    # Useful for showing how sentiment distribution shifts between language/source groups.
     width = 1120
     top = 104
     row_height = 54
@@ -393,6 +421,8 @@ def _stacked_pct_chart(
     chart_width = width - left - right
     parts = _svg_header(width, height, title, subtitle)
     grid_bottom = top + (max(1, len(rows)) - 1) * row_height + 38
+
+    # Add vertical grid lines at 0%, 50%, 100%.
     for tick_pct in (0.0, 0.5, 1.0):
         x = left + tick_pct * chart_width
         parts.append(
@@ -434,6 +464,9 @@ def _horizontal_bar_chart(
     zero_center: bool = False,
     max_abs: float | None = None,
 ) -> None:
+    # Generate a horizontal bar chart for showing effect sizes, differences, or other single-value metrics.
+    # If zero_center=True, bars can extend left (negative) or right (positive) from center.
+    # Otherwise, bars start from the left and extend rightward.
     width = 1120
     top = 102
     row_height = 39
@@ -441,6 +474,7 @@ def _horizontal_bar_chart(
     right = 170
     height = top + 76 + max(1, len(rows)) * row_height
     chart_width = width - left - right
+
     values = [float(row.get(value_key, 0.0) or 0.0) for row in rows]
     if zero_center:
         limit = max_abs or max([abs(value) for value in values] + [1.0])
@@ -487,6 +521,9 @@ def _driver_effect_chart(
     groups: list[dict[str, object]],
     note: str,
 ) -> None:
+    # Generate a multi-panel driver effect chart showing how different predictors explain within-language sentiment.
+    # Each panel shows a different outcome type (score differences, event risk differences, correlations, etc.)
+    # with a separate axis. Useful for visualizing many effect sizes across different statistical models.
     width = 1240
     top = 102
     left = 470
@@ -500,9 +537,11 @@ def _driver_effect_chart(
     visible_groups = [group for group in groups if group["rows"]]
     for group in visible_groups:
         rows = group["rows"]
+        # Compute row heights based on label line wrapping.
         for row in rows:
             row["label_lines"] = _wrapped_label_lines(row["label"], 50)
             row["height"] = max(row_base_height, 16 + len(row["label_lines"]) * line_gap)
+        # Each panel has rows, plus top padding and an axis.
         group["height"] = 42 + sum(int(row["height"]) for row in rows) + axis_height
 
     height = top + sum(int(group["height"]) for group in visible_groups) + panel_gap * max(0, len(visible_groups) - 1) + 64
@@ -635,16 +674,24 @@ def _observed_share_rows(details: dict, labels: dict[str, str] | None = None) ->
 
 
 def write_h1_figures(h1: pd.DataFrame, output_dir: Path) -> list[dict[str, str]]:
+    # Generate figures for Hypothesis 1: sentiment category share differences between JP and EN reviews.
+    # H1 is the primary hypothesis, tested via chi-square on the contingency table of language_group x sentiment_category.
+
     primary = h1[(h1["analysis_type"] == "primary") & (h1["status"] == "ok")].copy()
+
+    # Prepare data for stacked bar chart: one bar per language group, segments = sentiment categories.
     rows = []
     for language, chunk in primary.groupby("language_group", sort=False):
         row = {
             "label": GROUP_LABELS.get(str(language), str(language)),
             "n": int(chunk["observed_count"].sum()),
         }
+        # Extract category percentages (convert from 0-1 fraction to 0-100 percent).
         for _, item in chunk.iterrows():
             row[str(item["category"])] = float(item["category_share"]) * 100
         rows.append(row)
+
+    # Figure 1: Sentiment category shares (e.g., "35% positive English vs 28% positive Japanese").
     path1 = output_dir / "figure_h1_sentiment_category_share.svg"
     p = primary["p_value_holm"].dropna().iloc[0] if not primary.empty else math.nan
     effect = primary["effect_cramers_v"].dropna().iloc[0] if not primary.empty else math.nan
@@ -657,6 +704,9 @@ def write_h1_figures(h1: pd.DataFrame, output_dir: Path) -> list[dict[str, str]]
         "Category-share test only; VADER and oseti raw scores stay separate.",
     )
 
+    # Figure 2: Sensitivity analysis—does H1 hold if we use wider neutral bands?
+    # Neutral bands of 0.10 and 0.20 are stricter (fewer reviews categorized as "neutral").
+    # Confirms the finding isn't just an artifact of the neutral-band definition.
     sensitivity = (
         h1[h1["status"] == "ok"]
         .drop_duplicates(["category_source_column"])
@@ -670,6 +720,7 @@ def write_h1_figures(h1: pd.DataFrame, output_dir: Path) -> list[dict[str, str]]
             "color": PALETTE["score"],
             "annotation": f"V={float(row['effect_cramers_v']):.3f}; {_fmt_p(row['p_value_holm'])}",
         })
+
     path2 = output_dir / "figure_h1_neutral_band_sensitivity.svg"
     _horizontal_bar_chart(
         path2,
@@ -689,15 +740,23 @@ def write_h1_figures(h1: pd.DataFrame, output_dir: Path) -> list[dict[str, str]]
 
 
 def write_h2_figures(h2: pd.DataFrame, output_dir: Path) -> list[dict[str, str]]:
+    # Generate figures for Hypothesis 2: English-language reviews rate higher on Google's 1-to-5 star scale.
+    # H2 uses the common Google star rating as companion outcome evidence (not VADER/oseti, which are tool-specific).
+
     summaries = h2[h2["analysis_type"] == "group_summary"].copy()
+
+    # Prepare data for 5-star rating distribution chart.
     rating_rows = []
     for _, row in summaries.iterrows():
-        dist = _parse_json(row["rating_distribution_json"])
+        dist = _parse_json(row["rating_distribution_json"])  # JSON dict: "1"->count, "2"->count, etc.
         n = sum(int(value) for value in dist.values())
         chart_row = {"label": GROUP_LABELS.get(str(row["language_group"]), row["language_group"]), "n": n}
+        # Convert counts to percentages for each star level.
         for rating in range(1, 6):
             chart_row[f"rating_{rating}"] = int(dist.get(str(rating), 0)) / n * 100 if n else 0.0
         rating_rows.append(chart_row)
+
+    # Figure 1: Star rating distribution by language group.
     path1 = output_dir / "figure_h2_rating_distribution.svg"
     p_dist = h2.loc[h2["test_name"] == "chi_square_rating_distribution", "p_value"].dropna()
     _stacked_pct_chart(
@@ -744,7 +803,13 @@ def write_h2_figures(h2: pd.DataFrame, output_dir: Path) -> list[dict[str, str]]
 
 
 def write_h3_figures(h3: pd.DataFrame, output_dir: Path) -> list[dict[str, str]]:
+    # Generate figures for Hypothesis 3: English reviews contain more enjoyment/recommendation evidence.
+    # H3 uses reviewed (manually-coded) keyword matching, separate from VADER/oseti.
+    # Tests use Benjamini–Hochberg FDR adjustment for multiple comparisons.
+
     evidence = h3[h3["analysis_type"] == "evidence_family_test"].copy()
+
+    # Prepare data for grouped bar chart: one pair of bars per evidence family, sorted by risk difference.
     rows = []
     for _, row in evidence.sort_values("risk_difference_pct", ascending=False).iterrows():
         rows.append({
@@ -753,6 +818,8 @@ def write_h3_figures(h3: pd.DataFrame, output_dir: Path) -> list[dict[str, str]]
             "japanese": _as_pct(row["japanese_present_pct"]),
             "annotation": f"diff={float(row['risk_difference_pct']):.1f} pp; {_fmt_p(row['p_value_bh_fdr'])}",
         })
+
+    # Figure 1: Evidence prevalence by family (e.g., "friction", "enjoyment", "positive_sentiment").
     path1 = output_dir / "figure_h3_reviewed_evidence_prevalence.svg"
     _grouped_pct_chart(
         path1,
@@ -934,19 +1001,28 @@ def write_cross_source_figures(cross_tests: pd.DataFrame, date_scrub: pd.DataFra
 
 
 def write_within_language_figure(df: pd.DataFrame, output_dir: Path, slug: str, title: str, subtitle: str) -> dict[str, str]:
+    # Generate within-language driver effects: what predictors best explain sentiment within English/Japanese/Chinese reviews?
+    # Shows predictor/outcome pairs with their effect sizes, organized by analysis type.
+    # E.g., for English: "has_friction / sentiment_score" = score difference of -0.15 (friction lowers sentiment).
+
     work = df[df["status"] == "ok"].copy()
+
+    # Organize effects into panels by analysis type.
     grouped_rows: dict[str, list[dict[str, object]]] = {
-        "score": [],
-        "event": [],
-        "association": [],
-        "multicategory": [],
+        "score": [],          # Sentiment score differences (true vs false)
+        "event": [],          # Positive category risk differences (percentage points)
+        "association": [],    # Spearman correlations with rating
+        "multicategory": [],  # ANOVA epsilon-squared effects
     }
+
     for _, row in work.iterrows():
         analysis_type = str(row["analysis_type"])
         effect = float(row["effect_size"]) if pd.notna(row["effect_size"]) else 0.0
         p_value = row["p_value_bh_fdr"] if pd.notna(row.get("p_value_bh_fdr")) else row["p_value"]
         label = f"{row['predictor']} / {row['outcome']}"
+
         if analysis_type == "score_by_binary_predictor":
+            # Score difference: how much does the predictor shift the mean sentiment score?
             grouped_rows["score"].append({
                 "label": label,
                 "value": effect,
@@ -954,6 +1030,7 @@ def write_within_language_figure(df: pd.DataFrame, output_dir: Path, slug: str, 
                 "annotation": f"score diff={_fmt_signed(effect, 3)}; {_fmt_p(p_value)}",
             })
         elif analysis_type == "category_event_by_binary_predictor":
+            # Risk difference: by how many percentage points does the predictor change the rate of positive sentiment?
             risk_difference_pp = effect * 100
             grouped_rows["event"].append({
                 "label": label,
@@ -962,6 +1039,7 @@ def write_within_language_figure(df: pd.DataFrame, output_dir: Path, slug: str, 
                 "annotation": f"risk diff={_fmt_signed(risk_difference_pp, 1)}pp; {_fmt_p(p_value)}",
             })
         elif analysis_type == "association":
+            # Spearman correlation: continuous predictor association with sentiment score/rating.
             grouped_rows["association"].append({
                 "label": label,
                 "value": effect,
@@ -969,6 +1047,7 @@ def write_within_language_figure(df: pd.DataFrame, output_dir: Path, slug: str, 
                 "annotation": f"rho={_fmt_signed(effect, 3)}; {_fmt_p(p_value)}",
             })
         elif "multicategory" in analysis_type:
+            # ANOVA epsilon-squared: effect size for multi-category predictors.
             grouped_rows["multicategory"].append({
                 "label": label,
                 "value": effect,
@@ -1256,6 +1335,14 @@ def build_statistical_test_figures(
     output_dir: Path = DEFAULT_OUTPUT_DIR,
     command: str | None = None,
 ) -> dict:
+    # Main figure-building pipeline:
+    # 1. Load statistical test results from CSVs
+    # 2. Generate visualizations for each hypothesis (H1, H2, H3) and sensitivity analyses
+    # 3. Create cross-language comparison figures
+    # 4. Generate within-language driver effect charts
+    # 5. Write manifest and index markdown
+
+    # Define all input file paths.
     paths = {
         "h1": input_dir / "hypothesis_tests" / "h1_sentiment_category_jp_en.csv",
         "h2": input_dir / "hypothesis_tests" / "h2_review_rating_jp_en.csv",
@@ -1268,6 +1355,8 @@ def build_statistical_test_figures(
         "jp": input_dir / "within_language_sentiment" / "jp_within_language_sentiment_drivers.csv",
         "cn": input_dir / "within_language_sentiment" / "cn_within_source_sentiment_drivers.csv",
     }
+
+    # Load all test result CSVs (includes schema validation).
     h1 = _read_csv(paths["h1"], {"analysis_type", "test_name", "status", "category", "language_group", "observed_count", "category_share", "statistic", "p_value_holm", "effect_cramers_v", "neutral_band_note", "category_source_column"}, "hypothesis-tests")
     h2 = _read_csv(paths["h2"], {"analysis_type", "test_name", "status", "language_group", "english_n", "japanese_n", "n_rating_present", "mean_review_rating", "rating_distribution_json", "statistic", "p_value", "effect_mean_difference", "ci_95_lower", "ci_95_upper", "details_json"}, "hypothesis-tests")
     h3 = _read_csv(paths["h3"], {"analysis_type", "evidence_family", "status", "p_value_bh_fdr", "risk_difference_pct", "english_present_pct", "japanese_present_pct", "text_length_summary_json", "details_json"}, "hypothesis-tests")
@@ -1280,6 +1369,8 @@ def build_statistical_test_figures(
     cn = _read_csv(paths["cn"], {"status", "analysis_type", "predictor", "outcome", "effect_size", "p_value", "p_value_bh_fdr"}, "within-language-sentiment")
 
     output_dir.mkdir(parents=True, exist_ok=True)
+
+    # Generate all figures and collect their metadata (path, question, caveat).
     questions: list[dict[str, str]] = []
     questions.extend(write_h1_figures(h1, output_dir))
     questions.extend(write_h2_figures(h2, output_dir))
@@ -1292,6 +1383,7 @@ def build_statistical_test_figures(
     questions.append(write_within_language_figure(jp, output_dir, "japanese", "Within-Japanese Sentiment Drivers", "Enjoyment/positive evidence drives oseti sentiment most clearly"))
     questions.append(write_within_language_figure(cn, output_dir, "chinese", "Within-Chinese Social Sentiment Drivers", "Topic tags separate SnowNLP sentiment more than food/friction tags"))
 
+    # Write index files (markdown and CSV) describing all figures.
     questions_path = output_dir / "statistical_test_figure_questions.md"
     manifest_path = output_dir / "statistical_test_figure_manifest.json"
     index_path = output_dir / "statistical_test_figure_index.csv"

@@ -1,5 +1,15 @@
 #!/usr/bin/env python3
-"""WL-EN: within-English Google review sentiment driver tests."""
+"""
+WL-EN: within-English Google review sentiment driver tests.
+
+Analyzes English-language Fukui Google reviews to test whether sentiment scores
+(VADER compound score) and sentiment prevalence (positive/neutral/negative category)
+are associated with review content indicators: friction evidence, enjoyment evidence,
+recommendation evidence, and positive evidence. Also examines convergent validity
+(whether text sentiment tracks with star rating) and descriptive differences across
+POI categories. All statistical tests are row-level (reviews nested in venues) with
+p-values reported descriptively; no clustered model is applied.
+"""
 
 from __future__ import annotations
 
@@ -59,10 +69,21 @@ def build_en_within_language_sentiment_drivers(
     output_dir: Path = DEFAULT_OUTPUT_DIR,
     command: str | None = None,
 ) -> dict:
+    """
+    Parse English-language reviews, run sentiment driver tests, and write outputs.
+
+    Filters the input CSV to Fukui prefecture and English-language reviews, then
+    invokes a series of statistical tests to examine associations between sentiment
+    and review content indicators.
+    """
+    # Load the CSV and validate required columns
     df = load_csv_fail_loud(input_path, REQUIRED_COLUMNS, "make sentiment-analysis")
+    # Normalize language_group to lowercase for consistent comparison
     df["language_group"] = df["language_group"].astype(str).str.lower()
+    # Filter to Fukui prefecture if the column is present
     if "prefecture_normalized" in df.columns:
         df = df[df["prefecture_normalized"].astype(str).eq("Fukui")].copy()
+    # Filter to English-language reviews only
     df = df[df["language_group"].eq(LANGUAGE)].copy()
     command = command or default_command(SCRIPT_NAME)
     generated = generated_at_now()
@@ -96,7 +117,17 @@ def build_en_within_language_sentiment_drivers(
 
 
 def _review_rows(df: pd.DataFrame, input_path: Path, source_hash: str, command: str, generated: str, caveat: str) -> list[dict]:
+    """
+    Run statistical tests on English-language review sentiment and its drivers.
+
+    Tests are grouped into families for multiple-testing correction (Benjamini-Hochberg FDR):
+    - Evidence predictors: friction, enjoyment, recommendation, positive evidence
+    - Convergent validity: text sentiment vs. star rating
+    - Descriptive diagnostics: POI category differences (not FDR-corrected globally)
+    """
+    # WL-EN-1: Does friction evidence predict lower sentiment?
     rows = [
+        # Mann-Whitney U test: VADER sentiment score when friction present vs. absent
         score_by_binary_row(
             df=df,
             analysis_id="WL-EN-1",
@@ -113,6 +144,7 @@ def _review_rows(df: pd.DataFrame, input_path: Path, source_hash: str, command: 
             caveat=caveat,
             multiple_testing_family="english_evidence_predictors",
         ),
+        # Chi-square/Fisher test: positive sentiment category when friction present vs. absent
         binary_event_row(
             df=df,
             analysis_id="WL-EN-1",
@@ -130,6 +162,7 @@ def _review_rows(df: pd.DataFrame, input_path: Path, source_hash: str, command: 
             multiple_testing_family="english_evidence_predictors",
         ),
     ]
+    # WL-EN-2: Do enjoyment, recommendation, and positive evidence each predict higher sentiment?
     for predictor in ["any_enjoyment_evidence", "any_recommendation_evidence", "any_positive_evidence"]:
         rows.append(score_by_binary_row(
             df=df,
@@ -163,6 +196,7 @@ def _review_rows(df: pd.DataFrame, input_path: Path, source_hash: str, command: 
             caveat=caveat,
             multiple_testing_family="english_evidence_predictors",
         ))
+    # WL-EN-3: Convergent validity - Spearman correlation between text sentiment and star rating
     rows.append(spearman_row(
         df=df,
         analysis_id="WL-EN-3",
@@ -177,6 +211,7 @@ def _review_rows(df: pd.DataFrame, input_path: Path, source_hash: str, command: 
         generated=generated,
         caveat=caveat,
     ))
+    # WL-EN-4: Descriptive - Kruskal-Wallis test for differences in sentiment across POI categories
     rows.append(kruskal_row(
         df=df,
         analysis_id="WL-EN-4",
@@ -193,6 +228,7 @@ def _review_rows(df: pd.DataFrame, input_path: Path, source_hash: str, command: 
         caveat=caveat,
         family="english_poi_category_global",
     ))
+    # Apply Benjamini-Hochberg False Discovery Rate correction to evidence predictors
     apply_bh(rows, "english_evidence_predictors")
     return rows
 

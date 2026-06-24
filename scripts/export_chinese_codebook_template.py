@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""Export the reviewed Chinese codebook sheet to a UTF-8 CSV template."""
+"""Export the reviewed Chinese codebook sheet from an Excel workbook to a UTF-8 CSV template.
+
+This script extracts the Chinese-language rows from the multilingual keyword codebook review,
+validates reviewer decisions, and outputs a canonical CSV that is imported by the social-media pipeline.
+"""
 
 from __future__ import annotations
 
@@ -8,6 +12,9 @@ import csv
 from pathlib import Path
 
 from openpyxl import load_workbook
+
+# This module reads the Excel workbook of reviewed keyword codes, extracts the Chinese rows,
+# and exports them as a CSV template with columns for code families, keywords, and review decisions.
 
 ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_WORKBOOK = ROOT / "docs" / "codebook_reviews" / "source" / "multilingual_keyword_codebook_review.xlsx"
@@ -62,7 +69,7 @@ class CodebookExportError(RuntimeError):
 
 
 def _clean(value: object) -> str:
-    # Excel cells can come back as None; normalize everything to plain text for CSV output.
+    """Normalize Excel cell values to plain text: convert None to empty string and strip whitespace."""
     return "" if value is None else str(value).strip()
 
 
@@ -71,7 +78,8 @@ def export_chinese_codebook_template(
     output_path: Path = DEFAULT_OUTPUT,
     reviewed_at: str = "",
 ) -> list[dict[str, str]]:
-    # Read the reviewed workbook and convert the Chinese sheet into a stable CSV layout.
+    """Extract Chinese rows from the reviewed codebook Excel workbook and write to CSV."""
+    # Read the Excel workbook and extract the Chinese sheet.
     workbook = load_workbook(workbook_path, read_only=True, data_only=True)
     if CHINESE_SHEET not in workbook.sheetnames:
         raise CodebookExportError(f"Workbook missing required sheet: {CHINESE_SHEET}")
@@ -80,6 +88,7 @@ def export_chinese_codebook_template(
     if not rows:
         raise CodebookExportError("Chinese sheet is empty")
 
+    # Parse header row to find column indexes.
     headers = [_clean(value) for value in rows[0]]
     header_indexes = {name: index for index, name in enumerate(headers) if name}
     missing = sorted(set(SOURCE_TO_OUTPUT) - set(header_indexes))
@@ -88,24 +97,28 @@ def export_chinese_codebook_template(
 
     exported: list[dict[str, str]] = []
     for excel_row_number, source_row in enumerate(rows[1:], start=2):
-        # Start each output row empty, then fill only the fields we know how to map.
+        # Start with empty row, map columns from SOURCE_TO_OUTPUT, validate review decision.
         row = {column: "" for column in OUTPUT_COLUMNS}
         row["source_sheet"] = CHINESE_SHEET
         row["source_row_id"] = str(excel_row_number)
         row["reviewed_at"] = reviewed_at
+        # Map source Excel columns to output CSV columns.
         for source_col, output_col in SOURCE_TO_OUTPUT.items():
             source_index = header_indexes[source_col]
             row[output_col] = _clean(source_row[source_index] if source_index < len(source_row) else "")
         row["project_scope"] = PROJECT_SCOPE_RENAMES.get(row["project_scope"], row["project_scope"])
 
+        # Skip rows with missing core fields or non-Chinese language.
         if not any(row[column] for column in ("language", "code_family", "code", "keyword_original")):
             continue
         if row["language"] != "Chinese":
             continue
+        # Validate that review_decision is one of {No change, FIX, delete}.
         if row["review_decision"] not in VALID_DECISIONS:
             raise CodebookExportError(
                 f"Invalid review_decision on Chinese row {excel_row_number}: {row['review_decision']!r}"
             )
+        # Set keyword_final based on the review decision.
         if row["review_decision"] == "No change":
             row["keyword_final"] = row["keyword_original"]
         if row["review_decision"] == "delete":
@@ -114,6 +127,7 @@ def export_chinese_codebook_template(
             raise CodebookExportError(f"FIX row missing suggested replacement on Chinese row {excel_row_number}")
         exported.append(row)
 
+    # Write the exported rows to a CSV file with UTF-8 signature.
     output_path.parent.mkdir(parents=True, exist_ok=True)
     with output_path.open("w", newline="", encoding="utf-8-sig") as handle:
         writer = csv.DictWriter(handle, fieldnames=OUTPUT_COLUMNS)
@@ -123,6 +137,7 @@ def export_chinese_codebook_template(
 
 
 def parse_args() -> argparse.Namespace:
+    """Parse command-line arguments for workbook path, output path, and review timestamp."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--workbook", type=Path, default=DEFAULT_WORKBOOK)
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
@@ -131,6 +146,7 @@ def parse_args() -> argparse.Namespace:
 
 
 def main() -> int:
+    """Orchestrate: load workbook, extract Chinese rows, export to CSV, and report row count."""
     args = parse_args()
     try:
         rows = export_chinese_codebook_template(args.workbook, args.output, args.reviewed_at)

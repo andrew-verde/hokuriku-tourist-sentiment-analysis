@@ -66,6 +66,7 @@ H2_CAVEATS = COMMON_CAVEATS + [
 
 
 def _group_arrays(df: pd.DataFrame, value_column: str) -> dict[str, np.ndarray]:
+    """Extract numeric values by language group (English and Japanese), dropping missing values."""
     return {
         language: pd.to_numeric(
             df.loc[df["language_group"] == language, value_column],
@@ -76,15 +77,23 @@ def _group_arrays(df: pd.DataFrame, value_column: str) -> dict[str, np.ndarray]:
 
 
 def _welch_df(left: np.ndarray, right: np.ndarray) -> float | None:
+    """Compute degrees of freedom for Welch's t-test (accounts for unequal variances and sample sizes).
+
+    Uses the Welch-Satterthwaite equation to adjust degrees of freedom when
+    variances between groups are unequal.
+    """
     if len(left) < 2 or len(right) < 2:
         return None
+    # Compute sample variances with Bessel correction (ddof=1)
     var_left = float(np.var(left, ddof=1))
     var_right = float(np.var(right, ddof=1))
     n_left = float(len(left))
     n_right = float(len(right))
+    # Standard errors from unequal variances
     se_left = var_left / n_left
     se_right = var_right / n_right
     numerator = (se_left + se_right) ** 2
+    # Welch-Satterthwaite formula
     denominator = 0.0
     if n_left > 1:
         denominator += (se_left**2) / (n_left - 1)
@@ -96,18 +105,29 @@ def _welch_df(left: np.ndarray, right: np.ndarray) -> float | None:
 
 
 def _welch_ci(left: np.ndarray, right: np.ndarray) -> tuple[float | None, float | None, float | None]:
+    """Compute the 95% confidence interval for the difference in means (Welch's method).
+
+    Returns a tuple of (degrees_of_freedom, lower_bound, upper_bound).
+    """
     df = _welch_df(left, right)
     if df is None:
         return None, None, None
+    # Mean difference: English rating minus Japanese rating
     diff = float(np.mean(left) - np.mean(right))
+    # Standard error of the difference (accounts for unequal variances)
     se = float(np.sqrt(np.var(left, ddof=1) / len(left) + np.var(right, ddof=1) / len(right)))
     if se == 0:
         return df, diff, diff
+    # Critical value from t-distribution for 95% CI (two-tailed, alpha=0.05)
     critical = float(stats.t.ppf(0.975, df))
     return df, diff - critical * se, diff + critical * se
 
 
 def _rating_distribution(values: pd.Series) -> str:
+    """Count reviews at each star level (1-5) and return as JSON string.
+
+    Used for descriptive summaries and to check for ceiling effects.
+    """
     numeric = pd.to_numeric(values, errors="coerce").dropna()
     counts = {str(star): int((numeric == star).sum()) for star in range(1, 6)}
     return json.dumps(counts, sort_keys=True)
@@ -128,10 +148,12 @@ def _base_row(command: str, generated_at: str, input_path: Path, df: pd.DataFram
 
 
 def _summary_rows(df: pd.DataFrame, command: str, generated_at: str, input_path: Path) -> list[dict]:
+    """Generate descriptive statistics (mean, SD, median, distribution) for each language group."""
     rows = []
     base = _base_row(command, generated_at, input_path, df)
     for language in DEFAULT_GROUPS:
         chunk = df[df["language_group"] == language].copy()
+        # Extract numeric ratings and separate present from missing
         ratings = pd.to_numeric(chunk["review_rating"], errors="coerce")
         present = ratings.dropna()
         rows.append({
@@ -169,6 +191,12 @@ def _welch_row(
     test_name: str,
     unit: str,
 ) -> dict:
+    """Conduct Welch's t-test comparing mean ratings between English and Japanese reviews.
+
+    Welch's t-test does not assume equal variances, making it robust for comparing
+    groups with different dispersions. Returns test statistic, p-value, mean difference,
+    and 95% confidence interval.
+    """
     base = _base_row(command, generated_at, input_path, df)
     left = arrays["english"]
     right = arrays["japanese"]
@@ -199,7 +227,10 @@ def _welch_row(
                 "japanese_n": int(len(right)),
             }),
         }
+    # Welch's independent t-test: two-tailed hypothesis test of equal means
+    # equal_var=False allows unequal variances; alternative="two-sided" tests both directions
     result = stats.ttest_ind(left, right, equal_var=False, alternative="two-sided")
+    # Compute 95% confidence interval for the mean difference
     df_welch, ci_lower, ci_upper = _welch_ci(left, right)
     return {
         **base,
@@ -243,8 +274,11 @@ def build_h2_review_rating(
     command = command or default_command("test_h2_review_rating_jp_en.py")
     generated_at = generated_at_now()
 
+    # Add descriptive statistics by language group
     rows = _summary_rows(df, command, generated_at, input_path)
+    # Extract ratings by language group for row-level test
     rating_arrays = _group_arrays(df, "review_rating")
+    # Conduct Welch's t-test on row-level reviews (primary test)
     rows.append(_welch_row(
         df,
         rating_arrays,
@@ -255,6 +289,8 @@ def build_h2_review_rating(
         unit="one Google review row",
     ))
 
+    # Sensitivity test: aggregate reviews by POI and language to account for POI-level nesting
+    # (reviews within the same POI may be correlated)
     poi_rating = (
         df[["language_group", "poi_id", "review_rating"]]
         .dropna()
@@ -262,6 +298,7 @@ def build_h2_review_rating(
         .groupby(["language_group", "poi_id"], as_index=False)
         .agg(mean_review_rating=("review_rating", "mean"))
     )
+    # Conduct Welch's t-test on POI-language aggregates
     poi_arrays = _group_arrays(poi_rating, "mean_review_rating")
     rows.append(_welch_row(
         df,
@@ -273,9 +310,12 @@ def build_h2_review_rating(
         unit="one POI-language mean Google rating",
     ))
 
+    # Sensitivity test: Mann-Whitney U test (non-parametric rank test of distribution differences)
+    # This does not assume normality and tests whether rating distributions differ
     left = rating_arrays["english"]
     right = rating_arrays["japanese"]
     if len(left) >= 1 and len(right) >= 1:
+        # Two-tailed Mann-Whitney U test (null: distributions are equal)
         mann = stats.mannwhitneyu(left, right, alternative="two-sided")
         status = "ok"
         statistic = safe_float(mann.statistic)
@@ -309,11 +349,16 @@ def build_h2_review_rating(
         "details_json": json.dumps(details),
     })
 
+    # Sensitivity test: Chi-square test of rating distribution independence
+    # Build a 2x5 contingency table: rows are language groups, columns are star ratings (1-5)
     distribution = pd.crosstab(df["language_group"], df["review_rating"]).reindex(
         index=list(DEFAULT_GROUPS), columns=[1, 2, 3, 4, 5], fill_value=0
     )
+    # Remove star levels with zero counts
     nonzero_distribution = distribution.loc[:, distribution.sum(axis=0) > 0]
+    # Chi-square test requires at least 2 columns (rating levels)
     if nonzero_distribution.shape[1] >= 2:
+        # Chi-square test of independence between language group and star rating
         chi2, p_value, dof, expected = stats.chi2_contingency(nonzero_distribution)
         status = "ok"
         statistic = float(chi2)

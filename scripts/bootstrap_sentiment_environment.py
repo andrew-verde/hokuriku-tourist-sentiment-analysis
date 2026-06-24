@@ -19,9 +19,16 @@ ROOT = Path(__file__).resolve().parent.parent
 LOCK_PATH = ROOT / "requirements-sentiment.lock.txt"
 OSETI_PIN = "oseti==0.4.3.1"
 
+# This script handles a package dependency conflict: oseti depends on an old
+# mecab package that fails to build, but the sentiment analyzer works fine with
+# mecab-python3 + ipadic (which are listed separately in the lock file). We install
+# all transitive dependencies first, then install oseti without its declared
+# dependencies, and finally verify with a smoke test.
+
 
 def _read_lock(path: Path) -> list[str]:
-    # Keep only real requirement lines; blank lines and comments are ignored.
+    # Parse the locked requirements file (a pip-compatible format), keeping only
+    # non-empty, non-comment lines.
     requirements = []
     for raw_line in path.read_text(encoding="utf-8").splitlines():
         line = raw_line.strip()
@@ -36,7 +43,8 @@ def _run(args: list[str]) -> None:
 
 
 def _installed_versions(packages: list[str]) -> dict[str, str]:
-    # Import names and distribution names differ for some packages, so map them carefully.
+    # Query the installed version of each package. Some packages have different
+    # import names and distribution names, so we handle those cases explicitly.
     versions = {}
     for requirement in packages:
         package = requirement.split("==", 1)[0]
@@ -46,7 +54,9 @@ def _installed_versions(packages: list[str]) -> dict[str, str]:
 
 
 def _smoke_test_oseti() -> None:
-    # Run a tiny sentence check so we know the tokenizer and dictionary wiring work.
+    # Verify that the sentiment analyzer is properly wired by running a simple
+    # test: analyze two contrasting sentences (positive and negative) to ensure
+    # the tokenizer and Japanese dictionary are working correctly.
     import ipadic
     import oseti
 
@@ -57,16 +67,22 @@ def _smoke_test_oseti() -> None:
 
 
 def main() -> int:
-    # Install the pinned stack first, then install oseti without its legacy dependency set.
+    # Orchestrate the three-step install: load locked requirements, install all
+    # dependencies first (excluding oseti), then install oseti without its declared
+    # dependencies, and finally verify everything works with a smoke test.
     requirements = _read_lock(LOCK_PATH)
     if OSETI_PIN not in requirements:
         raise RuntimeError(f"{LOCK_PATH} must include {OSETI_PIN}")
 
+    # Install all transitive dependencies (mecab-python3, ipadic, etc.) first.
     dependency_requirements = [req for req in requirements if req != OSETI_PIN]
     _run([sys.executable, "-m", "pip", "install", *dependency_requirements])
+    # Now install oseti itself, but skip its declared (broken) dependencies.
     _run([sys.executable, "-m", "pip", "install", "--no-deps", OSETI_PIN])
+    # Verify that the sentiment analyzer can actually run.
     _smoke_test_oseti()
 
+    # Report the installed stack to the user.
     versions = _installed_versions(requirements)
     print("Sentiment runtime ready:")
     for package in sorted(versions):

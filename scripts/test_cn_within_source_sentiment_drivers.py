@@ -1,5 +1,14 @@
 #!/usr/bin/env python3
-"""WL-CN: within-Chinese social-source sentiment driver tests."""
+"""
+WL-CN: within-Chinese social-source sentiment driver tests.
+
+Analyzes Chinese-language social media posts (Xiaohongshu and Douyin) to test
+associations between sentiment (SnowNLP centered score) and evidence indicators
+(friction, enjoyment), as well as topic codes (scenic, temples, food, hot springs,
+etc.) and social platform differences. Includes theme-based diagnostics for posts
+with classified topics vs. unclassified. All row-level with Benjamini-Hochberg
+FDR correction within evidence, topic, and platform testing families.
+"""
 
 from __future__ import annotations
 
@@ -66,11 +75,19 @@ CAVEATS = COMMON_WITHIN_CAVEATS + [
 
 
 def _read_chinese_readiness(input_path: Path) -> dict:
+    """
+    Load data-readiness metrics from a companion JSON file.
+
+    The readiness file documents the preprocessing steps and filtering applied to
+    the Chinese social media dataset before the current analysis (e.g., how many
+    title-only posts were excluded, platform counts, theme distributions).
+    """
     readiness_path = input_path.with_name("chinese_social_readiness.json")
     if not readiness_path.exists():
         return {}
     with readiness_path.open(encoding="utf-8") as handle:
         data = json.load(handle)
+    # Extract key readiness metrics for documentation
     keys = [
         "analysis_variant",
         "analysis_scope_label",
@@ -90,9 +107,19 @@ def build_cn_within_source_sentiment_drivers(
     output_dir: Path = DEFAULT_OUTPUT_DIR,
     command: str | None = None,
 ) -> dict:
+    """
+    Parse Chinese social media posts and run sentiment driver tests.
+
+    Filters to Fukui city and rows with body text (excludes title-only posts).
+    Then tests associations with friction/enjoyment evidence, topic codes,
+    source platforms, and classified themes.
+    """
+    # Load and validate required columns
     df = load_csv_fail_loud(input_path, REQUIRED_COLUMNS, "make chinese-social")
+    # Filter to Fukui city if the column is present
     if "city" in df.columns:
         df = df[df["city"].astype(str).str.lower().eq("fukui")].copy()
+    # Filter to posts with body text (exclude title-only posts)
     body_mask = bool_series(df["body_has_text"]) | df["text_scope"].astype(str).str.contains("body|comment", case=False, na=False)
     df = df[body_mask].copy()
     command = command or default_command(SCRIPT_NAME)
@@ -140,7 +167,18 @@ def build_cn_within_source_sentiment_drivers(
 
 
 def _cn_rows(df: pd.DataFrame, input_path: Path, source_hash: str, command: str, generated: str, caveat: str) -> list[dict]:
+    """
+    Run statistical tests on Chinese social media post sentiment and its drivers.
+
+    Tests are grouped by multiple-testing families:
+    - Evidence predictors: friction and enjoyment (Benjamini-Hochberg corrected)
+    - Topic predictors: each of 10 topic codes (Benjamini-Hochberg corrected)
+    - Platform diagnostics: Kruskal-Wallis (Xiaohongshu vs. Douyin differences)
+    - Theme diagnostic: Kruskal-Wallis comparing classified theme categories
+    """
+    # WL-CN-1: Do friction and enjoyment evidence predict lower/higher sentiment?
     rows = [
+        # Mann-Whitney U: SnowNLP sentiment when friction present vs. absent
         score_by_binary_row(
             df=df,
             analysis_id="WL-CN-1",
@@ -157,6 +195,7 @@ def _cn_rows(df: pd.DataFrame, input_path: Path, source_hash: str, command: str,
             caveat=caveat,
             multiple_testing_family="chinese_evidence_predictors",
         ),
+        # Chi-square/Fisher: positive sentiment when friction present vs. absent
         binary_event_row(
             df=df,
             analysis_id="WL-CN-1",
@@ -174,6 +213,10 @@ def _cn_rows(df: pd.DataFrame, input_path: Path, source_hash: str, command: str,
             multiple_testing_family="chinese_evidence_predictors",
         ),
     ]
+    # WL-CN-2: For each of 10 topic codes, is presence associated with sentiment?
+    # Topics include: scenic_nature, temples_spiritual, history_culture, dinosaurs_museums,
+    # food_local_cuisine, hot_springs_relaxation, crafts_shopping, fan_pilgrimage_pop_culture,
+    # accommodation, seasonal_events.
     for topic in TOPIC_COLUMNS:
         rows.append(score_by_binary_row(
             df=df,
@@ -207,6 +250,8 @@ def _cn_rows(df: pd.DataFrame, input_path: Path, source_hash: str, command: str,
             caveat=caveat,
             multiple_testing_family="chinese_topic_predictors",
         ))
+    # WL-CN-3: Platform diagnostic - do Xiaohongshu and Douyin posts differ in sentiment?
+    # Kruskal-Wallis test with min 3 posts per platform.
     rows.append(kruskal_row(
         df=df,
         analysis_id="WL-CN-3",
@@ -223,6 +268,8 @@ def _cn_rows(df: pd.DataFrame, input_path: Path, source_hash: str, command: str,
         caveat=caveat,
         family="chinese_platform_diagnostics",
     ))
+    # WL-CN-4: Theme diagnostic - among classified theme categories (excluding unclassified),
+    # do sentiment levels differ? Kruskal-Wallis with min 10 posts per theme.
     rows.append(kruskal_row(
         df=df[df["theme"].astype(str).str.lower().ne("unclassified")].copy(),
         analysis_id="WL-CN-4",
@@ -239,6 +286,7 @@ def _cn_rows(df: pd.DataFrame, input_path: Path, source_hash: str, command: str,
         caveat=caveat,
         family="chinese_theme_diagnostic",
     ))
+    # Apply Benjamini-Hochberg FDR correction within each testing family
     apply_bh(rows, "chinese_evidence_predictors")
     apply_bh(rows, "chinese_topic_predictors")
     return rows

@@ -15,6 +15,14 @@ Inputs:
 Google review scope is filtered by checkpoint POI prefecture metadata. The
 default is Fukui; the same scaffold can later run for Ishikawa or Toyama once
 matching Chinese social inputs exist.
+
+WHAT THIS SCRIPT DOES:
+- Loads per-language Google review files (English, Japanese) and Chinese posts
+- Filters all rows to Fukui Prefecture (or specified prefecture) using POI metadata
+- Builds aggregate baseline: one row per city/language combo showing volume, rating mean, sentiment %s
+- Checks date quality and flags which rows are usable for monthly trends
+- Runs cross-language statistical tests (chi-square for sentiment category shares, etc.)
+- Writes outputs: aggregate baseline CSV, date-quality CSV, test results CSV, and a readiness note
 """
 
 from __future__ import annotations
@@ -118,10 +126,12 @@ def load_poi_metadata(path: Path) -> pd.DataFrame:
 
 
 def load_review_rows(path: Path, poi_metadata_path: Path, prefecture: str) -> pd.DataFrame:
-    # Load Google reviews, keep only English/Japanese groups, then attach POI
-    # metadata so the prefecture filter does not rely on city text.
+    # Load the multilingual Google reviews CSV and keep only English/Japanese language groups
     df = pd.read_csv(path)
     df = df[df["language_group"].astype(str).str.lower().isin(REVIEW_GROUPS)].copy()
+
+    # Load POI metadata (point-of-interest locations with prefecture tags)
+    # and use it to filter reviews to the specified prefecture (e.g., Fukui)
     metadata = load_poi_metadata(poi_metadata_path)
     try:
         scoped = scope_reviews_by_poi_prefecture(df, metadata, prefecture)
@@ -130,7 +140,9 @@ def load_review_rows(path: Path, poi_metadata_path: Path, prefecture: str) -> pd
             "Review rows missing POI prefecture metadata; rerun `make multilingual-reviews`. "
             f"{error}"
         ) from error
-    # Normalize numeric/date-like columns before any aggregate calculation happens.
+
+    # Convert data types: numeric ratings to float, dates to datetime, etc.
+    # Mark whether each row has a parseable review_date (for monthly trend readiness)
     scoped["review_rating"] = pd.to_numeric(scoped.get("review_rating"), errors="coerce")
     scoped["review_date_present"] = pd.to_datetime(scoped.get("review_date"), errors="coerce", utc=True).notna()
     scoped["language_group"] = scoped["language_group"].astype(str).str.lower()
@@ -138,15 +150,19 @@ def load_review_rows(path: Path, poi_metadata_path: Path, prefecture: str) -> pd
 
 
 def load_chinese_rows(path: Path, prefecture: str) -> pd.DataFrame:
-    # Load ignored row-level Chinese output created by `make chinese-social`.
+    # Load the Chinese social-media posts CSV (Xiaohongshu/Douyin rows)
     df = pd.read_csv(path)
     if df.empty:
         return df
+
+    # Filter Chinese posts to the specified prefecture using city labels
     try:
         scoped = scope_rows_by_source_city_label(df, prefecture)
     except MissingScopeColumnsError as error:
         raise MissingInputError(str(error)) from error
-    # Leave the Chinese layer in its original shape except for the columns used here.
+
+    # Prepare Chinese rows for analysis: normalize sentiment scores and ensure
+    # category/date-precision columns exist (fill missing with defaults)
     scoped["sentiment_norm"] = pd.to_numeric(scoped.get("sentiment_norm"), errors="coerce")
     if "sentiment_category" not in scoped.columns:
         scoped["sentiment_category"] = "unknown"
@@ -161,11 +177,13 @@ def _pct(count: int, denominator: int) -> float:
 
 
 def baseline_snapshot(reviews: pd.DataFrame, chinese: pd.DataFrame, prefecture: str) -> pd.DataFrame:
-    # Build one combined table for presentation-safe headline numbers.
+    # Build aggregate baseline table: one row per city/language combination
+    # showing row count, average rating, and sentiment category breakdowns
     rows = []
+
+    # For Google reviews: group by city and language, compute volume and mean rating
     for (city, group), chunk in reviews.groupby(["city", "language_group"], dropna=False):
         denominator = len(chunk)
-        # One row per city/language bucket keeps the baseline compact and comparable.
         rows.append({
             "prefecture": prefecture,
             "city": city,
@@ -179,11 +197,13 @@ def baseline_snapshot(reviews: pd.DataFrame, chinese: pd.DataFrame, prefecture: 
             "neutral_pct": None,
             "negative_pct": None,
         })
+
+    # For Chinese posts: group by city and platform (Xiaohongshu vs Douyin),
+    # compute volume, mean SnowNLP sentiment score, and % in each category
     if not chinese.empty:
         for (city, platform), chunk in chinese.groupby(["city", "source_platform"], dropna=False):
             denominator = len(chunk)
             categories = chunk["sentiment_category"].fillna("unknown").astype(str)
-            # Keep Xiaohongshu and Douyin separate so platform differences stay visible.
             rows.append({
                 "prefecture": prefecture,
                 "city": city,
@@ -197,18 +217,22 @@ def baseline_snapshot(reviews: pd.DataFrame, chinese: pd.DataFrame, prefecture: 
                 "neutral_pct": _pct(int((categories == "neutral").sum()), denominator),
                 "negative_pct": _pct(int((categories == "negative").sum()), denominator),
             })
+
+    # Convert to DataFrame, sort by prefecture/city/source for consistent output
     return pd.DataFrame(rows, columns=BASELINE_COLUMNS).sort_values(
         ["prefecture", "city", "source_kind", "group"]
     ).reset_index(drop=True)
 
 
 def date_scrub_requirements(reviews: pd.DataFrame, chinese: pd.DataFrame) -> pd.DataFrame:
-    # Explain which rows are safe for monthly trends and which need date repair.
+    # Assess date quality in all rows: which are ready for monthly-trend analysis,
+    # and which need date repair before time-series analysis can start
     rows = []
+
+    # For Google reviews: count how many have parseable dates vs. missing/bad dates
     if len(reviews):
         present = int(reviews["review_date_present"].sum())
         missing = len(reviews) - present
-        # Split Google review rows into usable and unusable date buckets.
         rows.extend([
             {
                 "source_kind": "google_review",
@@ -227,11 +251,13 @@ def date_scrub_requirements(reviews: pd.DataFrame, chinese: pd.DataFrame) -> pd.
                 "scrub_required": "Exclude or repair before monthly trend output.",
             },
         ])
+
+    # For Chinese posts: count rows by date-precision type (exact, year_inferred, etc.)
+    # and note which can be used for monthly trends (only "exact" dates are ready)
     if len(chinese):
         counts = chinese["post_date_precision"].fillna("none").astype(str).value_counts()
         for precision, count in counts.items():
             usable = precision == "exact"
-            # Only exact Chinese post dates are ready for a monthly trend pipeline.
             if usable:
                 scrub = "Keep only rows with exact platform post dates for monthly trend output."
             elif precision == "year_inferred":
@@ -248,6 +274,7 @@ def date_scrub_requirements(reviews: pd.DataFrame, chinese: pd.DataFrame) -> pd.
                 "usable_for_monthly_trends": usable,
                 "scrub_required": scrub,
             })
+
     return pd.DataFrame(rows, columns=DATE_SCRUB_COLUMNS)
 
 
@@ -660,10 +687,17 @@ def comparison_statistical_tests(
     sentiment_summary_path: Path,
     prefecture: str,
 ) -> pd.DataFrame:
+    # Run cross-language statistical tests: compare sentiment-category distributions
+    # and evidence (keyword) prevalence across English, Japanese, and Chinese rows
     rows = []
+
+    # Load sentiment-category counts from the JP/EN sentiment summary file
     review_counts, missing_review_reason = _review_sentiment_count_rows(sentiment_summary_path, prefecture)
+    # Load sentiment-category counts from the Chinese data
     chinese_counts = _chinese_sentiment_count_rows(chinese)
     count_rows = review_counts + chinese_counts
+
+    # Test 1: Do positive/neutral/negative shares differ across all three sources?
     if missing_review_reason:
         rows.append({
             "test_name": "cross_source_sentiment_category_independence",
@@ -675,12 +709,14 @@ def comparison_statistical_tests(
             "details_json": json.dumps(missing_review_reason),
         })
     else:
+        # Three-way test: English reviews vs. Japanese reviews vs. Chinese posts
         rows.append(_category_test_row(
             count_rows,
             ["google_review_english", "google_review_japanese", "chinese_social_all"],
             "cross_source_sentiment_category_independence",
             "google_review_english_vs_google_review_japanese_vs_chinese_social_all",
         ))
+        # Pairwise tests: English vs. Chinese, Japanese vs. Chinese
         for review_group in ["google_review_english", "google_review_japanese"]:
             rows.append(_category_test_row(
                 count_rows,
@@ -688,6 +724,8 @@ def comparison_statistical_tests(
                 "pairwise_cross_source_sentiment_category_independence",
                 f"{review_group}_vs_chinese_social_all",
             ))
+
+    # Test 2: Within Chinese posts, do sentiment shares differ by platform (Xiaohongshu vs. Douyin)?
     if chinese_counts:
         platform_groups = [row["group"] for row in chinese_counts if row["group"].startswith("chinese_social_") and row["group"] != "chinese_social_all"]
         rows.append(_category_test_row(
@@ -708,6 +746,7 @@ def comparison_statistical_tests(
             "details_json": json.dumps({"reason": "Chinese sentiment_category rows missing"}),
         })
 
+    # Test 3-4: Within Chinese posts, do friction/enjoyment evidence rates differ by platform?
     rows.append(_binary_prevalence_test(
         chinese,
         "source_platform",
@@ -724,6 +763,9 @@ def comparison_statistical_tests(
         "chinese_source_platforms",
         {"current_scope": "within Chinese social rows only"},
     ))
+
+    # Test 5-6: Across all sources, do friction/enjoyment prevalence differ
+    # (English vs. Japanese vs. Chinese)?
     for test_name, evidence_column in [
         ("cross_source_friction_prevalence", "any_friction"),
         ("cross_source_enjoyment_recommendation_prevalence", "any_enjoyment_evidence"),
@@ -754,6 +796,7 @@ def comparison_statistical_tests(
                 "google_review_english_vs_google_review_japanese_vs_chinese_social_xhs",
                 extra,
             ))
+
     return pd.DataFrame(rows, columns=TEST_COLUMNS)
 
 
@@ -808,33 +851,38 @@ def build_cross_language_trends(
     sentiment_summary_path: Path = DEFAULT_SENTIMENT_SUMMARY_PATH,
     prefecture: str = "Fukui",
 ) -> dict:
-    # Main orchestration function: validate inputs, load scoped rows, write
-    # aggregate outputs, and record a manifest/readiness note.
+    # Main orchestration: validate input files exist, load and filter by prefecture,
+    # build aggregate baseline and date readiness, run cross-language tests,
+    # and write all outputs (aggregate CSVs + manifest)
     _require_input(reviews_path, "multilingual-reviews")
     _require_input(chinese_path, "chinese-social")
     output_dir.mkdir(parents=True, exist_ok=True)
 
+    # Load and filter all rows to the specified prefecture
     reviews = load_review_rows(reviews_path, poi_metadata_path, prefecture)
     chinese = load_chinese_rows(chinese_path, prefecture)
 
+    # Build three aggregate tables
     baseline = baseline_snapshot(reviews, chinese, prefecture)
     date_scrub = date_scrub_requirements(reviews, chinese)
     statistical_tests = comparison_statistical_tests(chinese, sentiment_summary_path, prefecture)
 
-    # All outputs are aggregate/readiness files; no row-level text is written here.
+    # Define output paths for all aggregate files
     baseline_path = output_dir / "cross_language_baseline_snapshot.csv"
     date_scrub_path = output_dir / "date_scrub_requirements.csv"
     tests_path = output_dir / "cross_language_statistical_tests.csv"
     report_json_path = output_dir / "cross_language_trends_readiness.json"
     report_md_path = output_dir / "cross_language_trends_readiness.md"
+
+    # Clean up old files that are no longer produced (monthly trends disabled)
     for stale_path in [
         output_dir / "monthly_trends.csv",
         output_dir / "chinese_theme_mix_monthly.csv",
     ]:
-        # Remove old monthly outputs so the directory does not suggest a result that is no longer produced.
         if stale_path.exists():
             stale_path.unlink()
 
+    # Write all aggregate outputs to CSV
     baseline.to_csv(baseline_path, index=False)
     date_scrub.to_csv(date_scrub_path, index=False)
     statistical_tests.to_csv(tests_path, index=False)

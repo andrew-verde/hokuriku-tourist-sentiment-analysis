@@ -7,6 +7,15 @@ scored-review audit file named in the sentiment manifest. It reads only safe
 metadata from that audit file to aggregate date ranges and POI-category mix; it
 does not write row-level text, POI IDs, author fields, URLs, screenshots, or
 manual capture files.
+
+WHAT THIS SCRIPT DOES:
+- Loads the JP/EN sentiment summary CSV (aggregate statistics per language)
+- Loads the ignored scored-review audit file (row-level but never shared publicly)
+- Reads date ranges and POI-category mixes from the audit for context
+- Builds presentation-safe output tables with sentiments, test results, and chart data
+- Generates 7 SVG figures (bar charts, sentiment breakdowns, statistical summaries)
+- Checks that no forbidden columns (review_text, author, URLs, IDs) are in outputs
+- Outputs: aggregate CSVs + SVG figures + readiness documentation
 """
 
 from __future__ import annotations
@@ -202,6 +211,8 @@ def _row_level_path(manifest: dict, override: Path | None) -> Path:
 
 
 def build_metadata_summary(row_level: pd.DataFrame) -> pd.DataFrame:
+    # Extract safe metadata from the row-level audit file: date ranges and POI-category mix.
+    # Check first that no forbidden columns (text, authors, URLs, IDs) are present
     assert_no_forbidden_columns(
         row_level.columns,
         forbidden={
@@ -219,17 +230,23 @@ def build_metadata_summary(row_level: pd.DataFrame) -> pd.DataFrame:
         },
         context="presentation metadata input",
     )
+
+    # Extract only the safe columns: city, prefecture, category, and date info
     work = row_level[list(REQUIRED_ROW_LEVEL_COLUMNS)].copy()
     work["review_date"] = pd.to_datetime(work["review_date"], errors="coerce", utc=True)
     work["poi_category"] = work["poi_category"].fillna("unknown").astype(str)
+
+    # For each prefecture/city/language combo, compute date range and category breakdown
     rows = []
     for keys, chunk in work.groupby(["prefecture_normalized", "city", "language_group"], dropna=False):
         prefecture, city, language = keys
+        # Keep only rows with a parseable date to set the date range
         dated = chunk[chunk["review_date"].notna()]
         if dated.empty:
             raise PresentationOutputError(
                 f"No parseable review_date values for {prefecture} {city} {language}."
             )
+        # Count how many rows belong to each POI category
         mix = chunk["poi_category"].value_counts().sort_index()
         rows.append({
             "prefecture_normalized": prefecture,
@@ -647,13 +664,19 @@ def build_sentiment_chart_data(
     metadata_summary: pd.DataFrame,
     manifest: dict,
 ) -> pd.DataFrame:
+    # Build chart data: merge aggregate sentiment stats with date/POI metadata,
+    # check for forbidden columns, and add source hashes for provenance
     assert_no_forbidden_columns(
         summary.columns,
         forbidden=FORBIDDEN_PRESENTATION_COLUMNS,
         context="presentation sentiment input",
     )
+
+    # Extract SHA256 hashes from the sentiment manifest for provenance tracking
     hashes = _input_hashes(manifest)
     metadata = metadata_summary.set_index(["prefecture_normalized", "city", "language_group"])
+
+    # For each language group, combine sentiment stats with date range and POI mix
     rows = []
     for _, row in summary.sort_values(["language_group", "city"]).iterrows():
         key = (row["prefecture_normalized"], row["city"], row["language_group"])
@@ -693,6 +716,8 @@ def build_sentiment_chart_data(
             ),
         })
     output = pd.DataFrame(rows)
+
+    # Final safety checks: no forbidden columns and no placeholder/test values
     assert_no_forbidden_columns(
         output.columns,
         forbidden=FORBIDDEN_PRESENTATION_COLUMNS,
@@ -826,6 +851,8 @@ def build_presentation_safe_outputs(
     output_dir: Path = DEFAULT_OUTPUT_DIR,
     command: str | None = None,
 ) -> dict:
+    # Load all required inputs: JP/EN sentiment aggregates, tests, cross-language baseline,
+    # and the row-level audit file (for date/POI metadata only)
     _require_input(sentiment_summary_path, "sentiment-analysis")
     _require_input(sentiment_tests_path, "sentiment-analysis")
     _require_input(sentiment_manifest_path, "sentiment-analysis")
@@ -840,35 +867,43 @@ def build_presentation_safe_outputs(
     audit_path = _row_level_path(manifest, row_level_path)
     _require_input(audit_path, "sentiment-analysis")
     row_level = pd.read_csv(audit_path)
+
+    # Validate required columns are present in each file
     _require_columns(summary, REQUIRED_SUMMARY_COLUMNS, sentiment_summary_path)
     _require_columns(tests, REQUIRED_TEST_COLUMNS, sentiment_tests_path)
     _require_columns(cross_baseline, REQUIRED_BASELINE_COLUMNS, cross_language_baseline_path)
     _require_columns(cross_tests, REQUIRED_TEST_COLUMNS, cross_language_tests_path)
     _require_columns(row_level, REQUIRED_ROW_LEVEL_COLUMNS, audit_path)
 
+    # Verify inputs match expected scope (Fukui, JP/EN only)
     if set(summary["prefecture_normalized"].dropna().astype(str)) != {"Fukui"}:
         raise PresentationOutputError("Presentation-safe defaults require Fukui-only aggregate inputs.")
     if set(summary["language_group"].dropna().astype(str)) - {"english", "japanese"}:
         raise PresentationOutputError("Presentation-safe JP-EN output accepts only English/Japanese review groups.")
 
+    # Create output directory structure
     output_dir.mkdir(parents=True, exist_ok=True)
     japanese_dir = output_dir / "japanese"
     english_dir = output_dir / "english"
     multilingual_dir = output_dir / "multilingual"
     for figure_dir in [japanese_dir, english_dir, multilingual_dir]:
         figure_dir.mkdir(parents=True, exist_ok=True)
+
+    # Define output file paths
     chart_path = output_dir / "jp_en_library_sentiment_chart_data.csv"
     test_summary_path = output_dir / "jp_en_statistical_sensitivity_summary.csv"
     figure_questions_path = output_dir / "presentation_figure_questions.md"
     readiness_path = output_dir / "presentation_readiness.md"
     manifest_path = output_dir / "presentation_manifest.json"
 
+    # Build presentation-safe tables
     metadata_summary = build_metadata_summary(row_level)
     chart = build_sentiment_chart_data(summary, metadata_summary, manifest)
     test_summary = build_test_summary(tests, manifest)
     chart.to_csv(chart_path, index=False)
     test_summary.to_csv(test_summary_path, index=False)
 
+    # Generate 7 SVG figures: per-language sentiment profiles, POI mixes, and cross-language comparisons
     figure_outputs = {
         "japanese_sentiment_profile": japanese_dir / "figure_japanese_sentiment_profile.svg",
         "japanese_poi_priority_mix": japanese_dir / "figure_japanese_poi_priority_mix.svg",
@@ -878,6 +913,8 @@ def build_presentation_safe_outputs(
         "multilingual_volume_context": multilingual_dir / "figure_volume_context.svg",
         "multilingual_statistical_evidence": multilingual_dir / "figure_statistical_evidence_summary.svg",
     }
+
+    # Generate per-language figures (English and Japanese)
     figure_questions = []
     for language, language_dir, label in [
         ("japanese", japanese_dir, "Japanese-Language Reviews"),
@@ -886,6 +923,7 @@ def build_presentation_safe_outputs(
         row = chart[chart["language_source_group"].str.startswith(language)].iloc[0]
         sentiment_path = figure_outputs[f"{language}_sentiment_profile"]
         poi_path = figure_outputs[f"{language}_poi_priority_mix"]
+        # Write: (1) sentiment category share as stacked bar, (2) POI-category distribution as horizontal bar
         _write_single_sentiment_profile(row, sentiment_path, label)
         _write_poi_priority_mix(row, poi_path, label)
         figure_questions.extend([
@@ -902,9 +940,13 @@ def build_presentation_safe_outputs(
                 "caveat": "POI-category mix describes collection/sample composition, not all visitor priorities.",
             },
         ])
+
+    # Generate cross-language comparison figures
     _write_multilingual_sentiment_share(chart, cross_baseline, figure_outputs["multilingual_sentiment_share"])
     _write_multilingual_volume_context(cross_baseline, figure_outputs["multilingual_volume_context"])
     _write_statistical_evidence_summary(test_summary, cross_tests, figure_outputs["multilingual_statistical_evidence"])
+
+    # Add metadata and caveats for cross-language figures
     figure_questions.extend([
         {
             "figure": "Multilingual sentiment share",

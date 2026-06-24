@@ -1,5 +1,13 @@
 #!/usr/bin/env python3
-"""WL-JP: within-Japanese Google review sentiment driver tests."""
+"""
+WL-JP: within-Japanese Google review sentiment driver tests.
+
+Mirrors the English-language analysis (WL-EN) but applies it to Japanese-language
+Fukui Google reviews using the oseti sentiment score instead of VADER. Examines
+associations between sentiment and evidence indicators (friction, enjoyment,
+recommendation, positive) and convergent validity with star rating. All tests are
+row-level with descriptive p-values (no clustered model).
+"""
 
 from __future__ import annotations
 
@@ -40,6 +48,14 @@ def build_jp_within_language_sentiment_drivers(
     output_dir: Path = DEFAULT_OUTPUT_DIR,
     command: str | None = None,
 ) -> dict:
+    """
+    Parse Japanese-language reviews and run sentiment driver tests.
+
+    Reuses the English test logic (_review_rows from the EN script) but adapts
+    analysis IDs, labels, and testing families to Japanese. Sentiment is measured
+    via oseti (Japanese-specific tool), not VADER.
+    """
+    # Load and filter to Japanese-language Fukui reviews
     df = load_csv_fail_loud(input_path, REQUIRED_COLUMNS, "make sentiment-analysis")
     df["language_group"] = df["language_group"].astype(str).str.lower()
     if "prefecture_normalized" in df.columns:
@@ -50,17 +66,22 @@ def build_jp_within_language_sentiment_drivers(
     source_hash = sha256_file(input_path)
     caveat = "; ".join(CAVEATS)
 
+    # Run tests using shared logic from English module, then adapt labels for Japanese
     rows = _review_rows(df, input_path, source_hash, command, generated, caveat)
     for row in rows:
+        # Replace WL-EN with WL-JP to mark this as a Japanese analysis
         row["analysis_id"] = row["analysis_id"].replace("WL-EN", "WL-JP")
         row["language_source_group"] = LANGUAGE_LABEL
+        # Update research question text to reference Japanese and oseti instead of English and VADER
         row["research_question"] = row["research_question"].replace("English-language", "Japanese-language").replace("VADER", "oseti")
         row["unit"] = "one Japanese-language Fukui Google review row"
+        # Update testing family names to track that these are Japanese predictors
         row["multiple_testing_family"] = row["multiple_testing_family"].replace("english", "japanese")
         if isinstance(row.get("effect_size_label"), str):
             row["effect_size_label"] = row["effect_size_label"].replace("expected", "expected")
     from scripts.within_language_sentiment_common import apply_bh
 
+    # Apply Benjamini-Hochberg correction within the Japanese evidence predictors family
     apply_bh(rows, "japanese_evidence_predictors")
     out = pd.DataFrame(rows)
     output_csv = output_dir / OUTPUT_CSV

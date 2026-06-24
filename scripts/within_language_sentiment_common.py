@@ -1,5 +1,16 @@
 #!/usr/bin/env python3
-"""Shared helpers for aggregate-only within-language sentiment driver scripts."""
+"""
+Shared helpers for aggregate-only within-language sentiment driver scripts.
+
+This module provides reusable statistical analysis functions and data-handling
+utilities for within-language sentiment analysis across English, Japanese, and
+Chinese reviews. It runs Mann-Whitney U tests (nonparametric comparison of
+sentiment scores between two groups), chi-square and Fisher's exact tests
+(for categorical sentiment outcomes), Spearman rank correlation (sentiment
+vs. rating), and Kruskal-Wallis tests (comparing sentiment across multiple
+categories). All outputs are aggregated at the review-level or above with
+no row-level text or identifiers exposed.
+"""
 
 from __future__ import annotations
 
@@ -202,8 +213,17 @@ def score_by_binary_row(
     caveat: str,
     multiple_testing_family: str,
 ) -> dict:
+    """
+    Run a Mann-Whitney U test comparing sentiment scores between two groups.
+
+    Tests whether sentiment scores differ between rows where a binary predictor
+    is true vs. false (e.g., does "friction present" predict lower sentiment?).
+    The Mann-Whitney U is a nonparametric rank test suitable for non-normal
+    sentiment distributions.
+    """
     present_mask = bool_series(df[predictor])
     scores = numeric(df[outcome])
+    # Drop missing values for a clean comparison
     work = pd.DataFrame({"present": present_mask, "score": scores}).dropna()
     present = work.loc[work["present"], "score"].to_numpy(dtype=float)
     absent = work.loc[~work["present"], "score"].to_numpy(dtype=float)
@@ -253,6 +273,9 @@ def score_by_binary_row(
         row["status"] = "skipped"
         row["details_json"] = json.dumps({"reason": "predictor has fewer than two observed groups"})
         return row
+    # Perform Mann-Whitney U test (nonparametric test comparing two independent groups).
+    # Null hypothesis: the distributions of sentiment scores are equal for both groups.
+    # A low p-value indicates the predictor is associated with meaningful sentiment differences.
     result = stats.mannwhitneyu(present, absent, alternative="two-sided")
     row.update({
         "status": "ok",
@@ -285,8 +308,16 @@ def binary_event_row(
     caveat: str,
     multiple_testing_family: str,
 ) -> dict:
+    """
+    Test whether a binary predictor is associated with a categorical outcome.
+
+    For example, is the presence of "friction evidence" associated with lower
+    positive sentiment prevalence? Uses chi-square test (when cell counts are
+    adequate, n >= 5) or Fisher's exact test (when counts are sparse).
+    """
     predictor_present = bool_series(df[predictor])
     event = df[outcome].astype(str).str.lower().eq(positive_event)
+    # Create a 2x2 contingency table (predictor: true/false vs. outcome: event present/absent)
     work = pd.DataFrame({"present": predictor_present, "event": event}).dropna()
     table = pd.crosstab(work["present"], work["event"]).reindex(index=[True, False], columns=[True, False], fill_value=0)
     base = _base_row(
@@ -339,10 +370,14 @@ def binary_event_row(
         row["status"] = "skipped"
         row["details_json"] = json.dumps({"reason": "predictor has fewer than two observed groups"})
         return row
+    # Check expected cell frequencies for test appropriateness
     chi2, chi_p, _, expected = stats.chi2_contingency(table)
     min_expected = float(np.min(expected))
     row["min_expected_count"] = min_expected
     row["sparse_cell_warning"] = bool(min_expected < 5)
+    # Choose appropriate test: if any expected cell count is below 5, use Fisher's exact test.
+    # Otherwise use chi-square test. Both test the null hypothesis that the two variables
+    # (predictor and outcome) are independent.
     if min_expected < 5:
         odds_ratio, p_value = stats.fisher_exact(table, alternative="two-sided")
         row["test_name"] = "fisher_exact_sentiment_event"
@@ -377,6 +412,14 @@ def spearman_row(
     generated: str,
     caveat: str,
 ) -> dict:
+    """
+    Compute Spearman rank correlation between a continuous outcome and predictor.
+
+    Tests whether two numeric variables are monotonically related (e.g., does
+    sentiment score track with star rating?). Spearman's rho is the correlation
+    of ranks, making it robust to outliers and nonlinearity.
+    """
+    # Drop rows where either variable is missing, then convert both to numeric
     work = pd.DataFrame({"score": numeric(df[score_column]), "predictor": numeric(df[predictor])}).dropna()
     base = _base_row(
         analysis_id,
@@ -423,6 +466,8 @@ def spearman_row(
     }
     if len(work) < 3 or work["score"].nunique() < 2 or work["predictor"].nunique() < 2:
         return row
+    # Perform Spearman rank correlation. Null hypothesis: rho = 0 (no rank correlation).
+    # A low p-value indicates a significant monotonic relationship.
     result = stats.spearmanr(work["score"], work["predictor"], nan_policy="omit")
     row.update({
         "status": "ok",
@@ -451,7 +496,15 @@ def kruskal_row(
     caveat: str,
     family: str,
 ) -> dict:
+    """
+    Run a Kruskal-Wallis test comparing sentiment scores across multiple groups.
+
+    Tests whether sentiment differs significantly across categories (e.g., do POI
+    types or themes differ in sentiment?). Kruskal-Wallis is the nonparametric
+    extension of Mann-Whitney U to 3+ groups.
+    """
     work = pd.DataFrame({"score": numeric(df[score_column]), "group": df[predictor].astype(str)}).dropna()
+    # Select only groups with adequate sample size to avoid spurious findings from sparse categories
     groups = [
         group["score"].to_numpy(dtype=float)
         for _, group in work.groupby("group")
@@ -507,9 +560,12 @@ def kruskal_row(
     if len(np.unique(combined)) < 2:
         row["details_json"] = json.dumps({"group_counts": group_counts, "reason": "all retained scores are identical"})
         return row
+    # Perform Kruskal-Wallis H test. Null hypothesis: the k groups have equal distributions.
+    # A low p-value indicates at least one group differs significantly from the others.
     result = stats.kruskal(*groups)
     n = sum(len(group) for group in groups)
     k = len(groups)
+    # Compute epsilon-squared effect size (nonparametric analogue of eta-squared)
     epsilon = (float(result.statistic) - k + 1) / (n - k) if n > k else None
     row.update({
         "status": "ok",
@@ -522,6 +578,9 @@ def kruskal_row(
 
 
 def apply_bh(rows: list[dict], family: str) -> None:
+    # Apply Benjamini-Hochberg False Discovery Rate (FDR) correction within a testing family.
+    # Adjusts p-values to control the expected proportion of false discoveries when running
+    # multiple tests (e.g., multiple predictors tested in the same analysis family).
     indexes = [index for index, row in enumerate(rows) if row.get("multiple_testing_family") == family]
     adjusted = benjamini_hochberg([rows[index].get("p_value") for index in indexes])
     for index, p_adjusted in zip(indexes, adjusted):

@@ -21,6 +21,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from src.provenance import assert_no_forbidden_columns, file_record, research_manifest, write_json
 from src.utils.logger import setup_logger
 
+# This module reads tagged Chinese social-media rows and generates aggregate insight
+# tables and SVG charts (keyword inventory, sentiment breakdowns, theme summaries, etc.)
+# while strictly excluding row-level text, author names, URLs, and source IDs.
 
 logger = setup_logger(__name__)
 
@@ -72,6 +75,7 @@ class ChineseInsightError(RuntimeError):
 
 
 def _require_input(path: Path, make_target: str = "chinese-social") -> None:
+    # Verify that a required input file exists before processing; raise an error with instructions if missing.
     if not path.exists():
         raise ChineseInsightError(
             f"Required input not found: {path}\n"
@@ -80,29 +84,35 @@ def _require_input(path: Path, make_target: str = "chinese-social") -> None:
 
 
 def _read_csv(path: Path, make_target: str = "chinese-social") -> pd.DataFrame:
+    # Check that the input file exists, then read it as a CSV into a pandas DataFrame.
     _require_input(path, make_target)
     return pd.read_csv(path)
 
 
 def _coerce_bool(series: pd.Series) -> pd.Series:
+    # Convert a pandas Series to boolean: if already bool, fill missing values with False;
+    # otherwise convert to string, lowercase, and check if the value is one of {'true', '1', 'yes'}.
     if series.dtype == bool:
         return series.fillna(False)
     return series.fillna(False).astype(str).str.lower().isin({"true", "1", "yes"})
 
 
 def _split_terms(value: object) -> list[str]:
+    # Parse a pipe-delimited string of terms; return empty list if the value is missing or NaN.
     if pd.isna(value):
         return []
     return [term.strip() for term in str(value).split("|") if term.strip()]
 
 
 def _pct(numerator: float, denominator: float) -> float:
+    # Convert a fraction to a percentage rounded to 3 decimal places; return 0.0 if denominator is zero.
     if denominator == 0:
         return 0.0
     return round((numerator / denominator) * 100, 3)
 
 
 def _fmt_n(value: int | float) -> str:
+    # Format an integer with comma thousands separators for readable display (e.g., 1000 becomes "1,000").
     return f"{int(value):,}"
 
 
@@ -144,6 +154,7 @@ def _gridlines(parts: list[str], left: float, chart_width: float, y1: float, y2:
 
 
 def load_tagged_rows(path: Path) -> pd.DataFrame:
+    # Read the CSV file of tagged Chinese posts and verify all required columns are present.
     tagged = _read_csv(path)
     missing = REQUIRED_TAGGED_COLUMNS - set(tagged.columns)
     if missing:
@@ -152,6 +163,7 @@ def load_tagged_rows(path: Path) -> pd.DataFrame:
 
 
 def load_codebook_summary(path: Path) -> pd.DataFrame:
+    # Read the codebook summary CSV and verify that it has the required columns for code families and keyword counts.
     summary = _read_csv(path)
     required = {"code_family", "code", "label", "keyword_count"}
     missing = required - set(summary.columns)
@@ -161,12 +173,15 @@ def load_codebook_summary(path: Path) -> pd.DataFrame:
 
 
 def build_keyword_inventory(codebook_summary: pd.DataFrame) -> pd.DataFrame:
+    # Extract and sort the keyword inventory by code family, keyword count (highest first), and code name.
     rows = codebook_summary[["code_family", "code", "label", "keyword_count"]].copy()
     rows = rows.sort_values(["code_family", "keyword_count", "code"], ascending=[True, False, True])
     return rows.reset_index(drop=True)
 
 
 def build_category_occurrence(input_dir: Path) -> pd.DataFrame:
+    # Read topic-by-city-platform aggregates and roll them up to a single occurrence count per code,
+    # re-calculating the percentage of posts that contain each code.
     filename = TOPIC_AGGREGATE_INPUT
     df = _read_csv(input_dir / filename)
     required = {"city", "source_platform", "code", "label", "count", "denominator_posts", "pct_posts"}
@@ -175,11 +190,13 @@ def build_category_occurrence(input_dir: Path) -> pd.DataFrame:
         raise ChineseInsightError(f"{filename} missing required columns: {sorted(missing)}")
     combined = df[["city", "source_platform", "code", "label", "count", "denominator_posts", "pct_posts"]].copy()
     combined["evidence_family"] = "topic"
+    # Group by code and label, summing counts and denominators across all cities and platforms.
     grouped = (
         combined.groupby(["evidence_family", "code", "label"], dropna=False)
         .agg(count=("count", "sum"), denominator_posts=("denominator_posts", "sum"))
         .reset_index()
     )
+    # Recalculate percentages based on the new aggregated totals.
     grouped["pct_posts"] = grouped.apply(
         lambda row: _pct(float(row["count"]), float(row["denominator_posts"])), axis=1
     )
@@ -234,10 +251,13 @@ def build_sentiment_keyword_chart_rows(sentiment_keywords: pd.DataFrame, top_n_p
 
 
 def build_sentiment_keyword_counts(tagged: pd.DataFrame) -> pd.DataFrame:
+    # Extract individual sentiment keywords from the reviewed evidence columns (positive, negative, recommendation)
+    # and count their frequency per source platform, then also aggregate across all platforms.
     rows: list[dict[str, object]] = []
     for group, column in SENTIMENT_MATCH_COLUMNS.items():
         if column not in tagged.columns:
             continue
+        # Iterate through rows and split pipe-delimited keyword matches into individual keywords.
         for _, row in tagged[["source_platform", column]].iterrows():
             for keyword in _split_terms(row[column]):
                 rows.append(
@@ -252,19 +272,25 @@ def build_sentiment_keyword_counts(tagged: pd.DataFrame) -> pd.DataFrame:
         return pd.DataFrame(columns=["sentiment_group", "source_platform", "keyword", "count", "pct_all_rows"])
 
     counts = pd.DataFrame(rows)
+    # Count keyword occurrences per sentiment group and source platform.
     grouped = counts.groupby(["sentiment_group", "source_platform", "keyword"], dropna=False)["count"].sum().reset_index()
+    # Also create an aggregate row for each keyword across all platforms.
     all_platform = counts.groupby(["sentiment_group", "keyword"], dropna=False)["count"].sum().reset_index()
     all_platform["source_platform"] = "all"
     grouped = pd.concat([grouped, all_platform], ignore_index=True)
+    # Calculate percentage of total rows that contain each keyword.
     grouped["pct_all_rows"] = grouped["count"].apply(lambda value: _pct(float(value), float(len(tagged))))
     return grouped.sort_values(["count", "sentiment_group", "keyword"], ascending=[False, True, True]).reset_index(drop=True)
 
 
 def build_keywords_by_snownlp_category(tagged: pd.DataFrame) -> pd.DataFrame:
+    # Cross-tabulate reviewed sentiment keywords (positive, negative, recommendation) against
+    # the SnowNLP sentiment category classification to show which reviewed terms appear in which sentiment bins.
     rows: list[dict[str, object]] = []
     for group, column in SENTIMENT_MATCH_COLUMNS.items():
         if column not in tagged.columns:
             continue
+        # Extract keywords from each row and pair them with the post's SnowNLP sentiment category.
         for _, row in tagged[["sentiment_category", column]].iterrows():
             for keyword in _split_terms(row[column]):
                 rows.append(
@@ -280,6 +306,7 @@ def build_keywords_by_snownlp_category(tagged: pd.DataFrame) -> pd.DataFrame:
             columns=["snownlp_sentiment_category", "reviewed_sentiment_group", "keyword", "count"]
         )
     counts = pd.DataFrame(rows)
+    # Count occurrences of each keyword within each (SnowNLP category, reviewed sentiment group) pair.
     return (
         counts.groupby(["snownlp_sentiment_category", "reviewed_sentiment_group", "keyword"], dropna=False)["count"]
         .sum()
@@ -290,18 +317,23 @@ def build_keywords_by_snownlp_category(tagged: pd.DataFrame) -> pd.DataFrame:
 
 
 def build_sentiment_category_by_platform(tagged: pd.DataFrame) -> pd.DataFrame:
+    # Count rows by source platform and SnowNLP sentiment category, then calculate the percentage within each platform.
     counts = (
         tagged.groupby(["source_platform", "sentiment_category"], dropna=False)
         .size()
         .reset_index(name="count")
     )
+    # Calculate platform-specific totals for percentage calculation.
     totals = counts.groupby("source_platform")["count"].transform("sum")
     counts["pct_platform_rows"] = counts.apply(lambda row: _pct(float(row["count"]), float(totals.loc[row.name])), axis=1)
     return counts.sort_values(["source_platform", "sentiment_category"]).reset_index(drop=True)
 
 
 def build_theme_sentiment_summary(tagged: pd.DataFrame) -> pd.DataFrame:
+    # Build theme-by-platform sentiment summaries: count rows per theme/platform, calculate mean sentiment score,
+    # and count positive/negative sentiment rows; suppress percentage rates for themes with fewer than MIN_THEME_SLICE_ROWS.
     def _mean_or_na(values: pd.Series) -> float | pd.NA:
+        # Return mean sentiment score only if the slice has enough rows; otherwise return NA to suppress small samples.
         if len(values) < MIN_THEME_SLICE_ROWS:
             return pd.NA
         return round(float(values.mean()), 6)
@@ -312,6 +344,7 @@ def build_theme_sentiment_summary(tagged: pd.DataFrame) -> pd.DataFrame:
     def _count_negative(values: pd.Series) -> int:
         return int((values == "negative").sum())
 
+    # Group by theme and platform, aggregating row counts, mean sentiment, and positive/negative counts.
     summary = (
         tagged.groupby(["theme", "source_platform"], dropna=False)
         .agg(
@@ -322,9 +355,11 @@ def build_theme_sentiment_summary(tagged: pd.DataFrame) -> pd.DataFrame:
         )
         .reset_index()
     )
+    # Mark slices as "ok" or "suppressed_small_n" based on minimum row threshold.
     summary["theme_slice_status"] = summary["rows"].map(
         lambda value: "ok" if int(value) >= MIN_THEME_SLICE_ROWS else "suppressed_small_n"
     )
+    # Calculate percentages; suppress for slices below the minimum.
     summary["positive_pct"] = summary.apply(
         lambda row: pd.NA if row["theme_slice_status"] == "suppressed_small_n" else _pct(float(row["positive_rows"]), float(row["rows"])),
         axis=1,
@@ -333,6 +368,7 @@ def build_theme_sentiment_summary(tagged: pd.DataFrame) -> pd.DataFrame:
         lambda row: pd.NA if row["theme_slice_status"] == "suppressed_small_n" else _pct(float(row["negative_rows"]), float(row["rows"])),
         axis=1,
     )
+    # Also aggregate across all platforms for each theme.
     all_theme = (
         tagged.groupby(["theme"], dropna=False)
         .agg(
@@ -355,6 +391,7 @@ def build_theme_sentiment_summary(tagged: pd.DataFrame) -> pd.DataFrame:
         lambda row: pd.NA if row["theme_slice_status"] == "suppressed_small_n" else _pct(float(row["negative_rows"]), float(row["rows"])),
         axis=1,
     )
+    # Combine platform-specific and all-platform summaries.
     combined = pd.concat([summary, all_theme], ignore_index=True)
     return combined.sort_values(["rows", "theme"], ascending=[False, True]).reset_index(drop=True)
 
@@ -364,14 +401,18 @@ def build_code_by_sentiment_category(
     codebook_summary: pd.DataFrame,
     code_family: str,
 ) -> pd.DataFrame:
+    # Count how many rows have each code (topic, friction, or sentiment evidence) broken down by SnowNLP sentiment category.
+    # This shows which coded themes appear most in positive vs. negative vs. neutral posts.
     codes = codebook_summary.loc[codebook_summary["code_family"] == code_family, ["code", "label"]]
     rows: list[dict[str, object]] = []
+    # Iterate through each SnowNLP sentiment category (positive, negative, neutral).
     for sentiment_category, group in tagged.groupby("sentiment_category", dropna=False):
         denominator = len(group)
         for _, code_row in codes.iterrows():
             code = str(code_row["code"])
             if code not in group.columns:
                 continue
+            # Count how many rows in this sentiment category have the code set to True.
             count = int(_coerce_bool(group[code]).sum())
             if count == 0:
                 continue
@@ -641,6 +682,8 @@ def _write_readiness(path: Path, outputs: dict[str, Path], metrics: dict[str, ob
 
 
 def _write_safe_csv(df: pd.DataFrame, path: Path) -> None:
+    # Check that the DataFrame contains no sensitive columns (row-level text, author names, URLs, etc.),
+    # then write it to CSV.
     assert_no_forbidden_columns(df.columns, context=str(path))
     df.to_csv(path, index=False)
 
@@ -650,8 +693,10 @@ def build_chinese_specific_insights(
     output_dir: Path = DEFAULT_OUTPUT_DIR,
     analysis_label: str = "Chinese-language Fukui social-media rows",
 ) -> dict[str, object]:
+    """Main orchestration function: read tagged rows and codebook, build all aggregate views and charts, write outputs."""
     output_dir.mkdir(parents=True, exist_ok=True)
 
+    # Load the tagged Chinese posts (with sentiment category and evidence codes) and the codebook summary.
     tagged_path = input_dir / "tagged_chinese_social_posts.csv"
     codebook_summary_path = input_dir / "chinese_reviewed_codebook_runtime_summary.csv"
     tagged = load_tagged_rows(tagged_path)

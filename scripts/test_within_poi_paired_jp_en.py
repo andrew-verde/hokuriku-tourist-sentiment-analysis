@@ -57,36 +57,55 @@ def paired_poi_test(
     min_en_reviews: int = MIN_EN_REVIEWS,
     min_jp_reviews: int = MIN_JP_REVIEWS,
 ) -> dict:
-    """Run a paired Wilcoxon test on POI-level EN minus JP differences."""
+    """
+    Run a paired Wilcoxon signed-rank test on within-POI EN vs. JP differences.
+
+    This is a robustness check that accounts for venue clustering. The unit of
+    analysis is a POI pair (one POI with both English and Japanese reviews).
+    Wilcoxon tests whether the median difference (EN outcome minus JP outcome)
+    is zero. With ~25 paired POIs, statistical power is low; non-significance
+    does not support the null hypothesis of no difference.
+    """
     if outcome not in {"rating", "positive_share"}:
         raise ValueError(f"Unsupported outcome: {outcome}")
 
     data = df.copy()
     data["language_group"] = data["language_group"].astype(str).str.lower()
+    # Filter to rows with a POI identifier
     data = data[data["poi_id"].notna()].copy()
     data["poi_id"] = data["poi_id"].astype(str)
+    # Convert star rating to numeric, coerce errors to NaN
     data["review_rating"] = pd.to_numeric(data["review_rating"], errors="coerce")
+    # Create binary positive sentiment indicator (1 if positive category, 0 otherwise)
     data["is_positive"] = (
         data["sentiment_category"].astype(str).str.lower() == "positive"
     ).astype(int)
     value_column = "review_rating" if outcome == "rating" else "is_positive"
 
+    # Separate English and Japanese reviews
     english = data[data["language_group"] == "english"]
     japanese = data[data["language_group"] == "japanese"]
+    # Count reviews per POI for each language
     english_counts = english.groupby("poi_id").size()
     japanese_counts = japanese.groupby("poi_id").size()
+    # Identify POIs with reviews in both languages (candidates for pairing)
     shared_candidates = set(english_counts.index) & set(japanese_counts.index)
+    # Filter to POIs with adequate review counts in both languages
     keep = (
         set(english_counts[english_counts >= min_en_reviews].index)
         & set(japanese_counts[japanese_counts >= min_jp_reviews].index)
     )
 
+    # Compute mean outcome per POI and language
     english_values = english[english["poi_id"].isin(keep)].groupby("poi_id")[value_column].mean()
     japanese_values = japanese[japanese["poi_id"].isin(keep)].groupby("poi_id")[value_column].mean()
+    # Pair POIs that have outcomes in both languages, drop those with missing outcomes
     paired = pd.concat({"en": english_values, "jp": japanese_values}, axis=1).dropna()
     paired_pois = set(paired.index)
+    # Compute EN minus JP difference for each paired POI
     diff = (paired["en"] - paired["jp"]).to_numpy(dtype=float)
     n_pairs = int(len(diff))
+    # Count how many paired POIs have zero difference (exact ties)
     n_zero = int((diff == 0).sum())
 
     result = {
@@ -101,6 +120,7 @@ def paired_poi_test(
         "median_diff_en_minus_jp": float(np.median(diff)) if n_pairs else None,
         "unit": "POI pair",
     }
+    # Require at least 6 paired POIs to run Wilcoxon (small sample threshold)
     if n_pairs < 6:
         result.update({
             "status": "skipped",
@@ -109,6 +129,7 @@ def paired_poi_test(
             "reason": "fewer than 6 POI pairs",
         })
         return result
+    # Skip if all paired differences are exactly zero (no variation to test)
     if n_zero == n_pairs:
         result.update({
             "status": "skipped",
@@ -118,6 +139,9 @@ def paired_poi_test(
         })
         return result
 
+    # Perform paired Wilcoxon signed-rank test. Null hypothesis: median of EN - JP differences = 0.
+    # The test is one-sided in principle but this reports two-sided p-value (direction-agnostic).
+    # With n_pairs ~25, power is low; a non-significant result does not support the null.
     wilcoxon = stats.wilcoxon(diff, zero_method="wilcox", alternative="two-sided")
     result.update({
         "status": "ok",
@@ -160,11 +184,22 @@ def build_within_poi_paired_jp_en(
     output_dir: Path = OUTPUT_DIR,
     command: str | None = None,
 ) -> dict:
+    """
+    Conduct paired Wilcoxon tests on within-POI EN vs. JP differences.
+
+    Primary test: star rating (review_rating) per POI. Secondary test: proportion
+    of positive sentiment per POI. Both tests pair POIs that have >= 5 English and
+    >= 5 Japanese reviews. This is a robustness check addressing venue clustering;
+    with ~25 pairs, power is low and non-significance is not evidence of no difference.
+    """
+    # Load reviews with required columns
     df = load_scored_reviews(input_path, REQUIRED_COLUMNS)
     command = command or default_command("test_within_poi_paired_jp_en.py")
     generated_at = generated_at_now()
 
+    # Run Wilcoxon test on POI-level mean rating (primary outcome)
     rating_result = paired_poi_test(df, outcome="rating", min_en_reviews=MIN_EN_REVIEWS)
+    # Run Wilcoxon test on POI-level positive sentiment share (secondary outcome)
     positive_result = paired_poi_test(df, outcome="positive_share", min_en_reviews=MIN_EN_REVIEWS)
     rows = [
         _result_row("within_poi_paired_rating", rating_result),

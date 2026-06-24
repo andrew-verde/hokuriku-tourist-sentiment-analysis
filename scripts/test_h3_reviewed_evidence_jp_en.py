@@ -55,6 +55,11 @@ from scripts.hypothesis_test_common import (
     write_manifest,
 )
 
+# Four reviewed evidence families to test for prevalence differences between language groups:
+# - friction: negative experiences mentioned in the review
+# - enjoyment: positive experiences or enjoyment
+# - recommendation: mentions of recommending the place
+# - positive_sentiment: general positive sentiment markers
 EVIDENCE_COLUMNS = [
     ("friction", "any_friction"),
     ("enjoyment", "any_enjoyment_evidence"),
@@ -75,14 +80,24 @@ H3_CAVEATS = COMMON_CAVEATS + [
 
 
 def _bool_series(series: pd.Series) -> pd.Series:
+    """Convert a column to boolean, treating NaN as False.
+
+    Accepts bool dtype, or string representations ('true', '1', 'yes', 'y').
+    """
     if series.dtype == bool:
         return series.fillna(False)
     return series.fillna(False).astype(str).str.lower().isin({"true", "1", "yes", "y"})
 
 
 def _text_length_summary(df: pd.DataFrame) -> dict[str, dict[str, float | int | None]]:
+    """Compute descriptive statistics on review text length for each language group.
+
+    Longer reviews have more opportunity to match keyword evidence, so text length
+    is a diagnostic variable to understand evidence prevalence patterns.
+    """
     out = {}
     for language in DEFAULT_GROUPS:
+        # Extract numeric text lengths and drop missing values
         values = pd.to_numeric(
             df.loc[df["language_group"] == language, "text_length_chars"],
             errors="coerce",
@@ -97,10 +112,12 @@ def _text_length_summary(df: pd.DataFrame) -> dict[str, dict[str, float | int | 
 
 
 def _evidence_table(df: pd.DataFrame, column: str) -> pd.DataFrame:
+    """Build a 2x2 contingency table: rows are language groups, columns are evidence present (True/False)."""
     work = pd.DataFrame({
         "language_group": df["language_group"],
         "present": _bool_series(df[column]),
     })
+    # Create contingency table with English/Japanese rows and False/True columns
     table = pd.crosstab(work["language_group"], work["present"]).reindex(
         index=list(DEFAULT_GROUPS), columns=[False, True], fill_value=0
     )
@@ -108,16 +125,28 @@ def _evidence_table(df: pd.DataFrame, column: str) -> pd.DataFrame:
 
 
 def _risk_difference_pct(table: pd.DataFrame) -> float | None:
+    """Compute risk difference (percentage-point difference in evidence prevalence).
+
+    Risk difference = (English evidence prevalence %) - (Japanese evidence prevalence %)
+    """
     english_total = float(table.loc["english"].sum())
     japanese_total = float(table.loc["japanese"].sum())
     if english_total == 0 or japanese_total == 0:
         return None
+    # Prevalence of evidence in each language group
     english_rate = table.loc["english", True] / english_total
     japanese_rate = table.loc["japanese", True] / japanese_total
+    # Return as percentage-point difference
     return float((english_rate - japanese_rate) * 100)
 
 
 def _test_evidence(table: pd.DataFrame) -> tuple[str, float | None, float | None, float | None, float, dict]:
+    """Test whether evidence prevalence is independent of language group.
+
+    Uses chi-square test by default, falling back to Fisher's exact test if
+    expected frequencies are too small (< 5).
+    """
+    # Conduct chi-square test of independence
     chi2, chi_p, dof, expected = stats.chi2_contingency(table)
     min_expected = float(np.min(expected))
     details = {
@@ -125,10 +154,13 @@ def _test_evidence(table: pd.DataFrame) -> tuple[str, float | None, float | None
         "expected": np.round(expected, 6).tolist(),
         "min_expected_count": min_expected,
     }
+    # If chi-square validity assumption violated (expected < 5), use Fisher's exact test instead
     if min_expected < 5:
+        # Fisher's exact test: two-tailed test of independence for 2x2 contingency tables
         odds_ratio, fisher_p = stats.fisher_exact(table, alternative="two-sided")
         details["reason_for_fisher"] = "minimum expected count below 5"
         return "fisher_exact_evidence_prevalence", safe_float(odds_ratio), safe_float(fisher_p), safe_float(odds_ratio), min_expected, details
+    # Return chi-square results with effect size = odds ratio (None for chi-square)
     return "chi_square_evidence_prevalence", safe_float(chi2), safe_float(chi_p), None, min_expected, details
 
 
@@ -137,6 +169,13 @@ def build_h3_reviewed_evidence(
     output_dir: Path = OUTPUT_DIR,
     command: str | None = None,
 ) -> dict:
+    """Test whether four reviewed evidence families (friction, enjoyment, recommendation, positive sentiment)
+    differ in prevalence between English and Japanese reviews.
+
+    For each evidence family, conducts a chi-square (or Fisher's exact) test and computes
+    odds ratio and risk difference. Applies Benjamini-Hochberg FDR correction across
+    the four tests.
+    """
     df = load_scored_reviews(input_path, REQUIRED_COLUMNS)
     command = command or default_command("test_h3_reviewed_evidence_jp_en.py")
     generated_at = generated_at_now()
@@ -146,12 +185,15 @@ def build_h3_reviewed_evidence(
 
     rows = []
     p_values: list[float | None] = []
+    # Test each of the four evidence families for independence with language group
     for family, column in EVIDENCE_COLUMNS:
+        # Build 2x2 contingency table: English/Japanese vs. evidence present/absent
         table = _evidence_table(df, column)
         english_n = int(table.loc["english"].sum())
         japanese_n = int(table.loc["japanese"].sum())
         english_present = int(table.loc["english", True])
         japanese_present = int(table.loc["japanese", True])
+        # Skip if either language group has no data
         if english_n == 0 or japanese_n == 0:
             test_name = "evidence_prevalence"
             status = "skipped"
@@ -161,6 +203,7 @@ def build_h3_reviewed_evidence(
             min_expected = None
             details = {"reason": "missing denominator in one or both language groups"}
         else:
+            # Conduct chi-square or Fisher's exact test
             test_name, statistic, p_value, odds_ratio, min_expected, details = _test_evidence(table)
             status = "ok"
         p_values.append(p_value)
@@ -193,10 +236,14 @@ def build_h3_reviewed_evidence(
             "details_json": json.dumps(details, ensure_ascii=False),
         })
 
+    # Apply Benjamini-Hochberg FDR correction across the four evidence-family p-values
+    # This controls the expected false discovery rate across multiple testing
     adjusted = benjamini_hochberg(p_values)
     for row, p_adjusted in zip(rows, adjusted):
         row["p_value_bh_fdr"] = p_adjusted
 
+    # Add diagnostic row: text length summary by language group
+    # (longer reviews naturally have more chance to match any keyword evidence)
     rows.append({
         "hypothesis": "H3",
         "analysis_type": "diagnostic",
