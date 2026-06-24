@@ -5,7 +5,7 @@ Fukui-only JP-EN Google review aggregate scaffold for slides.
 ## Use Status
 
 - Ready for presentation as a secondary library sentiment check.
-- Not ready as primary JP/EN sentiment evidence until reviewed codebook evidence is promoted.
+- Reviewed JP/EN keyword evidence is available as an audit/sensitivity path, not a replacement for VADER/oseti.
 - H1-H3 statistical rows are descriptive support, not confirmatory claims; use the within-POI paired Wilcoxon test as the venue-clustering robustness check.
 - SVG figures are organized under `japanese/`, `english/`, and `multilingual/`.
 
@@ -19,7 +19,7 @@ Fukui-only JP-EN Google review aggregate scaffold for slides.
 
 - Reviews input SHA256: 6bc06f34848954674506f6fefb84ffd9689b4cc9b2c90780fd5c8fc45eafaa56
 - POI metadata SHA256: 34b088a57c0e61d23471cf3745ca2ec6e2811dce71aa7ab2a5a508fa5178e79a
-- Sentiment summary SHA256: 0200df8e14574170a5207e532a45bae808a30536c60e40d4a2fb05c432d0b854
+- Sentiment summary SHA256: 6a0705442ad6ca3d88a535f06f00555880d3dd07545db9ae4c788627740bc932
 - Statistical summary SHA256: 452cf42f25580de154e0e539638306692d4ca1623ae04bc7a837180946eeeb1d
 - Date range: derived from parseable review_date values in ignored scored-review audit file; aggregate only.
 - Date coverage: chart data includes parseable and missing review_date counts.

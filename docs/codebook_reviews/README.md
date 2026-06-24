@@ -20,7 +20,7 @@ Regenerate the CSV template from the workbook rather than using Excel's CSV
 export:
 
 ```bash
-python3 scripts/export_chinese_codebook_template.py --reviewed-at 2026-06-18
+python3 scripts/export_chinese_codebook_template.py --reviewed-at YYYY-MM-DD
 ```
 
 Excel has no dependable repo-local setting that guarantees every CSV export will

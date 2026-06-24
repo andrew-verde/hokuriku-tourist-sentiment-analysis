@@ -11,25 +11,26 @@ populations:
 
 1. **English-language Google reviewers** (multilingual review layer)
 2. **Japanese-language Google reviewers** (multilingual review layer)
-3. **Chinese social-media commenters** — Xiaohongshu/Douyin scrapes from the
-   companion `tourism-data` project (colleague-collected)
+3. **Chinese-language social rows** — current main pipeline uses Xiaohongshu
+   note rows from the companion `tourism-data` project; Douyin comments are
+   available only through an explicit source-sensitivity target
 
 Group membership is content language, never nationality.
 
-## Agreed design decisions (updated 2026-06-19)
+## Agreed design decisions
 
 | Decision | Choice |
 |---|---|
-| Ingestion source | Companion repo social data located via `TOURISM_DATA_DIR`: raw Xiaohongshu/Douyin scrapes under `data/raw/social/*.csv`, plus the parsed Fukui Douyin comment export at `data/processed/fukui_douyin_comments_from_md.csv`; other processed CSVs remain annotations |
+| Ingestion source | Companion repo social data located via `TOURISM_DATA_DIR`: default path uses raw Xiaohongshu inputs under `data/raw/social/*.csv` or the reviewed manual XHS workbook; Douyin raw/comment exports are opt-in source-sensitivity inputs only; other processed CSVs remain annotations |
 | Fan-pilgrimage content | Keep it; left-join colleague's `theme`/`fan_score`/`travel_score` from `data/processed/*.csv` on note id; report comparisons for `all_posts` and `excluding_fan`; unmatched rows are `unclassified` |
 | Post dates | Parse from the Xiaohongshu author cell with a `post_date_precision` flag (`exact`/`year_inferred`/`relative_inferred`); inference anchored to the scrape file's git commit date (`CN_SCRAPE_REFERENCE_DATE` overrides) |
-| Post text | Current Chinese rows include post/comment body text where available; reviewed Chinese codebook rows now drive friction/topic/positive-evidence matching, but outputs remain descriptive until match precision is validated |
+| Post text | Current main Chinese rows include Xiaohongshu body text where available; reviewed Chinese codebook rows now drive friction/topic/positive-evidence matching, but outputs remain descriptive until match precision is validated |
 | Headline deliverable | Fukui-first aggregate baseline snapshot: English/Japanese Google review volume and rating mean, plus Chinese social-media post volume and SnowNLP sentiment by platform |
 | Sentiment scales | Side-by-side, separate columns (`rating_mean` vs `sentiment_norm_mean`); never merged |
 | Code layout | Separate stage script `scripts/build_cross_language_trends.py` + `make cross-language-trends`; hard error (naming the make target) when inputs are missing |
 | Google scope filter | Use `output/checkpoints/poi_metadata.json` and `prefecture_normalized`; default prefecture is Fukui, with scaffold left for Ishikawa/Toyama later |
 | Monthly trend posture | Disabled for now. Current Chinese post dates are mostly inferred or scrape-anchored; reintroduce only after date scrub requirements are met |
-| Statistical posture | Descriptive cross-source category-share tests are allowed with caveats; raw SnowNLP/VADER/oseti score tests and cross-source friction/enjoyment tests are skipped until aligned evidence exists |
+| Statistical posture | Descriptive cross-source category-share tests and XHS-first reviewed-evidence prevalence tests are allowed with caveats; raw SnowNLP/VADER/oseti score tests remain skipped |
 | Thesis isolation | No thesis make-chain includes these targets; row-level outputs gitignored; source-ledger rows marked group project |
 
 ## Pipeline
@@ -105,8 +106,10 @@ Presentation safeguards:
 - Date ranges come from parseable review dates, with parseable/missing date
   counts carried in the chart data.
 - Generated chart/table files are scanned for dummy/placeholder-like values.
-- JP/EN sentiment remains a secondary VADER/oseti check until reviewed codebook
-  evidence is promoted into runtime configs.
+- JP/EN VADER/oseti remains a secondary library check. Reviewed JP/EN keyword
+  evidence is now promoted into runtime outputs and used for evidence-rate
+  diagnostics, but it is still not a replacement for language-specific
+  sentiment tools.
 
 ## Expected growth
 
@@ -149,14 +152,19 @@ Currently valid:
   Chinese-language social rows using positive/neutral/negative categories
 - pairwise category-share tests comparing each Google review language group
   with all Chinese social rows
+- XHS-first cross-source `any_friction` and `any_enjoyment_evidence`
+  prevalence tests using reviewed JP/EN keyword evidence and Chinese reviewed
+  keyword evidence
 - within-Chinese source-platform tests only when an explicit Douyin-inclusive
   source-sensitivity input is supplied
 
 Explicitly skipped:
 
 - raw SnowNLP/VADER/oseti score t-tests or ANOVA
-- cross-source friction/enjoyment prevalence tests, because EN/JP reviewed
-  keyword evidence is not promoted into runtime outputs yet
+
+Interpretation: evidence prevalence tests are descriptive discourse-evidence
+tests, not direct satisfaction measures, and Douyin remains outside the default
+Chinese layer.
 
 Interpretation: these p-values describe differences in platformed discourse
 categories, not direct visitor satisfaction or nationality differences.
@@ -168,9 +176,9 @@ categories, not direct visitor satisfaction or nationality differences.
 - Douyin comment rows are temporarily deferred from the main pipeline. In the
   opt-in variant, they use local parser IDs, not platform comment IDs; relative
   timestamps are approximate and cannot support monthly trend comparisons.
-- A large share of Fukui Xiaohongshu chatter is idol fan-pilgrimage content
-  (theme `fan`, 22/105 after dedup) — analytically interesting, but a different
-  travel motivation than general tourism; hence the dual-subset reporting.
+- Fukui Xiaohongshu chatter includes idol fan-pilgrimage content. Treat it as
+  analytically interesting but distinct from general tourism; use generated
+  theme-count outputs when reporting its share.
 - Chinese sentiment uses SnowNLP as a secondary baseline, not a validated
   project-specific sentiment model; Google star ratings and SnowNLP probability
   are different instruments.

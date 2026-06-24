@@ -1,4 +1,10 @@
-# Architecture Review Resume Notes - 2026-06-22
+# Architecture Review Resume Notes
+
+Archived implementation note. Do not use this file as current project status or
+method guidance; use `docs/repo_guidance.md`, `docs/cross_language_trends.md`,
+and `docs/sentiment_comparison_method.md` for live instructions. The matrix
+below records what the architecture review said at the time, so some "gap" and
+"next step" entries are intentionally historical.
 
 Source report:
 
@@ -21,7 +27,7 @@ Verdict matrix:
 | Split Chinese-language posts ingress Adapters | Partial | One normalizer handles XHS and Douyin with platform branches | `normalize_social_csv()` mixes registry, parser, mapper, date policy | Extract `normalize_xhs_source()` and `normalize_douyin_comment_source()` wrapper-preserving |
 | Separate statistical test family Modules | Not applied | `build_tests()` contains all JP/EN test families | Mixed categorical, score, bootstrap, POI, rating logic in one function | Extract pure row builders; keep output schema/order |
 
-Overall state:
+Historical state at time of review:
 
 - Architecture review was directionally acted on for provenance and scope.
 - Academic guardrails improved: fail-loud scope, provenance manifests, aggregate-only output checks, Chinese reviewed evidence path.

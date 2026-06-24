@@ -1,7 +1,7 @@
 {
   "schema_version": "research_provenance.v1",
   "kind": "presentation_safe_jp_en_sentiment",
-  "generated_at": "2026-06-23T09:12:16+00:00",
+  "generated_at": "2026-06-24T01:42:47+00:00",
   "command": "scripts/build_presentation_safe_outputs.py",
   "inputs": [
     {
@@ -36,8 +36,8 @@
       "role": "aggregate_cross_language_statistical_tests",
       "path": "/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/output/cross_language_trends/cross_language_statistical_tests.csv",
       "exists": true,
-      "bytes": 7363,
-      "sha256": "7c2e1c6e8124ea58868ff189b8918675a51c7973f441e01b1be4d5a8fbb33da1"
+      "bytes": 7309,
+      "sha256": "ffa84412cba339f1780fffedf531930f3a4b609d40f4c0ef9b559a3916a63fc7"
     },
     {
       "role": "ignored_scored_review_audit_file",
@@ -52,8 +52,8 @@
       "role": "presentation_chart_data",
       "path": "/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/output/presentation_safe/jp_en_library_sentiment_chart_data.csv",
       "exists": true,
-      "bytes": 1596,
-      "sha256": "0200df8e14574170a5207e532a45bae808a30536c60e40d4a2fb05c432d0b854"
+      "bytes": 1638,
+      "sha256": "6a0705442ad6ca3d88a535f06f00555880d3dd07545db9ae4c788627740bc932"
     },
     {
       "role": "presentation_statistical_summary",
@@ -66,8 +66,8 @@
       "role": "presentation_figure_questions",
       "path": "/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/output/presentation_safe/presentation_figure_questions.md",
       "exists": true,
-      "bytes": 3348,
-      "sha256": "2e8ae42e7851c762d33fce767ee4203df42934f38e2de2279b81c44c24fa259d"
+      "bytes": 3378,
+      "sha256": "05b8effc4d394d03e42323aa3697baba2675a075f68e3b0a6c04798a57fee36f"
     },
     {
       "role": "presentation_figure_japanese_sentiment_profile",
@@ -122,8 +122,8 @@
       "role": "presentation_readiness_markdown",
       "path": "/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/output/presentation_safe/presentation_readiness.md",
       "exists": true,
-      "bytes": 3717,
-      "sha256": "770f9efec9259207d5e23042633f87d6011155d408c784aac7ae7ad25dcbed4d"
+      "bytes": 3786,
+      "sha256": "23775f9026c805b253900c8015716f851145892c5be30e32dd21fc1acfddf988"
     }
   ],
   "filters": {

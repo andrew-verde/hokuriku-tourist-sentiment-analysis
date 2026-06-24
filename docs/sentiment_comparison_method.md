@@ -434,21 +434,27 @@ inside reviews, are not independent observations, and Japanese sentence boundary
 segmentation can differ from English punctuation behavior.
 
 For EN/JP/CN cross-source comparisons, the current defensible statistical layer
-is limited to sentiment category shares and within-Chinese platform checks:
+is limited to sentiment category shares, XHS-first reviewed-evidence prevalence
+checks, and within-Chinese platform checks when multiple Chinese platforms are
+explicitly supplied:
 
 ```text
 English-language Google reviews vs Japanese-language Google reviews vs
 Chinese-language social rows: chi-square/Fisher on positive/neutral/negative
 categories, labeled as descriptive cross-source evidence.
 
+XHS-first cross-source reviewed-evidence prevalence: chi-square/Fisher tests
+for `any_friction` and `any_enjoyment_evidence`, using reviewed JP/EN keyword
+evidence plus Chinese reviewed keyword evidence. These are descriptive
+discourse-evidence tests across different source/platform contexts.
+
 Xiaohongshu vs Douyin: within-Chinese category-share and binary evidence tests
-for current Chinese fields.
+only when the explicit Douyin-inclusive source-sensitivity path is supplied.
 ```
 
 Do not run raw SnowNLP/VADER/oseti score t-tests or ANOVA. Do not run
-cross-source friction/enjoyment evidence tests until reviewed English and
-Japanese keyword evidence has been promoted into the same runtime comparison
-shape as the Chinese `any_friction` and `any_enjoyment_evidence` fields.
+cross-source evidence tests without reviewed keyword evidence and explicit
+source/platform caveats.
 
 ## Aggregate Outputs
 

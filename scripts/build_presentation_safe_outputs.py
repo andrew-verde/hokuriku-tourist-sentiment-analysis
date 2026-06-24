@@ -596,7 +596,7 @@ def build_sentiment_chart_data(
             "poi_mix": meta["poi_mix"],
             "source_hashes": json.dumps(hashes, sort_keys=True),
             "caveat": (
-                "Secondary library-score check only; reviewed JP/EN codebook evidence pending. "
+                "Secondary library-score check only; reviewed JP/EN codebook evidence is an audit/sensitivity path. "
                 "Groups are language/source labels, not nationalities."
             ),
         })
@@ -670,8 +670,8 @@ def _write_readiness(
         "## Use Status",
         "",
         "- Ready for presentation as a secondary library sentiment check.",
-        "- Not ready as primary JP/EN sentiment evidence until reviewed codebook evidence is promoted.",
-        "- Statistical rows are descriptive sensitivity checks, not confirmatory claims.",
+        "- Reviewed JP/EN keyword evidence is available as an audit/sensitivity path, not a replacement for VADER/oseti.",
+        "- H1-H3 statistical rows are descriptive support, not confirmatory claims; use the within-POI paired Wilcoxon test as the venue-clustering robustness check.",
         "- SVG figures are organized under `japanese/`, `english/`, and `multilingual/`.",
         "",
         "## Denominators",
@@ -704,10 +704,9 @@ def _write_readiness(
         "shares as secondary checks. Denominators and hashes are in the chart "
         "data; language labels are not nationality claims.",
         "",
-        "Table statistical sensitivity: Review-row, POI-level, and cluster "
-        "bootstrap checks summarize robustness. Because review rows are nested "
-        "within POIs and group sizes are imbalanced, use as descriptive "
-        "sensitivity only.",
+        "Table statistical sensitivity: H1-H3 rows are descriptive support. "
+        "The within-POI paired Wilcoxon test is the venue-clustering robustness "
+        "check; report its paired-POI N alongside the result.",
         "",
         "## Figure Folders",
         "",
@@ -802,7 +801,7 @@ def build_presentation_safe_outputs(
                 "figure": f"{label} sentiment profile",
                 "path": str(sentiment_path),
                 "question": f"What share of {language}-language Fukui Google reviews is positive, neutral, or negative under the secondary library tool?",
-                "caveat": "Secondary library-score check; reviewed JP/EN keyword evidence still pending.",
+                "caveat": "Secondary library-score check; reviewed JP/EN keyword evidence is an audit/sensitivity path.",
             },
             {
                 "figure": f"{label} tourism priority mix",

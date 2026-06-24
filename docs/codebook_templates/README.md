@@ -25,7 +25,7 @@ for `No change` and `FIX` rows. For `delete` rows, leave `keyword_final` blank.
 Generate from the reviewed workbook:
 
 ```bash
-python3 scripts/export_chinese_codebook_template.py --reviewed-at 2026-06-18
+python3 scripts/export_chinese_codebook_template.py --reviewed-at YYYY-MM-DD
 ```
 
 The exporter writes UTF-8 with BOM (`utf-8-sig`) so Excel reopens the CSV with

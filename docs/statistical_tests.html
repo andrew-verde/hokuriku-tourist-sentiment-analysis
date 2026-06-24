@@ -172,7 +172,7 @@
     <main>
       <header>
         <h1>Statistical Test Index</h1>
-        <p class="subtitle">Fukui-first tourism text analysis - public-facing test map - 2026-06-23</p>
+        <p class="subtitle">Fukui-first tourism text analysis - public-facing test map</p>
         <p>
           This page collects the statistical tests currently implemented in the repository and links each referenced
           aggregate output. It excludes raw row-level text, author fields, source URLs, review IDs, and other local
@@ -196,7 +196,7 @@
           </p>
           <p>
             JP/EN Google review tests are strongest when they keep platform constant. Current Chinese-language social
-            comparisons use Xiaohongshu rows; Douyin remains a deferred source-sensitivity path.
+            comparisons use Xiaohongshu rows by default; Douyin is available only through the source-sensitivity path.
           </p>
         </div>
       </section>
@@ -260,7 +260,8 @@
         <h2>Supplemental Figure Pack</h2>
         <p class="section-intro">
           Use <code>make statistical-test-figures</code> to rebuild aggregate-only SVG figures for the hypothesis tests,
-          within-language driver tests, cross-source tests, date-quality diagnostics, and skipped Chinese platform slots.
+          within-language driver tests, cross-source tests, date-quality diagnostics, Chinese platform diagnostics, and
+          within-Chinese driver effects.
         </p>
         <ul class="facts">
           <li><a href="statistical_test_figures/statistical_test_figure_questions.md">Figure questions and caveats</a></li>
@@ -418,8 +419,8 @@
         <div class="risk">
           <p>
             Cross-source tests are descriptive because Google reviews and current Xiaohongshu rows differ in platform,
-            intent, text length, and date quality. Douyin remains deferred; do not interpret raw sentiment score means
-            across tools.
+            intent, text length, and date quality. Xiaohongshu is the default Chinese layer; Douyin is optional through
+            the source-sensitivity path. Do not interpret raw sentiment score means across tools.
           </p>
         </div>
         <table>

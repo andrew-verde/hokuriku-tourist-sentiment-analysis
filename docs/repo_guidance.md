@@ -35,13 +35,10 @@ Google review artifacts are synced locally under ignored `output/` paths:
 - `output/multilingual_review_analysis/`: derived multilingual review tables
 - `output/google_review_sync_manifest.json`: local sync manifest with hashes
 
-Current local review cache after sync:
-
-- `reviews_multilingual.csv`: 6,036 rows
-- Fukui rows: 2,209
-- Fukui language groups: 214 English, 1,800 Japanese, 186 other, 9 too short or undetected
-- Full cache language groups: 919 English, 4,037 Japanese, 1,040 other, 40 too short or undetected
-- Checkpoint review totals: 2,405 Fukui, 2,425 Kanazawa, 1,839 Toyama
+Current local review cache counts must come from generated sync/sentiment
+manifests, not hand-maintained documentation. Run `make multilingual-reviews`
+and `make sentiment-analysis`, then cite the generated aggregate manifests or
+readiness outputs.
 
 Chinese social inputs are external and should remain external:
 
@@ -94,11 +91,12 @@ Chinese social inputs are external and should remain external:
   EN/JP/CN sentiment-category chi-square/Fisher tests, within-Chinese
   source-platform tests when multiple Chinese platforms are present, and
   XHS-first cross-source friction/enjoyment evidence prevalence tests using
-  reviewed keyword evidence. The formal H1-H3 JP-EN scripts now write
-  aggregate-only hypothesis outputs under `output/hypothesis_tests/`: H1
-  sentiment category chi-square with neutral-band sensitivity, H2 common-scale
-  star-rating Welch tests, and H3 reviewed evidence prevalence tests with FDR
-  correction.
+  reviewed keyword evidence. The H1-H3 JP-EN descriptive-support scripts and
+  within-POI paired robustness script now write aggregate-only hypothesis
+  outputs under `output/hypothesis_tests/`: H1 sentiment category chi-square
+  with neutral-band sensitivity, H2 common-scale star-rating Welch tests, H3
+  reviewed evidence prevalence tests with FDR correction, and within-POI paired
+  Wilcoxon checks for venue-clustering robustness.
 - [x] Presentation outputs: `make presentation-safe` builds aggregate-only JP-EN
   chart/table data, captions, readiness notes, hashes, date coverage, and
   POI-category mix under `output/presentation_safe/`. The stage regenerates from

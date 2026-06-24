@@ -1,15 +1,16 @@
 # Manual Keyword Review Follow-Up
 
-Use this note when the English and Japanese manual keyword review is complete.
-It records coding tasks and tests needed to promote reviewed EN/JP evidence into
-the statistical comparison layer.
+Use this note for maintenance of reviewed EN/JP evidence. The initial
+promotion path, row-level evidence columns, aggregate evidence summaries,
+cross-source evidence tests, and disagreement reporting are already implemented;
+keep this as a regression checklist when codebooks or evidence-test logic
+change.
 
 ## Trigger
 
-Start this work only after reviewed English and Japanese keyword/codebook files
-exist under `docs/codebook_reviews/source/` or `docs/codebook_templates/`, with
-review decisions preserved. Do not infer missing EN/JP terms from current
-library sentiment output.
+Run this checklist when reviewed English or Japanese keyword/codebook files under
+`docs/codebook_reviews/source/` or `docs/codebook_templates/` change. Do not
+infer missing EN/JP terms from current library sentiment output.
 
 ## Required Coding Tasks
 
@@ -40,9 +41,10 @@ library sentiment output.
    - No `review_text`, review IDs, POI IDs, author names, URLs, or source row IDs
      in tracked aggregate outputs.
 
-4. Enable cross-source evidence tests in `scripts/build_cross_language_trends.py`.
-   - Replace skipped rows for cross-source friction prevalence and cross-source
-     enjoyment/recommendation prevalence.
+4. Maintain cross-source evidence tests in `scripts/build_cross_language_trends.py`.
+   - Keep cross-source friction prevalence and cross-source
+     enjoyment/recommendation prevalence rows active when reviewed evidence
+     inputs are present.
    - Compare aligned binary evidence rates across English-language Google
      reviews, Japanese-language Google reviews, and Chinese-language social rows.
    - Keep labels explicit: cross-source discourse prevalence tests, not direct
@@ -75,8 +77,8 @@ library sentiment output.
      silently pass as zero evidence.
 
 4. Cross-language statistical tests.
-   - Current skipped cross-source evidence rows become `ok` when fake aligned
-     EN/JP/CN binary evidence is present.
+   - Cross-source evidence rows become `ok` when fake aligned EN/JP/CN binary
+     evidence is present.
    - Rows remain `skipped` with clear reason when reviewed EN/JP evidence is
      absent.
    - Fisher exact is used for 2x2 tests; chi-square is used for larger tables.
