@@ -1,7 +1,7 @@
 {
   "schema_version": "research_provenance.v1",
   "kind": "statistical_test_figure_pack",
-  "generated_at": "2026-06-23T14:36:03+00:00",
+  "generated_at": "2026-06-24T12:53:24+00:00",
   "command": "scripts/build_statistical_test_figures.py",
   "inputs": [
     {
@@ -26,11 +26,18 @@
       "sha256": "86a0c42644ba0d28ea7910077dd3937b04804897716a29f9f28a4e401e638fdf"
     },
     {
+      "role": "within_poi",
+      "path": "/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/docs/statistical_test_outputs/hypothesis_tests/within_poi_paired_jp_en.csv",
+      "exists": true,
+      "bytes": 913,
+      "sha256": "e50a1ec108d9a07c221dae58c3c123be681febd43c54d2c0ca7e408c14aa9da5"
+    },
+    {
       "role": "cross_tests",
       "path": "/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/docs/statistical_test_outputs/cross_language_trends/cross_language_statistical_tests.csv",
       "exists": true,
-      "bytes": 7363,
-      "sha256": "7c2e1c6e8124ea58868ff189b8918675a51c7973f441e01b1be4d5a8fbb33da1"
+      "bytes": 7309,
+      "sha256": "ffa84412cba339f1780fffedf531930f3a4b609d40f4c0ef9b559a3916a63fc7"
     },
     {
       "role": "date_scrub",
@@ -65,7 +72,7 @@
       "path": "/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/docs/statistical_test_outputs/within_language_sentiment/cn_within_source_sentiment_drivers.csv",
       "exists": true,
       "bytes": 36993,
-      "sha256": "10af8515f727c5871d6f29a1d65b7358170c674f19005085361b4ba2028e1122"
+      "sha256": "63756339aa8e501c19e0cef5ec358826fe290fa05d0758660a25b9c86f52a875"
     }
   ],
   "outputs": [
@@ -73,113 +80,134 @@
       "role": "statistical_test_figure_index",
       "path": "/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/docs/statistical_test_figures/statistical_test_figure_index.csv",
       "exists": true,
-      "bytes": 4181,
-      "sha256": "80c7c9320917986b521c49b1297d8569903416a51ac9df7d6309861c8da33489"
+      "bytes": 5320,
+      "sha256": "e1c9644a2f85f1bdc2e8d8ee96ac60da249aaae1b9caebec320dbf8f36534380"
     },
     {
       "role": "statistical_test_figure_questions",
       "path": "/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/docs/statistical_test_figures/statistical_test_figure_questions.md",
       "exists": true,
-      "bytes": 4947,
-      "sha256": "04a2b865cab02b94e68e8f4447da88d64a5a1c898be8f03f707b7c7defd86aed"
+      "bytes": 6216,
+      "sha256": "1fc2bebff9cb4575f3d8c85aefd1becaf225f85715ef4fa6199a46b86027de02"
     },
     {
       "role": "statistical_test_figure_figure_h1_sentiment_category_share",
       "path": "/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/docs/statistical_test_figures/figure_h1_sentiment_category_share.svg",
       "exists": true,
-      "bytes": 2932,
-      "sha256": "9c4fdbb31fd9da0f3ee9a4e1caaf86ef013bb359e7851537e77f9fb0a2944f40"
+      "bytes": 3483,
+      "sha256": "de744cb79c02fdca01632933f1beb253c26f8b33adf54a2c474de8654c7a21f2"
     },
     {
       "role": "statistical_test_figure_figure_h1_neutral_band_sensitivity",
       "path": "/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/docs/statistical_test_figures/figure_h1_neutral_band_sensitivity.svg",
       "exists": true,
-      "bytes": 1853,
-      "sha256": "e4b53282c00ce49ffcc47f847336b8a6c99b01073666bc931cc4315ff72e8ebb"
+      "bytes": 2621,
+      "sha256": "759781e426827dc94174ecc0c149eea5bf17966eace5e5189d9e94438039b0ad"
     },
     {
       "role": "statistical_test_figure_figure_h2_rating_distribution",
       "path": "/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/docs/statistical_test_figures/figure_h2_rating_distribution.svg",
       "exists": true,
-      "bytes": 3779,
-      "sha256": "5fbe46129ffe514e8f957e8b367bf1ad94a1edf7922e5559f913c4604f3d0835"
+      "bytes": 4330,
+      "sha256": "ac613e1a7d737d3cf59dc6b7ba1e2440bad0616dae328b0c4fa49e202f8c1e20"
     },
     {
       "role": "statistical_test_figure_figure_h2_rating_mean_sensitivity",
       "path": "/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/docs/statistical_test_figures/figure_h2_rating_mean_sensitivity.svg",
       "exists": true,
-      "bytes": 2292,
-      "sha256": "9d1859d8975aa24cbaa370eb927ad0e5acf2220fbfc62bfe8a31245ba4305be1"
+      "bytes": 3177,
+      "sha256": "f50ebdac1cbc4ca4d48488a69f78a81967161628db0954dc435d107411fdacee"
     },
     {
       "role": "statistical_test_figure_figure_h3_reviewed_evidence_prevalence",
       "path": "/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/docs/statistical_test_figures/figure_h3_reviewed_evidence_prevalence.svg",
       "exists": true,
-      "bytes": 3488,
-      "sha256": "106af1511e4b3a9ef769b0c97041318b8e6d1a9fbd4056631df0aadd7fb64254"
+      "bytes": 4731,
+      "sha256": "e2c9b34302e4ac48bacd3be1e5fc7cc01ae0de9d8a1735048215ff362090937e"
     },
     {
       "role": "statistical_test_figure_figure_h3_text_length_diagnostic",
       "path": "/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/docs/statistical_test_figures/figure_h3_text_length_diagnostic.svg",
       "exists": true,
-      "bytes": 1501,
-      "sha256": "d682181086954c7119a7887c21c778b00228900b5ccf68e8d26cf73324b81536"
+      "bytes": 2035,
+      "sha256": "cd1986385be1611ac72f862bd87958b48950cdea5b9c260f5c634a819e4d47ff"
+    },
+    {
+      "role": "statistical_test_figure_figure_hypothesis_overview",
+      "path": "/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/docs/statistical_test_figures/figure_hypothesis_overview.svg",
+      "exists": true,
+      "bytes": 5564,
+      "sha256": "80384271cd04a4f38dd0fec27e76dfadf0e736e3d03b6f4584dbfce7ad7bb045"
+    },
+    {
+      "role": "statistical_test_figure_figure_h2_rating_gap_robustness_ladder",
+      "path": "/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/docs/statistical_test_figures/figure_h2_rating_gap_robustness_ladder.svg",
+      "exists": true,
+      "bytes": 5160,
+      "sha256": "0bc52c266f51d112638afc86e0df55cf19d59c301e37769da519d8aac6be23c6"
+    },
+    {
+      "role": "statistical_test_figure_figure_within_poi_paired_shift",
+      "path": "/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/docs/statistical_test_figures/figure_within_poi_paired_shift.svg",
+      "exists": true,
+      "bytes": 4038,
+      "sha256": "4b5c1304d501af7deefd51843ba8a2ea0ad35eb0b7cc4a5238cae28facf6a077"
     },
     {
       "role": "statistical_test_figure_figure_cross_source_sentiment_category",
       "path": "/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/docs/statistical_test_figures/figure_cross_source_sentiment_category.svg",
       "exists": true,
-      "bytes": 3771,
-      "sha256": "1c4f6befac8ff046d345678f7519489ce742753241fe7619aa303bb1af7c8271"
+      "bytes": 4439,
+      "sha256": "2fab0c0d0fe1b6967be77295d9f34eaa13dbf648d808bd8d4043c45d8aad57a9"
     },
     {
       "role": "statistical_test_figure_figure_cross_source_evidence_prevalence",
       "path": "/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/docs/statistical_test_figures/figure_cross_source_evidence_prevalence.svg",
       "exists": true,
-      "bytes": 2975,
-      "sha256": "d3426b3b1aa53bf33165f8fbfb610ea335adbb889fd6e9c62ade95b2190232c2"
+      "bytes": 3986,
+      "sha256": "8c52540978a0ac70ecab5250c31f3f0f023c5f2fe75f357ccdd74b1b2b9541a4"
     },
     {
       "role": "statistical_test_figure_figure_cross_source_test_effects",
       "path": "/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/docs/statistical_test_figures/figure_cross_source_test_effects.svg",
       "exists": true,
-      "bytes": 4072,
-      "sha256": "3de6049238515d7c7c79705b2e866bbf1952d1e2d162f5fb0d9620c9243645c0"
+      "bytes": 5425,
+      "sha256": "b702e071d69e469ba1f62831629a98413b2cbdba50d874ff5ba8b22984aa8664"
     },
     {
       "role": "statistical_test_figure_figure_date_scrub_requirements",
       "path": "/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/docs/statistical_test_figures/figure_date_scrub_requirements.svg",
       "exists": true,
-      "bytes": 2466,
-      "sha256": "00cb47700545d0c8f7e40e37ae9cc1dcc2fc6e83a2f494449d0f72b90245e065"
+      "bytes": 3017,
+      "sha256": "de6cc1f20c0586fad099a38d9832f151480e78666663740cd034b064abcaf78b"
     },
     {
       "role": "statistical_test_figure_figure_chinese_city_platform_friction_status",
       "path": "/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/docs/statistical_test_figures/figure_chinese_city_platform_friction_status.svg",
       "exists": true,
-      "bytes": 1140,
-      "sha256": "7f46eaa5df2a0f1bb0336f5ac505c9816767c43f5326aff199b14010996de9f2"
+      "bytes": 1094,
+      "sha256": "e793322defb96a30827b2472a2eb96ddce5a7e76eccc556e504708d0838eb055"
     },
     {
       "role": "statistical_test_figure_figure_within_english_driver_effects",
       "path": "/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/docs/statistical_test_figures/figure_within_english_driver_effects.svg",
       "exists": true,
-      "bytes": 4910,
-      "sha256": "dd91ea52edcaa9f3a7e6e00be7279345beaf9392af25c846e5d66549c8ec2a7a"
+      "bytes": 13426,
+      "sha256": "69a6376d3a8e034727e357b4019c3f64cb72914270ba6f3d489917ba2ff96beb"
     },
     {
       "role": "statistical_test_figure_figure_within_japanese_driver_effects",
       "path": "/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/docs/statistical_test_figures/figure_within_japanese_driver_effects.svg",
       "exists": true,
-      "bytes": 4919,
-      "sha256": "8a505ae9970af51d19110e6b850623fe19b1e3921800e1ff9410afeaa9f0faed"
+      "bytes": 13436,
+      "sha256": "5b5a5fe1b0cac122bd0f7d468e1660de93bb954f4d8a59545aaab24f892ab816"
     },
     {
       "role": "statistical_test_figure_figure_within_chinese_driver_effects",
       "path": "/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/docs/statistical_test_figures/figure_within_chinese_driver_effects.svg",
       "exists": true,
-      "bytes": 5766,
-      "sha256": "800be75db221baf54c101e057cfd01e87f8613d874ad589a5e160700a1e42511"
+      "bytes": 20431,
+      "sha256": "b3202df978a87949969082822b333db4df1bd5e1d058aff2d1903bf5f2a95c44"
     }
   ],
   "filters": {
@@ -187,7 +215,7 @@
     "output_surface": "aggregate-only SVG"
   },
   "metrics": {
-    "figure_count": 14
+    "figure_count": 17
   },
   "caveats": [
     "Language/source groups are not nationality groups.",

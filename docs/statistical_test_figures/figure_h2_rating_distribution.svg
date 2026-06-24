@@ -2,6 +2,9 @@
 <rect width="100%" height="100%" fill="#fbfaf7"/>
 <text x="32.00" y="39.00" text-anchor="start" font-family="Arial, sans-serif" font-size="24" font-weight="700" fill="#172033">H2 Star Rating Distribution</text>
 <text x="32.00" y="66.00" text-anchor="start" font-family="Arial, sans-serif" font-size="14" font-weight="400" fill="#5b677a">Common 1-to-5 Google scale; p=5.7e-08</text>
+<line x1="295.00" x2="295.00" y1="106.00" y2="196.00" stroke="#d7dde8" stroke-width="1" opacity="0.55"/>
+<line x1="648.50" x2="648.50" y1="106.00" y2="196.00" stroke="#d7dde8" stroke-width="1" opacity="0.55"/>
+<line x1="1002.00" x2="1002.00" y1="106.00" y2="196.00" stroke="#d7dde8" stroke-width="1" opacity="0.55"/>
 <text x="281.00" y="130.00" text-anchor="end" font-family="Arial, sans-serif" font-size="13" font-weight="400" fill="#172033">English-language reviews</text>
 <rect x="295.00" y="112.00" width="26.43" height="25" fill="#963a35"/>
 <rect x="321.43" y="112.00" width="6.61" height="25" fill="#c06c38"/>
@@ -10,7 +13,8 @@
 <text x="430.45" y="130.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#ffffff">17.8%</text>
 <rect x="493.22" y="112.00" width="508.78" height="25" fill="#2f6f73"/>
 <text x="747.61" y="130.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#ffffff">72.0%</text>
-<text x="1012.00" y="130.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#5b677a">n=214</text>
+<rect x="1008.00" y="115.00" width="48.40" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="1032.20" y="130.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#5b677a">n=214</text>
 <text x="281.00" y="184.00" text-anchor="end" font-family="Arial, sans-serif" font-size="13" font-weight="400" fill="#172033">Japanese-language reviews</text>
 <rect x="295.00" y="166.00" width="17.28" height="25" fill="#963a35"/>
 <rect x="312.28" y="166.00" width="14.93" height="25" fill="#c06c38"/>
@@ -20,7 +24,8 @@
 <text x="531.26" y="184.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#ffffff">31.5%</text>
 <rect x="642.61" y="166.00" width="359.39" height="25" fill="#2f6f73"/>
 <text x="822.30" y="184.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#ffffff">50.8%</text>
-<text x="1012.00" y="184.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#5b677a">n=1,800</text>
+<rect x="1008.00" y="169.00" width="61.36" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="1038.68" y="184.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#5b677a">n=1,800</text>
 <rect x="295.00" y="252.00" width="10" height="10" fill="#963a35"/>
 <text x="311.00" y="262.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#5b677a">rating_1</text>
 <rect x="413.00" y="252.00" width="10" height="10" fill="#c06c38"/>

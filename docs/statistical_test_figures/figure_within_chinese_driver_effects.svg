@@ -1,43 +1,160 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="646" viewBox="0 0 1120 646">
+<svg xmlns="http://www.w3.org/2000/svg" width="1240" height="1330" viewBox="0 0 1240 1330">
 <rect width="100%" height="100%" fill="#fbfaf7"/>
 <text x="32.00" y="39.00" text-anchor="start" font-family="Arial, sans-serif" font-size="24" font-weight="700" fill="#172033">Within-Chinese Social Sentiment Drivers</text>
 <text x="32.00" y="66.00" text-anchor="start" font-family="Arial, sans-serif" font-size="14" font-weight="400" fill="#5b677a">Topic tags separate SnowNLP sentiment more than food/friction tags</text>
-<line x1="657.50" x2="657.50" y1="94" y2="584" stroke="#d7dde8" stroke-width="1"/>
-<text x="351.00" y="125.00" text-anchor="end" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">dinosaurs museums / snownlp centered score</text>
-<rect x="657.50" y="110.00" width="292.50" height="20" rx="3" fill="#5b6c94"/>
-<text x="958.00" y="125.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">effect=0.430; p=1.2e-05</text>
-<text x="351.00" y="164.00" text-anchor="end" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">history culture / snownlp centered score</text>
-<rect x="657.50" y="149.00" width="206.90" height="20" rx="3" fill="#5b6c94"/>
-<text x="872.40" y="164.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">effect=0.304; p=9.9e-04</text>
-<text x="351.00" y="203.00" text-anchor="end" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">scenic nature / snownlp centered score</text>
-<rect x="657.50" y="188.00" width="204.09" height="20" rx="3" fill="#5b6c94"/>
-<text x="869.59" y="203.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">effect=0.300; p=0.002</text>
-<text x="351.00" y="242.00" text-anchor="end" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">temples spiritual / snownlp centered score</text>
-<rect x="657.50" y="227.00" width="196.54" height="20" rx="3" fill="#5b6c94"/>
-<text x="862.04" y="242.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">effect=0.289; p=1.2e-05</text>
-<text x="351.00" y="281.00" text-anchor="end" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">fan pilgrimage pop culture / snownlp centered s...</text>
-<rect x="486.21" y="266.00" width="171.29" height="20" rx="3" fill="#5b6c94"/>
-<text x="478.21" y="281.00" text-anchor="end" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">effect=-0.252; p=0.023</text>
-<text x="351.00" y="320.00" text-anchor="end" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">dinosaurs museums / sentiment category=positive</text>
-<rect x="657.50" y="305.00" width="144.60" height="20" rx="3" fill="#bc6c25"/>
-<text x="810.10" y="320.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">effect=0.212; p=0.011</text>
-<text x="351.00" y="359.00" text-anchor="end" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">crafts shopping / snownlp centered score</text>
-<rect x="657.50" y="344.00" width="121.14" height="20" rx="3" fill="#5b6c94"/>
-<text x="786.64" y="359.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">effect=0.178; p=0.002</text>
-<text x="351.00" y="398.00" text-anchor="end" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">scenic nature / sentiment category=positive</text>
-<rect x="657.50" y="383.00" width="118.10" height="20" rx="3" fill="#bc6c25"/>
-<text x="783.60" y="398.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">effect=0.173; p=0.016</text>
-<text x="351.00" y="437.00" text-anchor="end" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">seasonal events / snownlp centered score</text>
-<rect x="657.50" y="422.00" width="114.05" height="20" rx="3" fill="#5b6c94"/>
-<text x="779.55" y="437.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">effect=0.168; p=0.272</text>
-<text x="351.00" y="476.00" text-anchor="end" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">any friction / snownlp centered score</text>
-<rect x="657.50" y="461.00" width="100.65" height="20" rx="3" fill="#5b6c94"/>
-<text x="766.15" y="476.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">effect=0.148; p=1.6e-04</text>
-<text x="351.00" y="515.00" text-anchor="end" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">history culture / sentiment category=positive</text>
-<rect x="657.50" y="500.00" width="95.31" height="20" rx="3" fill="#bc6c25"/>
-<text x="760.81" y="515.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">effect=0.140; p=0.051</text>
-<text x="351.00" y="554.00" text-anchor="end" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">hot springs relaxation / snownlp centered score</text>
-<rect x="657.50" y="539.00" width="90.29" height="20" rx="3" fill="#5b6c94"/>
-<text x="755.79" y="554.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">effect=0.133; p=0.362</text>
-<text x="32.00" y="626.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#5b677a">Score effects and event risk differences are within-language/source only.</text>
+<text x="32.00" y="114.00" text-anchor="start" font-family="Arial, sans-serif" font-size="14" font-weight="700" fill="#172033">Score mean differences</text>
+<text x="470.00" y="114.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#5b677a">Unit: mean sentiment-score difference, true minus false, within one scoring tool</text>
+<line x1="470.00" x2="470.00" y1="130.00" y2="570.00" stroke="#d7dde8" stroke-width="1" opacity="0.65"/>
+<line x1="760.00" x2="760.00" y1="130.00" y2="570.00" stroke="#d7dde8" stroke-width="1" opacity="0.65"/>
+<line x1="1050.00" x2="1050.00" y1="130.00" y2="570.00" stroke="#d7dde8" stroke-width="1" opacity="0.65"/>
+<text x="454.00" y="167.00" text-anchor="end" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">dinosaurs museums / snownlp centered score</text>
+<line x1="470.00" x2="1050.00" y1="163.00" y2="163.00" stroke="#d7dde8" stroke-width="1" opacity="0.55"/>
+<rect x="760.00" y="153.00" width="290.00" height="20" rx="3" fill="#5b6c94"/>
+<rect x="1029.68" y="152.00" width="182.32" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="1120.84" y="166.50" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">score diff=+0.430; p=1.2e-05</text>
+<text x="454.00" y="205.00" text-anchor="end" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">history culture / snownlp centered score</text>
+<line x1="470.00" x2="1050.00" y1="201.00" y2="201.00" stroke="#d7dde8" stroke-width="1" opacity="0.55"/>
+<rect x="760.00" y="191.00" width="205.14" height="20" rx="3" fill="#5b6c94"/>
+<rect x="969.14" y="190.00" width="182.32" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="1060.30" y="204.50" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">score diff=+0.304; p=9.9e-04</text>
+<text x="454.00" y="243.00" text-anchor="end" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">scenic nature / snownlp centered score</text>
+<line x1="470.00" x2="1050.00" y1="239.00" y2="239.00" stroke="#d7dde8" stroke-width="1" opacity="0.55"/>
+<rect x="760.00" y="229.00" width="202.35" height="20" rx="3" fill="#5b6c94"/>
+<rect x="966.35" y="228.00" width="170.44" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="1051.57" y="242.50" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">score diff=+0.300; p=0.002</text>
+<text x="454.00" y="281.00" text-anchor="end" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">temples spiritual / snownlp centered score</text>
+<line x1="470.00" x2="1050.00" y1="277.00" y2="277.00" stroke="#d7dde8" stroke-width="1" opacity="0.55"/>
+<rect x="760.00" y="267.00" width="194.86" height="20" rx="3" fill="#5b6c94"/>
+<rect x="958.86" y="266.00" width="182.32" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="1050.02" y="280.50" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">score diff=+0.289; p=1.2e-05</text>
+<text x="454.00" y="315.00" text-anchor="end" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">fan pilgrimage pop culture / snownlp centered</text>
+<text x="454.00" y="329.00" text-anchor="end" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">score</text>
+<line x1="470.00" x2="1050.00" y1="318.00" y2="318.00" stroke="#d7dde8" stroke-width="1" opacity="0.55"/>
+<rect x="590.18" y="308.00" width="169.82" height="20" rx="3" fill="#5b6c94"/>
+<rect x="764.00" y="307.00" width="170.44" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="849.22" y="321.50" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">score diff=-0.252; p=0.023</text>
+<text x="454.00" y="363.00" text-anchor="end" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">crafts shopping / snownlp centered score</text>
+<line x1="470.00" x2="1050.00" y1="359.00" y2="359.00" stroke="#d7dde8" stroke-width="1" opacity="0.55"/>
+<rect x="760.00" y="349.00" width="120.10" height="20" rx="3" fill="#5b6c94"/>
+<rect x="884.10" y="348.00" width="170.44" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="969.32" y="362.50" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">score diff=+0.178; p=0.002</text>
+<text x="454.00" y="401.00" text-anchor="end" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">seasonal events / snownlp centered score</text>
+<line x1="470.00" x2="1050.00" y1="397.00" y2="397.00" stroke="#d7dde8" stroke-width="1" opacity="0.55"/>
+<rect x="760.00" y="387.00" width="113.07" height="20" rx="3" fill="#5b6c94"/>
+<rect x="877.07" y="386.00" width="170.44" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="962.29" y="400.50" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">score diff=+0.168; p=0.272</text>
+<text x="454.00" y="439.00" text-anchor="end" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">any friction / snownlp centered score</text>
+<line x1="470.00" x2="1050.00" y1="435.00" y2="435.00" stroke="#d7dde8" stroke-width="1" opacity="0.55"/>
+<rect x="760.00" y="425.00" width="99.78" height="20" rx="3" fill="#5b6c94"/>
+<rect x="863.78" y="424.00" width="182.32" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="954.94" y="438.50" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">score diff=+0.148; p=1.6e-04</text>
+<text x="454.00" y="477.00" text-anchor="end" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">hot springs relaxation / snownlp centered score</text>
+<line x1="470.00" x2="1050.00" y1="473.00" y2="473.00" stroke="#d7dde8" stroke-width="1" opacity="0.55"/>
+<rect x="760.00" y="463.00" width="89.51" height="20" rx="3" fill="#5b6c94"/>
+<rect x="853.51" y="462.00" width="170.44" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="938.73" y="476.50" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">score diff=+0.133; p=0.362</text>
+<text x="454.00" y="515.00" text-anchor="end" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">accommodation / snownlp centered score</text>
+<line x1="470.00" x2="1050.00" y1="511.00" y2="511.00" stroke="#d7dde8" stroke-width="1" opacity="0.55"/>
+<rect x="760.00" y="501.00" width="30.64" height="20" rx="3" fill="#5b6c94"/>
+<rect x="794.64" y="500.00" width="170.44" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="879.86" y="514.50" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">score diff=+0.045; p=0.362</text>
+<text x="454.00" y="553.00" text-anchor="end" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">food local cuisine / snownlp centered score</text>
+<line x1="470.00" x2="1050.00" y1="549.00" y2="549.00" stroke="#d7dde8" stroke-width="1" opacity="0.55"/>
+<rect x="754.83" y="539.00" width="5.17" height="20" rx="3" fill="#5b6c94"/>
+<rect x="764.00" y="538.00" width="170.44" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="849.22" y="552.50" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">score diff=-0.008; p=0.343</text>
+<line x1="470.00" x2="1050.00" y1="580.00" y2="580.00" stroke="#d7dde8" stroke-width="1" opacity="0.75"/>
+<line x1="470.00" x2="470.00" y1="580.00" y2="586.00" stroke="#d7dde8" stroke-width="1"/>
+<text x="470.00" y="602.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="400" fill="#5b677a">-0.43</text>
+<line x1="760.00" x2="760.00" y1="580.00" y2="586.00" stroke="#d7dde8" stroke-width="1"/>
+<text x="760.00" y="602.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="400" fill="#5b677a">0</text>
+<line x1="1050.00" x2="1050.00" y1="580.00" y2="586.00" stroke="#d7dde8" stroke-width="1"/>
+<text x="1050.00" y="602.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="400" fill="#5b677a">+0.43</text>
+<text x="32.00" y="640.00" text-anchor="start" font-family="Arial, sans-serif" font-size="14" font-weight="700" fill="#172033">Positive-event risk differences</text>
+<text x="470.00" y="640.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#5b677a">Unit: percentage points, true minus false</text>
+<line x1="470.00" x2="470.00" y1="656.00" y2="1102.00" stroke="#d7dde8" stroke-width="1" opacity="0.65"/>
+<line x1="760.00" x2="760.00" y1="656.00" y2="1102.00" stroke="#d7dde8" stroke-width="1" opacity="0.65"/>
+<line x1="1050.00" x2="1050.00" y1="656.00" y2="1102.00" stroke="#d7dde8" stroke-width="1" opacity="0.65"/>
+<text x="454.00" y="693.00" text-anchor="end" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">dinosaurs museums / sentiment category=positive</text>
+<line x1="470.00" x2="1050.00" y1="689.00" y2="689.00" stroke="#d7dde8" stroke-width="1" opacity="0.55"/>
+<rect x="760.00" y="679.00" width="290.00" height="20" rx="3" fill="#bc6c25"/>
+<rect x="1041.56" y="678.00" width="170.44" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="1126.78" y="692.50" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">risk diff=+21.2pp; p=0.011</text>
+<text x="454.00" y="731.00" text-anchor="end" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">scenic nature / sentiment category=positive</text>
+<line x1="470.00" x2="1050.00" y1="727.00" y2="727.00" stroke="#d7dde8" stroke-width="1" opacity="0.55"/>
+<rect x="760.00" y="717.00" width="236.86" height="20" rx="3" fill="#bc6c25"/>
+<rect x="1000.86" y="716.00" width="170.44" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="1086.08" y="730.50" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">risk diff=+17.3pp; p=0.016</text>
+<text x="454.00" y="769.00" text-anchor="end" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">history culture / sentiment category=positive</text>
+<line x1="470.00" x2="1050.00" y1="765.00" y2="765.00" stroke="#d7dde8" stroke-width="1" opacity="0.55"/>
+<rect x="760.00" y="755.00" width="191.15" height="20" rx="3" fill="#bc6c25"/>
+<rect x="955.15" y="754.00" width="170.44" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="1040.37" y="768.50" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">risk diff=+14.0pp; p=0.051</text>
+<text x="454.00" y="803.00" text-anchor="end" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">fan pilgrimage pop culture / sentiment</text>
+<text x="454.00" y="817.00" text-anchor="end" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">category=positive</text>
+<line x1="470.00" x2="1050.00" y1="806.00" y2="806.00" stroke="#d7dde8" stroke-width="1" opacity="0.55"/>
+<rect x="588.97" y="796.00" width="171.03" height="20" rx="3" fill="#bc6c25"/>
+<rect x="764.00" y="795.00" width="170.44" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="849.22" y="809.50" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">risk diff=-12.5pp; p=0.090</text>
+<text x="454.00" y="851.00" text-anchor="end" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">temples spiritual / sentiment category=positive</text>
+<line x1="470.00" x2="1050.00" y1="847.00" y2="847.00" stroke="#d7dde8" stroke-width="1" opacity="0.55"/>
+<rect x="760.00" y="837.00" width="168.24" height="20" rx="3" fill="#bc6c25"/>
+<rect x="932.24" y="836.00" width="170.44" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="1017.46" y="850.50" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">risk diff=+12.3pp; p=0.085</text>
+<text x="454.00" y="889.00" text-anchor="end" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">seasonal events / sentiment category=positive</text>
+<line x1="470.00" x2="1050.00" y1="885.00" y2="885.00" stroke="#d7dde8" stroke-width="1" opacity="0.55"/>
+<rect x="760.00" y="875.00" width="137.18" height="20" rx="3" fill="#bc6c25"/>
+<rect x="901.18" y="874.00" width="170.44" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="986.40" y="888.50" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">risk diff=+10.0pp; p=0.343</text>
+<text x="454.00" y="927.00" text-anchor="end" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">crafts shopping / sentiment category=positive</text>
+<line x1="470.00" x2="1050.00" y1="923.00" y2="923.00" stroke="#d7dde8" stroke-width="1" opacity="0.55"/>
+<rect x="760.00" y="913.00" width="119.01" height="20" rx="3" fill="#bc6c25"/>
+<rect x="883.01" y="912.00" width="164.50" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="965.26" y="926.50" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">risk diff=+8.7pp; p=0.408</text>
+<text x="454.00" y="961.00" text-anchor="end" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">hot springs relaxation / sentiment</text>
+<text x="454.00" y="975.00" text-anchor="end" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">category=positive</text>
+<line x1="470.00" x2="1050.00" y1="964.00" y2="964.00" stroke="#d7dde8" stroke-width="1" opacity="0.55"/>
+<rect x="760.00" y="954.00" width="87.77" height="20" rx="3" fill="#bc6c25"/>
+<rect x="851.77" y="953.00" width="164.50" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="934.02" y="967.50" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">risk diff=+6.4pp; p=0.515</text>
+<text x="454.00" y="1009.00" text-anchor="end" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">any friction / sentiment category=positive</text>
+<line x1="470.00" x2="1050.00" y1="1005.00" y2="1005.00" stroke="#d7dde8" stroke-width="1" opacity="0.55"/>
+<rect x="760.00" y="995.00" width="79.61" height="20" rx="3" fill="#bc6c25"/>
+<rect x="843.61" y="994.00" width="164.50" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="925.86" y="1008.50" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">risk diff=+5.8pp; p=0.392</text>
+<text x="454.00" y="1047.00" text-anchor="end" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">accommodation / sentiment category=positive</text>
+<line x1="470.00" x2="1050.00" y1="1043.00" y2="1043.00" stroke="#d7dde8" stroke-width="1" opacity="0.55"/>
+<rect x="760.00" y="1033.00" width="30.73" height="20" rx="3" fill="#bc6c25"/>
+<rect x="794.73" y="1032.00" width="164.50" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="876.98" y="1046.50" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">risk diff=+2.3pp; p=0.943</text>
+<text x="454.00" y="1085.00" text-anchor="end" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">food local cuisine / sentiment category=positive</text>
+<line x1="470.00" x2="1050.00" y1="1081.00" y2="1081.00" stroke="#d7dde8" stroke-width="1" opacity="0.55"/>
+<rect x="734.54" y="1071.00" width="25.46" height="20" rx="3" fill="#bc6c25"/>
+<rect x="764.00" y="1070.00" width="164.50" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="846.25" y="1084.50" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">risk diff=-1.9pp; p=0.943</text>
+<line x1="470.00" x2="1050.00" y1="1112.00" y2="1112.00" stroke="#d7dde8" stroke-width="1" opacity="0.75"/>
+<line x1="470.00" x2="470.00" y1="1112.00" y2="1118.00" stroke="#d7dde8" stroke-width="1"/>
+<text x="470.00" y="1134.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="400" fill="#5b677a">-21.24pp</text>
+<line x1="760.00" x2="760.00" y1="1112.00" y2="1118.00" stroke="#d7dde8" stroke-width="1"/>
+<text x="760.00" y="1134.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="400" fill="#5b677a">0pp</text>
+<line x1="1050.00" x2="1050.00" y1="1112.00" y2="1118.00" stroke="#d7dde8" stroke-width="1"/>
+<text x="1050.00" y="1134.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="400" fill="#5b677a">+21.24pp</text>
+<text x="32.00" y="1172.00" text-anchor="start" font-family="Arial, sans-serif" font-size="14" font-weight="700" fill="#172033">Multicategory score effects</text>
+<text x="470.00" y="1172.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#5b677a">Unit: epsilon-squared</text>
+<line x1="470.00" x2="470.00" y1="1188.00" y2="1242.00" stroke="#d7dde8" stroke-width="1" opacity="0.65"/>
+<line x1="760.00" x2="760.00" y1="1188.00" y2="1242.00" stroke="#d7dde8" stroke-width="1" opacity="0.65"/>
+<line x1="1050.00" x2="1050.00" y1="1188.00" y2="1242.00" stroke="#d7dde8" stroke-width="1" opacity="0.65"/>
+<text x="454.00" y="1225.00" text-anchor="end" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">theme / snownlp centered score</text>
+<line x1="470.00" x2="1050.00" y1="1221.00" y2="1221.00" stroke="#d7dde8" stroke-width="1" opacity="0.55"/>
+<rect x="760.00" y="1211.00" width="221.85" height="20" rx="3" fill="#8d99ae"/>
+<rect x="985.85" y="1210.00" width="170.44" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="1071.07" y="1224.50" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">epsilon^2=0.076; p=6.0e-04</text>
+<line x1="470.00" x2="1050.00" y1="1252.00" y2="1252.00" stroke="#d7dde8" stroke-width="1" opacity="0.75"/>
+<line x1="470.00" x2="470.00" y1="1252.00" y2="1258.00" stroke="#d7dde8" stroke-width="1"/>
+<text x="470.00" y="1274.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="400" fill="#5b677a">-0.1</text>
+<line x1="760.00" x2="760.00" y1="1252.00" y2="1258.00" stroke="#d7dde8" stroke-width="1"/>
+<text x="760.00" y="1274.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="400" fill="#5b677a">0</text>
+<line x1="1050.00" x2="1050.00" y1="1252.00" y2="1258.00" stroke="#d7dde8" stroke-width="1"/>
+<text x="1050.00" y="1274.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="400" fill="#5b677a">+0.1</text>
+<text x="32.00" y="1310.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#5b677a">Panels use separate axes: score rows are mean score differences; event rows are percentage-point risk differences; rho and epsilon-squared are separate diagnostics.</text>
 </svg>

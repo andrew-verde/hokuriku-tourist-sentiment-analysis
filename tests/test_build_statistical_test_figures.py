@@ -27,10 +27,12 @@ def test_builds_statistical_test_figure_pack_from_aggregate_docs(tmp_path):
         )
     )
 
-    assert report["metrics"]["figure_count"] == 14
-    assert len(index) == 14
+    assert report["metrics"]["figure_count"] == 17
+    assert len(index) == 17
     assert "H1 sentiment category shares" in set(index["figure"])
     assert "Chinese city/platform friction status" in set(index["figure"])
+    assert "Hypothesis results at a glance" in set(index["figure"])
+    assert "Within-English Sentiment Drivers" in set(index["figure"])
     assert "row-level post/review text" in questions
     assert "not nationality" in "\n".join(report["caveats"])
     assert manifest["kind"] == "statistical_test_figure_pack"

@@ -41,5 +41,5 @@ Each figure is aggregate-only and omits row-level review/post text, author field
 ## Statistical evidence summary
 
 - Path: `/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/output/presentation_safe/multilingual/figure_statistical_evidence_summary.svg`
-- Question answered: Which descriptive statistical checks currently support language/source comparisons, and where are aligned evidence gaps still present?
-- Use caveat: Effects and p-values are descriptive; rows are nested in POIs and cross-source units differ.
+- Question answered: Which descriptive statistical checks have usable status, and which metric type belongs to each row?
+- Use caveat: Bars are status indicators only; effect metrics differ by row and are not comparable bar-to-bar.

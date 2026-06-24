@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="347" viewBox="0 0 1120 347">
+<rect width="100%" height="100%" fill="#fbfaf7"/>
+<text x="32.00" y="39.00" text-anchor="start" font-family="Arial, sans-serif" font-size="24" font-weight="700" fill="#172033">Within-POI Paired Differences (English minus Japanese)</text>
+<text x="32.00" y="66.00" text-anchor="start" font-family="Arial, sans-serif" font-size="14" font-weight="400" fill="#5b677a">Holding venue constant across 14 shared Fukui POIs (≥5 reviews per language)</text>
+<rect x="416.86" y="90.00" width="395.14" height="144.00" fill="#2f6f73" opacity="0.07"/>
+<line x1="416.86" x2="416.86" y1="87.00" y2="251.00" stroke="#d7dde8" stroke-width="1.5" stroke-dasharray="5 5"/>
+<text x="804.00" y="105.00" text-anchor="end" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#5b677a">favors English →</text>
+<text x="366.00" y="146.00" text-anchor="end" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">Mean star rating</text>
+<line x1="382.00" x2="812.00" y1="142.00" y2="142.00" stroke="#d7dde8" stroke-width="1" opacity="0.65"/>
+<circle cx="781.54" cy="142.00" r="5.2" fill="#5b6c94"/>
+<rect x="830.00" y="130.00" width="76.00" height="23.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="868.00" y="144.50" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="400" fill="#5b677a">p=0.058</text>
+<rect x="918.00" y="129.00" width="170.00" height="25.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="1003.00" y="145.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="700" fill="#172033">+0.314</text>
+<text x="366.00" y="208.00" text-anchor="end" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">Positive sentiment share</text>
+<line x1="382.00" x2="812.00" y1="204.00" y2="204.00" stroke="#d7dde8" stroke-width="1" opacity="0.65"/>
+<circle cx="603.74" cy="204.00" r="5.2" fill="#2f6f73"/>
+<rect x="830.00" y="192.00" width="76.00" height="23.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="868.00" y="206.50" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="400" fill="#5b677a">p=1.2e-04 *</text>
+<rect x="918.00" y="191.00" width="170.00" height="25.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="1003.00" y="207.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="700" fill="#172033">+0.161</text>
+<line x1="382.00" x2="812.00" y1="251.00" y2="251.00" stroke="#d7dde8" stroke-width="1.2"/>
+<line x1="416.86" x2="416.86" y1="251.00" y2="257.00" stroke="#d7dde8" stroke-width="1"/>
+<text x="416.86" y="273.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#5b677a">0</text>
+<line x1="533.08" x2="533.08" y1="251.00" y2="257.00" stroke="#d7dde8" stroke-width="1"/>
+<text x="533.08" y="273.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#5b677a">0.1</text>
+<line x1="649.30" x2="649.30" y1="251.00" y2="257.00" stroke="#d7dde8" stroke-width="1"/>
+<text x="649.30" y="273.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#5b677a">0.2</text>
+<line x1="765.51" x2="765.51" y1="251.00" y2="257.00" stroke="#d7dde8" stroke-width="1"/>
+<text x="765.51" y="273.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#5b677a">0.3</text>
+<text x="32.00" y="305.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#5b677a">14 paired POIs from 25 shared candidates; 185 English + 962 Japanese reviews paired.</text>
+<text x="32.00" y="329.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#5b677a">Pairing removes venue/POI composition as a confound; Wilcoxon signed-rank on POI-pair differences.</text>
+</svg>

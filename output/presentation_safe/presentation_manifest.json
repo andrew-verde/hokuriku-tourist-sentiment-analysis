@@ -1,7 +1,7 @@
 {
   "schema_version": "research_provenance.v1",
   "kind": "presentation_safe_jp_en_sentiment",
-  "generated_at": "2026-06-24T01:42:47+00:00",
+  "generated_at": "2026-06-24T11:23:13+00:00",
   "command": "scripts/build_presentation_safe_outputs.py",
   "inputs": [
     {
@@ -66,57 +66,57 @@
       "role": "presentation_figure_questions",
       "path": "/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/output/presentation_safe/presentation_figure_questions.md",
       "exists": true,
-      "bytes": 3378,
-      "sha256": "05b8effc4d394d03e42323aa3697baba2675a075f68e3b0a6c04798a57fee36f"
+      "bytes": 3347,
+      "sha256": "2cc1afe7014b8c49c9b78871b330c7e8b2e667e23c5c4669011372a03b221967"
     },
     {
       "role": "presentation_figure_japanese_sentiment_profile",
       "path": "/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/output/presentation_safe/japanese/figure_japanese_sentiment_profile.svg",
       "exists": true,
-      "bytes": 1786,
-      "sha256": "8e0c9f3f4b8886f7c717d745df299a2d7d90bf26791cc008dd6f3a45f9056fe0"
+      "bytes": 2101,
+      "sha256": "af5e3fef2267b2d9f32c0ee9edd6bb4904a189f072960de2f7d1c11f2bf4255e"
     },
     {
       "role": "presentation_figure_japanese_poi_priority_mix",
       "path": "/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/output/presentation_safe/japanese/figure_japanese_poi_priority_mix.svg",
       "exists": true,
-      "bytes": 2307,
-      "sha256": "ee1951e3a4df0f0c79ccda2fba4d688551fb2ed219916790e6f494622409240d"
+      "bytes": 3349,
+      "sha256": "3330c6b382b11707bb4e7ebab66967b76f83165bc9d580d808529816c3bf391c"
     },
     {
       "role": "presentation_figure_english_sentiment_profile",
       "path": "/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/output/presentation_safe/english/figure_english_sentiment_profile.svg",
       "exists": true,
-      "bytes": 1539,
-      "sha256": "9211d7c5b037008048efe98a80be25fd97008c354f687eb95891059d02772e38"
+      "bytes": 1854,
+      "sha256": "651ca0294a74f46e0b0b6eea6a38e029237756fed3f1ff3ba6ae4e52737c96a5"
     },
     {
       "role": "presentation_figure_english_poi_priority_mix",
       "path": "/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/output/presentation_safe/english/figure_english_poi_priority_mix.svg",
       "exists": true,
-      "bytes": 1993,
-      "sha256": "424a203470deb7385b114ec9b49b5f9efb7ecc777c698df67d25b31ad7512c5e"
+      "bytes": 2744,
+      "sha256": "e4113479a11b429c2c0d91c0810068d17c85afae0719a7b6391f88f1818aba2b"
     },
     {
       "role": "presentation_figure_multilingual_sentiment_share",
       "path": "/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/output/presentation_safe/multilingual/figure_sentiment_share_by_language_source.svg",
       "exists": true,
-      "bytes": 2977,
-      "sha256": "aa8f4195fddbf7028061298d74a700667a674d016f52b930c56059ca73d65bd2"
+      "bytes": 3292,
+      "sha256": "46753a74b767587db40ee76a160a5636b0e5c74a298d2efe17f952061ec2607d"
     },
     {
       "role": "presentation_figure_multilingual_volume_context",
       "path": "/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/output/presentation_safe/multilingual/figure_volume_context.svg",
       "exists": true,
-      "bytes": 1442,
-      "sha256": "f3a0ea2c1c092b8dcd8f5921489230967e264c8861af41736ddaf2bd782456f7"
+      "bytes": 2030,
+      "sha256": "ae850ecbf71c239ad3939dc0376889d54f4b4314d64a189171c81f209f644f08"
     },
     {
       "role": "presentation_figure_multilingual_statistical_evidence",
       "path": "/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/output/presentation_safe/multilingual/figure_statistical_evidence_summary.svg",
       "exists": true,
-      "bytes": 2131,
-      "sha256": "2dae39d4ff06f3fc8c35bdef21f01decd5f3742f11494befe5ea3710c6b1fd4e"
+      "bytes": 3513,
+      "sha256": "d89331d5845bf26543ba90ea1e0411e7f019c85ef8f33a2a9323d7ff649574d9"
     },
     {
       "role": "presentation_readiness_markdown",

@@ -2,56 +2,79 @@
 <rect width="100%" height="100%" fill="#fbfaf7"/>
 <text x="32" y="38" font-family="Arial, sans-serif" font-size="24" font-weight="700" fill="#1f2933">Chinese Topic Evidence by Sentiment</text>
 <text x="32" y="66" font-family="Arial, sans-serif" font-size="14" fill="#52616b">Topic keyword matches across n=200 rows; positive n=162, negative n=36</text>
+<line x1="280.00" x2="280.00" y1="102.00" y2="558.00" stroke="#d7dde8" stroke-width="1" opacity="0.58"/>
+<line x1="600.00" x2="600.00" y1="102.00" y2="558.00" stroke="#d7dde8" stroke-width="1" opacity="0.58"/>
+<line x1="920.00" x2="920.00" y1="102.00" y2="558.00" stroke="#d7dde8" stroke-width="1" opacity="0.58"/>
 <text x="266" y="126" text-anchor="end" font-family="Arial, sans-serif" font-size="13" fill="#1f2933">Temples / Spiritual</text>
 <rect x="280" y="107" width="640.00" height="14" rx="3" fill="#2f6f73"/>
 <rect x="280" y="125" width="89.11" height="14" rx="3" fill="#9a031e"/>
-<text x="928.0" y="119" font-family="Arial, sans-serif" font-size="11" fill="#1f2933">79</text>
-<text x="377.11392405063293" y="137" font-family="Arial, sans-serif" font-size="11" fill="#1f2933">11</text>
+<rect x="924.00" y="104.00" width="34.00" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="941.00" y="118.50" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#1f2933">79</text>
+<rect x="373.11" y="122.00" width="34.00" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="390.11" y="136.50" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#1f2933">11</text>
 <text x="266" y="172" text-anchor="end" font-family="Arial, sans-serif" font-size="13" fill="#1f2933">History / Culture</text>
 <rect x="280" y="153" width="558.99" height="14" rx="3" fill="#2f6f73"/>
 <rect x="280" y="171" width="56.71" height="14" rx="3" fill="#9a031e"/>
-<text x="846.9873417721519" y="165" font-family="Arial, sans-serif" font-size="11" fill="#1f2933">69</text>
-<text x="344.7088607594937" y="183" font-family="Arial, sans-serif" font-size="11" fill="#1f2933">7</text>
+<rect x="842.99" y="150.00" width="34.00" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="859.99" y="164.50" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#1f2933">69</text>
+<rect x="340.71" y="168.00" width="34.00" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="357.71" y="182.50" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#1f2933">7</text>
 <text x="266" y="218" text-anchor="end" font-family="Arial, sans-serif" font-size="13" fill="#1f2933">Fan Pilgrimage / Pop Culture</text>
 <rect x="280" y="199" width="413.16" height="14" rx="3" fill="#2f6f73"/>
 <rect x="280" y="217" width="145.82" height="14" rx="3" fill="#9a031e"/>
-<text x="701.1645569620252" y="211" font-family="Arial, sans-serif" font-size="11" fill="#1f2933">51</text>
-<text x="433.82278481012656" y="229" font-family="Arial, sans-serif" font-size="11" fill="#1f2933">18</text>
+<rect x="697.16" y="196.00" width="34.00" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="714.16" y="210.50" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#1f2933">51</text>
+<rect x="429.82" y="214.00" width="34.00" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="446.82" y="228.50" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#1f2933">18</text>
 <text x="266" y="264" text-anchor="end" font-family="Arial, sans-serif" font-size="13" fill="#1f2933">Scenic Nature</text>
 <rect x="280" y="245" width="502.28" height="14" rx="3" fill="#2f6f73"/>
 <rect x="280" y="263" width="40.51" height="14" rx="3" fill="#9a031e"/>
-<text x="790.2784810126582" y="257" font-family="Arial, sans-serif" font-size="11" fill="#1f2933">62</text>
-<text x="328.50632911392404" y="275" font-family="Arial, sans-serif" font-size="11" fill="#1f2933">5</text>
+<rect x="786.28" y="242.00" width="34.00" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="803.28" y="256.50" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#1f2933">62</text>
+<rect x="324.51" y="260.00" width="34.00" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="341.51" y="274.50" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#1f2933">5</text>
 <text x="266" y="310" text-anchor="end" font-family="Arial, sans-serif" font-size="13" fill="#1f2933">Food / Local Cuisine</text>
 <rect x="280" y="291" width="315.95" height="14" rx="3" fill="#2f6f73"/>
 <rect x="280" y="309" width="72.91" height="14" rx="3" fill="#9a031e"/>
-<text x="603.9493670886077" y="303" font-family="Arial, sans-serif" font-size="11" fill="#1f2933">39</text>
-<text x="360.9113924050633" y="321" font-family="Arial, sans-serif" font-size="11" fill="#1f2933">9</text>
+<rect x="599.95" y="288.00" width="34.00" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="616.95" y="302.50" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#1f2933">39</text>
+<rect x="356.91" y="306.00" width="34.00" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="373.91" y="320.50" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#1f2933">9</text>
 <text x="266" y="356" text-anchor="end" font-family="Arial, sans-serif" font-size="13" fill="#1f2933">Dinosaurs / Museums</text>
 <rect x="280" y="337" width="340.25" height="14" rx="3" fill="#2f6f73"/>
 <rect x="280" y="355" width="8.10" height="14" rx="3" fill="#9a031e"/>
-<text x="628.253164556962" y="349" font-family="Arial, sans-serif" font-size="11" fill="#1f2933">42</text>
-<text x="296.1012658227848" y="367" font-family="Arial, sans-serif" font-size="11" fill="#1f2933">1</text>
+<rect x="624.25" y="334.00" width="34.00" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="641.25" y="348.50" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#1f2933">42</text>
+<rect x="292.10" y="352.00" width="34.00" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="309.10" y="366.50" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#1f2933">1</text>
 <text x="266" y="402" text-anchor="end" font-family="Arial, sans-serif" font-size="13" fill="#1f2933">Hot Springs / Relaxation</text>
 <rect x="280" y="383" width="299.75" height="14" rx="3" fill="#2f6f73"/>
 <rect x="280" y="401" width="48.61" height="14" rx="3" fill="#9a031e"/>
-<text x="587.746835443038" y="395" font-family="Arial, sans-serif" font-size="11" fill="#1f2933">37</text>
-<text x="336.6075949367089" y="413" font-family="Arial, sans-serif" font-size="11" fill="#1f2933">6</text>
+<rect x="583.75" y="380.00" width="34.00" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="600.75" y="394.50" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#1f2933">37</text>
+<rect x="332.61" y="398.00" width="34.00" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="349.61" y="412.50" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#1f2933">6</text>
 <text x="266" y="448" text-anchor="end" font-family="Arial, sans-serif" font-size="13" fill="#1f2933">Seasonal Events</text>
 <rect x="280" y="429" width="267.34" height="14" rx="3" fill="#2f6f73"/>
 <rect x="280" y="447" width="32.41" height="14" rx="3" fill="#9a031e"/>
-<text x="555.3417721518988" y="441" font-family="Arial, sans-serif" font-size="11" fill="#1f2933">33</text>
-<text x="320.40506329113924" y="459" font-family="Arial, sans-serif" font-size="11" fill="#1f2933">4</text>
+<rect x="551.34" y="426.00" width="34.00" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="568.34" y="440.50" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#1f2933">33</text>
+<rect x="316.41" y="444.00" width="34.00" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="333.41" y="458.50" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#1f2933">4</text>
 <text x="266" y="494" text-anchor="end" font-family="Arial, sans-serif" font-size="13" fill="#1f2933">Accommodation</text>
 <rect x="280" y="475" width="234.94" height="14" rx="3" fill="#2f6f73"/>
 <rect x="280" y="493" width="48.61" height="14" rx="3" fill="#9a031e"/>
-<text x="522.9367088607595" y="487" font-family="Arial, sans-serif" font-size="11" fill="#1f2933">29</text>
-<text x="336.6075949367089" y="505" font-family="Arial, sans-serif" font-size="11" fill="#1f2933">6</text>
+<rect x="518.94" y="472.00" width="34.00" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="535.94" y="486.50" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#1f2933">29</text>
+<rect x="332.61" y="490.00" width="34.00" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="349.61" y="504.50" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#1f2933">6</text>
 <text x="266" y="540" text-anchor="end" font-family="Arial, sans-serif" font-size="13" fill="#1f2933">Crafts / Shopping</text>
 <rect x="280" y="521" width="243.04" height="14" rx="3" fill="#2f6f73"/>
 <rect x="280" y="539" width="32.41" height="14" rx="3" fill="#9a031e"/>
-<text x="531.0379746835443" y="533" font-family="Arial, sans-serif" font-size="11" fill="#1f2933">30</text>
-<text x="320.40506329113924" y="551" font-family="Arial, sans-serif" font-size="11" fill="#1f2933">4</text>
+<rect x="527.04" y="518.00" width="34.00" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="544.04" y="532.50" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#1f2933">30</text>
+<rect x="316.41" y="536.00" width="34.00" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="333.41" y="550.50" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#1f2933">4</text>
 <rect x="280" y="580" width="10" height="10" fill="#2f6f73"/>
 <text x="296" y="590" font-family="Arial, sans-serif" font-size="12" fill="#52616b">positive SnowNLP rows</text>
 <rect x="470" y="580" width="10" height="10" fill="#9a031e"/>

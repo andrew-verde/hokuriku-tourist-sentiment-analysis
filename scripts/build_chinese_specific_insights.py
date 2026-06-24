@@ -54,6 +54,10 @@ FIGURE_PALETTE = [
     "#386641",
     "#9a031e",
 ]
+FIGURE_BG = "#fbfaf7"
+FIGURE_INK = "#1f2933"
+FIGURE_MUTED = "#52616b"
+FIGURE_LINE = "#d7dde8"
 
 SENTIMENT_GROUP_LABELS = {
     "positive_sentiment": "Positive",
@@ -100,6 +104,43 @@ def _pct(numerator: float, denominator: float) -> float:
 
 def _fmt_n(value: int | float) -> str:
     return f"{int(value):,}"
+
+
+def _text(x: float, y: float, value: object, size: int = 12, fill: str = FIGURE_INK, anchor: str = "start", weight: int = 400) -> str:
+    return (
+        f'<text x="{x:.2f}" y="{y:.2f}" text-anchor="{anchor}" font-family="Arial, sans-serif" '
+        f'font-size="{size}" font-weight="{weight}" fill="{fill}">{html.escape(str(value))}</text>'
+    )
+
+
+def _chip(parts: list[str], x: float, y: float, width: float, height: float, label: str, *, size: int = 12, text_fill: str = FIGURE_INK) -> None:
+    parts.append(
+        f'<rect x="{x:.2f}" y="{y:.2f}" width="{width:.2f}" height="{height:.2f}" '
+        f'rx="4" fill="{FIGURE_BG}" stroke="{FIGURE_LINE}" stroke-width="1"/>'
+    )
+    parts.append(_text(x + width / 2, y + height / 2 + size / 2 - 2, label, size=size, fill=text_fill, anchor="middle"))
+
+
+def _chip_width(label: str, size: int = 12) -> float:
+    return max(34.0, len(label) * size * 0.54 + 16.0)
+
+
+def _label_chip(parts: list[str], x: float, baseline_y: float, label: str, *, canvas_width: float, size: int = 12) -> bool:
+    chip_width = _chip_width(label, size=size)
+    chip_x = x - 4
+    if chip_x + chip_width > canvas_width - 32:
+        return False
+    _chip(parts, chip_x, baseline_y - 15, chip_width, 22, label, size=size)
+    return True
+
+
+def _gridlines(parts: list[str], left: float, chart_width: float, y1: float, y2: float) -> None:
+    for tick_pct in (0.0, 0.5, 1.0):
+        x = left + tick_pct * chart_width
+        parts.append(
+            f'<line x1="{x:.2f}" x2="{x:.2f}" y1="{y1:.2f}" y2="{y2:.2f}" '
+            f'stroke="{FIGURE_LINE}" stroke-width="1" opacity="0.58"/>'
+        )
 
 
 def load_tagged_rows(path: Path) -> pd.DataFrame:
@@ -392,6 +433,7 @@ def _write_svg_bar_chart(
         f'<text x="32" y="38" font-family="Arial, sans-serif" font-size="24" font-weight="700" fill="#1f2933">{html.escape(title)}</text>',
         f'<text x="32" y="66" font-family="Arial, sans-serif" font-size="14" fill="#52616b">{html.escape(subtitle)}</text>',
     ]
+    _gridlines(parts, left, chart_width, top - 4, top + (max(1, len(chart_rows)) - 1) * row_height + 30)
     for index, row in enumerate(chart_rows):
         y = top + index * row_height
         value = float(row[value_key])
@@ -403,9 +445,12 @@ def _write_svg_bar_chart(
             [
                 f'<text x="{left - 14}" y="{y + 22}" text-anchor="end" font-family="Arial, sans-serif" font-size="13" fill="#1f2933">{html.escape(label[:42])}</text>',
                 f'<rect x="{left}" y="{y + 7}" width="{bar_width:.2f}" height="18" rx="3" fill="{color}"/>',
-                f'<text x="{left + bar_width + 8}" y="{y + 22}" font-family="Arial, sans-serif" font-size="12" fill="#1f2933">{html.escape(value_label)}</text>',
             ]
         )
+        if not _label_chip(parts, left + bar_width + 8, y + 22, value_label, canvas_width=width):
+            parts.append(
+                f'<text x="{left + bar_width + 8}" y="{y + 22}" font-family="Arial, sans-serif" font-size="12" fill="#1f2933">{html.escape(value_label)}</text>'
+            )
     if color_key and color_values:
         legend_x = left
         legend_y = height - 22
@@ -452,6 +497,7 @@ def _write_svg_stacked_bar_chart(
         f'<text x="32" y="38" font-family="Arial, sans-serif" font-size="24" font-weight="700" fill="#1f2933">{html.escape(title)}</text>',
         f'<text x="32" y="66" font-family="Arial, sans-serif" font-size="14" fill="#52616b">{html.escape(subtitle)}</text>',
     ]
+    _gridlines(parts, left, chart_width, top + 2, top + (max(1, len(groups)) - 1) * row_height + 34)
     for index, group in enumerate(groups):
         y = top + index * row_height
         x = left
@@ -515,6 +561,7 @@ def _write_svg_dual_bar_chart(
         f'<text x="32" y="38" font-family="Arial, sans-serif" font-size="24" font-weight="700" fill="#1f2933">{html.escape(title)}</text>',
         f'<text x="32" y="66" font-family="Arial, sans-serif" font-size="14" fill="#52616b">{html.escape(subtitle)}</text>',
     ]
+    _gridlines(parts, left, chart_width, top + 2, top + (max(1, len(chart_rows)) - 1) * row_height + 44)
     for index, row in enumerate(chart_rows):
         y = top + index * row_height
         label = str(row[label_key])
@@ -527,10 +574,18 @@ def _write_svg_dual_bar_chart(
                 f'<text x="{left - 14}" y="{y + 26}" text-anchor="end" font-family="Arial, sans-serif" font-size="13" fill="#1f2933">{html.escape(label[:42])}</text>',
                 f'<rect x="{left}" y="{y + 7}" width="{positive_width:.2f}" height="14" rx="3" fill="{colors["positive"]}"/>',
                 f'<rect x="{left}" y="{y + 25}" width="{negative_width:.2f}" height="14" rx="3" fill="{colors["negative"]}"/>',
-                f'<text x="{left + positive_width + 8}" y="{y + 19}" font-family="Arial, sans-serif" font-size="11" fill="#1f2933">{positive:,.0f}</text>',
-                f'<text x="{left + negative_width + 8}" y="{y + 37}" font-family="Arial, sans-serif" font-size="11" fill="#1f2933">{negative:,.0f}</text>',
             ]
         )
+        positive_label = f"{positive:,.0f}"
+        negative_label = f"{negative:,.0f}"
+        if not _label_chip(parts, left + positive_width + 8, y + 19, positive_label, canvas_width=width, size=11):
+            parts.append(
+                f'<text x="{left + positive_width + 8}" y="{y + 19}" font-family="Arial, sans-serif" font-size="11" fill="#1f2933">{html.escape(positive_label)}</text>'
+            )
+        if not _label_chip(parts, left + negative_width + 8, y + 37, negative_label, canvas_width=width, size=11):
+            parts.append(
+                f'<text x="{left + negative_width + 8}" y="{y + 37}" font-family="Arial, sans-serif" font-size="11" fill="#1f2933">{html.escape(negative_label)}</text>'
+            )
     legend_y = height - 28
     parts.extend(
         [

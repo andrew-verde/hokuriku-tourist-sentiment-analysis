@@ -2,6 +2,9 @@
 <rect width="100%" height="100%" fill="#fbfaf7"/>
 <text x="32" y="38" font-family="Arial, sans-serif" font-size="24" font-weight="700" fill="#1f2933">Sentiment Category Share by Language Source</text>
 <text x="32" y="66" font-family="Arial, sans-serif" font-size="14" fill="#52616b">Secondary library/category shares; source platforms and tools differ</text>
+<line x1="245.00" x2="245.00" y1="100.00" y2="230.00" stroke="#d7dde8" stroke-width="1" opacity="0.58"/>
+<line x1="582.50" x2="582.50" y1="100.00" y2="230.00" stroke="#d7dde8" stroke-width="1" opacity="0.58"/>
+<line x1="920.00" x2="920.00" y1="100.00" y2="230.00" stroke="#d7dde8" stroke-width="1" opacity="0.58"/>
 <text x="231" y="123" text-anchor="end" font-family="Arial, sans-serif" font-size="13" fill="#1f2933">english Google reviews</text>
 <rect x="245.00" y="106" width="34.69" height="24" fill="#9a031e"/>
 <rect x="279.69" y="106" width="25.23" height="24" fill="#8d99ae"/>

@@ -2,20 +2,29 @@
 <rect width="100%" height="100%" fill="#fbfaf7"/>
 <text x="32.00" y="39.00" text-anchor="start" font-family="Arial, sans-serif" font-size="24" font-weight="700" fill="#172033">Cross-Source Evidence Prevalence</text>
 <text x="32.00" y="66.00" text-anchor="start" font-family="Arial, sans-serif" font-size="14" font-weight="400" fill="#5b677a">Chinese-language XHS rows carry much more friction and enjoyment evidence</text>
+<line x1="310.00" x2="310.00" y1="102.00" y2="236.00" stroke="#d7dde8" stroke-width="1" opacity="0.55"/>
+<line x1="650.00" x2="650.00" y1="102.00" y2="236.00" stroke="#d7dde8" stroke-width="1" opacity="0.55"/>
+<line x1="990.00" x2="990.00" y1="102.00" y2="236.00" stroke="#d7dde8" stroke-width="1" opacity="0.55"/>
 <text x="296.00" y="137.00" text-anchor="end" font-family="Arial, sans-serif" font-size="13" font-weight="400" fill="#172033">Friction evidence</text>
 <rect x="310" y="104" width="111.21" height="15" rx="2" fill="#2f6f73"/>
-<text x="429.21" y="116.00" text-anchor="start" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">16.4%</text>
+<rect x="425.21" y="101.00" width="45.70" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="448.06" y="115.50" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">16.4%</text>
 <rect x="310" y="123" width="99.36" height="15" rx="2" fill="#5b6c94"/>
-<text x="417.36" y="135.00" text-anchor="start" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">14.6%</text>
+<rect x="413.36" y="120.00" width="45.70" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="436.21" y="134.50" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">14.6%</text>
 <rect x="310" y="142" width="391.00" height="15" rx="2" fill="#bc6c25"/>
-<text x="709.00" y="154.00" text-anchor="start" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">57.5%</text>
+<rect x="705.00" y="139.00" width="45.70" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="727.85" y="153.50" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">57.5%</text>
 <text x="296.00" y="213.00" text-anchor="end" font-family="Arial, sans-serif" font-size="13" font-weight="400" fill="#172033">Enjoyment evidence</text>
 <rect x="310" y="180" width="362.24" height="15" rx="2" fill="#2f6f73"/>
-<text x="680.24" y="192.00" text-anchor="start" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">53.3%</text>
+<rect x="676.24" y="177.00" width="45.70" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="699.09" y="191.50" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">53.3%</text>
 <rect x="310" y="199" width="149.60" height="15" rx="2" fill="#5b6c94"/>
-<text x="467.60" y="211.00" text-anchor="start" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">22.0%</text>
+<rect x="463.60" y="196.00" width="45.70" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="486.45" y="210.50" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">22.0%</text>
 <rect x="310" y="218" width="571.20" height="15" rx="2" fill="#bc6c25"/>
-<text x="889.20" y="230.00" text-anchor="start" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">84.0%</text>
+<rect x="885.20" y="215.00" width="45.70" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="908.05" y="229.50" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">84.0%</text>
 <rect x="310.00" y="296.00" width="10" height="10" fill="#2f6f73"/>
 <text x="326.00" y="306.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#5b677a">English Google</text>
 <rect x="440.00" y="296.00" width="10" height="10" fill="#5b6c94"/>

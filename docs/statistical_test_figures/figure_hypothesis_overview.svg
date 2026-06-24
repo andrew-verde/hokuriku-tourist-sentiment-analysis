@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="438" viewBox="0 0 1120 438">
+<rect width="100%" height="100%" fill="#fbfaf7"/>
+<text x="32.00" y="39.00" text-anchor="start" font-family="Arial, sans-serif" font-size="24" font-weight="700" fill="#172033">Hypothesis Results at a Glance</text>
+<text x="32.00" y="66.00" text-anchor="start" font-family="Arial, sans-serif" font-size="14" font-weight="400" fill="#5b677a">Fukui Google reviews; effect sizes with multiplicity-adjusted p-values</text>
+<text x="58.00" y="116.00" text-anchor="start" font-family="Arial, sans-serif" font-size="15" font-weight="700" fill="#172033">H1</text>
+<text x="172.00" y="116.00" text-anchor="start" font-family="Arial, sans-serif" font-size="13" font-weight="400" fill="#172033">English reviews skew more positive (91% vs 72% positive).</text>
+<rect x="590.00" y="96.00" width="318.00" height="30.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="749.00" y="114.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="700" fill="#172033">Cramér&#x27;s V=0.14 (χ²=38.6)</text>
+<rect x="920.00" y="96.00" width="98.00" height="30.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="969.00" y="114.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="400" fill="#5b677a">p(Holm)=4.2e-09</text>
+<rect x="1030.00" y="96.00" width="58.00" height="30.00" rx="4" fill="#2f6f73" stroke="#2f6f73" stroke-width="1"/>
+<text x="1059.00" y="113.50" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" font-weight="700" fill="#fbfaf7">supported</text>
+<rect x="32" y="163.00" width="1056" height="56" rx="6" fill="#d7dde8" opacity="0.22"/>
+<text x="58.00" y="186.00" text-anchor="start" font-family="Arial, sans-serif" font-size="15" font-weight="700" fill="#172033">H2</text>
+<text x="172.00" y="186.00" text-anchor="start" font-family="Arial, sans-serif" font-size="13" font-weight="400" fill="#172033">Holds at review and POI level; within-POI rating borderline.</text>
+<rect x="590.00" y="166.00" width="318.00" height="30.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="749.00" y="184.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="700" fill="#172033">ΔEN−JP=+0.27 stars (95% CI 0.14–0.40)</text>
+<rect x="920.00" y="166.00" width="98.00" height="30.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="969.00" y="184.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="400" fill="#5b677a">p=7.7e-05</text>
+<rect x="1030.00" y="166.00" width="58.00" height="30.00" rx="4" fill="#2f6f73" stroke="#2f6f73" stroke-width="1"/>
+<text x="1059.00" y="183.50" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" font-weight="700" fill="#fbfaf7">supported</text>
+<text x="58.00" y="256.00" text-anchor="start" font-family="Arial, sans-serif" font-size="15" font-weight="700" fill="#172033">H3</text>
+<text x="172.00" y="256.00" text-anchor="start" font-family="Arial, sans-serif" font-size="13" font-weight="400" fill="#172033">Friction prevalence does NOT differ (+1.7pp, n.s.).</text>
+<rect x="590.00" y="236.00" width="318.00" height="30.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="749.00" y="254.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="700" fill="#172033">enjoyment +31pp; positive +24pp; recommendation +11pp</text>
+<rect x="920.00" y="236.00" width="98.00" height="30.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="969.00" y="254.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="400" fill="#5b677a">p(FDR)&lt;1e-8</text>
+<rect x="1030.00" y="236.00" width="58.00" height="30.00" rx="4" fill="#2f6f73" stroke="#2f6f73" stroke-width="1"/>
+<text x="1059.00" y="253.50" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" font-weight="700" fill="#fbfaf7">supported</text>
+<rect x="32" y="303.00" width="1056" height="56" rx="6" fill="#d7dde8" opacity="0.22"/>
+<text x="58.00" y="326.00" text-anchor="start" font-family="Arial, sans-serif" font-size="15" font-weight="700" fill="#172033">Robustness</text>
+<text x="172.00" y="326.00" text-anchor="start" font-family="Arial, sans-serif" font-size="13" font-weight="400" fill="#172033">Positive-share holds; rating borderline/n.s.</text>
+<rect x="590.00" y="306.00" width="318.00" height="30.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="749.00" y="324.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="700" fill="#172033">positive-share +0.16 (p=1.2e-04); rating +0.31 (p=0.058)</text>
+<rect x="920.00" y="306.00" width="98.00" height="30.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="969.00" y="324.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="400" fill="#5b677a">n=14 POIs</text>
+<rect x="1030.00" y="306.00" width="58.00" height="30.00" rx="4" fill="#bc6c25" stroke="#bc6c25" stroke-width="1"/>
+<text x="1059.00" y="323.50" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" font-weight="700" fill="#fbfaf7">mixed</text>
+<text x="32.00" y="420.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#5b677a">H1 Holm-adjusted; H3 Benjamini–Hochberg FDR. Rows nested in POIs; the within-POI paired row is the venue-clustering robustness check.</text>
+</svg>

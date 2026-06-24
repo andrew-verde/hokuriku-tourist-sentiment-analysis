@@ -1,6 +1,7 @@
 PYTHON = .venv/bin/python3
+PBL_SITE ?= $(HOME)/pbl-site
 
-.PHONY: help test chinese-codebook-template reviewed-codebook-config reviewed-codebook-status chinese-social chinese-social-xhs-only chinese-social-with-douyin chinese-insights chinese-insights-xhs-only multilingual-reviews cross-language-trends sentiment-env sentiment-analysis hypothesis-h1 hypothesis-h2 hypothesis-h3 hypothesis-within-poi hypothesis-tests within-en-sentiment within-jp-sentiment within-cn-sentiment within-language-sentiment presentation-safe statistical-test-figures
+.PHONY: help test chinese-codebook-template reviewed-codebook-config reviewed-codebook-status chinese-social chinese-social-xhs-only chinese-social-with-douyin chinese-insights chinese-insights-xhs-only multilingual-reviews cross-language-trends sentiment-env sentiment-analysis hypothesis-h1 hypothesis-h2 hypothesis-h3 hypothesis-within-poi hypothesis-tests within-en-sentiment within-jp-sentiment within-cn-sentiment within-language-sentiment presentation-safe statistical-test-figures dashboard deploy
 
 help:
 	@echo "Hokuriku tourist sentiment analysis"
@@ -28,6 +29,8 @@ help:
 	@echo "  make within-language-sentiment Run all within-language/source sentiment drivers"
 	@echo "  make presentation-safe       Build slide-safe JP-EN aggregate scaffold"
 	@echo "  make statistical-test-figures Build aggregate-only SVG figures for statistical tests"
+	@echo "  make dashboard               Build provenance-locked PBL-Dashboard.html"
+	@echo "  make deploy                  Regenerate figures+dashboard and sync to PBL_SITE ($(PBL_SITE))"
 	@echo "  make test                    Run pytest"
 
 chinese-codebook-template:
@@ -96,6 +99,25 @@ presentation-safe:
 
 statistical-test-figures:
 	$(PYTHON) scripts/build_statistical_test_figures.py
+
+dashboard:
+	$(PYTHON) scripts/build_pbl_dashboard.py
+
+# Regenerate figures + dashboard, then sync the page and only the assets it
+# references (figure SVGs + provenance source files) into the served directory.
+# The asset list is parsed from PBL-Dashboard.html so it stays in sync with the
+# page; override the destination with `make deploy PBL_SITE=/path`.
+deploy: statistical-test-figures dashboard
+	@mkdir -p "$(PBL_SITE)"
+	@cp -f PBL-Dashboard.html "$(PBL_SITE)/index.html"
+	@grep -oE "(href|data-source)=['\"](docs|output)/[^'\"]+" PBL-Dashboard.html \
+		| sed -E "s/.*['\"]//" | sort -u \
+		| while read -r p; do \
+			mkdir -p "$(PBL_SITE)/$$(dirname "$$p")"; \
+			cp -f "$$p" "$(PBL_SITE)/$$p"; \
+		done
+	@n=$$(grep -oE "(href|data-source)=['\"](docs|output)/[^'\"]+" PBL-Dashboard.html | sed -E "s/.*['\"]//" | sort -u | wc -l); \
+		echo "deployed index.html + $$n referenced assets to $(PBL_SITE)"
 
 test:
 	$(PYTHON) -m pytest

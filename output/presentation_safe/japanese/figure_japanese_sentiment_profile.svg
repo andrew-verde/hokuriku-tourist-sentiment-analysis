@@ -3,6 +3,9 @@
 <text x="32" y="38" font-family="Arial, sans-serif" font-size="24" font-weight="700" fill="#1f2933">Japanese-Language Reviews Sentiment Profile</text>
 <text x="32" y="66" font-family="Arial, sans-serif" font-size="14" fill="#52616b">oseti secondary check; n=1,800, mean rating=4.26</text>
 <text x="176" y="132" text-anchor="end" font-family="Arial, sans-serif" font-size="14" fill="#1f2933">share of rows</text>
+<line x1="190.00" x2="190.00" y1="112.00" y2="144.00" stroke="#d7dde8" stroke-width="1" opacity="0.58"/>
+<line x1="535.00" x2="535.00" y1="112.00" y2="144.00" stroke="#d7dde8" stroke-width="1" opacity="0.58"/>
+<line x1="880.00" x2="880.00" y1="112.00" y2="144.00" stroke="#d7dde8" stroke-width="1" opacity="0.58"/>
 <rect x="190.00" y="115" width="50.60" height="26" fill="#9a031e"/>
 <text x="215.30" y="134" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#ffffff">7.3%</text>
 <rect x="240.60" y="115" width="139.92" height="26" fill="#8d99ae"/>

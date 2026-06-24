@@ -2,12 +2,16 @@
 <rect width="100%" height="100%" fill="#fbfaf7"/>
 <text x="32.00" y="39.00" text-anchor="start" font-family="Arial, sans-serif" font-size="24" font-weight="700" fill="#172033">H1 Sentiment Category Shares</text>
 <text x="32.00" y="66.00" text-anchor="start" font-family="Arial, sans-serif" font-size="14" font-weight="400" fill="#5b677a">JP/EN Google reviews; p=4.2e-09, Cramer&#x27;s V=0.138</text>
+<line x1="295.00" x2="295.00" y1="106.00" y2="196.00" stroke="#d7dde8" stroke-width="1" opacity="0.55"/>
+<line x1="648.50" x2="648.50" y1="106.00" y2="196.00" stroke="#d7dde8" stroke-width="1" opacity="0.55"/>
+<line x1="1002.00" x2="1002.00" y1="106.00" y2="196.00" stroke="#d7dde8" stroke-width="1" opacity="0.55"/>
 <text x="281.00" y="130.00" text-anchor="end" font-family="Arial, sans-serif" font-size="13" font-weight="400" fill="#172033">English-language reviews</text>
 <rect x="295.00" y="112.00" width="36.34" height="25" fill="#9a031e"/>
 <rect x="331.34" y="112.00" width="26.43" height="25" fill="#8d99ae"/>
 <rect x="357.77" y="112.00" width="644.23" height="25" fill="#2f6f73"/>
 <text x="679.89" y="130.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#ffffff">91.1%</text>
-<text x="1012.00" y="130.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#5b677a">n=214</text>
+<rect x="1008.00" y="115.00" width="48.40" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="1032.20" y="130.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#5b677a">n=214</text>
 <text x="281.00" y="184.00" text-anchor="end" font-family="Arial, sans-serif" font-size="13" font-weight="400" fill="#172033">Japanese-language reviews</text>
 <rect x="295.00" y="166.00" width="51.85" height="25" fill="#9a031e"/>
 <text x="320.92" y="184.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#ffffff">7.3%</text>
@@ -15,7 +19,8 @@
 <text x="418.53" y="184.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#ffffff">20.3%</text>
 <rect x="490.21" y="166.00" width="511.79" height="25" fill="#2f6f73"/>
 <text x="746.11" y="184.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#ffffff">72.4%</text>
-<text x="1012.00" y="184.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#5b677a">n=1,800</text>
+<rect x="1008.00" y="169.00" width="61.36" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="1038.68" y="184.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#5b677a">n=1,800</text>
 <rect x="295.00" y="252.00" width="10" height="10" fill="#9a031e"/>
 <text x="311.00" y="262.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#5b677a">negative</text>
 <rect x="413.00" y="252.00" width="10" height="10" fill="#8d99ae"/>

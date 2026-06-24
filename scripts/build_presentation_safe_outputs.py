@@ -123,6 +123,10 @@ FIGURE_PALETTE = {
     "rating": "#5b6c94",
     "volume": "#bc6c25",
 }
+FIGURE_BG = "#fbfaf7"
+FIGURE_INK = "#1f2933"
+FIGURE_MUTED = "#52616b"
+FIGURE_LINE = "#d7dde8"
 
 FORBIDDEN_PRESENTATION_VALUES = {
     "dummy",
@@ -264,10 +268,52 @@ def _language_key(language_source_group: str) -> str:
 def _svg_header(width: int, height: int, title: str, subtitle: str) -> list[str]:
     return [
         f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}">',
-        '<rect width="100%" height="100%" fill="#fbfaf7"/>',
-        f'<text x="32" y="38" font-family="Arial, sans-serif" font-size="24" font-weight="700" fill="#1f2933">{html.escape(title)}</text>',
-        f'<text x="32" y="66" font-family="Arial, sans-serif" font-size="14" fill="#52616b">{html.escape(subtitle)}</text>',
+        f'<rect width="100%" height="100%" fill="{FIGURE_BG}"/>',
+        f'<text x="32" y="38" font-family="Arial, sans-serif" font-size="24" font-weight="700" fill="{FIGURE_INK}">{html.escape(title)}</text>',
+        f'<text x="32" y="66" font-family="Arial, sans-serif" font-size="14" fill="{FIGURE_MUTED}">{html.escape(subtitle)}</text>',
     ]
+
+
+def _text(x: float, y: float, value: object, size: int = 12, fill: str = FIGURE_INK, anchor: str = "start", weight: int = 400) -> str:
+    return (
+        f'<text x="{x:.2f}" y="{y:.2f}" text-anchor="{anchor}" font-family="Arial, sans-serif" '
+        f'font-size="{size}" font-weight="{weight}" fill="{fill}">{html.escape(str(value))}</text>'
+    )
+
+
+def _chip(parts: list[str], x: float, y: float, width: float, height: float, label: str, *, size: int = 12, fill: str = FIGURE_BG, text_fill: str = FIGURE_INK) -> None:
+    parts.append(
+        f'<rect x="{x:.2f}" y="{y:.2f}" width="{width:.2f}" height="{height:.2f}" '
+        f'rx="4" fill="{fill}" stroke="{FIGURE_LINE}" stroke-width="1"/>'
+    )
+    parts.append(_text(x + width / 2, y + height / 2 + size / 2 - 2, label, size=size, fill=text_fill, anchor="middle"))
+
+
+def _chip_width(label: str, size: int = 12) -> float:
+    return max(34.0, len(label) * size * 0.54 + 16.0)
+
+
+def _label_chip(parts: list[str], x: float, baseline_y: float, label: str, *, canvas_width: float, size: int = 12, text_fill: str = FIGURE_INK, anchor: str = "start") -> bool:
+    chip_width = _chip_width(label, size=size)
+    if anchor == "end":
+        chip_x = x - chip_width + 4
+        if chip_x < 32:
+            return False
+    else:
+        chip_x = x - 4
+        if chip_x + chip_width > canvas_width - 32:
+            return False
+    _chip(parts, chip_x, baseline_y - 15, chip_width, 22, label, size=size, text_fill=text_fill)
+    return True
+
+
+def _gridlines(parts: list[str], left: float, chart_width: float, y1: float, y2: float) -> None:
+    for tick_pct in (0.0, 0.5, 1.0):
+        x = left + tick_pct * chart_width
+        parts.append(
+            f'<line x1="{x:.2f}" x2="{x:.2f}" y1="{y1:.2f}" y2="{y2:.2f}" '
+            f'stroke="{FIGURE_LINE}" stroke-width="1" opacity="0.58"/>'
+        )
 
 
 def _write_single_sentiment_profile(row: pd.Series, path: Path, language_label: str) -> None:
@@ -293,6 +339,7 @@ def _write_single_sentiment_profile(row: pd.Series, path: Path, language_label: 
     parts.append(
         f'<text x="{left - 14}" y="{top + 24}" text-anchor="end" font-family="Arial, sans-serif" font-size="14" fill="#1f2933">share of rows</text>'
     )
+    _gridlines(parts, left, chart_width, top + 4, top + 36)
     x = left
     for category, value in categories:
         segment_width = (value / 100.0) * chart_width
@@ -352,6 +399,7 @@ def _write_poi_priority_mix(row: pd.Series, path: Path, language_label: str) -> 
         f"Google review POI-category distribution; n={_fmt_n(row['n_reviews'])} rows",
     )
     color = FIGURE_PALETTE[_language_key(row["language_source_group"])]
+    _gridlines(parts, left, chart_width, top - 4, top + (max(1, len(rows)) - 1) * row_height + 32)
     for index, item in enumerate(rows):
         y = top + index * row_height
         bar_width = (int(item["count"]) / max_count) * chart_width
@@ -359,8 +407,12 @@ def _write_poi_priority_mix(row: pd.Series, path: Path, language_label: str) -> 
         parts.extend([
             f'<text x="{left - 14}" y="{y + 23}" text-anchor="end" font-family="Arial, sans-serif" font-size="13" fill="#1f2933">{html.escape(label[:34])}</text>',
             f'<rect x="{left}" y="{y + 8}" width="{bar_width:.2f}" height="20" rx="3" fill="{color}"/>',
-            f'<text x="{left + bar_width + 8}" y="{y + 23}" font-family="Arial, sans-serif" font-size="12" fill="#1f2933">{_fmt_n(item["count"])} ({float(item["pct"]):.1f}%)</text>',
         ])
+        value_label = f"{_fmt_n(item['count'])} ({float(item['pct']):.1f}%)"
+        if not _label_chip(parts, left + bar_width + 8, y + 23, value_label, canvas_width=width):
+            parts.append(
+                f'<text x="{left + bar_width + 8}" y="{y + 23}" font-family="Arial, sans-serif" font-size="12" fill="#1f2933">{html.escape(value_label)}</text>'
+            )
     parts.append("</svg>")
     path.write_text("\n".join(parts), encoding="utf-8")
 
@@ -403,6 +455,7 @@ def _write_multilingual_sentiment_share(
         "Sentiment Category Share by Language Source",
         "Secondary library/category shares; source platforms and tools differ",
     )
+    _gridlines(parts, left, chart_width, top + 2, top + (max(1, len(rows)) - 1) * row_height + 36)
     for index, row in enumerate(rows):
         y = top + index * row_height
         parts.append(
@@ -420,9 +473,11 @@ def _write_multilingual_sentiment_share(
                     f'<text x="{x + segment_width / 2:.2f}" y="{y + 25}" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#ffffff">{value:.1f}%</text>'
                 )
             x += segment_width
-        parts.append(
-            f'<text x="{left + chart_width + 10}" y="{y + 25}" font-family="Arial, sans-serif" font-size="12" fill="#52616b">n={_fmt_n(row["n"])}</text>'
-        )
+        n_label = f"n={_fmt_n(row['n'])}"
+        if not _label_chip(parts, left + chart_width + 10, y + 25, n_label, canvas_width=width, text_fill=FIGURE_MUTED):
+            parts.append(
+                f'<text x="{left + chart_width + 10}" y="{y + 25}" font-family="Arial, sans-serif" font-size="12" fill="#52616b">{html.escape(n_label)}</text>'
+            )
     legend_y = height - 30
     for index, category in enumerate(["negative", "neutral", "positive"]):
         offset = index * 122
@@ -452,6 +507,7 @@ def _write_multilingual_volume_context(baseline: pd.DataFrame, path: Path) -> No
         "Comparable Volume Context",
         "Rows represented by source group; rating shown only for Google reviews",
     )
+    _gridlines(parts, left, chart_width, top - 4, top + (max(1, len(rows)) - 1) * row_height + 32)
     for index, (_, row) in enumerate(rows.iterrows()):
         y = top + index * row_height
         volume = int(row["volume"])
@@ -474,10 +530,32 @@ def _write_multilingual_volume_context(baseline: pd.DataFrame, path: Path) -> No
         parts.extend([
             f'<text x="{left - 14}" y="{y + 23}" text-anchor="end" font-family="Arial, sans-serif" font-size="13" fill="#1f2933">{html.escape(str(row["label"])[:38])}</text>',
             f'<rect x="{left}" y="{y + 8}" width="{bar_width:.2f}" height="20" rx="3" fill="{color}"/>',
-            f'<text x="{value_x:.2f}" y="{y + 23}" text-anchor="{value_anchor}" font-family="Arial, sans-serif" font-size="12" fill="{value_fill}">{html.escape(value_label)}</text>',
         ])
+        if value_fill == "#ffffff" or not _label_chip(parts, value_x, y + 23, value_label, canvas_width=width, text_fill=value_fill, anchor=value_anchor):
+            parts.append(
+                f'<text x="{value_x:.2f}" y="{y + 23}" text-anchor="{value_anchor}" font-family="Arial, sans-serif" font-size="12" fill="{value_fill}">{html.escape(value_label)}</text>'
+            )
     parts.append("</svg>")
     path.write_text("\n".join(parts), encoding="utf-8")
+
+
+def _evidence_metric_type(row: pd.Series) -> str:
+    test_name = str(row.get("test_name", ""))
+    details = {}
+    try:
+        details = json.loads(str(row.get("details_json", "{}")))
+    except json.JSONDecodeError:
+        details = {}
+    method = str(details.get("method", "")).lower()
+    if test_name == "chi_square_sentiment_category" or "sentiment_category_independence" in test_name or "chi_square" in method:
+        return "Cramér's V"
+    if "mean_review_rating" in test_name:
+        return "mean diff, stars"
+    if "mean_difference_sentiment_score" in test_name:
+        return "mean diff, tool score"
+    if "prevalence" in test_name or "risk_difference" in test_name:
+        return "risk diff, pp"
+    return "effect"
 
 
 def _write_statistical_evidence_summary(jp_en_tests: pd.DataFrame, cross_tests: pd.DataFrame, path: Path) -> None:
@@ -499,34 +577,48 @@ def _write_statistical_evidence_summary(jp_en_tests: pd.DataFrame, cross_tests: 
     row_height = 42
     left = 365
     right = 80
-    height = top + 52 + max(1, len(selected)) * row_height
+    height = top + 78 + max(1, len(selected)) * row_height
     chart_width = width - left - right
     ok_effects = pd.to_numeric(selected.loc[selected["status"] == "ok", "effect"], errors="coerce").fillna(0)
     max_effect = max([float(value) for value in ok_effects] + [1.0])
     parts = _svg_header(
         width,
         height,
-        "Statistical Backing Readiness",
-        "Effect sizes for ok checks; skipped rows mark evidence gaps",
+        "Statistical Check Status",
+        "Effect metrics differ by row and are NOT comparable bar-to-bar",
     )
+    _gridlines(parts, left, chart_width, top + 2, top + (max(1, len(selected)) - 1) * row_height + 32)
     for index, (_, row) in enumerate(selected.iterrows()):
         y = top + index * row_height
         name = str(row["test_name"]).replace("_", " ")
         status = str(row["status"])
+        metric_type = _evidence_metric_type(row)
         if status == "ok":
             effect = float(pd.to_numeric(pd.Series([row.get("effect")]), errors="coerce").fillna(0).iloc[0])
             bar_width = (effect / max_effect) * chart_width
-            label = f"effect={effect:.3f}"
+            label = f"effect={effect:.3f} ({metric_type})"
             color = "#5b6c94"
         else:
             bar_width = chart_width * 0.18
-            label = status
+            label = f"{status} ({metric_type})"
             color = "#8d99ae"
         parts.extend([
             f'<text x="{left - 14}" y="{y + 24}" text-anchor="end" font-family="Arial, sans-serif" font-size="12" fill="#1f2933">{html.escape(name[:52])}</text>',
             f'<rect x="{left}" y="{y + 9}" width="{bar_width:.2f}" height="20" rx="3" fill="{color}"/>',
-            f'<text x="{left + bar_width + 8}" y="{y + 24}" font-family="Arial, sans-serif" font-size="12" fill="#1f2933">{html.escape(label)}</text>',
         ])
+        if not _label_chip(parts, left + bar_width + 8, y + 24, label, canvas_width=width):
+            parts.append(
+                f'<text x="{left + bar_width + 8}" y="{y + 24}" font-family="Arial, sans-serif" font-size="12" fill="#1f2933">{html.escape(label)}</text>'
+            )
+    parts.append(
+        _text(
+            32,
+            height - 24,
+            "Bars are status indicators only; compare each effect to its own metric, not across rows.",
+            size=12,
+            fill=FIGURE_MUTED,
+        )
+    )
     parts.append("</svg>")
     path.write_text("\n".join(parts), encoding="utf-8")
 
@@ -829,8 +921,8 @@ def build_presentation_safe_outputs(
         {
             "figure": "Statistical evidence summary",
             "path": str(figure_outputs["multilingual_statistical_evidence"]),
-            "question": "Which descriptive statistical checks currently support language/source comparisons, and where are aligned evidence gaps still present?",
-            "caveat": "Effects and p-values are descriptive; rows are nested in POIs and cross-source units differ.",
+            "question": "Which descriptive statistical checks have usable status, and which metric type belongs to each row?",
+            "caveat": "Bars are status indicators only; effect metrics differ by row and are not comparable bar-to-bar.",
         },
     ])
     _write_figure_questions(figure_questions_path, figure_questions)

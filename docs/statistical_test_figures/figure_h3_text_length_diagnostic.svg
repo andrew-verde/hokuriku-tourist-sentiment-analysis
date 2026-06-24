@@ -2,11 +2,16 @@
 <rect width="100%" height="100%" fill="#fbfaf7"/>
 <text x="32.00" y="39.00" text-anchor="start" font-family="Arial, sans-serif" font-size="24" font-weight="700" fill="#172033">H3 Text Length Diagnostic</text>
 <text x="32.00" y="66.00" text-anchor="start" font-family="Arial, sans-serif" font-size="14" font-weight="400" fill="#5b677a">Longer reviews have more opportunity to match evidence terms</text>
+<line x1="365.00" x2="365.00" y1="94.00" y2="194.00" stroke="#d7dde8" stroke-width="1" opacity="0.65"/>
+<line x1="657.50" x2="657.50" y1="94.00" y2="194.00" stroke="#d7dde8" stroke-width="1" opacity="0.65"/>
+<line x1="950.00" x2="950.00" y1="94.00" y2="194.00" stroke="#d7dde8" stroke-width="1" opacity="0.65"/>
+<line x1="365.00" x2="950.00" y1="194.00" y2="194.00" stroke="#d7dde8" stroke-width="1" opacity="0.75"/>
 <text x="351.00" y="125.00" text-anchor="end" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">English-language reviews mean chars</text>
 <rect x="365.00" y="110.00" width="585.00" height="20" rx="3" fill="#2f6f73"/>
 <text x="958.00" y="125.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">mean=274.7; median=176.0</text>
 <text x="351.00" y="164.00" text-anchor="end" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">Japanese-language reviews mean chars</text>
 <rect x="365.00" y="149.00" width="229.12" height="20" rx="3" fill="#5b6c94"/>
-<text x="602.12" y="164.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">mean=107.6; median=62.0</text>
+<rect x="598.12" y="149.00" width="165.04" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="680.64" y="164.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">mean=107.6; median=62.0</text>
 <text x="32.00" y="236.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#5b677a">Use as caveat beside H3 evidence-prevalence claims.</text>
 </svg>

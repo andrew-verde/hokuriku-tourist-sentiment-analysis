@@ -2,17 +2,25 @@
 <rect width="100%" height="100%" fill="#fbfaf7"/>
 <text x="32.00" y="39.00" text-anchor="start" font-family="Arial, sans-serif" font-size="24" font-weight="700" fill="#172033">H2 Mean Rating + Sensitivity</text>
 <text x="32.00" y="66.00" text-anchor="start" font-family="Arial, sans-serif" font-size="14" font-weight="400" fill="#5b677a">English-language reviews rate higher on common Google scale</text>
+<line x1="365.00" x2="365.00" y1="94.00" y2="272.00" stroke="#d7dde8" stroke-width="1" opacity="0.65"/>
+<line x1="657.50" x2="657.50" y1="94.00" y2="272.00" stroke="#d7dde8" stroke-width="1" opacity="0.65"/>
+<line x1="950.00" x2="950.00" y1="94.00" y2="272.00" stroke="#d7dde8" stroke-width="1" opacity="0.65"/>
+<line x1="365.00" x2="950.00" y1="272.00" y2="272.00" stroke="#d7dde8" stroke-width="1" opacity="0.75"/>
 <text x="351.00" y="125.00" text-anchor="end" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">English-language reviews mean</text>
 <rect x="365.00" y="110.00" width="530.33" height="20" rx="3" fill="#2f6f73"/>
-<text x="903.33" y="125.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">mean=4.53; n=214</text>
+<rect x="899.33" y="110.00" width="119.68" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="959.17" y="125.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">mean=4.53; n=214</text>
 <text x="351.00" y="164.00" text-anchor="end" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">Japanese-language reviews mean</text>
 <rect x="365.00" y="149.00" width="498.62" height="20" rx="3" fill="#5b6c94"/>
-<text x="871.62" y="164.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">mean=4.26; n=1,800</text>
+<rect x="867.62" y="149.00" width="132.64" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="933.94" y="164.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">mean=4.26; n=1,800</text>
 <text x="351.00" y="203.00" text-anchor="end" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">welch t review rating</text>
 <rect x="365.00" y="188.00" width="31.71" height="20" rx="3" fill="#bc6c25"/>
-<text x="404.71" y="203.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">EN-JP=0.27; p=7.7e-05</text>
+<rect x="400.71" y="188.00" width="152.08" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="476.75" y="203.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">EN-JP=0.27; p=7.7e-05</text>
 <text x="351.00" y="242.00" text-anchor="end" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">poi level welch t mean review rating</text>
 <rect x="365.00" y="227.00" width="31.28" height="20" rx="3" fill="#bc6c25"/>
-<text x="404.28" y="242.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">EN-JP=0.27; p=0.035</text>
+<rect x="400.28" y="227.00" width="139.12" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="469.84" y="242.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">EN-JP=0.27; p=0.035</text>
 <text x="32.00" y="314.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#5b677a">Mean rows use 1-to-5 stars; difference rows show English minus Japanese.</text>
 </svg>

@@ -1,0 +1,866 @@
+#!/usr/bin/env python3
+"""Build PBL-Dashboard.html — a public-facing, provenance-locked results page.
+
+Provenance contract
+-------------------
+Every number that appears in the narrative is resolved at build time directly from
+an analysis-script output file (CSV/JSON under output/). No numeric literal is
+hand-written into the prose. Each value is fetched through ``stat(...)`` with an
+explicit getter callable; if the getter cannot find its cell/field the build fails
+loud (KeyError/IndexError) rather than emitting a guessed number. Every rendered
+number is wrapped in a span that links to its source file and records the source
+field, the file SHA256, and the generating command. A provenance appendix at the
+bottom of the page lists every reference.
+
+The script writes only aggregate statistics that already live in tracked outputs;
+it never reads row-level text, authors, URLs, or IDs.
+"""
+from __future__ import annotations
+
+import hashlib
+import html
+import json
+import sys
+from pathlib import Path
+
+import pandas as pd
+
+ROOT = Path(__file__).resolve().parent.parent
+OUT_HTML = ROOT / "PBL-Dashboard.html"
+
+# --- source registry: short id -> path of an analysis-script output -----------
+SOURCES: dict[str, Path] = {
+    "h1": ROOT / "output/hypothesis_tests/h1_sentiment_category_jp_en.csv",
+    "h1_manifest": ROOT / "output/hypothesis_tests/h1_sentiment_category_jp_en_manifest.json",
+    "h2": ROOT / "output/hypothesis_tests/h2_review_rating_jp_en.csv",
+    "h3": ROOT / "output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv",
+    "wpoi": ROOT / "output/hypothesis_tests/within_poi_paired_jp_en.csv",
+    "wen": ROOT / "output/within_language_sentiment/en_within_language_sentiment_drivers.csv",
+    "wjp": ROOT / "output/within_language_sentiment/jp_within_language_sentiment_drivers.csv",
+    "wcn": ROOT / "output/within_language_sentiment/cn_within_source_sentiment_drivers.csv",
+    "cn_plat": ROOT / "output/chinese_specific_insights/sentiment_category_by_platform.csv",
+    "cn_manifest": ROOT / "output/chinese_specific_insights/chinese_specific_insights_manifest.json",
+    "pres_manifest": ROOT / "output/presentation_safe/presentation_manifest.json",
+    "pres_ready": ROOT / "output/presentation_safe/presentation_readiness.md",
+}
+
+# figures (script-generated, aggregate-only SVGs) embedded inline
+FIGURES = {
+    "overview": ROOT / "docs/statistical_test_figures/figure_hypothesis_overview.svg",
+    "h3_prev": ROOT / "docs/statistical_test_figures/figure_h3_reviewed_evidence_prevalence.svg",
+    "h2_ladder": ROOT / "docs/statistical_test_figures/figure_h2_rating_gap_robustness_ladder.svg",
+    "h2_dist": ROOT / "docs/statistical_test_figures/figure_h2_rating_distribution.svg",
+    "wpoi_shift": ROOT / "docs/statistical_test_figures/figure_within_poi_paired_shift.svg",
+    "h1_share": ROOT / "docs/statistical_test_figures/figure_h1_sentiment_category_share.svg",
+    "wen_drivers": ROOT / "docs/statistical_test_figures/figure_within_english_driver_effects.svg",
+    "cross_cat": ROOT / "docs/statistical_test_figures/figure_cross_source_sentiment_category.svg",
+    "cn_plat": ROOT / "output/chinese_specific_insights/figure_sentiment_category_by_platform.svg",
+}
+
+DATA: dict[str, object] = {}
+SHA: dict[str, str] = {}
+COMMAND: dict[str, str] = {}
+REFS: list[dict] = []
+
+
+def _sha256(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def load() -> None:
+    for sid, path in SOURCES.items():
+        if not path.exists():
+            raise SystemExit(f"missing source: {path}")
+        SHA[sid] = _sha256(path)
+        if path.suffix == ".csv":
+            DATA[sid] = pd.read_csv(path)
+        elif path.suffix == ".json":
+            DATA[sid] = json.loads(path.read_text())
+        else:
+            DATA[sid] = path.read_text()
+    # generating command per source (from CSV column or manifest)
+    for sid in SOURCES:
+        cmd = ""
+        d = DATA[sid]
+        if isinstance(d, pd.DataFrame) and "command" in d.columns:
+            cmd = str(d["command"].dropna().iloc[0])
+        elif isinstance(d, dict) and "command" in d:
+            cmd = str(d["command"])
+        COMMAND[sid] = cmd
+
+
+def rel(path: Path) -> str:
+    return path.relative_to(ROOT).as_posix()
+
+
+def pfmt(p: float) -> str:
+    """Format a p-value the way a methods section would."""
+    p = float(p)
+    if p < 1e-4:
+        mant, exp = f"{p:.1e}".split("e")
+        return f"p = {mant}×10<sup>{int(exp)}</sup>"
+    if p < 0.001:
+        return "p &lt; .001"
+    return f"p = {p:.3f}".replace("0.", ".")
+
+
+def stat(src_id: str, getter, fmt="{:.0f}", unit: str = "", field: str = "") -> str:
+    """Resolve a value directly from a loaded source and render a traced chip.
+
+    ``getter`` receives the loaded source object and returns the raw value. If it
+    raises, the build fails loud (no fabricated numbers).
+    """
+    raw = getter(DATA[src_id])
+    if callable(fmt):
+        disp = fmt(raw)
+    else:
+        disp = fmt.format(raw) + unit
+    src_path = rel(SOURCES[src_id])
+    sha = SHA[src_id]
+    cmd = COMMAND.get(src_id, "")
+    REFS.append({
+        "value": disp_to_text(disp),
+        "raw": raw,
+        "source": src_path,
+        "field": field,
+        "sha256": sha,
+        "command": cmd,
+    })
+    tip = (
+        f"raw value: {raw}\nfield: {field}\nsource: {src_path}\n"
+        f"sha256: {sha}\nscript: {cmd}"
+    )
+    return (
+        f'<a class="stat" href="{src_path}" target="_blank" '
+        f'title="{html.escape(tip)}" data-raw="{html.escape(str(raw))}" '
+        f'data-source="{src_path}" data-field="{html.escape(field)}" '
+        f'data-sha256="{sha}">{disp}<span class="prov-dot">●</span></a>'
+    )
+
+
+def disp_to_text(disp: str) -> str:
+    # strip simple tags for the appendix plain-text value
+    return (
+        disp.replace("<sup>", "^").replace("</sup>", "")
+        .replace("&lt;", "<").replace("&times;", "x").replace("×", "x")
+        .replace(" ", "")
+    )
+
+
+# --- getters: small, explicit, fail-loud lookups ------------------------------
+def h1_cell(col):
+    def g(d):
+        r = d[d["analysis_type"] == "primary"]
+        return float(r[col].iloc[0])
+    return g
+
+
+def h1_share(category, group):
+    def g(d):
+        r = d[(d["analysis_type"] == "primary") & (d["category"] == category) & (d["language_group"] == group)]
+        return float(r["category_share"].iloc[0]) * 100
+    return g
+
+
+def h2_test(test_name, col):
+    def g(d):
+        r = d[d["test_name"] == test_name]
+        return float(r[col].iloc[0])
+    return g
+
+
+def h2_mean(group):
+    def g(d):
+        r = d[(d["analysis_type"] == "group_summary") & (d["language_group"] == group)]
+        return float(r["mean_review_rating"].iloc[0])
+    return g
+
+
+def h2_n(group):
+    def g(d):
+        r = d[(d["analysis_type"] == "group_summary") & (d["language_group"] == group)]
+        return int(r["n_rating_present"].iloc[0])
+    return g
+
+
+def h3_fam(family, col):
+    def g(d):
+        r = d[(d["analysis_type"] == "evidence_family_test") & (d["evidence_family"] == family)]
+        return float(r[col].iloc[0])
+    return g
+
+
+def h3_textlen(group, key):
+    def g(d):
+        r = d[d["text_length_summary_json"].notna()]
+        obj = json.loads(r["text_length_summary_json"].iloc[0])
+        return float(obj[group][key])
+    return g
+
+
+def wpoi_field(test_name, col):
+    def g(d):
+        r = d[d["test_name"] == test_name]
+        return float(r[col].iloc[0])
+    return g
+
+
+def wpoi_detail(test_name, key):
+    def g(d):
+        r = d[d["test_name"] == test_name]
+        obj = json.loads(r["details_json"].iloc[0])
+        return int(obj[key])
+    return g
+
+
+def wl_row(analysis_id, outcome, col):
+    def g(d):
+        r = d[(d["analysis_id"] == analysis_id) & (d["outcome"] == outcome)]
+        return float(r[col].iloc[0])
+    return g
+
+
+def cn_plat_pct(category):
+    def g(d):
+        r = d[d["sentiment_category"] == category]
+        return float(r["pct_platform_rows"].iloc[0])
+    return g
+
+
+def manifest_metric(src_id, *path):
+    def g(d):
+        cur = d["metrics"]
+        for k in path:
+            cur = cur[k]
+        return cur
+    return g
+
+
+def fig(key: str, caption: str) -> str:
+    path = FIGURES[key]
+    if not path.exists():
+        raise SystemExit(f"missing figure: {path}")
+    svg = path.read_text()
+    # drop any xml prolog, let CSS size it responsively
+    svg = svg[svg.find("<svg"):]
+    src = rel(path)
+    return (
+        f'<figure class="fig">{svg}'
+        f'<figcaption>{caption} '
+        f'<a class="figsrc" href="{src}" target="_blank">{src}</a> '
+        f'<span class="figsrc-note">(script-generated, aggregate-only)</span>'
+        f'</figcaption></figure>'
+    )
+
+
+def pp(x):
+    """percentage-points formatter (value already in points)."""
+    return f"{float(x):+.1f} pp"
+
+
+def stars(x):
+    return f"{float(x):+.2f} stars"
+
+
+def build_html() -> str:
+    pct1 = lambda x: f"{float(x):.1f}%"
+    n = lambda src, getter, field: stat(src, getter, "{:,.0f}", "", field)
+
+    # ---- pull headline values (all traced) ----
+    total_rows = n("pres_manifest", manifest_metric("pres_manifest", "review_rows_represented"), "metrics.review_rows_represented")
+    en_n = stat("h2", h2_n("english"), "{:,.0f}", "", "H2 group_summary n_rating_present[english]")
+    jp_n = stat("h2", h2_n("japanese"), "{:,.0f}", "", "H2 group_summary n_rating_present[japanese]")
+    cn_n = n("cn_manifest", manifest_metric("cn_manifest", "rows_represented"), "metrics.rows_represented")
+
+    # H3
+    h3_enj = stat("h3", h3_fam("enjoyment", "risk_difference_pct"), pp, "", "H3 enjoyment risk_difference_pct")
+    h3_enj_p = stat("h3", h3_fam("enjoyment", "p_value_bh_fdr"), pfmt, "", "H3 enjoyment p_value_bh_fdr")
+    h3_enj_en = stat("h3", h3_fam("enjoyment", "english_present_pct"), lambda x: f"{float(x)*100:.0f}%", "", "H3 enjoyment english_present_pct")
+    h3_enj_jp = stat("h3", h3_fam("enjoyment", "japanese_present_pct"), lambda x: f"{float(x)*100:.0f}%", "", "H3 enjoyment japanese_present_pct")
+    h3_pos = stat("h3", h3_fam("positive_sentiment", "risk_difference_pct"), pp, "", "H3 positive_sentiment risk_difference_pct")
+    h3_pos_p = stat("h3", h3_fam("positive_sentiment", "p_value_bh_fdr"), pfmt, "", "H3 positive_sentiment p_value_bh_fdr")
+    h3_rec = stat("h3", h3_fam("recommendation", "risk_difference_pct"), pp, "", "H3 recommendation risk_difference_pct")
+    h3_rec_p = stat("h3", h3_fam("recommendation", "p_value_bh_fdr"), pfmt, "", "H3 recommendation p_value_bh_fdr")
+    h3_fri = stat("h3", h3_fam("friction", "risk_difference_pct"), pp, "", "H3 friction risk_difference_pct")
+    h3_fri_p = stat("h3", h3_fam("friction", "p_value_bh_fdr"), pfmt, "", "H3 friction p_value_bh_fdr")
+    en_len = stat("h3", h3_textlen("english", "median"), "{:.0f}", " chars", "H3 text_length english median")
+    jp_len = stat("h3", h3_textlen("japanese", "median"), "{:.0f}", " chars", "H3 text_length japanese median")
+
+    # H2
+    h2_diff = stat("h2", h2_test("welch_t_review_rating", "effect_mean_difference"), stars, "", "H2 welch effect_mean_difference")
+    h2_lo = stat("h2", h2_test("welch_t_review_rating", "ci_95_lower"), "{:.2f}", "", "H2 welch ci_95_lower")
+    h2_hi = stat("h2", h2_test("welch_t_review_rating", "ci_95_upper"), "{:.2f}", "", "H2 welch ci_95_upper")
+    h2_p = stat("h2", h2_test("welch_t_review_rating", "p_value"), pfmt, "", "H2 welch p_value")
+    h2_en_mean = stat("h2", h2_mean("english"), "{:.2f}", "", "H2 english mean_review_rating")
+    h2_jp_mean = stat("h2", h2_mean("japanese"), "{:.2f}", "", "H2 japanese mean_review_rating")
+    h2_poi_diff = stat("h2", h2_test("poi_level_welch_t_mean_review_rating", "effect_mean_difference"), stars, "", "H2 POI-level effect_mean_difference")
+    h2_poi_p = stat("h2", h2_test("poi_level_welch_t_mean_review_rating", "p_value"), pfmt, "", "H2 POI-level p_value")
+
+    # within-POI paired
+    wp_pos = stat("wpoi", wpoi_field("within_poi_paired_positive_share", "effect"), "{:+.2f}", "", "within-POI positive_share effect (median diff)")
+    wp_pos_p = stat("wpoi", wpoi_field("within_poi_paired_positive_share", "p_value"), pfmt, "", "within-POI positive_share p_value")
+    wp_rat = stat("wpoi", wpoi_field("within_poi_paired_rating", "effect"), stars, "", "within-POI rating effect (median diff)")
+    wp_rat_p = stat("wpoi", wpoi_field("within_poi_paired_rating", "p_value"), pfmt, "", "within-POI rating p_value")
+    wp_pairs = stat("wpoi", wpoi_detail("within_poi_paired_positive_share", "n_pairs"), "{:.0f}", "", "within-POI n_pairs")
+    wp_cand = stat("wpoi", wpoi_detail("within_poi_paired_positive_share", "n_shared_poi_candidates"), "{:.0f}", "", "within-POI n_shared_poi_candidates")
+
+    # H1
+    h1_chi = stat("h1", h1_cell("statistic"), "{:.1f}", "", "H1 primary chi-square statistic")
+    h1_p = stat("h1", h1_cell("p_value_holm"), pfmt, "", "H1 primary p_value_holm")
+    h1_v = stat("h1", h1_cell("effect_cramers_v"), "{:.2f}", "", "H1 primary effect_cramers_v")
+    h1_pos_en = stat("h1", h1_share("positive", "english"), pct1, "", "H1 positive share english")
+    h1_pos_jp = stat("h1", h1_share("positive", "japanese"), pct1, "", "H1 positive share japanese")
+
+    # within-language EN drivers (mechanism)
+    wen_enj = stat("wen", wl_row("WL-EN-2", "sentiment_score", "effect_size"), "{:+.2f}", "", "WL-EN enjoyment mean_score_difference")
+    wen_enj_p = stat("wen", wl_row("WL-EN-2", "sentiment_score", "p_value_bh_fdr"), pfmt, "", "WL-EN enjoyment p_value_bh_fdr")
+
+    # Chinese single-platform
+    cn_pos = stat("cn_plat", cn_plat_pct("positive"), pct1, "", "CN XHS positive pct_platform_rows")
+    cn_neg = stat("cn_plat", cn_plat_pct("negative"), pct1, "", "CN XHS negative pct_platform_rows")
+
+    gen_at = DATA["pres_manifest"].get("generated_at", "") if isinstance(DATA["pres_manifest"], dict) else ""
+    rev_sha = SHA["h2"]
+
+    css = r"""
+:root{
+  --paper:#fbfaf7; --ink:#172033; --muted:#5b677a; --teal:#2f6f73; --teal-deep:#1a4d50;
+  --rule:#d7dde8; --neg:#9a031e; --band:#f1efe9; --teal-tint:#eaf1f0;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);
+  font-family:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
+  font-size:18px;line-height:1.62;-webkit-font-smoothing:antialiased}
+.wrap{max-width:840px;margin:0 auto;padding:0 28px}
+header.masthead{border-bottom:2px solid var(--ink);margin-top:56px;padding-bottom:22px}
+.eyebrow{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:12px;
+  letter-spacing:.22em;text-transform:uppercase;color:var(--teal-deep);margin:0 0 14px}
+h1{font-size:40px;line-height:1.12;margin:0 0 14px;font-weight:600;letter-spacing:-.01em}
+.standfirst{font-size:20px;color:#33414f;margin:0;max-width:62ch}
+.meta{font-family:ui-monospace,Menlo,monospace;font-size:12px;color:var(--muted);
+  margin-top:20px;line-height:1.8}
+nav.toc{position:sticky;top:0;background:rgba(251,250,247,.94);backdrop-filter:saturate(1.1) blur(2px);
+  border-bottom:1px solid var(--rule);z-index:5;margin-top:30px}
+nav.toc ol{list-style:none;display:flex;flex-wrap:wrap;gap:4px 22px;margin:0;padding:12px 0;
+  font-family:ui-monospace,Menlo,monospace;font-size:12.5px;letter-spacing:.02em}
+nav.toc a{color:var(--muted);text-decoration:none}
+nav.toc a:hover{color:var(--teal-deep)}
+section{padding:46px 0;border-bottom:1px solid var(--rule)}
+h2.sec{font-size:28px;font-weight:600;margin:0 0 6px;letter-spacing:-.01em}
+.sec-num{font-family:ui-monospace,Menlo,monospace;font-size:13px;color:var(--teal-deep);
+  letter-spacing:.12em;display:block;margin-bottom:8px}
+p{margin:0 0 16px}
+.lead{font-size:19.5px;color:#2b3742}
+.stat{color:var(--teal-deep);text-decoration:none;border-bottom:1px dotted var(--teal);
+  white-space:nowrap;cursor:help;font-variant-numeric:tabular-nums}
+.stat:hover{background:var(--teal-tint)}
+.stat .prov-dot{font-size:.5em;vertical-align:.5em;color:var(--teal);margin-left:1px;opacity:.55}
+.finding{margin-top:14px}
+.rank{display:flex;align-items:baseline;gap:12px;margin:0 0 4px}
+.rank .badge{font-family:ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:.12em;
+  text-transform:uppercase;padding:3px 9px;border-radius:2px;color:#fff;white-space:nowrap}
+.b-strong{background:var(--teal)} .b-mod{background:#6f8f72} .b-mixed{background:#bc6c25}
+.b-desc{background:#8d99ae}
+.finding h3{font-size:21px;font-weight:600;margin:0;letter-spacing:-.005em}
+figure.fig{margin:24px 0 8px;padding:14px;background:#fff;border:1px solid var(--rule);border-radius:4px}
+figure.fig svg{width:100%;height:auto;display:block}
+figcaption{font-size:13.5px;color:var(--muted);margin-top:10px;line-height:1.5;
+  font-family:"Iowan Old Style",Georgia,serif}
+.figsrc{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;color:var(--teal-deep);
+  word-break:break-all}
+.figsrc-note{font-style:italic}
+.callout{background:var(--band);border-left:3px solid var(--teal);padding:14px 18px;margin:18px 0;
+  font-size:16.5px}
+.caveat{background:#fbf3f0;border-left:3px solid var(--neg);padding:12px 16px;margin:16px 0;
+  font-size:15.5px;color:#5a2630}
+table{width:100%;border-collapse:collapse;margin:18px 0;font-size:14.5px}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--muted);font-weight:400}
+td.num{font-variant-numeric:tabular-nums;font-family:ui-monospace,Menlo,monospace;font-size:13px}
+.prov-table td{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;word-break:break-word}
+.prov-table a{color:var(--teal-deep)}
+.dl{display:grid;grid-template-columns:max-content 1fr;gap:6px 22px;margin:14px 0;font-size:16px}
+.dl dt{font-family:ui-monospace,Menlo,monospace;font-size:12.5px;color:var(--muted);
+  letter-spacing:.03em;padding-top:3px}
+.dl dd{margin:0}
+.hyp{border:1px solid var(--rule);border-left:3px solid var(--teal);border-radius:4px;
+  background:#fff;padding:18px 20px;margin:18px 0}
+.hyp-head{display:flex;align-items:baseline;gap:12px;margin:0 0 12px}
+.hyp-tag{font-family:ui-monospace,Menlo,monospace;font-size:12px;letter-spacing:.1em;
+  font-weight:600;color:#fff;background:var(--teal);padding:3px 9px;border-radius:2px}
+.hyp-head h3{font-size:19px;font-weight:600;margin:0;letter-spacing:-.005em}
+.hyp-grid{display:grid;grid-template-columns:max-content 1fr;gap:7px 20px;font-size:16px}
+.hyp-grid .k{font-family:ui-monospace,Menlo,monospace;font-size:12px;color:var(--muted);
+  letter-spacing:.02em;padding-top:3px;white-space:nowrap}
+.hyp-grid .v{margin:0}
+.hyp-decision{margin-top:14px;padding:11px 14px;background:var(--teal-tint);border-radius:3px;
+  font-size:15.5px;line-height:1.55}
+.hyp-decision .rej{color:var(--teal-deep);font-weight:600}
+.hyp-decision .keep{color:var(--muted);font-weight:600}
+footer{padding:40px 0 80px;color:var(--muted);font-size:13.5px;
+  font-family:ui-monospace,Menlo,monospace;line-height:1.7}
+.pipeline{counter-reset:step;list-style:none;padding:0;margin:18px 0}
+.pipeline li{position:relative;padding:0 0 16px 42px;border-left:1px solid var(--rule);margin-left:14px}
+.pipeline li::before{counter-increment:step;content:counter(step);position:absolute;left:-15px;top:-2px;
+  width:28px;height:28px;border-radius:50%;background:var(--paper);border:1px solid var(--teal);
+  color:var(--teal-deep);font-family:ui-monospace,Menlo,monospace;font-size:13px;
+  display:flex;align-items:center;justify-content:center}
+.pipeline li:last-child{border-left-color:transparent}
+.pipeline b{font-weight:600}
+@media(max-width:600px){h1{font-size:30px}body{font-size:17px}.wrap{padding:0 18px}}
+"""
+
+    H = []
+    H.append(f"<!doctype html><html lang='en'><head><meta charset='utf-8'>")
+    H.append("<meta name='viewport' content='width=device-width,initial-scale=1'>")
+    H.append("<title>Fukui Cross-Language Tourism Sentiment — Results</title>")
+    H.append(f"<style>{css}</style></head><body>")
+
+    # masthead
+    H.append("<div class='wrap'><header class='masthead'>")
+    H.append("<p class='eyebrow'>Fukui-First Cross-Language Tourism Text Analysis</p>")
+    H.append("<h1>What different language groups say about Fukui tourism</h1>")
+    H.append(
+        "<p class='standfirst'>A descriptive and statistical comparison of "
+        "English-language and Japanese-language Google reviews and Chinese-language "
+        "Xiaohongshu posts, scored with transparent reviewed keyword codebooks and "
+        "secondary sentiment libraries.</p>"
+    )
+    H.append(
+        f"<div class='meta'>Scope: Fukui Prefecture &nbsp;|&nbsp; "
+        f"{total_rows} review/post rows represented &nbsp;|&nbsp; "
+        f"reviews input SHA256 <span title='sha256 of the scored hypothesis input'>{rev_sha[:16]}…</span><br>"
+        f"Every figure in <span class='stat' style='cursor:default'>this page</span> is script-generated; "
+        f"every number is a live reference to an analysis output (hover a number for its source, click to open the file).</div>"
+    )
+    H.append("</header></div>")
+
+    # nav
+    H.append(
+        "<nav class='toc'><div class='wrap'><ol>"
+        "<li><a href='#data'>00 · Raw data</a></li>"
+        "<li><a href='#pipeline'>01 · Processing</a></li>"
+        "<li><a href='#hyp'>02 · Hypotheses</a></li>"
+        "<li><a href='#summary'>03 · Results overview</a></li>"
+        "<li><a href='#f1'>F1 · Rating gap</a></li>"
+        "<li><a href='#f2'>F2 · Within-POI</a></li>"
+        "<li><a href='#f3'>F3 · Evidence prevalence</a></li>"
+        "<li><a href='#f4'>F4 · Sentiment mix</a></li>"
+        "<li><a href='#f5'>F5 · Drivers</a></li>"
+        "<li><a href='#f6'>F6 · Cross-source</a></li>"
+        "<li><a href='#discuss'>04 · Discussion</a></li>"
+        "<li><a href='#prov'>Provenance</a></li>"
+        "</ol></div></nav>"
+    )
+
+    H.append("<main class='wrap'>")
+
+    # ---- 00 raw data ----
+    H.append("<section id='data'><span class='sec-num'>00 — RAW DATA</span>")
+    H.append("<h2 class='sec'>Where the text comes from</h2>")
+    H.append(
+        "<p class='lead'>Three content-language groups, all filtered to Fukui Prefecture. "
+        "Group labels describe the language of the text, not the nationality of any author "
+        "or reviewer.</p>"
+    )
+    H.append("<dl class='dl'>")
+    H.append(f"<dt>English reviews</dt><dd>{en_n} Google review rows (Fukui), scored with VADER.</dd>")
+    H.append(f"<dt>Japanese reviews</dt><dd>{jp_n} Google review rows (Fukui), scored with oseti (MeCab + polarity dictionaries).</dd>")
+    H.append(f"<dt>Chinese posts</dt><dd>{cn_n} Xiaohongshu rows, scored with SnowNLP plus a reviewed Chinese codebook. Douyin is held out of the main pipeline.</dd>")
+    H.append(f"<dt>Total</dt><dd>{total_rows} aggregate rows represented across the project.</dd>")
+    H.append("</dl>")
+    H.append(
+        "<p>Google review text is an Outscraper-derived local cache; Chinese posts come from an "
+        "external <code>tourism-data</code> checkout. Raw text, authors, URLs, and IDs stay out of "
+        "this repository — only aggregate counts and statistics are published. The English and "
+        "Japanese reviews differ markedly in length, which matters for keyword matching: median "
+        f"text is {en_len} for English versus {jp_len} for Japanese.</p>"
+    )
+    H.append("</section>")
+
+    # ---- 01 pipeline ----
+    H.append("<section id='pipeline'><span class='sec-num'>01 — PROCESSING</span>")
+    H.append("<h2 class='sec'>From raw text to auditable evidence</h2>")
+    H.append(
+        "<p class='lead'>Every row carries two parallel signals: a language-specific sentiment "
+        "score and reviewed keyword evidence. The score gives a comparable category; the evidence "
+        "gives a human-auditable reason.</p>"
+    )
+    H.append("<ol class='pipeline'>")
+    H.append("<li><b>Sync &amp; filter.</b> Pull the Google review cache and Chinese posts, keep Fukui POIs only.</li>")
+    H.append("<li><b>Language tagging.</b> Split Google reviews into English- and Japanese-language rows.</li>")
+    H.append("<li><b>Dual-path scoring.</b> VADER (EN), oseti (JP), SnowNLP (CN) for category shares; "
+             "reviewed friction / enjoyment / recommendation / positive codebooks for matched evidence.</li>")
+    H.append("<li><b>Category rule.</b> A shared threshold maps scores to positive / neutral / negative "
+             "(positive ≥ 0.05, negative ≤ −0.05); neutral-band width is varied as a robustness check.</li>")
+    H.append("<li><b>Statistical tests.</b> Category-share χ², common-scale star-rating Welch tests, "
+             "evidence-prevalence tests with multiplicity correction, and a within-POI paired check.</li>")
+    H.append("<li><b>Aggregate-only outputs.</b> Every result is written with denominators, source SHA256, "
+             "and the generating command; the build fails loud on missing inputs rather than inventing data.</li>")
+    H.append("</ol>")
+    H.append(
+        "<div class='caveat'>Measurement honesty: VADER, oseti, and SnowNLP scores are <em>not</em> a common "
+        "scale, so raw scores are never compared across languages. Cross-language comparison uses category "
+        "shares, common 1–5 Google star ratings, and reviewed evidence prevalence. Review rows are nested in "
+        "POIs, so single-level p-values are descriptive; the within-POI paired test (F2) is the venue-clustering "
+        "robustness check.</div>"
+    )
+    H.append("</section>")
+
+    # ---- 02 hypotheses ----
+    H.append("<section id='hyp'><span class='sec-num'>02 — HYPOTHESES</span>")
+    H.append("<h2 class='sec'>The hypotheses under test</h2>")
+    H.append(
+        "<p class='lead'>The confirmatory comparison is between English-language and "
+        "Japanese-language Fukui Google reviews. Three pre-specified hypotheses (H1–H3) are "
+        "stated below with their null and alternative, the test used, the multiplicity control, "
+        "and the rejection rule; a fourth, venue-controlled robustness hypothesis re-tests the "
+        "rating and sentiment results within shared POIs.</p>"
+    )
+    H.append(
+        "<p>Decision threshold is &alpha; = .05 (two-sided) throughout. Because review rows are "
+        "nested in POIs, single-level tests are read as descriptive support and the within-POI "
+        "paired hypothesis is the clustering robustness check. The Chinese-social and "
+        "within-language analyses shown further down are exploratory/descriptive and are not "
+        "framed as confirmatory hypotheses.</p>"
+    )
+
+    def hyp(tag, title, h0, ha, unit, test, mult, reject, decision):
+        return (
+            f"<div class='hyp'><div class='hyp-head'><span class='hyp-tag'>{tag}</span>"
+            f"<h3>{title}</h3></div><div class='hyp-grid'>"
+            f"<div class='k'>H<sub>0</sub> (null)</div><div class='v'>{h0}</div>"
+            f"<div class='k'>H<sub>a</sub> (alt)</div><div class='v'>{ha}</div>"
+            f"<div class='k'>Unit &amp; groups</div><div class='v'>{unit}</div>"
+            f"<div class='k'>Test</div><div class='v'>{test}</div>"
+            f"<div class='k'>Multiplicity</div><div class='v'>{mult}</div>"
+            f"<div class='k'>Reject H<sub>0</sub> if</div><div class='v'>{reject}</div>"
+            f"</div><div class='hyp-decision'>{decision}</div></div>"
+        )
+
+    H.append(hyp(
+        "H1", "Sentiment-category mix vs. review language",
+        "The distribution across positive / neutral / negative categories is independent of "
+        "review language (English vs Japanese).",
+        "The category distribution differs by review language.",
+        f"One Fukui Google review row; English (n={en_n}) vs Japanese (n={jp_n}).",
+        "Pearson &chi;<sup>2</sup> test of independence (3 categories × 2 languages).",
+        "Holm step-down across the primary test and two neutral-band sensitivity tests.",
+        "the Holm-adjusted p-value is below &alpha; = .05.",
+        f"&chi;<sup>2</sup> = {h1_chi}, Holm {h1_p} → <span class='rej'>Reject H<sub>0</sub>.</span> "
+        f"The association is statistically clear but small in magnitude (Cramér's V = {h1_v}).",
+    ))
+    H.append(hyp(
+        "H2", "Mean star rating vs. review language",
+        "Mean Google star rating (1–5) is equal for English- and Japanese-language reviews "
+        "(&mu;<sub>EN</sub> = &mu;<sub>JP</sub>).",
+        "The mean ratings differ (&mu;<sub>EN</sub> &ne; &mu;<sub>JP</sub>).",
+        "One review row (primary); POI-language mean and shared-POI pair as sensitivity units.",
+        "Welch's two-sample t-test on the common 1–5 scale (two-sided, unequal variances).",
+        "Single primary test, reported with a 95% CI; POI-level and within-POI paired sensitivity.",
+        "the p-value is below &alpha; = .05.",
+        f"&Delta; = {h2_diff} (95% CI {h2_lo}–{h2_hi}), {h2_p} → <span class='rej'>Reject H<sub>0</sub>.</span> "
+        f"The gap persists at POI level ({h2_poi_diff}, {h2_poi_p}).",
+    ))
+    H.append(hyp(
+        "H3", "Reviewed-evidence prevalence vs. review language",
+        "For each evidence family (friction, enjoyment, recommendation, positive sentiment), "
+        "prevalence is equal across English and Japanese review rows.",
+        "Prevalence differs across languages for that family.",
+        "One review row; four parallel family tests.",
+        "Per-family two-group test of evidence prevalence (English vs Japanese).",
+        "Benjamini–Hochberg FDR across the four evidence families.",
+        "the BH-FDR-adjusted p-value for that family is below &alpha; = .05.",
+        f"Enjoyment {h3_enj} ({h3_enj_p}) → <span class='rej'>Reject</span>; "
+        f"positive {h3_pos} ({h3_pos_p}) → <span class='rej'>Reject</span>; "
+        f"recommendation {h3_rec} ({h3_rec_p}) → <span class='rej'>Reject</span>; "
+        f"friction {h3_fri} ({h3_fri_p}) → <span class='keep'>Fail to reject</span>.",
+    ))
+    H.append(hyp(
+        "H4 · robustness", "Language gap within shared venues (clustering control)",
+        "Within POIs reviewed by both groups, the paired English−Japanese difference is zero "
+        "(median = 0) for star rating and for positive-sentiment share.",
+        "The paired within-POI difference is non-zero.",
+        f"Shared-POI pair — {wp_pairs} pairs from {wp_cand} candidate POIs (≥5 reviews per language).",
+        "Wilcoxon signed-rank test on POI-pair differences.",
+        "Robustness re-test of H2/H3 holding venue (POI) constant.",
+        "the p-value is below &alpha; = .05.",
+        f"Positive-sentiment share: median {wp_pos} ({wp_pos_p}) → <span class='rej'>Reject H<sub>0</sub>.</span> "
+        f"Star rating: median {wp_rat} ({wp_rat_p}) → <span class='keep'>not significant at .05</span> (borderline).",
+    ))
+    H.append("</section>")
+
+    # ---- 03 overview ----
+    H.append("<section id='summary'><span class='sec-num'>03 — RESULTS OVERVIEW</span>")
+    H.append("<h2 class='sec'>The findings at a glance</h2>")
+    H.append(
+        "<p class='lead'>English-language reviews consistently give higher ratings and carry more positive "
+        "experience evidence than Japanese-language reviews of the same Fukui venues, and the gap survives "
+        "controlling for which venues each group reviews. The cleanest comparison is the shared 1–5 star "
+        "scale (F1); findings below descend from that cleanest, most interpretable result to the most "
+        "caveated.</p>"
+    )
+    H.append(
+        f"<div class='caveat'><b>Rival explanation — cross-cultural response style.</b> "
+        f"The consistent EN&nbsp;&gt;&nbsp;JP positivity gap is also consistent with well-documented "
+        f"cross-cultural differences in rating and expressive style: Japanese-language reviewers tend "
+        f"toward more reserved scale use, so the gap may partly reflect expression norms rather than "
+        f"differences in actual experience quality at Fukui venues. "
+        f"This interpretation is reinforced — not refuted — by the friction (complaint) null: "
+        f"complaint-evidence prevalence does <em>not</em> differ between groups "
+        f"({h3_fri}, {h3_fri_p}), meaning the groups differ in how much they praise, not in how much "
+        f"they complain — exactly the asymmetric pattern a positivity-expression difference would produce. "
+        f"The within-POI check (F2) controls for <em>which</em> venues are reviewed but does not rule "
+        f"out this response-style confound.</div>"
+    )
+    H.append(fig("overview", "Results panel across the four confirmatory checks; effect sizes shown with multiplicity-adjusted p-values."))
+    H.append("</section>")
+
+    # ---- F1 H2 rating gap — lead finding ----
+    H.append("<section id='f1'><span class='sec-num'>FINDING 1 — CLEANEST COMPARISON</span>")
+    H.append("<div class='rank'><span class='badge b-strong'>Strongest · common 1–5 scale</span></div>")
+    H.append("<h3 style='font-size:25px;font-weight:600;margin:0 0 6px'>English reviewers give higher star ratings</h3>")
+    H.append(
+        f"<p class='lead'>This is the cleanest cross-language comparison: Google star ratings run on a "
+        f"shared 1–5 scale for both groups, so no tool-specific scoring is involved. English reviews "
+        f"average {h2_en_mean} versus {h2_jp_mean} for Japanese — a difference of {h2_diff} "
+        f"(95% CI {h2_lo}–{h2_hi}, {h2_p}).</p>"
+    )
+    H.append(
+        f"<p>The gap holds when the unit of analysis is tightened from individual reviews to POI averages "
+        f"({h2_poi_diff}, {h2_poi_p}), and again under the within-POI paired check (F2 below).</p>"
+    )
+    H.append(fig("h2_ladder", "The English-minus-Japanese rating gap under three nested unit definitions; the effect stays right of zero throughout."))
+    H.append(fig("h2_dist", "Full 1–5 star distribution by language group — both skew high, but English has proportionally more 5-star rows."))
+    H.append("</section>")
+
+    # ---- F2 within-POI robustness check ----
+    H.append("<section id='f2'><span class='sec-num'>FINDING 2 — ROBUSTNESS CHECK</span>")
+    H.append("<div class='rank'><span class='badge b-mixed'>Mixed · venue-controlled</span></div>")
+    H.append("<h3 style='font-size:25px;font-weight:600;margin:0 0 6px'>Venue composition is one removed confound — results are partially consistent</h3>")
+    H.append(
+        f"<p class='lead'>Restricting to {wp_pairs} Fukui POIs reviewed by both groups (from {wp_cand} shared "
+        f"candidates, ≥5 reviews per language), the within-POI paired difference in positive-sentiment share is "
+        f"{wp_pos} ({wp_pos_p}), which is significant. The paired difference in star rating is {wp_rat} "
+        f"({wp_rat_p}), which does not reach significance at .05 (borderline). Holding venue constant "
+        f"removes POI composition as one confound — it does not address reviewer self-selection within a venue, "
+        f"nor the response-style confound described above.</p>"
+    )
+    H.append(
+        "<div class='caveat'>This is a mixed / partial robustness result, not a clean confirmation. "
+        "The positive-share difference holds within shared venues; the star-rating difference is borderline. "
+        "Note also that positive-share uses two different scoring tools (VADER for English, oseti for Japanese), "
+        "so this cross-language comparison is tool-dependent.</div>"
+    )
+    H.append(fig("wpoi_shift", "Within-POI paired differences (English minus Japanese) for both outcomes; positive on the scale favours English."))
+    H.append("</section>")
+
+    # ---- F3 H3 evidence prevalence — demoted ----
+    H.append("<section id='f3'><span class='sec-num'>FINDING 3</span>")
+    H.append("<div class='rank'><span class='badge b-mixed'>Significant · length-confounded</span></div>")
+    H.append("<h3 style='font-size:25px;font-weight:600;margin:0 0 6px'>English reviews carry more positive experience evidence — but English texts are longer</h3>")
+    H.append(
+        f"<p class='lead'>English reviews are substantially longer (median {en_len} vs {jp_len} for "
+        f"Japanese), which means they have more opportunity for any keyword to match; prevalence differences "
+        f"partly reflect text length, not a pure rate. With that caveat noted up front: using reviewed keyword "
+        f"codebooks, English reviews mention enjoyment in {h3_enj_en} of rows versus {h3_enj_jp} for "
+        f"Japanese — a gap of {h3_enj} ({h3_enj_p}, Benjamini–Hochberg FDR). Positive-sentiment evidence "
+        f"differs by {h3_pos} ({h3_pos_p}) and recommendation evidence by {h3_rec} ({h3_rec_p}).</p>"
+    )
+    H.append(
+        f"<div class='callout'>Friction (complaint) evidence is the telling null: the English–Japanese "
+        f"difference is only {h3_fri} and is <b>not</b> significant ({h3_fri_p}). The groups differ in how "
+        f"much they praise, not in how much they complain.</div>"
+    )
+    H.append(fig("h3_prev", "Reviewed-evidence prevalence by language group, English vs Japanese, across four evidence families."))
+    H.append(
+        f"<div class='caveat'>Because English reviews are longer (median {en_len} vs {jp_len}), "
+        f"more keyword matches are expected by chance alone. Treat prevalence differences as reflecting "
+        f"evidence-rich-text behaviour rather than a pure rate difference.</div>"
+    )
+    H.append("</section>")
+
+    # ---- F4 H1 sentiment mix ----
+    H.append("<section id='f4'><span class='sec-num'>FINDING 4</span>")
+    H.append("<div class='rank'><span class='badge b-mixed'>Highly significant · small effect</span></div>")
+    H.append("<h3 style='font-size:25px;font-weight:600;margin:0 0 6px'>Sentiment mix differs by review language</h3>")
+    H.append(
+        f"<p class='lead'>The distribution across positive / neutral / negative categories differs significantly "
+        f"between the groups (χ² = {h1_chi}, {h1_p}, Holm-adjusted): {h1_pos_en} of English reviews are positive "
+        f"versus {h1_pos_jp} of Japanese. The association is real but small in magnitude — Cramér's V = {h1_v} — "
+        f"so it is reported as a significant-but-modest difference, not a dramatic one.</p>"
+    )
+    H.append(fig("h1_share", "Positive / neutral / negative category shares by language group under the secondary sentiment libraries."))
+    H.append("</section>")
+
+    # ---- F5 drivers ----
+    H.append("<section id='f5'><span class='sec-num'>FINDING 5 — MECHANISM</span>")
+    H.append("<div class='rank'><span class='badge b-desc'>Descriptive · within-tool</span></div>")
+    H.append("<h3 style='font-size:25px;font-weight:600;margin:0 0 6px'>What moves sentiment inside each language</h3>")
+    H.append(
+        f"<p class='lead'>Within English reviews alone, the presence of enjoyment evidence is the largest "
+        f"driver of higher VADER sentiment (mean-score difference {wen_enj}, {wen_enj_p}, FDR-corrected). "
+        f"Parallel within-Japanese and within-Chinese analyses tell the same story: enjoyment and positive "
+        f"evidence separate sentiment most clearly. These are interpreted within one tool and one language "
+        f"only — never compared as raw scores across groups.</p>"
+    )
+    H.append(fig("wen_drivers", "Within-English sentiment drivers; bar length is the within-tool effect size for each predictor."))
+    H.append("</section>")
+
+    # ---- F6 cross-source / chinese ----
+    H.append("<section id='f6'><span class='sec-num'>FINDING 6 — MOST CAVEATED</span>")
+    H.append("<div class='rank'><span class='badge b-desc'>Descriptive only · gaps noted</span></div>")
+    H.append("<h3 style='font-size:25px;font-weight:600;margin:0 0 6px'>Chinese social posts and cross-source comparison</h3>")
+    H.append(
+        f"<p class='lead'>Chinese-language Xiaohongshu posts read overwhelmingly positive — {cn_pos} positive "
+        f"versus {cn_neg} negative — but this is a different platform (curated social media, not solicited "
+        f"reviews), a different tool (SnowNLP), and a different unit, so it sits beside the Google comparison "
+        f"as descriptive context, not a like-for-like test.</p>"
+    )
+    H.append(fig("cross_cat", "Sentiment category shares across English, Japanese, and Chinese-language source groups — descriptive across platforms and tools."))
+    H.append(fig("cn_plat", "Chinese-language sentiment category shares within the Xiaohongshu platform."))
+    H.append(
+        "<div class='caveat'>The within-Chinese city/platform friction comparison cannot be run yet: current "
+        "Fukui Chinese data is single-platform (Xiaohongshu only), so there are no comparison groups. This is a "
+        "stated data gap, not a finding.</div>"
+    )
+    H.append("</section>")
+
+    # ---- 04 discussion ----
+    H.append("<section id='discuss'><span class='sec-num'>04 — DISCUSSION</span>")
+    H.append("<h2 class='sec'>What the gap does and does not mean</h2>")
+    H.append(
+        f"<p class='lead'>The defensible headline is the shared-scale star-rating gap "
+        f"({h2_diff}, {h2_en_mean} vs {h2_jp_mean}): it is the one measure on a common 1–5 scale, "
+        f"with no tool-specific scoring in between. Its <em>direction</em> is clear; its <em>cause</em> "
+        f"is not. Two readings fit the data equally well — English-language reviewers genuinely experienced "
+        f"Fukui venues more favourably, or English- and Japanese-language reviewers differ in how they "
+        f"express evaluation on a rating scale. This study cannot separate the two.</p>"
+    )
+    H.append(
+        f"<div class='callout'>The most informative result is not the gap itself but the friction "
+        f"(complaint) null. Complaint-evidence prevalence is essentially equal across groups "
+        f"({h3_fri}, {h3_fri_p}): the groups differ in how much they <b>praise</b>, not in how much they "
+        f"<b>complain</b>. A real difference in venue quality would be expected to move complaints too; a "
+        f"difference confined to praise is the asymmetric signature of a positivity-<em>expression</em> "
+        f"difference — i.e. response style — more than of Fukui serving one group worse.</div>"
+    )
+    H.append(
+        f"<p>The findings are therefore best read as a hierarchy of evidential strength rather than a single "
+        f"claim. The common-scale star rating is the strongest rung; the sentiment-category mix is weaker "
+        f"(tool-dependent and small in magnitude, Cramér's V = {h1_v}); the reviewed-evidence prevalence gap "
+        f"is the most caveated, because English texts are markedly longer ({en_len} vs {jp_len}) and longer "
+        f"text mechanically matches more keywords. Where the evidence is weak, this page says so.</p>"
+    )
+    H.append(
+        "<div class='callout'>Practical reading for Fukui tourism stakeholders. First, raw cross-language "
+        "review scores should not be benchmarked directly — a lower Japanese-language average does not by "
+        "itself mean a worse experience, and a dashboard that ranks venues on mixed-language ratings will be "
+        "misled by response style. Second, because complaint prevalence is language-independent, friction "
+        "evidence — not rating averages — is the more trustworthy place to look for genuine service issues "
+        "that affect every group.</div>"
+    )
+    H.append("<h3 style='font-size:20px;font-weight:600;margin:22px 0 6px'>Limitations</h3>")
+    H.append("<dl class='dl'>")
+    H.append(
+        "<dt>Sample &amp; scope</dt><dd>A Fukui-only convenience cache (Outscraper-derived Google reviews; "
+        "a single external Chinese checkout). No claim of national or all-Japan representativeness.</dd>"
+    )
+    H.append(
+        f"<dt>Statistical power</dt><dd>The venue-controlled paired test rests on only {wp_pairs} shared POIs; "
+        f"the within-POI star-rating difference ({wp_rat}, {wp_rat_p}) is therefore <em>inconclusive</em>, not "
+        f"a demonstrated null — the test is underpowered at this venue overlap.</dd>"
+    )
+    H.append(
+        "<dt>Measurement</dt><dd>VADER, oseti, and SnowNLP are not validated against hand-labelled Fukui "
+        "tourism text, and the reviewed keyword codebooks are coverage-limited; both skew positive, so the "
+        "category test meets a ceiling effect.</dd>"
+    )
+    H.append(
+        "<dt>Design</dt><dd>Holding venue constant removes POI composition as one confound only; reviewer "
+        "self-selection within a venue and the response-style confound above remain open. No temporal/trend "
+        "analysis is attempted, given the date-quality gap.</dd>"
+    )
+    H.append(
+        f"<dt>Chinese strand</dt><dd>Single-platform (Xiaohongshu, {cn_pos} positive) and descriptive only; it "
+        f"generates hypotheses, it does not provide a like-for-like cross-source test.</dd>"
+    )
+    H.append("</dl>")
+    H.append("<h3 style='font-size:20px;font-weight:600;margin:22px 0 6px'>Where this should go next</h3>")
+    H.append("<ol class='pipeline'>")
+    H.append(
+        "<li><b>Calibrate response style.</b> Within-reviewer cross-language pairs or anchoring vignettes to "
+        "isolate genuine experience differences from scale-use differences — the central unresolved question.</li>"
+    )
+    H.append(
+        "<li><b>Power up the venue-controlled test.</b> Widen the shared-POI overlap so the borderline "
+        "within-POI rating result can be resolved rather than left inconclusive.</li>"
+    )
+    H.append(
+        "<li><b>Validate the scoring tools.</b> Score a hand-labelled tourism subset in each language to "
+        "quantify how far VADER / oseti / SnowNLP agree with human judgement before leaning on category shares.</li>"
+    )
+    H.append(
+        "<li><b>Make the Chinese strand confirmatory.</b> Add a second platform (e.g. Douyin) so source can be "
+        "held constant and the comparison becomes a test rather than context.</li>"
+    )
+    H.append(
+        "<li><b>Add a temporal view.</b> Once date precision is sufficient, examine whether the language gap "
+        "is stable or seasonal.</li>"
+    )
+    H.append("</ol>")
+    H.append(
+        "<div class='caveat'>In one line: the cross-language gap is real on the clean scale, but its cause is "
+        "unresolved — and the equal complaint rate across groups suggests it reflects, at least in part, how "
+        "groups express evaluation rather than how well Fukui serves them.</div>"
+    )
+    H.append("</section>")
+
+    # ---- provenance appendix ----
+    H.append("<section id='prov'><span class='sec-num'>APPENDIX — PROVENANCE</span>")
+    H.append("<h2 class='sec'>Every number, traced</h2>")
+    H.append(
+        "<p>Each value above is resolved at build time directly from an analysis-script output file. "
+        "The table lists every reference in order of first appearance: the displayed value, the exact "
+        "field it was read from, the source file, and that file's SHA256. Click any source to open it.</p>"
+    )
+    H.append("<table class='prov-table'><thead><tr><th>#</th><th>Value</th><th>Field</th><th>Source file</th><th>SHA256</th></tr></thead><tbody>")
+    seen = set()
+    i = 0
+    for r in REFS:
+        key = (r["value"], r["field"], r["source"])
+        if key in seen:
+            continue
+        seen.add(key)
+        i += 1
+        H.append(
+            f"<tr><td class='num'>{i}</td><td class='num'>{html.escape(r['value'])}</td>"
+            f"<td>{html.escape(r['field'])}</td>"
+            f"<td><a href='{r['source']}' target='_blank'>{r['source']}</a></td>"
+            f"<td>{r['sha256'][:16]}…</td></tr>"
+        )
+    H.append("</tbody></table>")
+    H.append("</section>")
+
+    H.append("</main>")
+    H.append(
+        f"<footer><div class='wrap'>Generated by <code>scripts/build_pbl_dashboard.py</code> from tracked "
+        f"aggregate outputs. Presentation manifest generated_at: {html.escape(str(gen_at))}. "
+        f"Group labels are content-language groups, not nationalities. All outputs aggregate-only — no "
+        f"row-level text, authors, URLs, or IDs.</div></footer>"
+    )
+    H.append("</body></html>")
+    return "\n".join(H)
+
+
+def main() -> int:
+    load()
+    OUT_HTML.write_text(build_html(), encoding="utf-8")
+    print(f"wrote {OUT_HTML} ({OUT_HTML.stat().st_size:,} bytes); {len(REFS)} traced references")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

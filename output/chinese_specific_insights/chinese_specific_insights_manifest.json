@@ -1,7 +1,7 @@
 {
   "schema_version": "research_provenance.v1",
   "kind": "chinese_specific_insights",
-  "generated_at": "2026-06-23T10:34:46+00:00",
+  "generated_at": "2026-06-24T11:23:13+00:00",
   "command": "python scripts/build_chinese_specific_insights.py",
   "inputs": [
     {
@@ -87,29 +87,29 @@
       "role": "figure_keyword_occurrence_by_category",
       "path": "/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/output/chinese_specific_insights/figure_keyword_occurrence_by_category.svg",
       "exists": true,
-      "bytes": 5677,
-      "sha256": "b4b2ff9017bf1130b381e12ad4cd507a676471482069332fe6a2b2c6e55d82f0"
+      "bytes": 8921,
+      "sha256": "df60e053a1e1d2e807d8aa022ef575cb5b9b855b3b35d213f6ee6213b08311a5"
     },
     {
       "role": "figure_top_sentiment_keywords",
       "path": "/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/output/chinese_specific_insights/figure_top_sentiment_keywords.svg",
       "exists": true,
-      "bytes": 6517,
-      "sha256": "25b25694cb320a3ae61532bdedd2687c1dbabf2793c7264e787b202dcf05abd2"
+      "bytes": 9302,
+      "sha256": "cdcbd14aa046804a0c481ef9bdaece0ad962bdd5e55932e6ab3e07cd65811f73"
     },
     {
       "role": "figure_sentiment_category_by_platform",
       "path": "/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/output/chinese_specific_insights/figure_sentiment_category_by_platform.svg",
       "exists": true,
-      "bytes": 1506,
-      "sha256": "9c91c0c4ef00014e9114797dd68b9def443ca36fef467da69e45a4580a422f69"
+      "bytes": 1818,
+      "sha256": "f6f7d8db593a60859b04f3b4fc30a6f1787c9c45df49e7b25326eb1f570ab398"
     },
     {
       "role": "figure_theme_sentiment",
       "path": "/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/output/chinese_specific_insights/figure_theme_sentiment.svg",
       "exists": true,
-      "bytes": 1055,
-      "sha256": "141c6b2c10ece175b5d0ed032638cf945503e968da5afd49be0a3d271a7a0165"
+      "bytes": 1671,
+      "sha256": "5500737a17309d14df8e46f9aed74aac7b3ccd5993cdf758dff25ec9d228f627"
     },
     {
       "role": "readiness",

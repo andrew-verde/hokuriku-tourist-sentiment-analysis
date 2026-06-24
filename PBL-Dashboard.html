@@ -1,0 +1,972 @@
+<!doctype html><html lang='en'><head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width,initial-scale=1'>
+<title>Fukui Cross-Language Tourism Sentiment — Results</title>
+<style>
+:root{
+  --paper:#fbfaf7; --ink:#172033; --muted:#5b677a; --teal:#2f6f73; --teal-deep:#1a4d50;
+  --rule:#d7dde8; --neg:#9a031e; --band:#f1efe9; --teal-tint:#eaf1f0;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);
+  font-family:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
+  font-size:18px;line-height:1.62;-webkit-font-smoothing:antialiased}
+.wrap{max-width:840px;margin:0 auto;padding:0 28px}
+header.masthead{border-bottom:2px solid var(--ink);margin-top:56px;padding-bottom:22px}
+.eyebrow{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:12px;
+  letter-spacing:.22em;text-transform:uppercase;color:var(--teal-deep);margin:0 0 14px}
+h1{font-size:40px;line-height:1.12;margin:0 0 14px;font-weight:600;letter-spacing:-.01em}
+.standfirst{font-size:20px;color:#33414f;margin:0;max-width:62ch}
+.meta{font-family:ui-monospace,Menlo,monospace;font-size:12px;color:var(--muted);
+  margin-top:20px;line-height:1.8}
+nav.toc{position:sticky;top:0;background:rgba(251,250,247,.94);backdrop-filter:saturate(1.1) blur(2px);
+  border-bottom:1px solid var(--rule);z-index:5;margin-top:30px}
+nav.toc ol{list-style:none;display:flex;flex-wrap:wrap;gap:4px 22px;margin:0;padding:12px 0;
+  font-family:ui-monospace,Menlo,monospace;font-size:12.5px;letter-spacing:.02em}
+nav.toc a{color:var(--muted);text-decoration:none}
+nav.toc a:hover{color:var(--teal-deep)}
+section{padding:46px 0;border-bottom:1px solid var(--rule)}
+h2.sec{font-size:28px;font-weight:600;margin:0 0 6px;letter-spacing:-.01em}
+.sec-num{font-family:ui-monospace,Menlo,monospace;font-size:13px;color:var(--teal-deep);
+  letter-spacing:.12em;display:block;margin-bottom:8px}
+p{margin:0 0 16px}
+.lead{font-size:19.5px;color:#2b3742}
+.stat{color:var(--teal-deep);text-decoration:none;border-bottom:1px dotted var(--teal);
+  white-space:nowrap;cursor:help;font-variant-numeric:tabular-nums}
+.stat:hover{background:var(--teal-tint)}
+.stat .prov-dot{font-size:.5em;vertical-align:.5em;color:var(--teal);margin-left:1px;opacity:.55}
+.finding{margin-top:14px}
+.rank{display:flex;align-items:baseline;gap:12px;margin:0 0 4px}
+.rank .badge{font-family:ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:.12em;
+  text-transform:uppercase;padding:3px 9px;border-radius:2px;color:#fff;white-space:nowrap}
+.b-strong{background:var(--teal)} .b-mod{background:#6f8f72} .b-mixed{background:#bc6c25}
+.b-desc{background:#8d99ae}
+.finding h3{font-size:21px;font-weight:600;margin:0;letter-spacing:-.005em}
+figure.fig{margin:24px 0 8px;padding:14px;background:#fff;border:1px solid var(--rule);border-radius:4px}
+figure.fig svg{width:100%;height:auto;display:block}
+figcaption{font-size:13.5px;color:var(--muted);margin-top:10px;line-height:1.5;
+  font-family:"Iowan Old Style",Georgia,serif}
+.figsrc{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;color:var(--teal-deep);
+  word-break:break-all}
+.figsrc-note{font-style:italic}
+.callout{background:var(--band);border-left:3px solid var(--teal);padding:14px 18px;margin:18px 0;
+  font-size:16.5px}
+.caveat{background:#fbf3f0;border-left:3px solid var(--neg);padding:12px 16px;margin:16px 0;
+  font-size:15.5px;color:#5a2630}
+table{width:100%;border-collapse:collapse;margin:18px 0;font-size:14.5px}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--muted);font-weight:400}
+td.num{font-variant-numeric:tabular-nums;font-family:ui-monospace,Menlo,monospace;font-size:13px}
+.prov-table td{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;word-break:break-word}
+.prov-table a{color:var(--teal-deep)}
+.dl{display:grid;grid-template-columns:max-content 1fr;gap:6px 22px;margin:14px 0;font-size:16px}
+.dl dt{font-family:ui-monospace,Menlo,monospace;font-size:12.5px;color:var(--muted);
+  letter-spacing:.03em;padding-top:3px}
+.dl dd{margin:0}
+.hyp{border:1px solid var(--rule);border-left:3px solid var(--teal);border-radius:4px;
+  background:#fff;padding:18px 20px;margin:18px 0}
+.hyp-head{display:flex;align-items:baseline;gap:12px;margin:0 0 12px}
+.hyp-tag{font-family:ui-monospace,Menlo,monospace;font-size:12px;letter-spacing:.1em;
+  font-weight:600;color:#fff;background:var(--teal);padding:3px 9px;border-radius:2px}
+.hyp-head h3{font-size:19px;font-weight:600;margin:0;letter-spacing:-.005em}
+.hyp-grid{display:grid;grid-template-columns:max-content 1fr;gap:7px 20px;font-size:16px}
+.hyp-grid .k{font-family:ui-monospace,Menlo,monospace;font-size:12px;color:var(--muted);
+  letter-spacing:.02em;padding-top:3px;white-space:nowrap}
+.hyp-grid .v{margin:0}
+.hyp-decision{margin-top:14px;padding:11px 14px;background:var(--teal-tint);border-radius:3px;
+  font-size:15.5px;line-height:1.55}
+.hyp-decision .rej{color:var(--teal-deep);font-weight:600}
+.hyp-decision .keep{color:var(--muted);font-weight:600}
+footer{padding:40px 0 80px;color:var(--muted);font-size:13.5px;
+  font-family:ui-monospace,Menlo,monospace;line-height:1.7}
+.pipeline{counter-reset:step;list-style:none;padding:0;margin:18px 0}
+.pipeline li{position:relative;padding:0 0 16px 42px;border-left:1px solid var(--rule);margin-left:14px}
+.pipeline li::before{counter-increment:step;content:counter(step);position:absolute;left:-15px;top:-2px;
+  width:28px;height:28px;border-radius:50%;background:var(--paper);border:1px solid var(--teal);
+  color:var(--teal-deep);font-family:ui-monospace,Menlo,monospace;font-size:13px;
+  display:flex;align-items:center;justify-content:center}
+.pipeline li:last-child{border-left-color:transparent}
+.pipeline b{font-weight:600}
+@media(max-width:600px){h1{font-size:30px}body{font-size:17px}.wrap{padding:0 18px}}
+</style></head><body>
+<div class='wrap'><header class='masthead'>
+<p class='eyebrow'>Fukui-First Cross-Language Tourism Text Analysis</p>
+<h1>What different language groups say about Fukui tourism</h1>
+<p class='standfirst'>A descriptive and statistical comparison of English-language and Japanese-language Google reviews and Chinese-language Xiaohongshu posts, scored with transparent reviewed keyword codebooks and secondary sentiment libraries.</p>
+<div class='meta'>Scope: Fukui Prefecture &nbsp;|&nbsp; <a class="stat" href="output/presentation_safe/presentation_manifest.json" target="_blank" title="raw value: 2014
+field: metrics.review_rows_represented
+source: output/presentation_safe/presentation_manifest.json
+sha256: 1dc1f5ee2db1de36f781b3daef30deaf519b4e6c1a68a3835550f3a21faef328
+script: scripts/build_presentation_safe_outputs.py" data-raw="2014" data-source="output/presentation_safe/presentation_manifest.json" data-field="metrics.review_rows_represented" data-sha256="1dc1f5ee2db1de36f781b3daef30deaf519b4e6c1a68a3835550f3a21faef328">2,014<span class="prov-dot">●</span></a> review/post rows represented &nbsp;|&nbsp; reviews input SHA256 <span title='sha256 of the scored hypothesis input'>d2fee108d6768ca2…</span><br>Every figure in <span class='stat' style='cursor:default'>this page</span> is script-generated; every number is a live reference to an analysis output (hover a number for its source, click to open the file).</div>
+</header></div>
+<nav class='toc'><div class='wrap'><ol><li><a href='#data'>00 · Raw data</a></li><li><a href='#pipeline'>01 · Processing</a></li><li><a href='#hyp'>02 · Hypotheses</a></li><li><a href='#summary'>03 · Results overview</a></li><li><a href='#f1'>F1 · Rating gap</a></li><li><a href='#f2'>F2 · Within-POI</a></li><li><a href='#f3'>F3 · Evidence prevalence</a></li><li><a href='#f4'>F4 · Sentiment mix</a></li><li><a href='#f5'>F5 · Drivers</a></li><li><a href='#f6'>F6 · Cross-source</a></li><li><a href='#discuss'>04 · Discussion</a></li><li><a href='#prov'>Provenance</a></li></ol></div></nav>
+<main class='wrap'>
+<section id='data'><span class='sec-num'>00 — RAW DATA</span>
+<h2 class='sec'>Where the text comes from</h2>
+<p class='lead'>Three content-language groups, all filtered to Fukui Prefecture. Group labels describe the language of the text, not the nationality of any author or reviewer.</p>
+<dl class='dl'>
+<dt>English reviews</dt><dd><a class="stat" href="output/hypothesis_tests/h2_review_rating_jp_en.csv" target="_blank" title="raw value: 214
+field: H2 group_summary n_rating_present[english]
+source: output/hypothesis_tests/h2_review_rating_jp_en.csv
+sha256: d2fee108d6768ca2d5adc005de24089de12913f53b80daa4660050eb49b9edf8
+script: scripts/test_h2_review_rating_jp_en.py" data-raw="214" data-source="output/hypothesis_tests/h2_review_rating_jp_en.csv" data-field="H2 group_summary n_rating_present[english]" data-sha256="d2fee108d6768ca2d5adc005de24089de12913f53b80daa4660050eb49b9edf8">214<span class="prov-dot">●</span></a> Google review rows (Fukui), scored with VADER.</dd>
+<dt>Japanese reviews</dt><dd><a class="stat" href="output/hypothesis_tests/h2_review_rating_jp_en.csv" target="_blank" title="raw value: 1800
+field: H2 group_summary n_rating_present[japanese]
+source: output/hypothesis_tests/h2_review_rating_jp_en.csv
+sha256: d2fee108d6768ca2d5adc005de24089de12913f53b80daa4660050eb49b9edf8
+script: scripts/test_h2_review_rating_jp_en.py" data-raw="1800" data-source="output/hypothesis_tests/h2_review_rating_jp_en.csv" data-field="H2 group_summary n_rating_present[japanese]" data-sha256="d2fee108d6768ca2d5adc005de24089de12913f53b80daa4660050eb49b9edf8">1,800<span class="prov-dot">●</span></a> Google review rows (Fukui), scored with oseti (MeCab + polarity dictionaries).</dd>
+<dt>Chinese posts</dt><dd><a class="stat" href="output/chinese_specific_insights/chinese_specific_insights_manifest.json" target="_blank" title="raw value: 200
+field: metrics.rows_represented
+source: output/chinese_specific_insights/chinese_specific_insights_manifest.json
+sha256: db2cf7d29115b94304d4c8d50945d05d0f5887a30ca447b8745834a1a7dfac21
+script: python scripts/build_chinese_specific_insights.py" data-raw="200" data-source="output/chinese_specific_insights/chinese_specific_insights_manifest.json" data-field="metrics.rows_represented" data-sha256="db2cf7d29115b94304d4c8d50945d05d0f5887a30ca447b8745834a1a7dfac21">200<span class="prov-dot">●</span></a> Xiaohongshu rows, scored with SnowNLP plus a reviewed Chinese codebook. Douyin is held out of the main pipeline.</dd>
+<dt>Total</dt><dd><a class="stat" href="output/presentation_safe/presentation_manifest.json" target="_blank" title="raw value: 2014
+field: metrics.review_rows_represented
+source: output/presentation_safe/presentation_manifest.json
+sha256: 1dc1f5ee2db1de36f781b3daef30deaf519b4e6c1a68a3835550f3a21faef328
+script: scripts/build_presentation_safe_outputs.py" data-raw="2014" data-source="output/presentation_safe/presentation_manifest.json" data-field="metrics.review_rows_represented" data-sha256="1dc1f5ee2db1de36f781b3daef30deaf519b4e6c1a68a3835550f3a21faef328">2,014<span class="prov-dot">●</span></a> aggregate rows represented across the project.</dd>
+</dl>
+<p>Google review text is an Outscraper-derived local cache; Chinese posts come from an external <code>tourism-data</code> checkout. Raw text, authors, URLs, and IDs stay out of this repository — only aggregate counts and statistics are published. The English and Japanese reviews differ markedly in length, which matters for keyword matching: median text is <a class="stat" href="output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv" target="_blank" title="raw value: 176.0
+field: H3 text_length english median
+source: output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv
+sha256: 86a0c42644ba0d28ea7910077dd3937b04804897716a29f9f28a4e401e638fdf
+script: scripts/test_h3_reviewed_evidence_jp_en.py" data-raw="176.0" data-source="output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv" data-field="H3 text_length english median" data-sha256="86a0c42644ba0d28ea7910077dd3937b04804897716a29f9f28a4e401e638fdf">176 chars<span class="prov-dot">●</span></a> for English versus <a class="stat" href="output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv" target="_blank" title="raw value: 62.0
+field: H3 text_length japanese median
+source: output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv
+sha256: 86a0c42644ba0d28ea7910077dd3937b04804897716a29f9f28a4e401e638fdf
+script: scripts/test_h3_reviewed_evidence_jp_en.py" data-raw="62.0" data-source="output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv" data-field="H3 text_length japanese median" data-sha256="86a0c42644ba0d28ea7910077dd3937b04804897716a29f9f28a4e401e638fdf">62 chars<span class="prov-dot">●</span></a> for Japanese.</p>
+</section>
+<section id='pipeline'><span class='sec-num'>01 — PROCESSING</span>
+<h2 class='sec'>From raw text to auditable evidence</h2>
+<p class='lead'>Every row carries two parallel signals: a language-specific sentiment score and reviewed keyword evidence. The score gives a comparable category; the evidence gives a human-auditable reason.</p>
+<ol class='pipeline'>
+<li><b>Sync &amp; filter.</b> Pull the Google review cache and Chinese posts, keep Fukui POIs only.</li>
+<li><b>Language tagging.</b> Split Google reviews into English- and Japanese-language rows.</li>
+<li><b>Dual-path scoring.</b> VADER (EN), oseti (JP), SnowNLP (CN) for category shares; reviewed friction / enjoyment / recommendation / positive codebooks for matched evidence.</li>
+<li><b>Category rule.</b> A shared threshold maps scores to positive / neutral / negative (positive ≥ 0.05, negative ≤ −0.05); neutral-band width is varied as a robustness check.</li>
+<li><b>Statistical tests.</b> Category-share χ², common-scale star-rating Welch tests, evidence-prevalence tests with multiplicity correction, and a within-POI paired check.</li>
+<li><b>Aggregate-only outputs.</b> Every result is written with denominators, source SHA256, and the generating command; the build fails loud on missing inputs rather than inventing data.</li>
+</ol>
+<div class='caveat'>Measurement honesty: VADER, oseti, and SnowNLP scores are <em>not</em> a common scale, so raw scores are never compared across languages. Cross-language comparison uses category shares, common 1–5 Google star ratings, and reviewed evidence prevalence. Review rows are nested in POIs, so single-level p-values are descriptive; the within-POI paired test (F2) is the venue-clustering robustness check.</div>
+</section>
+<section id='hyp'><span class='sec-num'>02 — HYPOTHESES</span>
+<h2 class='sec'>The hypotheses under test</h2>
+<p class='lead'>The confirmatory comparison is between English-language and Japanese-language Fukui Google reviews. Three pre-specified hypotheses (H1–H3) are stated below with their null and alternative, the test used, the multiplicity control, and the rejection rule; a fourth, venue-controlled robustness hypothesis re-tests the rating and sentiment results within shared POIs.</p>
+<p>Decision threshold is &alpha; = .05 (two-sided) throughout. Because review rows are nested in POIs, single-level tests are read as descriptive support and the within-POI paired hypothesis is the clustering robustness check. The Chinese-social and within-language analyses shown further down are exploratory/descriptive and are not framed as confirmatory hypotheses.</p>
+<div class='hyp'><div class='hyp-head'><span class='hyp-tag'>H1</span><h3>Sentiment-category mix vs. review language</h3></div><div class='hyp-grid'><div class='k'>H<sub>0</sub> (null)</div><div class='v'>The distribution across positive / neutral / negative categories is independent of review language (English vs Japanese).</div><div class='k'>H<sub>a</sub> (alt)</div><div class='v'>The category distribution differs by review language.</div><div class='k'>Unit &amp; groups</div><div class='v'>One Fukui Google review row; English (n=<a class="stat" href="output/hypothesis_tests/h2_review_rating_jp_en.csv" target="_blank" title="raw value: 214
+field: H2 group_summary n_rating_present[english]
+source: output/hypothesis_tests/h2_review_rating_jp_en.csv
+sha256: d2fee108d6768ca2d5adc005de24089de12913f53b80daa4660050eb49b9edf8
+script: scripts/test_h2_review_rating_jp_en.py" data-raw="214" data-source="output/hypothesis_tests/h2_review_rating_jp_en.csv" data-field="H2 group_summary n_rating_present[english]" data-sha256="d2fee108d6768ca2d5adc005de24089de12913f53b80daa4660050eb49b9edf8">214<span class="prov-dot">●</span></a>) vs Japanese (n=<a class="stat" href="output/hypothesis_tests/h2_review_rating_jp_en.csv" target="_blank" title="raw value: 1800
+field: H2 group_summary n_rating_present[japanese]
+source: output/hypothesis_tests/h2_review_rating_jp_en.csv
+sha256: d2fee108d6768ca2d5adc005de24089de12913f53b80daa4660050eb49b9edf8
+script: scripts/test_h2_review_rating_jp_en.py" data-raw="1800" data-source="output/hypothesis_tests/h2_review_rating_jp_en.csv" data-field="H2 group_summary n_rating_present[japanese]" data-sha256="d2fee108d6768ca2d5adc005de24089de12913f53b80daa4660050eb49b9edf8">1,800<span class="prov-dot">●</span></a>).</div><div class='k'>Test</div><div class='v'>Pearson &chi;<sup>2</sup> test of independence (3 categories × 2 languages).</div><div class='k'>Multiplicity</div><div class='v'>Holm step-down across the primary test and two neutral-band sensitivity tests.</div><div class='k'>Reject H<sub>0</sub> if</div><div class='v'>the Holm-adjusted p-value is below &alpha; = .05.</div></div><div class='hyp-decision'>&chi;<sup>2</sup> = <a class="stat" href="output/hypothesis_tests/h1_sentiment_category_jp_en.csv" target="_blank" title="raw value: 38.56916459269966
+field: H1 primary chi-square statistic
+source: output/hypothesis_tests/h1_sentiment_category_jp_en.csv
+sha256: 089d60762ef52f55095179c76899ef008e8e5e7996f0601e2b02be8a65d8653d
+script: scripts/test_h1_sentiment_category_jp_en.py" data-raw="38.56916459269966" data-source="output/hypothesis_tests/h1_sentiment_category_jp_en.csv" data-field="H1 primary chi-square statistic" data-sha256="089d60762ef52f55095179c76899ef008e8e5e7996f0601e2b02be8a65d8653d">38.6<span class="prov-dot">●</span></a>, Holm <a class="stat" href="output/hypothesis_tests/h1_sentiment_category_jp_en.csv" target="_blank" title="raw value: 4.215143098065763e-09
+field: H1 primary p_value_holm
+source: output/hypothesis_tests/h1_sentiment_category_jp_en.csv
+sha256: 089d60762ef52f55095179c76899ef008e8e5e7996f0601e2b02be8a65d8653d
+script: scripts/test_h1_sentiment_category_jp_en.py" data-raw="4.215143098065763e-09" data-source="output/hypothesis_tests/h1_sentiment_category_jp_en.csv" data-field="H1 primary p_value_holm" data-sha256="089d60762ef52f55095179c76899ef008e8e5e7996f0601e2b02be8a65d8653d">p = 4.2×10<sup>-9</sup><span class="prov-dot">●</span></a> → <span class='rej'>Reject H<sub>0</sub>.</span> The association is statistically clear but small in magnitude (Cramér's V = <a class="stat" href="output/hypothesis_tests/h1_sentiment_category_jp_en.csv" target="_blank" title="raw value: 0.1383854349134206
+field: H1 primary effect_cramers_v
+source: output/hypothesis_tests/h1_sentiment_category_jp_en.csv
+sha256: 089d60762ef52f55095179c76899ef008e8e5e7996f0601e2b02be8a65d8653d
+script: scripts/test_h1_sentiment_category_jp_en.py" data-raw="0.1383854349134206" data-source="output/hypothesis_tests/h1_sentiment_category_jp_en.csv" data-field="H1 primary effect_cramers_v" data-sha256="089d60762ef52f55095179c76899ef008e8e5e7996f0601e2b02be8a65d8653d">0.14<span class="prov-dot">●</span></a>).</div></div>
+<div class='hyp'><div class='hyp-head'><span class='hyp-tag'>H2</span><h3>Mean star rating vs. review language</h3></div><div class='hyp-grid'><div class='k'>H<sub>0</sub> (null)</div><div class='v'>Mean Google star rating (1–5) is equal for English- and Japanese-language reviews (&mu;<sub>EN</sub> = &mu;<sub>JP</sub>).</div><div class='k'>H<sub>a</sub> (alt)</div><div class='v'>The mean ratings differ (&mu;<sub>EN</sub> &ne; &mu;<sub>JP</sub>).</div><div class='k'>Unit &amp; groups</div><div class='v'>One review row (primary); POI-language mean and shared-POI pair as sensitivity units.</div><div class='k'>Test</div><div class='v'>Welch's two-sample t-test on the common 1–5 scale (two-sided, unequal variances).</div><div class='k'>Multiplicity</div><div class='v'>Single primary test, reported with a 95% CI; POI-level and within-POI paired sensitivity.</div><div class='k'>Reject H<sub>0</sub> if</div><div class='v'>the p-value is below &alpha; = .05.</div></div><div class='hyp-decision'>&Delta; = <a class="stat" href="output/hypothesis_tests/h2_review_rating_jp_en.csv" target="_blank" title="raw value: 0.2710436137071648
+field: H2 welch effect_mean_difference
+source: output/hypothesis_tests/h2_review_rating_jp_en.csv
+sha256: d2fee108d6768ca2d5adc005de24089de12913f53b80daa4660050eb49b9edf8
+script: scripts/test_h2_review_rating_jp_en.py" data-raw="0.2710436137071648" data-source="output/hypothesis_tests/h2_review_rating_jp_en.csv" data-field="H2 welch effect_mean_difference" data-sha256="d2fee108d6768ca2d5adc005de24089de12913f53b80daa4660050eb49b9edf8">+0.27 stars<span class="prov-dot">●</span></a> (95% CI <a class="stat" href="output/hypothesis_tests/h2_review_rating_jp_en.csv" target="_blank" title="raw value: 0.1382166907911169
+field: H2 welch ci_95_lower
+source: output/hypothesis_tests/h2_review_rating_jp_en.csv
+sha256: d2fee108d6768ca2d5adc005de24089de12913f53b80daa4660050eb49b9edf8
+script: scripts/test_h2_review_rating_jp_en.py" data-raw="0.1382166907911169" data-source="output/hypothesis_tests/h2_review_rating_jp_en.csv" data-field="H2 welch ci_95_lower" data-sha256="d2fee108d6768ca2d5adc005de24089de12913f53b80daa4660050eb49b9edf8">0.14<span class="prov-dot">●</span></a>–<a class="stat" href="output/hypothesis_tests/h2_review_rating_jp_en.csv" target="_blank" title="raw value: 0.4038705366232127
+field: H2 welch ci_95_upper
+source: output/hypothesis_tests/h2_review_rating_jp_en.csv
+sha256: d2fee108d6768ca2d5adc005de24089de12913f53b80daa4660050eb49b9edf8
+script: scripts/test_h2_review_rating_jp_en.py" data-raw="0.4038705366232127" data-source="output/hypothesis_tests/h2_review_rating_jp_en.csv" data-field="H2 welch ci_95_upper" data-sha256="d2fee108d6768ca2d5adc005de24089de12913f53b80daa4660050eb49b9edf8">0.40<span class="prov-dot">●</span></a>), <a class="stat" href="output/hypothesis_tests/h2_review_rating_jp_en.csv" target="_blank" title="raw value: 7.65005350589232e-05
+field: H2 welch p_value
+source: output/hypothesis_tests/h2_review_rating_jp_en.csv
+sha256: d2fee108d6768ca2d5adc005de24089de12913f53b80daa4660050eb49b9edf8
+script: scripts/test_h2_review_rating_jp_en.py" data-raw="7.65005350589232e-05" data-source="output/hypothesis_tests/h2_review_rating_jp_en.csv" data-field="H2 welch p_value" data-sha256="d2fee108d6768ca2d5adc005de24089de12913f53b80daa4660050eb49b9edf8">p = 7.7×10<sup>-5</sup><span class="prov-dot">●</span></a> → <span class='rej'>Reject H<sub>0</sub>.</span> The gap persists at POI level (<a class="stat" href="output/hypothesis_tests/h2_review_rating_jp_en.csv" target="_blank" title="raw value: 0.2673816245890537
+field: H2 POI-level effect_mean_difference
+source: output/hypothesis_tests/h2_review_rating_jp_en.csv
+sha256: d2fee108d6768ca2d5adc005de24089de12913f53b80daa4660050eb49b9edf8
+script: scripts/test_h2_review_rating_jp_en.py" data-raw="0.2673816245890537" data-source="output/hypothesis_tests/h2_review_rating_jp_en.csv" data-field="H2 POI-level effect_mean_difference" data-sha256="d2fee108d6768ca2d5adc005de24089de12913f53b80daa4660050eb49b9edf8">+0.27 stars<span class="prov-dot">●</span></a>, <a class="stat" href="output/hypothesis_tests/h2_review_rating_jp_en.csv" target="_blank" title="raw value: 0.0351390234840489
+field: H2 POI-level p_value
+source: output/hypothesis_tests/h2_review_rating_jp_en.csv
+sha256: d2fee108d6768ca2d5adc005de24089de12913f53b80daa4660050eb49b9edf8
+script: scripts/test_h2_review_rating_jp_en.py" data-raw="0.0351390234840489" data-source="output/hypothesis_tests/h2_review_rating_jp_en.csv" data-field="H2 POI-level p_value" data-sha256="d2fee108d6768ca2d5adc005de24089de12913f53b80daa4660050eb49b9edf8">p = .035<span class="prov-dot">●</span></a>).</div></div>
+<div class='hyp'><div class='hyp-head'><span class='hyp-tag'>H3</span><h3>Reviewed-evidence prevalence vs. review language</h3></div><div class='hyp-grid'><div class='k'>H<sub>0</sub> (null)</div><div class='v'>For each evidence family (friction, enjoyment, recommendation, positive sentiment), prevalence is equal across English and Japanese review rows.</div><div class='k'>H<sub>a</sub> (alt)</div><div class='v'>Prevalence differs across languages for that family.</div><div class='k'>Unit &amp; groups</div><div class='v'>One review row; four parallel family tests.</div><div class='k'>Test</div><div class='v'>Per-family two-group test of evidence prevalence (English vs Japanese).</div><div class='k'>Multiplicity</div><div class='v'>Benjamini–Hochberg FDR across the four evidence families.</div><div class='k'>Reject H<sub>0</sub> if</div><div class='v'>the BH-FDR-adjusted p-value for that family is below &alpha; = .05.</div></div><div class='hyp-decision'>Enjoyment <a class="stat" href="output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv" target="_blank" title="raw value: 31.27102803738317
+field: H3 enjoyment risk_difference_pct
+source: output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv
+sha256: 86a0c42644ba0d28ea7910077dd3937b04804897716a29f9f28a4e401e638fdf
+script: scripts/test_h3_reviewed_evidence_jp_en.py" data-raw="31.27102803738317" data-source="output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv" data-field="H3 enjoyment risk_difference_pct" data-sha256="86a0c42644ba0d28ea7910077dd3937b04804897716a29f9f28a4e401e638fdf">+31.3 pp<span class="prov-dot">●</span></a> (<a class="stat" href="output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv" target="_blank" title="raw value: 2.435715758780761e-22
+field: H3 enjoyment p_value_bh_fdr
+source: output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv
+sha256: 86a0c42644ba0d28ea7910077dd3937b04804897716a29f9f28a4e401e638fdf
+script: scripts/test_h3_reviewed_evidence_jp_en.py" data-raw="2.435715758780761e-22" data-source="output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv" data-field="H3 enjoyment p_value_bh_fdr" data-sha256="86a0c42644ba0d28ea7910077dd3937b04804897716a29f9f28a4e401e638fdf">p = 2.4×10<sup>-22</sup><span class="prov-dot">●</span></a>) → <span class='rej'>Reject</span>; positive <a class="stat" href="output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv" target="_blank" title="raw value: 23.59190031152648
+field: H3 positive_sentiment risk_difference_pct
+source: output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv
+sha256: 86a0c42644ba0d28ea7910077dd3937b04804897716a29f9f28a4e401e638fdf
+script: scripts/test_h3_reviewed_evidence_jp_en.py" data-raw="23.59190031152648" data-source="output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv" data-field="H3 positive_sentiment risk_difference_pct" data-sha256="86a0c42644ba0d28ea7910077dd3937b04804897716a29f9f28a4e401e638fdf">+23.6 pp<span class="prov-dot">●</span></a> (<a class="stat" href="output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv" target="_blank" title="raw value: 3.0396161334758097e-14
+field: H3 positive_sentiment p_value_bh_fdr
+source: output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv
+sha256: 86a0c42644ba0d28ea7910077dd3937b04804897716a29f9f28a4e401e638fdf
+script: scripts/test_h3_reviewed_evidence_jp_en.py" data-raw="3.0396161334758097e-14" data-source="output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv" data-field="H3 positive_sentiment p_value_bh_fdr" data-sha256="86a0c42644ba0d28ea7910077dd3937b04804897716a29f9f28a4e401e638fdf">p = 3.0×10<sup>-14</sup><span class="prov-dot">●</span></a>) → <span class='rej'>Reject</span>; recommendation <a class="stat" href="output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv" target="_blank" title="raw value: 10.832294911734165
+field: H3 recommendation risk_difference_pct
+source: output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv
+sha256: 86a0c42644ba0d28ea7910077dd3937b04804897716a29f9f28a4e401e638fdf
+script: scripts/test_h3_reviewed_evidence_jp_en.py" data-raw="10.832294911734165" data-source="output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv" data-field="H3 recommendation risk_difference_pct" data-sha256="86a0c42644ba0d28ea7910077dd3937b04804897716a29f9f28a4e401e638fdf">+10.8 pp<span class="prov-dot">●</span></a> (<a class="stat" href="output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv" target="_blank" title="raw value: 1.8244103090437826e-09
+field: H3 recommendation p_value_bh_fdr
+source: output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv
+sha256: 86a0c42644ba0d28ea7910077dd3937b04804897716a29f9f28a4e401e638fdf
+script: scripts/test_h3_reviewed_evidence_jp_en.py" data-raw="1.8244103090437826e-09" data-source="output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv" data-field="H3 recommendation p_value_bh_fdr" data-sha256="86a0c42644ba0d28ea7910077dd3937b04804897716a29f9f28a4e401e638fdf">p = 1.8×10<sup>-9</sup><span class="prov-dot">●</span></a>) → <span class='rej'>Reject</span>; friction <a class="stat" href="output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv" target="_blank" title="raw value: 1.744029075804776
+field: H3 friction risk_difference_pct
+source: output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv
+sha256: 86a0c42644ba0d28ea7910077dd3937b04804897716a29f9f28a4e401e638fdf
+script: scripts/test_h3_reviewed_evidence_jp_en.py" data-raw="1.744029075804776" data-source="output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv" data-field="H3 friction risk_difference_pct" data-sha256="86a0c42644ba0d28ea7910077dd3937b04804897716a29f9f28a4e401e638fdf">+1.7 pp<span class="prov-dot">●</span></a> (<a class="stat" href="output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv" target="_blank" title="raw value: 0.5636197062874753
+field: H3 friction p_value_bh_fdr
+source: output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv
+sha256: 86a0c42644ba0d28ea7910077dd3937b04804897716a29f9f28a4e401e638fdf
+script: scripts/test_h3_reviewed_evidence_jp_en.py" data-raw="0.5636197062874753" data-source="output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv" data-field="H3 friction p_value_bh_fdr" data-sha256="86a0c42644ba0d28ea7910077dd3937b04804897716a29f9f28a4e401e638fdf">p = .564<span class="prov-dot">●</span></a>) → <span class='keep'>Fail to reject</span>.</div></div>
+<div class='hyp'><div class='hyp-head'><span class='hyp-tag'>H4 · robustness</span><h3>Language gap within shared venues (clustering control)</h3></div><div class='hyp-grid'><div class='k'>H<sub>0</sub> (null)</div><div class='v'>Within POIs reviewed by both groups, the paired English−Japanese difference is zero (median = 0) for star rating and for positive-sentiment share.</div><div class='k'>H<sub>a</sub> (alt)</div><div class='v'>The paired within-POI difference is non-zero.</div><div class='k'>Unit &amp; groups</div><div class='v'>Shared-POI pair — <a class="stat" href="output/hypothesis_tests/within_poi_paired_jp_en.csv" target="_blank" title="raw value: 14
+field: within-POI n_pairs
+source: output/hypothesis_tests/within_poi_paired_jp_en.csv
+sha256: e50a1ec108d9a07c221dae58c3c123be681febd43c54d2c0ca7e408c14aa9da5
+script: " data-raw="14" data-source="output/hypothesis_tests/within_poi_paired_jp_en.csv" data-field="within-POI n_pairs" data-sha256="e50a1ec108d9a07c221dae58c3c123be681febd43c54d2c0ca7e408c14aa9da5">14<span class="prov-dot">●</span></a> pairs from <a class="stat" href="output/hypothesis_tests/within_poi_paired_jp_en.csv" target="_blank" title="raw value: 25
+field: within-POI n_shared_poi_candidates
+source: output/hypothesis_tests/within_poi_paired_jp_en.csv
+sha256: e50a1ec108d9a07c221dae58c3c123be681febd43c54d2c0ca7e408c14aa9da5
+script: " data-raw="25" data-source="output/hypothesis_tests/within_poi_paired_jp_en.csv" data-field="within-POI n_shared_poi_candidates" data-sha256="e50a1ec108d9a07c221dae58c3c123be681febd43c54d2c0ca7e408c14aa9da5">25<span class="prov-dot">●</span></a> candidate POIs (≥5 reviews per language).</div><div class='k'>Test</div><div class='v'>Wilcoxon signed-rank test on POI-pair differences.</div><div class='k'>Multiplicity</div><div class='v'>Robustness re-test of H2/H3 holding venue (POI) constant.</div><div class='k'>Reject H<sub>0</sub> if</div><div class='v'>the p-value is below &alpha; = .05.</div></div><div class='hyp-decision'>Positive-sentiment share: median <a class="stat" href="output/hypothesis_tests/within_poi_paired_jp_en.csv" target="_blank" title="raw value: 0.1608025819023261
+field: within-POI positive_share effect (median diff)
+source: output/hypothesis_tests/within_poi_paired_jp_en.csv
+sha256: e50a1ec108d9a07c221dae58c3c123be681febd43c54d2c0ca7e408c14aa9da5
+script: " data-raw="0.1608025819023261" data-source="output/hypothesis_tests/within_poi_paired_jp_en.csv" data-field="within-POI positive_share effect (median diff)" data-sha256="e50a1ec108d9a07c221dae58c3c123be681febd43c54d2c0ca7e408c14aa9da5">+0.16<span class="prov-dot">●</span></a> (<a class="stat" href="output/hypothesis_tests/within_poi_paired_jp_en.csv" target="_blank" title="raw value: 0.0001220703125
+field: within-POI positive_share p_value
+source: output/hypothesis_tests/within_poi_paired_jp_en.csv
+sha256: e50a1ec108d9a07c221dae58c3c123be681febd43c54d2c0ca7e408c14aa9da5
+script: " data-raw="0.0001220703125" data-source="output/hypothesis_tests/within_poi_paired_jp_en.csv" data-field="within-POI positive_share p_value" data-sha256="e50a1ec108d9a07c221dae58c3c123be681febd43c54d2c0ca7e408c14aa9da5">p &lt; .001<span class="prov-dot">●</span></a>) → <span class='rej'>Reject H<sub>0</sub>.</span> Star rating: median <a class="stat" href="output/hypothesis_tests/within_poi_paired_jp_en.csv" target="_blank" title="raw value: 0.3137931034482757
+field: within-POI rating effect (median diff)
+source: output/hypothesis_tests/within_poi_paired_jp_en.csv
+sha256: e50a1ec108d9a07c221dae58c3c123be681febd43c54d2c0ca7e408c14aa9da5
+script: " data-raw="0.3137931034482757" data-source="output/hypothesis_tests/within_poi_paired_jp_en.csv" data-field="within-POI rating effect (median diff)" data-sha256="e50a1ec108d9a07c221dae58c3c123be681febd43c54d2c0ca7e408c14aa9da5">+0.31 stars<span class="prov-dot">●</span></a> (<a class="stat" href="output/hypothesis_tests/within_poi_paired_jp_en.csv" target="_blank" title="raw value: 0.0579833984375
+field: within-POI rating p_value
+source: output/hypothesis_tests/within_poi_paired_jp_en.csv
+sha256: e50a1ec108d9a07c221dae58c3c123be681febd43c54d2c0ca7e408c14aa9da5
+script: " data-raw="0.0579833984375" data-source="output/hypothesis_tests/within_poi_paired_jp_en.csv" data-field="within-POI rating p_value" data-sha256="e50a1ec108d9a07c221dae58c3c123be681febd43c54d2c0ca7e408c14aa9da5">p = .058<span class="prov-dot">●</span></a>) → <span class='keep'>not significant at .05</span> (borderline).</div></div>
+</section>
+<section id='summary'><span class='sec-num'>03 — RESULTS OVERVIEW</span>
+<h2 class='sec'>The findings at a glance</h2>
+<p class='lead'>English-language reviews consistently give higher ratings and carry more positive experience evidence than Japanese-language reviews of the same Fukui venues, and the gap survives controlling for which venues each group reviews. The cleanest comparison is the shared 1–5 star scale (F1); findings below descend from that cleanest, most interpretable result to the most caveated.</p>
+<div class='caveat'><b>Rival explanation — cross-cultural response style.</b> The consistent EN&nbsp;&gt;&nbsp;JP positivity gap is also consistent with well-documented cross-cultural differences in rating and expressive style: Japanese-language reviewers tend toward more reserved scale use, so the gap may partly reflect expression norms rather than differences in actual experience quality at Fukui venues. This interpretation is reinforced — not refuted — by the friction (complaint) null: complaint-evidence prevalence does <em>not</em> differ between groups (<a class="stat" href="output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv" target="_blank" title="raw value: 1.744029075804776
+field: H3 friction risk_difference_pct
+source: output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv
+sha256: 86a0c42644ba0d28ea7910077dd3937b04804897716a29f9f28a4e401e638fdf
+script: scripts/test_h3_reviewed_evidence_jp_en.py" data-raw="1.744029075804776" data-source="output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv" data-field="H3 friction risk_difference_pct" data-sha256="86a0c42644ba0d28ea7910077dd3937b04804897716a29f9f28a4e401e638fdf">+1.7 pp<span class="prov-dot">●</span></a>, <a class="stat" href="output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv" target="_blank" title="raw value: 0.5636197062874753
+field: H3 friction p_value_bh_fdr
+source: output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv
+sha256: 86a0c42644ba0d28ea7910077dd3937b04804897716a29f9f28a4e401e638fdf
+script: scripts/test_h3_reviewed_evidence_jp_en.py" data-raw="0.5636197062874753" data-source="output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv" data-field="H3 friction p_value_bh_fdr" data-sha256="86a0c42644ba0d28ea7910077dd3937b04804897716a29f9f28a4e401e638fdf">p = .564<span class="prov-dot">●</span></a>), meaning the groups differ in how much they praise, not in how much they complain — exactly the asymmetric pattern a positivity-expression difference would produce. The within-POI check (F2) controls for <em>which</em> venues are reviewed but does not rule out this response-style confound.</div>
+<figure class="fig"><svg xmlns="http://www.w3.org/2000/svg" width="1120" height="438" viewBox="0 0 1120 438">
+<rect width="100%" height="100%" fill="#fbfaf7"/>
+<text x="32.00" y="39.00" text-anchor="start" font-family="Arial, sans-serif" font-size="24" font-weight="700" fill="#172033">Hypothesis Results at a Glance</text>
+<text x="32.00" y="66.00" text-anchor="start" font-family="Arial, sans-serif" font-size="14" font-weight="400" fill="#5b677a">Fukui Google reviews; effect sizes with multiplicity-adjusted p-values</text>
+<text x="58.00" y="116.00" text-anchor="start" font-family="Arial, sans-serif" font-size="15" font-weight="700" fill="#172033">H1</text>
+<text x="172.00" y="116.00" text-anchor="start" font-family="Arial, sans-serif" font-size="13" font-weight="400" fill="#172033">English reviews skew more positive (91% vs 72% positive).</text>
+<rect x="590.00" y="96.00" width="318.00" height="30.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="749.00" y="114.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="700" fill="#172033">Cramér&#x27;s V=0.14 (χ²=38.6)</text>
+<rect x="920.00" y="96.00" width="98.00" height="30.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="969.00" y="114.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="400" fill="#5b677a">p(Holm)=4.2e-09</text>
+<rect x="1030.00" y="96.00" width="58.00" height="30.00" rx="4" fill="#2f6f73" stroke="#2f6f73" stroke-width="1"/>
+<text x="1059.00" y="113.50" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" font-weight="700" fill="#fbfaf7">supported</text>
+<rect x="32" y="163.00" width="1056" height="56" rx="6" fill="#d7dde8" opacity="0.22"/>
+<text x="58.00" y="186.00" text-anchor="start" font-family="Arial, sans-serif" font-size="15" font-weight="700" fill="#172033">H2</text>
+<text x="172.00" y="186.00" text-anchor="start" font-family="Arial, sans-serif" font-size="13" font-weight="400" fill="#172033">Holds at review and POI level; within-POI rating borderline.</text>
+<rect x="590.00" y="166.00" width="318.00" height="30.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="749.00" y="184.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="700" fill="#172033">ΔEN−JP=+0.27 stars (95% CI 0.14–0.40)</text>
+<rect x="920.00" y="166.00" width="98.00" height="30.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="969.00" y="184.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="400" fill="#5b677a">p=7.7e-05</text>
+<rect x="1030.00" y="166.00" width="58.00" height="30.00" rx="4" fill="#2f6f73" stroke="#2f6f73" stroke-width="1"/>
+<text x="1059.00" y="183.50" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" font-weight="700" fill="#fbfaf7">supported</text>
+<text x="58.00" y="256.00" text-anchor="start" font-family="Arial, sans-serif" font-size="15" font-weight="700" fill="#172033">H3</text>
+<text x="172.00" y="256.00" text-anchor="start" font-family="Arial, sans-serif" font-size="13" font-weight="400" fill="#172033">Friction prevalence does NOT differ (+1.7pp, n.s.).</text>
+<rect x="590.00" y="236.00" width="318.00" height="30.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="749.00" y="254.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="700" fill="#172033">enjoyment +31pp; positive +24pp; recommendation +11pp</text>
+<rect x="920.00" y="236.00" width="98.00" height="30.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="969.00" y="254.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="400" fill="#5b677a">p(FDR)&lt;1e-8</text>
+<rect x="1030.00" y="236.00" width="58.00" height="30.00" rx="4" fill="#2f6f73" stroke="#2f6f73" stroke-width="1"/>
+<text x="1059.00" y="253.50" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" font-weight="700" fill="#fbfaf7">supported</text>
+<rect x="32" y="303.00" width="1056" height="56" rx="6" fill="#d7dde8" opacity="0.22"/>
+<text x="58.00" y="326.00" text-anchor="start" font-family="Arial, sans-serif" font-size="15" font-weight="700" fill="#172033">Robustness</text>
+<text x="172.00" y="326.00" text-anchor="start" font-family="Arial, sans-serif" font-size="13" font-weight="400" fill="#172033">Positive-share holds; rating borderline/n.s.</text>
+<rect x="590.00" y="306.00" width="318.00" height="30.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="749.00" y="324.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="700" fill="#172033">positive-share +0.16 (p=1.2e-04); rating +0.31 (p=0.058)</text>
+<rect x="920.00" y="306.00" width="98.00" height="30.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="969.00" y="324.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="400" fill="#5b677a">n=14 POIs</text>
+<rect x="1030.00" y="306.00" width="58.00" height="30.00" rx="4" fill="#bc6c25" stroke="#bc6c25" stroke-width="1"/>
+<text x="1059.00" y="323.50" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" font-weight="700" fill="#fbfaf7">mixed</text>
+<text x="32.00" y="420.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#5b677a">H1 Holm-adjusted; H3 Benjamini–Hochberg FDR. Rows nested in POIs; the within-POI paired row is the venue-clustering robustness check.</text>
+</svg><figcaption>Results panel across the four confirmatory checks; effect sizes shown with multiplicity-adjusted p-values. <a class="figsrc" href="docs/statistical_test_figures/figure_hypothesis_overview.svg" target="_blank">docs/statistical_test_figures/figure_hypothesis_overview.svg</a> <span class="figsrc-note">(script-generated, aggregate-only)</span></figcaption></figure>
+</section>
+<section id='f1'><span class='sec-num'>FINDING 1 — CLEANEST COMPARISON</span>
+<div class='rank'><span class='badge b-strong'>Strongest · common 1–5 scale</span></div>
+<h3 style='font-size:25px;font-weight:600;margin:0 0 6px'>English reviewers give higher star ratings</h3>
+<p class='lead'>This is the cleanest cross-language comparison: Google star ratings run on a shared 1–5 scale for both groups, so no tool-specific scoring is involved. English reviews average <a class="stat" href="output/hypothesis_tests/h2_review_rating_jp_en.csv" target="_blank" title="raw value: 4.532710280373832
+field: H2 english mean_review_rating
+source: output/hypothesis_tests/h2_review_rating_jp_en.csv
+sha256: d2fee108d6768ca2d5adc005de24089de12913f53b80daa4660050eb49b9edf8
+script: scripts/test_h2_review_rating_jp_en.py" data-raw="4.532710280373832" data-source="output/hypothesis_tests/h2_review_rating_jp_en.csv" data-field="H2 english mean_review_rating" data-sha256="d2fee108d6768ca2d5adc005de24089de12913f53b80daa4660050eb49b9edf8">4.53<span class="prov-dot">●</span></a> versus <a class="stat" href="output/hypothesis_tests/h2_review_rating_jp_en.csv" target="_blank" title="raw value: 4.261666666666667
+field: H2 japanese mean_review_rating
+source: output/hypothesis_tests/h2_review_rating_jp_en.csv
+sha256: d2fee108d6768ca2d5adc005de24089de12913f53b80daa4660050eb49b9edf8
+script: scripts/test_h2_review_rating_jp_en.py" data-raw="4.261666666666667" data-source="output/hypothesis_tests/h2_review_rating_jp_en.csv" data-field="H2 japanese mean_review_rating" data-sha256="d2fee108d6768ca2d5adc005de24089de12913f53b80daa4660050eb49b9edf8">4.26<span class="prov-dot">●</span></a> for Japanese — a difference of <a class="stat" href="output/hypothesis_tests/h2_review_rating_jp_en.csv" target="_blank" title="raw value: 0.2710436137071648
+field: H2 welch effect_mean_difference
+source: output/hypothesis_tests/h2_review_rating_jp_en.csv
+sha256: d2fee108d6768ca2d5adc005de24089de12913f53b80daa4660050eb49b9edf8
+script: scripts/test_h2_review_rating_jp_en.py" data-raw="0.2710436137071648" data-source="output/hypothesis_tests/h2_review_rating_jp_en.csv" data-field="H2 welch effect_mean_difference" data-sha256="d2fee108d6768ca2d5adc005de24089de12913f53b80daa4660050eb49b9edf8">+0.27 stars<span class="prov-dot">●</span></a> (95% CI <a class="stat" href="output/hypothesis_tests/h2_review_rating_jp_en.csv" target="_blank" title="raw value: 0.1382166907911169
+field: H2 welch ci_95_lower
+source: output/hypothesis_tests/h2_review_rating_jp_en.csv
+sha256: d2fee108d6768ca2d5adc005de24089de12913f53b80daa4660050eb49b9edf8
+script: scripts/test_h2_review_rating_jp_en.py" data-raw="0.1382166907911169" data-source="output/hypothesis_tests/h2_review_rating_jp_en.csv" data-field="H2 welch ci_95_lower" data-sha256="d2fee108d6768ca2d5adc005de24089de12913f53b80daa4660050eb49b9edf8">0.14<span class="prov-dot">●</span></a>–<a class="stat" href="output/hypothesis_tests/h2_review_rating_jp_en.csv" target="_blank" title="raw value: 0.4038705366232127
+field: H2 welch ci_95_upper
+source: output/hypothesis_tests/h2_review_rating_jp_en.csv
+sha256: d2fee108d6768ca2d5adc005de24089de12913f53b80daa4660050eb49b9edf8
+script: scripts/test_h2_review_rating_jp_en.py" data-raw="0.4038705366232127" data-source="output/hypothesis_tests/h2_review_rating_jp_en.csv" data-field="H2 welch ci_95_upper" data-sha256="d2fee108d6768ca2d5adc005de24089de12913f53b80daa4660050eb49b9edf8">0.40<span class="prov-dot">●</span></a>, <a class="stat" href="output/hypothesis_tests/h2_review_rating_jp_en.csv" target="_blank" title="raw value: 7.65005350589232e-05
+field: H2 welch p_value
+source: output/hypothesis_tests/h2_review_rating_jp_en.csv
+sha256: d2fee108d6768ca2d5adc005de24089de12913f53b80daa4660050eb49b9edf8
+script: scripts/test_h2_review_rating_jp_en.py" data-raw="7.65005350589232e-05" data-source="output/hypothesis_tests/h2_review_rating_jp_en.csv" data-field="H2 welch p_value" data-sha256="d2fee108d6768ca2d5adc005de24089de12913f53b80daa4660050eb49b9edf8">p = 7.7×10<sup>-5</sup><span class="prov-dot">●</span></a>).</p>
+<p>The gap holds when the unit of analysis is tightened from individual reviews to POI averages (<a class="stat" href="output/hypothesis_tests/h2_review_rating_jp_en.csv" target="_blank" title="raw value: 0.2673816245890537
+field: H2 POI-level effect_mean_difference
+source: output/hypothesis_tests/h2_review_rating_jp_en.csv
+sha256: d2fee108d6768ca2d5adc005de24089de12913f53b80daa4660050eb49b9edf8
+script: scripts/test_h2_review_rating_jp_en.py" data-raw="0.2673816245890537" data-source="output/hypothesis_tests/h2_review_rating_jp_en.csv" data-field="H2 POI-level effect_mean_difference" data-sha256="d2fee108d6768ca2d5adc005de24089de12913f53b80daa4660050eb49b9edf8">+0.27 stars<span class="prov-dot">●</span></a>, <a class="stat" href="output/hypothesis_tests/h2_review_rating_jp_en.csv" target="_blank" title="raw value: 0.0351390234840489
+field: H2 POI-level p_value
+source: output/hypothesis_tests/h2_review_rating_jp_en.csv
+sha256: d2fee108d6768ca2d5adc005de24089de12913f53b80daa4660050eb49b9edf8
+script: scripts/test_h2_review_rating_jp_en.py" data-raw="0.0351390234840489" data-source="output/hypothesis_tests/h2_review_rating_jp_en.csv" data-field="H2 POI-level p_value" data-sha256="d2fee108d6768ca2d5adc005de24089de12913f53b80daa4660050eb49b9edf8">p = .035<span class="prov-dot">●</span></a>), and again under the within-POI paired check (F2 below).</p>
+<figure class="fig"><svg xmlns="http://www.w3.org/2000/svg" width="1120" height="385" viewBox="0 0 1120 385">
+<rect width="100%" height="100%" fill="#fbfaf7"/>
+<text x="32.00" y="39.00" text-anchor="start" font-family="Arial, sans-serif" font-size="24" font-weight="700" fill="#172033">English Rating Advantage Holds Across Units of Analysis</text>
+<text x="32.00" y="66.00" text-anchor="start" font-family="Arial, sans-serif" font-size="14" font-weight="400" fill="#5b677a">EN−JP mean Google star difference, three nested unit definitions</text>
+<rect x="397.09" y="90.00" width="414.91" height="206.00" fill="#2f6f73" opacity="0.07"/>
+<line x1="397.09" x2="397.09" y1="87.00" y2="313.00" stroke="#d7dde8" stroke-width="1.5" stroke-dasharray="5 5"/>
+<text x="366.00" y="146.00" text-anchor="end" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">Review-level Welch t (n=214 vs 1,800)</text>
+<line x1="382.00" x2="812.00" y1="142.00" y2="142.00" stroke="#d7dde8" stroke-width="1" opacity="0.65"/>
+<line x1="501.36" x2="701.76" y1="142.00" y2="142.00" stroke="#5b6c94" stroke-width="2.2"/>
+<line x1="501.36" x2="501.36" y1="135.00" y2="149.00" stroke="#5b6c94" stroke-width="2.2"/>
+<line x1="701.76" x2="701.76" y1="135.00" y2="149.00" stroke="#5b6c94" stroke-width="2.2"/>
+<circle cx="601.56" cy="142.00" r="5.2" fill="#5b6c94"/>
+<rect x="830.00" y="130.00" width="76.00" height="23.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="868.00" y="144.50" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="400" fill="#5b677a">p=7.7e-05</text>
+<rect x="918.00" y="129.00" width="170.00" height="25.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="1003.00" y="145.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="700" fill="#172033">+0.27 [0.14, 0.40]</text>
+<text x="366.00" y="208.00" text-anchor="end" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">POI-level Welch t (25 vs 28 POIs)</text>
+<line x1="382.00" x2="812.00" y1="204.00" y2="204.00" stroke="#d7dde8" stroke-width="1" opacity="0.65"/>
+<line x1="411.96" x2="785.63" y1="204.00" y2="204.00" stroke="#bc6c25" stroke-width="2.2"/>
+<line x1="411.96" x2="411.96" y1="197.00" y2="211.00" stroke="#bc6c25" stroke-width="2.2"/>
+<line x1="785.63" x2="785.63" y1="197.00" y2="211.00" stroke="#bc6c25" stroke-width="2.2"/>
+<circle cx="598.80" cy="204.00" r="5.2" fill="#bc6c25"/>
+<rect x="830.00" y="192.00" width="76.00" height="23.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="868.00" y="206.50" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="400" fill="#5b677a">p=0.035</text>
+<rect x="918.00" y="191.00" width="170.00" height="25.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="1003.00" y="207.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="700" fill="#172033">+0.27 [0.02, 0.52]</text>
+<text x="366.00" y="270.00" text-anchor="end" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">Within-POI paired Wilcoxon (14 shared POIs)</text>
+<line x1="382.00" x2="812.00" y1="266.00" y2="266.00" stroke="#d7dde8" stroke-width="1" opacity="0.65"/>
+<circle cx="633.81" cy="266.00" r="5.2" fill="#2f6f73"/>
+<rect x="830.00" y="254.00" width="76.00" height="23.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="868.00" y="268.50" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="400" fill="#5b677a">p=0.058</text>
+<rect x="918.00" y="253.00" width="170.00" height="25.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="1003.00" y="269.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="700" fill="#172033">+0.314</text>
+<line x1="382.00" x2="812.00" y1="313.00" y2="313.00" stroke="#d7dde8" stroke-width="1.2"/>
+<line x1="397.09" x2="397.09" y1="313.00" y2="319.00" stroke="#d7dde8" stroke-width="1"/>
+<text x="397.09" y="335.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#5b677a">0</text>
+<line x1="547.96" x2="547.96" y1="313.00" y2="319.00" stroke="#d7dde8" stroke-width="1"/>
+<text x="547.96" y="335.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#5b677a">0.2</text>
+<line x1="698.84" x2="698.84" y1="313.00" y2="319.00" stroke="#d7dde8" stroke-width="1"/>
+<text x="698.84" y="335.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#5b677a">0.4</text>
+<line x1="812.00" x2="812.00" y1="313.00" y2="319.00" stroke="#d7dde8" stroke-width="1"/>
+<text x="812.00" y="335.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#5b677a">0.55</text>
+<text x="32.00" y="367.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#5b677a">Same estimand (English minus Japanese) under progressively stricter venue control; common 1–5 star scale, not text-sentiment equivalence.</text>
+</svg><figcaption>The English-minus-Japanese rating gap under three nested unit definitions; the effect stays right of zero throughout. <a class="figsrc" href="docs/statistical_test_figures/figure_h2_rating_gap_robustness_ladder.svg" target="_blank">docs/statistical_test_figures/figure_h2_rating_gap_robustness_ladder.svg</a> <span class="figsrc-note">(script-generated, aggregate-only)</span></figcaption></figure>
+<figure class="fig"><svg xmlns="http://www.w3.org/2000/svg" width="1120" height="304" viewBox="0 0 1120 304">
+<rect width="100%" height="100%" fill="#fbfaf7"/>
+<text x="32.00" y="39.00" text-anchor="start" font-family="Arial, sans-serif" font-size="24" font-weight="700" fill="#172033">H2 Star Rating Distribution</text>
+<text x="32.00" y="66.00" text-anchor="start" font-family="Arial, sans-serif" font-size="14" font-weight="400" fill="#5b677a">Common 1-to-5 Google scale; p=5.7e-08</text>
+<line x1="295.00" x2="295.00" y1="106.00" y2="196.00" stroke="#d7dde8" stroke-width="1" opacity="0.55"/>
+<line x1="648.50" x2="648.50" y1="106.00" y2="196.00" stroke="#d7dde8" stroke-width="1" opacity="0.55"/>
+<line x1="1002.00" x2="1002.00" y1="106.00" y2="196.00" stroke="#d7dde8" stroke-width="1" opacity="0.55"/>
+<text x="281.00" y="130.00" text-anchor="end" font-family="Arial, sans-serif" font-size="13" font-weight="400" fill="#172033">English-language reviews</text>
+<rect x="295.00" y="112.00" width="26.43" height="25" fill="#963a35"/>
+<rect x="321.43" y="112.00" width="6.61" height="25" fill="#c06c38"/>
+<rect x="328.04" y="112.00" width="39.64" height="25" fill="#d6a14a"/>
+<rect x="367.68" y="112.00" width="125.54" height="25" fill="#6f8f72"/>
+<text x="430.45" y="130.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#ffffff">17.8%</text>
+<rect x="493.22" y="112.00" width="508.78" height="25" fill="#2f6f73"/>
+<text x="747.61" y="130.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#ffffff">72.0%</text>
+<rect x="1008.00" y="115.00" width="48.40" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="1032.20" y="130.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#5b677a">n=214</text>
+<text x="281.00" y="184.00" text-anchor="end" font-family="Arial, sans-serif" font-size="13" font-weight="400" fill="#172033">Japanese-language reviews</text>
+<rect x="295.00" y="166.00" width="17.28" height="25" fill="#963a35"/>
+<rect x="312.28" y="166.00" width="14.93" height="25" fill="#c06c38"/>
+<rect x="327.21" y="166.00" width="92.70" height="25" fill="#d6a14a"/>
+<text x="373.56" y="184.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#ffffff">13.1%</text>
+<rect x="419.90" y="166.00" width="222.71" height="25" fill="#6f8f72"/>
+<text x="531.26" y="184.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#ffffff">31.5%</text>
+<rect x="642.61" y="166.00" width="359.39" height="25" fill="#2f6f73"/>
+<text x="822.30" y="184.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#ffffff">50.8%</text>
+<rect x="1008.00" y="169.00" width="61.36" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="1038.68" y="184.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#5b677a">n=1,800</text>
+<rect x="295.00" y="252.00" width="10" height="10" fill="#963a35"/>
+<text x="311.00" y="262.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#5b677a">rating_1</text>
+<rect x="413.00" y="252.00" width="10" height="10" fill="#c06c38"/>
+<text x="429.00" y="262.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#5b677a">rating_2</text>
+<rect x="531.00" y="252.00" width="10" height="10" fill="#d6a14a"/>
+<text x="547.00" y="262.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#5b677a">rating_3</text>
+<rect x="649.00" y="252.00" width="10" height="10" fill="#6f8f72"/>
+<text x="665.00" y="262.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#5b677a">rating_4</text>
+<rect x="767.00" y="252.00" width="10" height="10" fill="#2f6f73"/>
+<text x="783.00" y="262.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#5b677a">rating_5</text>
+<text x="32.00" y="286.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#5b677a">Ceiling effects matter: both groups skew high, but English has more 5-star rows.</text>
+</svg><figcaption>Full 1–5 star distribution by language group — both skew high, but English has proportionally more 5-star rows. <a class="figsrc" href="docs/statistical_test_figures/figure_h2_rating_distribution.svg" target="_blank">docs/statistical_test_figures/figure_h2_rating_distribution.svg</a> <span class="figsrc-note">(script-generated, aggregate-only)</span></figcaption></figure>
+</section>
+<section id='f2'><span class='sec-num'>FINDING 2 — ROBUSTNESS CHECK</span>
+<div class='rank'><span class='badge b-mixed'>Mixed · venue-controlled</span></div>
+<h3 style='font-size:25px;font-weight:600;margin:0 0 6px'>Venue composition is one removed confound — results are partially consistent</h3>
+<p class='lead'>Restricting to <a class="stat" href="output/hypothesis_tests/within_poi_paired_jp_en.csv" target="_blank" title="raw value: 14
+field: within-POI n_pairs
+source: output/hypothesis_tests/within_poi_paired_jp_en.csv
+sha256: e50a1ec108d9a07c221dae58c3c123be681febd43c54d2c0ca7e408c14aa9da5
+script: " data-raw="14" data-source="output/hypothesis_tests/within_poi_paired_jp_en.csv" data-field="within-POI n_pairs" data-sha256="e50a1ec108d9a07c221dae58c3c123be681febd43c54d2c0ca7e408c14aa9da5">14<span class="prov-dot">●</span></a> Fukui POIs reviewed by both groups (from <a class="stat" href="output/hypothesis_tests/within_poi_paired_jp_en.csv" target="_blank" title="raw value: 25
+field: within-POI n_shared_poi_candidates
+source: output/hypothesis_tests/within_poi_paired_jp_en.csv
+sha256: e50a1ec108d9a07c221dae58c3c123be681febd43c54d2c0ca7e408c14aa9da5
+script: " data-raw="25" data-source="output/hypothesis_tests/within_poi_paired_jp_en.csv" data-field="within-POI n_shared_poi_candidates" data-sha256="e50a1ec108d9a07c221dae58c3c123be681febd43c54d2c0ca7e408c14aa9da5">25<span class="prov-dot">●</span></a> shared candidates, ≥5 reviews per language), the within-POI paired difference in positive-sentiment share is <a class="stat" href="output/hypothesis_tests/within_poi_paired_jp_en.csv" target="_blank" title="raw value: 0.1608025819023261
+field: within-POI positive_share effect (median diff)
+source: output/hypothesis_tests/within_poi_paired_jp_en.csv
+sha256: e50a1ec108d9a07c221dae58c3c123be681febd43c54d2c0ca7e408c14aa9da5
+script: " data-raw="0.1608025819023261" data-source="output/hypothesis_tests/within_poi_paired_jp_en.csv" data-field="within-POI positive_share effect (median diff)" data-sha256="e50a1ec108d9a07c221dae58c3c123be681febd43c54d2c0ca7e408c14aa9da5">+0.16<span class="prov-dot">●</span></a> (<a class="stat" href="output/hypothesis_tests/within_poi_paired_jp_en.csv" target="_blank" title="raw value: 0.0001220703125
+field: within-POI positive_share p_value
+source: output/hypothesis_tests/within_poi_paired_jp_en.csv
+sha256: e50a1ec108d9a07c221dae58c3c123be681febd43c54d2c0ca7e408c14aa9da5
+script: " data-raw="0.0001220703125" data-source="output/hypothesis_tests/within_poi_paired_jp_en.csv" data-field="within-POI positive_share p_value" data-sha256="e50a1ec108d9a07c221dae58c3c123be681febd43c54d2c0ca7e408c14aa9da5">p &lt; .001<span class="prov-dot">●</span></a>), which is significant. The paired difference in star rating is <a class="stat" href="output/hypothesis_tests/within_poi_paired_jp_en.csv" target="_blank" title="raw value: 0.3137931034482757
+field: within-POI rating effect (median diff)
+source: output/hypothesis_tests/within_poi_paired_jp_en.csv
+sha256: e50a1ec108d9a07c221dae58c3c123be681febd43c54d2c0ca7e408c14aa9da5
+script: " data-raw="0.3137931034482757" data-source="output/hypothesis_tests/within_poi_paired_jp_en.csv" data-field="within-POI rating effect (median diff)" data-sha256="e50a1ec108d9a07c221dae58c3c123be681febd43c54d2c0ca7e408c14aa9da5">+0.31 stars<span class="prov-dot">●</span></a> (<a class="stat" href="output/hypothesis_tests/within_poi_paired_jp_en.csv" target="_blank" title="raw value: 0.0579833984375
+field: within-POI rating p_value
+source: output/hypothesis_tests/within_poi_paired_jp_en.csv
+sha256: e50a1ec108d9a07c221dae58c3c123be681febd43c54d2c0ca7e408c14aa9da5
+script: " data-raw="0.0579833984375" data-source="output/hypothesis_tests/within_poi_paired_jp_en.csv" data-field="within-POI rating p_value" data-sha256="e50a1ec108d9a07c221dae58c3c123be681febd43c54d2c0ca7e408c14aa9da5">p = .058<span class="prov-dot">●</span></a>), which does not reach significance at .05 (borderline). Holding venue constant removes POI composition as one confound — it does not address reviewer self-selection within a venue, nor the response-style confound described above.</p>
+<div class='caveat'>This is a mixed / partial robustness result, not a clean confirmation. The positive-share difference holds within shared venues; the star-rating difference is borderline. Note also that positive-share uses two different scoring tools (VADER for English, oseti for Japanese), so this cross-language comparison is tool-dependent.</div>
+<figure class="fig"><svg xmlns="http://www.w3.org/2000/svg" width="1120" height="347" viewBox="0 0 1120 347">
+<rect width="100%" height="100%" fill="#fbfaf7"/>
+<text x="32.00" y="39.00" text-anchor="start" font-family="Arial, sans-serif" font-size="24" font-weight="700" fill="#172033">Within-POI Paired Differences (English minus Japanese)</text>
+<text x="32.00" y="66.00" text-anchor="start" font-family="Arial, sans-serif" font-size="14" font-weight="400" fill="#5b677a">Holding venue constant across 14 shared Fukui POIs (≥5 reviews per language)</text>
+<rect x="416.86" y="90.00" width="395.14" height="144.00" fill="#2f6f73" opacity="0.07"/>
+<line x1="416.86" x2="416.86" y1="87.00" y2="251.00" stroke="#d7dde8" stroke-width="1.5" stroke-dasharray="5 5"/>
+<text x="804.00" y="105.00" text-anchor="end" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#5b677a">favors English →</text>
+<text x="366.00" y="146.00" text-anchor="end" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">Mean star rating</text>
+<line x1="382.00" x2="812.00" y1="142.00" y2="142.00" stroke="#d7dde8" stroke-width="1" opacity="0.65"/>
+<circle cx="781.54" cy="142.00" r="5.2" fill="#5b6c94"/>
+<rect x="830.00" y="130.00" width="76.00" height="23.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="868.00" y="144.50" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="400" fill="#5b677a">p=0.058</text>
+<rect x="918.00" y="129.00" width="170.00" height="25.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="1003.00" y="145.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="700" fill="#172033">+0.314</text>
+<text x="366.00" y="208.00" text-anchor="end" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">Positive sentiment share</text>
+<line x1="382.00" x2="812.00" y1="204.00" y2="204.00" stroke="#d7dde8" stroke-width="1" opacity="0.65"/>
+<circle cx="603.74" cy="204.00" r="5.2" fill="#2f6f73"/>
+<rect x="830.00" y="192.00" width="76.00" height="23.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="868.00" y="206.50" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="400" fill="#5b677a">p=1.2e-04 *</text>
+<rect x="918.00" y="191.00" width="170.00" height="25.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="1003.00" y="207.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="700" fill="#172033">+0.161</text>
+<line x1="382.00" x2="812.00" y1="251.00" y2="251.00" stroke="#d7dde8" stroke-width="1.2"/>
+<line x1="416.86" x2="416.86" y1="251.00" y2="257.00" stroke="#d7dde8" stroke-width="1"/>
+<text x="416.86" y="273.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#5b677a">0</text>
+<line x1="533.08" x2="533.08" y1="251.00" y2="257.00" stroke="#d7dde8" stroke-width="1"/>
+<text x="533.08" y="273.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#5b677a">0.1</text>
+<line x1="649.30" x2="649.30" y1="251.00" y2="257.00" stroke="#d7dde8" stroke-width="1"/>
+<text x="649.30" y="273.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#5b677a">0.2</text>
+<line x1="765.51" x2="765.51" y1="251.00" y2="257.00" stroke="#d7dde8" stroke-width="1"/>
+<text x="765.51" y="273.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#5b677a">0.3</text>
+<text x="32.00" y="305.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#5b677a">14 paired POIs from 25 shared candidates; 185 English + 962 Japanese reviews paired.</text>
+<text x="32.00" y="329.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#5b677a">Pairing removes venue/POI composition as a confound; Wilcoxon signed-rank on POI-pair differences.</text>
+</svg><figcaption>Within-POI paired differences (English minus Japanese) for both outcomes; positive on the scale favours English. <a class="figsrc" href="docs/statistical_test_figures/figure_within_poi_paired_shift.svg" target="_blank">docs/statistical_test_figures/figure_within_poi_paired_shift.svg</a> <span class="figsrc-note">(script-generated, aggregate-only)</span></figcaption></figure>
+</section>
+<section id='f3'><span class='sec-num'>FINDING 3</span>
+<div class='rank'><span class='badge b-mixed'>Significant · length-confounded</span></div>
+<h3 style='font-size:25px;font-weight:600;margin:0 0 6px'>English reviews carry more positive experience evidence — but English texts are longer</h3>
+<p class='lead'>English reviews are substantially longer (median <a class="stat" href="output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv" target="_blank" title="raw value: 176.0
+field: H3 text_length english median
+source: output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv
+sha256: 86a0c42644ba0d28ea7910077dd3937b04804897716a29f9f28a4e401e638fdf
+script: scripts/test_h3_reviewed_evidence_jp_en.py" data-raw="176.0" data-source="output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv" data-field="H3 text_length english median" data-sha256="86a0c42644ba0d28ea7910077dd3937b04804897716a29f9f28a4e401e638fdf">176 chars<span class="prov-dot">●</span></a> vs <a class="stat" href="output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv" target="_blank" title="raw value: 62.0
+field: H3 text_length japanese median
+source: output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv
+sha256: 86a0c42644ba0d28ea7910077dd3937b04804897716a29f9f28a4e401e638fdf
+script: scripts/test_h3_reviewed_evidence_jp_en.py" data-raw="62.0" data-source="output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv" data-field="H3 text_length japanese median" data-sha256="86a0c42644ba0d28ea7910077dd3937b04804897716a29f9f28a4e401e638fdf">62 chars<span class="prov-dot">●</span></a> for Japanese), which means they have more opportunity for any keyword to match; prevalence differences partly reflect text length, not a pure rate. With that caveat noted up front: using reviewed keyword codebooks, English reviews mention enjoyment in <a class="stat" href="output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv" target="_blank" title="raw value: 0.53271
+field: H3 enjoyment english_present_pct
+source: output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv
+sha256: 86a0c42644ba0d28ea7910077dd3937b04804897716a29f9f28a4e401e638fdf
+script: scripts/test_h3_reviewed_evidence_jp_en.py" data-raw="0.53271" data-source="output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv" data-field="H3 enjoyment english_present_pct" data-sha256="86a0c42644ba0d28ea7910077dd3937b04804897716a29f9f28a4e401e638fdf">53%<span class="prov-dot">●</span></a> of rows versus <a class="stat" href="output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv" target="_blank" title="raw value: 0.22
+field: H3 enjoyment japanese_present_pct
+source: output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv
+sha256: 86a0c42644ba0d28ea7910077dd3937b04804897716a29f9f28a4e401e638fdf
+script: scripts/test_h3_reviewed_evidence_jp_en.py" data-raw="0.22" data-source="output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv" data-field="H3 enjoyment japanese_present_pct" data-sha256="86a0c42644ba0d28ea7910077dd3937b04804897716a29f9f28a4e401e638fdf">22%<span class="prov-dot">●</span></a> for Japanese — a gap of <a class="stat" href="output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv" target="_blank" title="raw value: 31.27102803738317
+field: H3 enjoyment risk_difference_pct
+source: output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv
+sha256: 86a0c42644ba0d28ea7910077dd3937b04804897716a29f9f28a4e401e638fdf
+script: scripts/test_h3_reviewed_evidence_jp_en.py" data-raw="31.27102803738317" data-source="output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv" data-field="H3 enjoyment risk_difference_pct" data-sha256="86a0c42644ba0d28ea7910077dd3937b04804897716a29f9f28a4e401e638fdf">+31.3 pp<span class="prov-dot">●</span></a> (<a class="stat" href="output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv" target="_blank" title="raw value: 2.435715758780761e-22
+field: H3 enjoyment p_value_bh_fdr
+source: output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv
+sha256: 86a0c42644ba0d28ea7910077dd3937b04804897716a29f9f28a4e401e638fdf
+script: scripts/test_h3_reviewed_evidence_jp_en.py" data-raw="2.435715758780761e-22" data-source="output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv" data-field="H3 enjoyment p_value_bh_fdr" data-sha256="86a0c42644ba0d28ea7910077dd3937b04804897716a29f9f28a4e401e638fdf">p = 2.4×10<sup>-22</sup><span class="prov-dot">●</span></a>, Benjamini–Hochberg FDR). Positive-sentiment evidence differs by <a class="stat" href="output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv" target="_blank" title="raw value: 23.59190031152648
+field: H3 positive_sentiment risk_difference_pct
+source: output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv
+sha256: 86a0c42644ba0d28ea7910077dd3937b04804897716a29f9f28a4e401e638fdf
+script: scripts/test_h3_reviewed_evidence_jp_en.py" data-raw="23.59190031152648" data-source="output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv" data-field="H3 positive_sentiment risk_difference_pct" data-sha256="86a0c42644ba0d28ea7910077dd3937b04804897716a29f9f28a4e401e638fdf">+23.6 pp<span class="prov-dot">●</span></a> (<a class="stat" href="output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv" target="_blank" title="raw value: 3.0396161334758097e-14
+field: H3 positive_sentiment p_value_bh_fdr
+source: output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv
+sha256: 86a0c42644ba0d28ea7910077dd3937b04804897716a29f9f28a4e401e638fdf
+script: scripts/test_h3_reviewed_evidence_jp_en.py" data-raw="3.0396161334758097e-14" data-source="output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv" data-field="H3 positive_sentiment p_value_bh_fdr" data-sha256="86a0c42644ba0d28ea7910077dd3937b04804897716a29f9f28a4e401e638fdf">p = 3.0×10<sup>-14</sup><span class="prov-dot">●</span></a>) and recommendation evidence by <a class="stat" href="output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv" target="_blank" title="raw value: 10.832294911734165
+field: H3 recommendation risk_difference_pct
+source: output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv
+sha256: 86a0c42644ba0d28ea7910077dd3937b04804897716a29f9f28a4e401e638fdf
+script: scripts/test_h3_reviewed_evidence_jp_en.py" data-raw="10.832294911734165" data-source="output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv" data-field="H3 recommendation risk_difference_pct" data-sha256="86a0c42644ba0d28ea7910077dd3937b04804897716a29f9f28a4e401e638fdf">+10.8 pp<span class="prov-dot">●</span></a> (<a class="stat" href="output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv" target="_blank" title="raw value: 1.8244103090437826e-09
+field: H3 recommendation p_value_bh_fdr
+source: output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv
+sha256: 86a0c42644ba0d28ea7910077dd3937b04804897716a29f9f28a4e401e638fdf
+script: scripts/test_h3_reviewed_evidence_jp_en.py" data-raw="1.8244103090437826e-09" data-source="output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv" data-field="H3 recommendation p_value_bh_fdr" data-sha256="86a0c42644ba0d28ea7910077dd3937b04804897716a29f9f28a4e401e638fdf">p = 1.8×10<sup>-9</sup><span class="prov-dot">●</span></a>).</p>
+<div class='callout'>Friction (complaint) evidence is the telling null: the English–Japanese difference is only <a class="stat" href="output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv" target="_blank" title="raw value: 1.744029075804776
+field: H3 friction risk_difference_pct
+source: output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv
+sha256: 86a0c42644ba0d28ea7910077dd3937b04804897716a29f9f28a4e401e638fdf
+script: scripts/test_h3_reviewed_evidence_jp_en.py" data-raw="1.744029075804776" data-source="output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv" data-field="H3 friction risk_difference_pct" data-sha256="86a0c42644ba0d28ea7910077dd3937b04804897716a29f9f28a4e401e638fdf">+1.7 pp<span class="prov-dot">●</span></a> and is <b>not</b> significant (<a class="stat" href="output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv" target="_blank" title="raw value: 0.5636197062874753
+field: H3 friction p_value_bh_fdr
+source: output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv
+sha256: 86a0c42644ba0d28ea7910077dd3937b04804897716a29f9f28a4e401e638fdf
+script: scripts/test_h3_reviewed_evidence_jp_en.py" data-raw="0.5636197062874753" data-source="output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv" data-field="H3 friction p_value_bh_fdr" data-sha256="86a0c42644ba0d28ea7910077dd3937b04804897716a29f9f28a4e401e638fdf">p = .564<span class="prov-dot">●</span></a>). The groups differ in how much they praise, not in how much they complain.</div>
+<figure class="fig"><svg xmlns="http://www.w3.org/2000/svg" width="1120" height="500" viewBox="0 0 1120 500">
+<rect width="100%" height="100%" fill="#fbfaf7"/>
+<text x="32.00" y="39.00" text-anchor="start" font-family="Arial, sans-serif" font-size="24" font-weight="700" fill="#172033">H3 Reviewed Evidence Prevalence</text>
+<text x="32.00" y="66.00" text-anchor="start" font-family="Arial, sans-serif" font-size="14" font-weight="400" fill="#5b677a">English-language rows show more enjoyment/recommendation/positive evidence; friction similar</text>
+<line x1="310.00" x2="310.00" y1="102.00" y2="388.00" stroke="#d7dde8" stroke-width="1" opacity="0.55"/>
+<line x1="650.00" x2="650.00" y1="102.00" y2="388.00" stroke="#d7dde8" stroke-width="1" opacity="0.55"/>
+<line x1="990.00" x2="990.00" y1="102.00" y2="388.00" stroke="#d7dde8" stroke-width="1" opacity="0.55"/>
+<text x="296.00" y="137.00" text-anchor="end" font-family="Arial, sans-serif" font-size="13" font-weight="400" fill="#172033">enjoyment</text>
+<rect x="310" y="104" width="362.24" height="15" rx="2" fill="#2f6f73"/>
+<rect x="676.24" y="101.00" width="45.70" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="699.09" y="115.50" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">53.3%</text>
+<rect x="310" y="123" width="149.60" height="15" rx="2" fill="#5b6c94"/>
+<rect x="463.60" y="120.00" width="45.70" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="486.45" y="134.50" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">22.0%</text>
+<text x="296.00" y="213.00" text-anchor="end" font-family="Arial, sans-serif" font-size="13" font-weight="400" fill="#172033">positive sentiment</text>
+<rect x="310" y="180" width="298.69" height="15" rx="2" fill="#2f6f73"/>
+<rect x="612.69" y="177.00" width="45.70" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="635.54" y="191.50" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">43.9%</text>
+<rect x="310" y="199" width="138.27" height="15" rx="2" fill="#5b6c94"/>
+<rect x="452.27" y="196.00" width="45.70" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="475.12" y="210.50" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">20.3%</text>
+<text x="296.00" y="289.00" text-anchor="end" font-family="Arial, sans-serif" font-size="13" font-weight="400" fill="#172033">recommendation</text>
+<rect x="310" y="256" width="108.04" height="15" rx="2" fill="#2f6f73"/>
+<rect x="422.04" y="253.00" width="45.70" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="444.89" y="267.50" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">15.9%</text>
+<rect x="310" y="275" width="34.38" height="15" rx="2" fill="#5b6c94"/>
+<rect x="348.38" y="272.00" width="39.76" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="368.26" y="286.50" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">5.1%</text>
+<text x="296.00" y="365.00" text-anchor="end" font-family="Arial, sans-serif" font-size="13" font-weight="400" fill="#172033">friction</text>
+<rect x="310" y="332" width="111.21" height="15" rx="2" fill="#2f6f73"/>
+<rect x="425.21" y="329.00" width="45.70" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="448.06" y="343.50" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">16.4%</text>
+<rect x="310" y="351" width="99.36" height="15" rx="2" fill="#5b6c94"/>
+<rect x="413.36" y="348.00" width="45.70" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="436.21" y="362.50" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">14.6%</text>
+<rect x="310.00" y="448.00" width="10" height="10" fill="#2f6f73"/>
+<text x="326.00" y="458.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#5b677a">English-language reviews</text>
+<rect x="510.00" y="448.00" width="10" height="10" fill="#5b6c94"/>
+<text x="526.00" y="458.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#5b677a">Japanese-language reviews</text>
+<text x="32.00" y="482.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#5b677a">FDR-adjusted tests use reviewed keyword evidence, aggregate-only.</text>
+</svg><figcaption>Reviewed-evidence prevalence by language group, English vs Japanese, across four evidence families. <a class="figsrc" href="docs/statistical_test_figures/figure_h3_reviewed_evidence_prevalence.svg" target="_blank">docs/statistical_test_figures/figure_h3_reviewed_evidence_prevalence.svg</a> <span class="figsrc-note">(script-generated, aggregate-only)</span></figcaption></figure>
+<div class='caveat'>Because English reviews are longer (median <a class="stat" href="output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv" target="_blank" title="raw value: 176.0
+field: H3 text_length english median
+source: output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv
+sha256: 86a0c42644ba0d28ea7910077dd3937b04804897716a29f9f28a4e401e638fdf
+script: scripts/test_h3_reviewed_evidence_jp_en.py" data-raw="176.0" data-source="output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv" data-field="H3 text_length english median" data-sha256="86a0c42644ba0d28ea7910077dd3937b04804897716a29f9f28a4e401e638fdf">176 chars<span class="prov-dot">●</span></a> vs <a class="stat" href="output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv" target="_blank" title="raw value: 62.0
+field: H3 text_length japanese median
+source: output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv
+sha256: 86a0c42644ba0d28ea7910077dd3937b04804897716a29f9f28a4e401e638fdf
+script: scripts/test_h3_reviewed_evidence_jp_en.py" data-raw="62.0" data-source="output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv" data-field="H3 text_length japanese median" data-sha256="86a0c42644ba0d28ea7910077dd3937b04804897716a29f9f28a4e401e638fdf">62 chars<span class="prov-dot">●</span></a>), more keyword matches are expected by chance alone. Treat prevalence differences as reflecting evidence-rich-text behaviour rather than a pure rate difference.</div>
+</section>
+<section id='f4'><span class='sec-num'>FINDING 4</span>
+<div class='rank'><span class='badge b-mixed'>Highly significant · small effect</span></div>
+<h3 style='font-size:25px;font-weight:600;margin:0 0 6px'>Sentiment mix differs by review language</h3>
+<p class='lead'>The distribution across positive / neutral / negative categories differs significantly between the groups (χ² = <a class="stat" href="output/hypothesis_tests/h1_sentiment_category_jp_en.csv" target="_blank" title="raw value: 38.56916459269966
+field: H1 primary chi-square statistic
+source: output/hypothesis_tests/h1_sentiment_category_jp_en.csv
+sha256: 089d60762ef52f55095179c76899ef008e8e5e7996f0601e2b02be8a65d8653d
+script: scripts/test_h1_sentiment_category_jp_en.py" data-raw="38.56916459269966" data-source="output/hypothesis_tests/h1_sentiment_category_jp_en.csv" data-field="H1 primary chi-square statistic" data-sha256="089d60762ef52f55095179c76899ef008e8e5e7996f0601e2b02be8a65d8653d">38.6<span class="prov-dot">●</span></a>, <a class="stat" href="output/hypothesis_tests/h1_sentiment_category_jp_en.csv" target="_blank" title="raw value: 4.215143098065763e-09
+field: H1 primary p_value_holm
+source: output/hypothesis_tests/h1_sentiment_category_jp_en.csv
+sha256: 089d60762ef52f55095179c76899ef008e8e5e7996f0601e2b02be8a65d8653d
+script: scripts/test_h1_sentiment_category_jp_en.py" data-raw="4.215143098065763e-09" data-source="output/hypothesis_tests/h1_sentiment_category_jp_en.csv" data-field="H1 primary p_value_holm" data-sha256="089d60762ef52f55095179c76899ef008e8e5e7996f0601e2b02be8a65d8653d">p = 4.2×10<sup>-9</sup><span class="prov-dot">●</span></a>, Holm-adjusted): <a class="stat" href="output/hypothesis_tests/h1_sentiment_category_jp_en.csv" target="_blank" title="raw value: 91.1215
+field: H1 positive share english
+source: output/hypothesis_tests/h1_sentiment_category_jp_en.csv
+sha256: 089d60762ef52f55095179c76899ef008e8e5e7996f0601e2b02be8a65d8653d
+script: scripts/test_h1_sentiment_category_jp_en.py" data-raw="91.1215" data-source="output/hypothesis_tests/h1_sentiment_category_jp_en.csv" data-field="H1 positive share english" data-sha256="089d60762ef52f55095179c76899ef008e8e5e7996f0601e2b02be8a65d8653d">91.1%<span class="prov-dot">●</span></a> of English reviews are positive versus <a class="stat" href="output/hypothesis_tests/h1_sentiment_category_jp_en.csv" target="_blank" title="raw value: 72.3889
+field: H1 positive share japanese
+source: output/hypothesis_tests/h1_sentiment_category_jp_en.csv
+sha256: 089d60762ef52f55095179c76899ef008e8e5e7996f0601e2b02be8a65d8653d
+script: scripts/test_h1_sentiment_category_jp_en.py" data-raw="72.3889" data-source="output/hypothesis_tests/h1_sentiment_category_jp_en.csv" data-field="H1 positive share japanese" data-sha256="089d60762ef52f55095179c76899ef008e8e5e7996f0601e2b02be8a65d8653d">72.4%<span class="prov-dot">●</span></a> of Japanese. The association is real but small in magnitude — Cramér's V = <a class="stat" href="output/hypothesis_tests/h1_sentiment_category_jp_en.csv" target="_blank" title="raw value: 0.1383854349134206
+field: H1 primary effect_cramers_v
+source: output/hypothesis_tests/h1_sentiment_category_jp_en.csv
+sha256: 089d60762ef52f55095179c76899ef008e8e5e7996f0601e2b02be8a65d8653d
+script: scripts/test_h1_sentiment_category_jp_en.py" data-raw="0.1383854349134206" data-source="output/hypothesis_tests/h1_sentiment_category_jp_en.csv" data-field="H1 primary effect_cramers_v" data-sha256="089d60762ef52f55095179c76899ef008e8e5e7996f0601e2b02be8a65d8653d">0.14<span class="prov-dot">●</span></a> — so it is reported as a significant-but-modest difference, not a dramatic one.</p>
+<figure class="fig"><svg xmlns="http://www.w3.org/2000/svg" width="1120" height="304" viewBox="0 0 1120 304">
+<rect width="100%" height="100%" fill="#fbfaf7"/>
+<text x="32.00" y="39.00" text-anchor="start" font-family="Arial, sans-serif" font-size="24" font-weight="700" fill="#172033">H1 Sentiment Category Shares</text>
+<text x="32.00" y="66.00" text-anchor="start" font-family="Arial, sans-serif" font-size="14" font-weight="400" fill="#5b677a">JP/EN Google reviews; p=4.2e-09, Cramer&#x27;s V=0.138</text>
+<line x1="295.00" x2="295.00" y1="106.00" y2="196.00" stroke="#d7dde8" stroke-width="1" opacity="0.55"/>
+<line x1="648.50" x2="648.50" y1="106.00" y2="196.00" stroke="#d7dde8" stroke-width="1" opacity="0.55"/>
+<line x1="1002.00" x2="1002.00" y1="106.00" y2="196.00" stroke="#d7dde8" stroke-width="1" opacity="0.55"/>
+<text x="281.00" y="130.00" text-anchor="end" font-family="Arial, sans-serif" font-size="13" font-weight="400" fill="#172033">English-language reviews</text>
+<rect x="295.00" y="112.00" width="36.34" height="25" fill="#9a031e"/>
+<rect x="331.34" y="112.00" width="26.43" height="25" fill="#8d99ae"/>
+<rect x="357.77" y="112.00" width="644.23" height="25" fill="#2f6f73"/>
+<text x="679.89" y="130.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#ffffff">91.1%</text>
+<rect x="1008.00" y="115.00" width="48.40" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="1032.20" y="130.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#5b677a">n=214</text>
+<text x="281.00" y="184.00" text-anchor="end" font-family="Arial, sans-serif" font-size="13" font-weight="400" fill="#172033">Japanese-language reviews</text>
+<rect x="295.00" y="166.00" width="51.85" height="25" fill="#9a031e"/>
+<text x="320.92" y="184.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#ffffff">7.3%</text>
+<rect x="346.85" y="166.00" width="143.36" height="25" fill="#8d99ae"/>
+<text x="418.53" y="184.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#ffffff">20.3%</text>
+<rect x="490.21" y="166.00" width="511.79" height="25" fill="#2f6f73"/>
+<text x="746.11" y="184.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#ffffff">72.4%</text>
+<rect x="1008.00" y="169.00" width="61.36" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="1038.68" y="184.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#5b677a">n=1,800</text>
+<rect x="295.00" y="252.00" width="10" height="10" fill="#9a031e"/>
+<text x="311.00" y="262.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#5b677a">negative</text>
+<rect x="413.00" y="252.00" width="10" height="10" fill="#8d99ae"/>
+<text x="429.00" y="262.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#5b677a">neutral</text>
+<rect x="531.00" y="252.00" width="10" height="10" fill="#2f6f73"/>
+<text x="547.00" y="262.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#5b677a">positive</text>
+<text x="32.00" y="286.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#5b677a">Category-share test only; VADER and oseti raw scores stay separate.</text>
+</svg><figcaption>Positive / neutral / negative category shares by language group under the secondary sentiment libraries. <a class="figsrc" href="docs/statistical_test_figures/figure_h1_sentiment_category_share.svg" target="_blank">docs/statistical_test_figures/figure_h1_sentiment_category_share.svg</a> <span class="figsrc-note">(script-generated, aggregate-only)</span></figcaption></figure>
+</section>
+<section id='f5'><span class='sec-num'>FINDING 5 — MECHANISM</span>
+<div class='rank'><span class='badge b-desc'>Descriptive · within-tool</span></div>
+<h3 style='font-size:25px;font-weight:600;margin:0 0 6px'>What moves sentiment inside each language</h3>
+<p class='lead'>Within English reviews alone, the presence of enjoyment evidence is the largest driver of higher VADER sentiment (mean-score difference <a class="stat" href="output/within_language_sentiment/en_within_language_sentiment_drivers.csv" target="_blank" title="raw value: 0.2989243684210526
+field: WL-EN enjoyment mean_score_difference
+source: output/within_language_sentiment/en_within_language_sentiment_drivers.csv
+sha256: 013c6eab9d537d4cdb6f82ef0a6427a3d81d0f009dcf50436add7d16853c80fa
+script: scripts/test_en_within_language_sentiment_drivers.py" data-raw="0.2989243684210526" data-source="output/within_language_sentiment/en_within_language_sentiment_drivers.csv" data-field="WL-EN enjoyment mean_score_difference" data-sha256="013c6eab9d537d4cdb6f82ef0a6427a3d81d0f009dcf50436add7d16853c80fa">+0.30<span class="prov-dot">●</span></a>, <a class="stat" href="output/within_language_sentiment/en_within_language_sentiment_drivers.csv" target="_blank" title="raw value: 1.552017595114259e-11
+field: WL-EN enjoyment p_value_bh_fdr
+source: output/within_language_sentiment/en_within_language_sentiment_drivers.csv
+sha256: 013c6eab9d537d4cdb6f82ef0a6427a3d81d0f009dcf50436add7d16853c80fa
+script: scripts/test_en_within_language_sentiment_drivers.py" data-raw="1.552017595114259e-11" data-source="output/within_language_sentiment/en_within_language_sentiment_drivers.csv" data-field="WL-EN enjoyment p_value_bh_fdr" data-sha256="013c6eab9d537d4cdb6f82ef0a6427a3d81d0f009dcf50436add7d16853c80fa">p = 1.6×10<sup>-11</sup><span class="prov-dot">●</span></a>, FDR-corrected). Parallel within-Japanese and within-Chinese analyses tell the same story: enjoyment and positive evidence separate sentiment most clearly. These are interpreted within one tool and one language only — never compared as raw scores across groups.</p>
+<figure class="fig"><svg xmlns="http://www.w3.org/2000/svg" width="1240" height="936" viewBox="0 0 1240 936">
+<rect width="100%" height="100%" fill="#fbfaf7"/>
+<text x="32.00" y="39.00" text-anchor="start" font-family="Arial, sans-serif" font-size="24" font-weight="700" fill="#172033">Within-English Sentiment Drivers</text>
+<text x="32.00" y="66.00" text-anchor="start" font-family="Arial, sans-serif" font-size="14" font-weight="400" fill="#5b677a">Enjoyment/positive evidence has largest VADER-score separation</text>
+<text x="32.00" y="114.00" text-anchor="start" font-family="Arial, sans-serif" font-size="14" font-weight="700" fill="#172033">Score mean differences</text>
+<text x="470.00" y="114.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#5b677a">Unit: mean sentiment-score difference, true minus false, within one scoring tool</text>
+<line x1="470.00" x2="470.00" y1="130.00" y2="298.00" stroke="#d7dde8" stroke-width="1" opacity="0.65"/>
+<line x1="760.00" x2="760.00" y1="130.00" y2="298.00" stroke="#d7dde8" stroke-width="1" opacity="0.65"/>
+<line x1="1050.00" x2="1050.00" y1="130.00" y2="298.00" stroke="#d7dde8" stroke-width="1" opacity="0.65"/>
+<text x="454.00" y="167.00" text-anchor="end" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">any enjoyment evidence / sentiment score</text>
+<line x1="470.00" x2="1050.00" y1="163.00" y2="163.00" stroke="#d7dde8" stroke-width="1" opacity="0.55"/>
+<rect x="760.00" y="153.00" width="290.00" height="20" rx="3" fill="#5b6c94"/>
+<rect x="1029.68" y="152.00" width="182.32" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="1120.84" y="166.50" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">score diff=+0.299; p=1.6e-11</text>
+<text x="454.00" y="205.00" text-anchor="end" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">any positive evidence / sentiment score</text>
+<line x1="470.00" x2="1050.00" y1="201.00" y2="201.00" stroke="#d7dde8" stroke-width="1" opacity="0.55"/>
+<rect x="760.00" y="191.00" width="270.45" height="20" rx="3" fill="#5b6c94"/>
+<rect x="1029.68" y="190.00" width="182.32" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="1120.84" y="204.50" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">score diff=+0.279; p=2.2e-10</text>
+<text x="454.00" y="243.00" text-anchor="end" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">any friction / sentiment score</text>
+<line x1="470.00" x2="1050.00" y1="239.00" y2="239.00" stroke="#d7dde8" stroke-width="1" opacity="0.55"/>
+<rect x="518.45" y="229.00" width="241.55" height="20" rx="3" fill="#5b6c94"/>
+<rect x="764.00" y="228.00" width="170.44" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="849.22" y="242.50" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">score diff=-0.249; p=0.056</text>
+<text x="454.00" y="281.00" text-anchor="end" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">any recommendation evidence / sentiment score</text>
+<line x1="470.00" x2="1050.00" y1="277.00" y2="277.00" stroke="#d7dde8" stroke-width="1" opacity="0.55"/>
+<rect x="760.00" y="267.00" width="132.32" height="20" rx="3" fill="#5b6c94"/>
+<rect x="896.32" y="266.00" width="170.44" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="981.54" y="280.50" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">score diff=+0.136; p=0.007</text>
+<line x1="470.00" x2="1050.00" y1="308.00" y2="308.00" stroke="#d7dde8" stroke-width="1" opacity="0.75"/>
+<line x1="470.00" x2="470.00" y1="308.00" y2="314.00" stroke="#d7dde8" stroke-width="1"/>
+<text x="470.00" y="330.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="400" fill="#5b677a">-0.3</text>
+<line x1="760.00" x2="760.00" y1="308.00" y2="314.00" stroke="#d7dde8" stroke-width="1"/>
+<text x="760.00" y="330.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="400" fill="#5b677a">0</text>
+<line x1="1050.00" x2="1050.00" y1="308.00" y2="314.00" stroke="#d7dde8" stroke-width="1"/>
+<text x="1050.00" y="330.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="400" fill="#5b677a">+0.3</text>
+<text x="32.00" y="368.00" text-anchor="start" font-family="Arial, sans-serif" font-size="14" font-weight="700" fill="#172033">Positive-event risk differences</text>
+<text x="470.00" y="368.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#5b677a">Unit: percentage points, true minus false</text>
+<line x1="470.00" x2="470.00" y1="384.00" y2="570.00" stroke="#d7dde8" stroke-width="1" opacity="0.65"/>
+<line x1="760.00" x2="760.00" y1="384.00" y2="570.00" stroke="#d7dde8" stroke-width="1" opacity="0.65"/>
+<line x1="1050.00" x2="1050.00" y1="384.00" y2="570.00" stroke="#d7dde8" stroke-width="1" opacity="0.65"/>
+<text x="454.00" y="421.00" text-anchor="end" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">any friction / sentiment category=positive</text>
+<line x1="470.00" x2="1050.00" y1="417.00" y2="417.00" stroke="#d7dde8" stroke-width="1" opacity="0.55"/>
+<rect x="470.00" y="407.00" width="290.00" height="20" rx="3" fill="#bc6c25"/>
+<rect x="764.00" y="406.00" width="170.44" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="849.22" y="420.50" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">risk diff=-20.1pp; p=0.001</text>
+<text x="454.00" y="455.00" text-anchor="end" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">any enjoyment evidence / sentiment</text>
+<text x="454.00" y="469.00" text-anchor="end" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">category=positive</text>
+<line x1="470.00" x2="1050.00" y1="458.00" y2="458.00" stroke="#d7dde8" stroke-width="1" opacity="0.55"/>
+<rect x="760.00" y="448.00" width="219.66" height="20" rx="3" fill="#bc6c25"/>
+<rect x="983.66" y="447.00" width="182.32" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="1074.82" y="461.50" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">risk diff=+15.2pp; p=6.4e-04</text>
+<text x="454.00" y="499.00" text-anchor="end" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">any positive evidence / sentiment</text>
+<text x="454.00" y="513.00" text-anchor="end" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">category=positive</text>
+<line x1="470.00" x2="1050.00" y1="502.00" y2="502.00" stroke="#d7dde8" stroke-width="1" opacity="0.55"/>
+<rect x="760.00" y="492.00" width="200.79" height="20" rx="3" fill="#bc6c25"/>
+<rect x="964.79" y="491.00" width="170.44" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="1050.01" y="505.50" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">risk diff=+13.9pp; p=0.001</text>
+<text x="454.00" y="543.00" text-anchor="end" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">any recommendation evidence / sentiment</text>
+<text x="454.00" y="557.00" text-anchor="end" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">category=positive</text>
+<line x1="470.00" x2="1050.00" y1="546.00" y2="546.00" stroke="#d7dde8" stroke-width="1" opacity="0.55"/>
+<rect x="760.00" y="536.00" width="101.70" height="20" rx="3" fill="#bc6c25"/>
+<rect x="865.70" y="535.00" width="164.50" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="947.95" y="549.50" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">risk diff=+7.1pp; p=0.322</text>
+<line x1="470.00" x2="1050.00" y1="580.00" y2="580.00" stroke="#d7dde8" stroke-width="1" opacity="0.75"/>
+<line x1="470.00" x2="470.00" y1="580.00" y2="586.00" stroke="#d7dde8" stroke-width="1"/>
+<text x="470.00" y="602.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="400" fill="#5b677a">-20.13pp</text>
+<line x1="760.00" x2="760.00" y1="580.00" y2="586.00" stroke="#d7dde8" stroke-width="1"/>
+<text x="760.00" y="602.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="400" fill="#5b677a">0pp</text>
+<line x1="1050.00" x2="1050.00" y1="580.00" y2="586.00" stroke="#d7dde8" stroke-width="1"/>
+<text x="1050.00" y="602.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="400" fill="#5b677a">+20.13pp</text>
+<text x="32.00" y="640.00" text-anchor="start" font-family="Arial, sans-serif" font-size="14" font-weight="700" fill="#172033">Rating association</text>
+<text x="470.00" y="640.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#5b677a">Unit: Spearman rho</text>
+<line x1="470.00" x2="470.00" y1="656.00" y2="710.00" stroke="#d7dde8" stroke-width="1" opacity="0.65"/>
+<line x1="760.00" x2="760.00" y1="656.00" y2="710.00" stroke="#d7dde8" stroke-width="1" opacity="0.65"/>
+<line x1="1050.00" x2="1050.00" y1="656.00" y2="710.00" stroke="#d7dde8" stroke-width="1" opacity="0.65"/>
+<text x="454.00" y="693.00" text-anchor="end" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">review rating / sentiment score</text>
+<line x1="470.00" x2="1050.00" y1="689.00" y2="689.00" stroke="#d7dde8" stroke-width="1" opacity="0.55"/>
+<rect x="760.00" y="679.00" width="290.00" height="20" rx="3" fill="#8d99ae"/>
+<rect x="1054.00" y="678.00" width="140.74" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="1124.37" y="692.50" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">rho=+0.348; p=1.7e-07</text>
+<line x1="470.00" x2="1050.00" y1="720.00" y2="720.00" stroke="#d7dde8" stroke-width="1" opacity="0.75"/>
+<line x1="470.00" x2="470.00" y1="720.00" y2="726.00" stroke="#d7dde8" stroke-width="1"/>
+<text x="470.00" y="742.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="400" fill="#5b677a">-0.35</text>
+<line x1="760.00" x2="760.00" y1="720.00" y2="726.00" stroke="#d7dde8" stroke-width="1"/>
+<text x="760.00" y="742.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="400" fill="#5b677a">0</text>
+<line x1="1050.00" x2="1050.00" y1="720.00" y2="726.00" stroke="#d7dde8" stroke-width="1"/>
+<text x="1050.00" y="742.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="400" fill="#5b677a">+0.35</text>
+<text x="32.00" y="780.00" text-anchor="start" font-family="Arial, sans-serif" font-size="14" font-weight="700" fill="#172033">Multicategory score effects</text>
+<text x="470.00" y="780.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#5b677a">Unit: epsilon-squared</text>
+<line x1="470.00" x2="470.00" y1="796.00" y2="850.00" stroke="#d7dde8" stroke-width="1" opacity="0.65"/>
+<line x1="760.00" x2="760.00" y1="796.00" y2="850.00" stroke="#d7dde8" stroke-width="1" opacity="0.65"/>
+<line x1="1050.00" x2="1050.00" y1="796.00" y2="850.00" stroke="#d7dde8" stroke-width="1" opacity="0.65"/>
+<text x="454.00" y="833.00" text-anchor="end" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">poi category / sentiment score</text>
+<line x1="470.00" x2="1050.00" y1="829.00" y2="829.00" stroke="#d7dde8" stroke-width="1" opacity="0.55"/>
+<rect x="760.00" y="819.00" width="63.33" height="20" rx="3" fill="#8d99ae"/>
+<rect x="827.33" y="818.00" width="158.56" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="906.61" y="832.50" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">epsilon^2=0.022; p=0.073</text>
+<line x1="470.00" x2="1050.00" y1="860.00" y2="860.00" stroke="#d7dde8" stroke-width="1" opacity="0.75"/>
+<line x1="470.00" x2="470.00" y1="860.00" y2="866.00" stroke="#d7dde8" stroke-width="1"/>
+<text x="470.00" y="882.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="400" fill="#5b677a">-0.1</text>
+<line x1="760.00" x2="760.00" y1="860.00" y2="866.00" stroke="#d7dde8" stroke-width="1"/>
+<text x="760.00" y="882.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="400" fill="#5b677a">0</text>
+<line x1="1050.00" x2="1050.00" y1="860.00" y2="866.00" stroke="#d7dde8" stroke-width="1"/>
+<text x="1050.00" y="882.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="400" fill="#5b677a">+0.1</text>
+<text x="32.00" y="916.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#5b677a">Panels use separate axes: score rows are mean score differences; event rows are percentage-point risk differences; rho and epsilon-squared are separate diagnostics.</text>
+</svg><figcaption>Within-English sentiment drivers; bar length is the within-tool effect size for each predictor. <a class="figsrc" href="docs/statistical_test_figures/figure_within_english_driver_effects.svg" target="_blank">docs/statistical_test_figures/figure_within_english_driver_effects.svg</a> <span class="figsrc-note">(script-generated, aggregate-only)</span></figcaption></figure>
+</section>
+<section id='f6'><span class='sec-num'>FINDING 6 — MOST CAVEATED</span>
+<div class='rank'><span class='badge b-desc'>Descriptive only · gaps noted</span></div>
+<h3 style='font-size:25px;font-weight:600;margin:0 0 6px'>Chinese social posts and cross-source comparison</h3>
+<p class='lead'>Chinese-language Xiaohongshu posts read overwhelmingly positive — <a class="stat" href="output/chinese_specific_insights/sentiment_category_by_platform.csv" target="_blank" title="raw value: 81.0
+field: CN XHS positive pct_platform_rows
+source: output/chinese_specific_insights/sentiment_category_by_platform.csv
+sha256: 0f46e5efc950a5616400cf7e4d3b26eda1e74a9d469182ffe46371d7b7dc59f2
+script: " data-raw="81.0" data-source="output/chinese_specific_insights/sentiment_category_by_platform.csv" data-field="CN XHS positive pct_platform_rows" data-sha256="0f46e5efc950a5616400cf7e4d3b26eda1e74a9d469182ffe46371d7b7dc59f2">81.0%<span class="prov-dot">●</span></a> positive versus <a class="stat" href="output/chinese_specific_insights/sentiment_category_by_platform.csv" target="_blank" title="raw value: 18.0
+field: CN XHS negative pct_platform_rows
+source: output/chinese_specific_insights/sentiment_category_by_platform.csv
+sha256: 0f46e5efc950a5616400cf7e4d3b26eda1e74a9d469182ffe46371d7b7dc59f2
+script: " data-raw="18.0" data-source="output/chinese_specific_insights/sentiment_category_by_platform.csv" data-field="CN XHS negative pct_platform_rows" data-sha256="0f46e5efc950a5616400cf7e4d3b26eda1e74a9d469182ffe46371d7b7dc59f2">18.0%<span class="prov-dot">●</span></a> negative — but this is a different platform (curated social media, not solicited reviews), a different tool (SnowNLP), and a different unit, so it sits beside the Google comparison as descriptive context, not a like-for-like test.</p>
+<figure class="fig"><svg xmlns="http://www.w3.org/2000/svg" width="1120" height="358" viewBox="0 0 1120 358">
+<rect width="100%" height="100%" fill="#fbfaf7"/>
+<text x="32.00" y="39.00" text-anchor="start" font-family="Arial, sans-serif" font-size="24" font-weight="700" fill="#172033">Cross-Source Sentiment Category Shares</text>
+<text x="32.00" y="66.00" text-anchor="start" font-family="Arial, sans-serif" font-size="14" font-weight="400" fill="#5b677a">Descriptive source-aware comparison; p=4.2e-21, V=0.152</text>
+<line x1="295.00" x2="295.00" y1="106.00" y2="250.00" stroke="#d7dde8" stroke-width="1" opacity="0.55"/>
+<line x1="648.50" x2="648.50" y1="106.00" y2="250.00" stroke="#d7dde8" stroke-width="1" opacity="0.55"/>
+<line x1="1002.00" x2="1002.00" y1="106.00" y2="250.00" stroke="#d7dde8" stroke-width="1" opacity="0.55"/>
+<text x="281.00" y="130.00" text-anchor="end" font-family="Arial, sans-serif" font-size="13" font-weight="400" fill="#172033">Chinese-language social rows</text>
+<rect x="295.00" y="112.00" width="127.26" height="25" fill="#9a031e"/>
+<text x="358.63" y="130.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#ffffff">18.0%</text>
+<rect x="422.26" y="112.00" width="7.07" height="25" fill="#8d99ae"/>
+<rect x="429.33" y="112.00" width="572.67" height="25" fill="#2f6f73"/>
+<text x="715.66" y="130.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#ffffff">81.0%</text>
+<rect x="1008.00" y="115.00" width="48.40" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="1032.20" y="130.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#5b677a">n=200</text>
+<text x="281.00" y="184.00" text-anchor="end" font-family="Arial, sans-serif" font-size="13" font-weight="400" fill="#172033">English-language Google reviews</text>
+<rect x="295.00" y="166.00" width="36.34" height="25" fill="#9a031e"/>
+<rect x="331.34" y="166.00" width="26.43" height="25" fill="#8d99ae"/>
+<rect x="357.77" y="166.00" width="644.23" height="25" fill="#2f6f73"/>
+<text x="679.89" y="184.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#ffffff">91.1%</text>
+<rect x="1008.00" y="169.00" width="48.40" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="1032.20" y="184.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#5b677a">n=214</text>
+<text x="281.00" y="238.00" text-anchor="end" font-family="Arial, sans-serif" font-size="13" font-weight="400" fill="#172033">Japanese-language Google reviews</text>
+<rect x="295.00" y="220.00" width="51.85" height="25" fill="#9a031e"/>
+<text x="320.92" y="238.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#ffffff">7.3%</text>
+<rect x="346.85" y="220.00" width="143.36" height="25" fill="#8d99ae"/>
+<text x="418.53" y="238.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#ffffff">20.3%</text>
+<rect x="490.21" y="220.00" width="511.79" height="25" fill="#2f6f73"/>
+<text x="746.11" y="238.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#ffffff">72.4%</text>
+<rect x="1008.00" y="223.00" width="61.36" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="1038.68" y="238.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#5b677a">n=1,800</text>
+<rect x="295.00" y="306.00" width="10" height="10" fill="#9a031e"/>
+<text x="311.00" y="316.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#5b677a">negative</text>
+<rect x="413.00" y="306.00" width="10" height="10" fill="#8d99ae"/>
+<text x="429.00" y="316.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#5b677a">neutral</text>
+<rect x="531.00" y="306.00" width="10" height="10" fill="#2f6f73"/>
+<text x="547.00" y="316.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#5b677a">positive</text>
+<text x="32.00" y="340.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#5b677a">Google reviews and Xiaohongshu rows differ in platform, unit, and scoring tool.</text>
+</svg><figcaption>Sentiment category shares across English, Japanese, and Chinese-language source groups — descriptive across platforms and tools. <a class="figsrc" href="docs/statistical_test_figures/figure_cross_source_sentiment_category.svg" target="_blank">docs/statistical_test_figures/figure_cross_source_sentiment_category.svg</a> <span class="figsrc-note">(script-generated, aggregate-only)</span></figcaption></figure>
+<figure class="fig"><svg xmlns="http://www.w3.org/2000/svg" width="1000" height="200" viewBox="0 0 1000 200">
+<rect width="100%" height="100%" fill="#fbfaf7"/>
+<text x="32" y="38" font-family="Arial, sans-serif" font-size="24" font-weight="700" fill="#1f2933">SnowNLP Sentiment Share by Platform</text>
+<text x="32" y="66" font-family="Arial, sans-serif" font-size="14" fill="#52616b">Percentage of Chinese rows in each sentiment category; total n=200</text>
+<line x1="220.00" x2="220.00" y1="98.00" y2="130.00" stroke="#d7dde8" stroke-width="1" opacity="0.58"/>
+<line x1="565.00" x2="565.00" y1="98.00" y2="130.00" stroke="#d7dde8" stroke-width="1" opacity="0.58"/>
+<line x1="910.00" x2="910.00" y1="98.00" y2="130.00" stroke="#d7dde8" stroke-width="1" opacity="0.58"/>
+<text x="206" y="120" text-anchor="end" font-family="Arial, sans-serif" font-size="14" fill="#1f2933">xiaohongshu (n=200)</text>
+<rect x="220.00" y="104" width="124.20" height="22" fill="#9a031e"/>
+<text x="282.10" y="120" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#ffffff">18.0%</text>
+<rect x="344.20" y="104" width="6.90" height="22" fill="#8d99ae"/>
+<rect x="351.10" y="104" width="558.90" height="22" fill="#2f6f73"/>
+<text x="630.55" y="120" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#ffffff">81.0%</text>
+<rect x="220" y="164" width="10" height="10" fill="#9a031e"/>
+<text x="236" y="174" font-family="Arial, sans-serif" font-size="12" fill="#52616b">negative</text>
+<rect x="336" y="164" width="10" height="10" fill="#8d99ae"/>
+<text x="352" y="174" font-family="Arial, sans-serif" font-size="12" fill="#52616b">neutral</text>
+<rect x="452" y="164" width="10" height="10" fill="#2f6f73"/>
+<text x="468" y="174" font-family="Arial, sans-serif" font-size="12" fill="#52616b">positive</text>
+</svg><figcaption>Chinese-language sentiment category shares within the Xiaohongshu platform. <a class="figsrc" href="output/chinese_specific_insights/figure_sentiment_category_by_platform.svg" target="_blank">output/chinese_specific_insights/figure_sentiment_category_by_platform.svg</a> <span class="figsrc-note">(script-generated, aggregate-only)</span></figcaption></figure>
+<div class='caveat'>The within-Chinese city/platform friction comparison cannot be run yet: current Fukui Chinese data is single-platform (Xiaohongshu only), so there are no comparison groups. This is a stated data gap, not a finding.</div>
+</section>
+<section id='discuss'><span class='sec-num'>04 — DISCUSSION</span>
+<h2 class='sec'>What the gap does and does not mean</h2>
+<p class='lead'>The defensible headline is the shared-scale star-rating gap (<a class="stat" href="output/hypothesis_tests/h2_review_rating_jp_en.csv" target="_blank" title="raw value: 0.2710436137071648
+field: H2 welch effect_mean_difference
+source: output/hypothesis_tests/h2_review_rating_jp_en.csv
+sha256: d2fee108d6768ca2d5adc005de24089de12913f53b80daa4660050eb49b9edf8
+script: scripts/test_h2_review_rating_jp_en.py" data-raw="0.2710436137071648" data-source="output/hypothesis_tests/h2_review_rating_jp_en.csv" data-field="H2 welch effect_mean_difference" data-sha256="d2fee108d6768ca2d5adc005de24089de12913f53b80daa4660050eb49b9edf8">+0.27 stars<span class="prov-dot">●</span></a>, <a class="stat" href="output/hypothesis_tests/h2_review_rating_jp_en.csv" target="_blank" title="raw value: 4.532710280373832
+field: H2 english mean_review_rating
+source: output/hypothesis_tests/h2_review_rating_jp_en.csv
+sha256: d2fee108d6768ca2d5adc005de24089de12913f53b80daa4660050eb49b9edf8
+script: scripts/test_h2_review_rating_jp_en.py" data-raw="4.532710280373832" data-source="output/hypothesis_tests/h2_review_rating_jp_en.csv" data-field="H2 english mean_review_rating" data-sha256="d2fee108d6768ca2d5adc005de24089de12913f53b80daa4660050eb49b9edf8">4.53<span class="prov-dot">●</span></a> vs <a class="stat" href="output/hypothesis_tests/h2_review_rating_jp_en.csv" target="_blank" title="raw value: 4.261666666666667
+field: H2 japanese mean_review_rating
+source: output/hypothesis_tests/h2_review_rating_jp_en.csv
+sha256: d2fee108d6768ca2d5adc005de24089de12913f53b80daa4660050eb49b9edf8
+script: scripts/test_h2_review_rating_jp_en.py" data-raw="4.261666666666667" data-source="output/hypothesis_tests/h2_review_rating_jp_en.csv" data-field="H2 japanese mean_review_rating" data-sha256="d2fee108d6768ca2d5adc005de24089de12913f53b80daa4660050eb49b9edf8">4.26<span class="prov-dot">●</span></a>): it is the one measure on a common 1–5 scale, with no tool-specific scoring in between. Its <em>direction</em> is clear; its <em>cause</em> is not. Two readings fit the data equally well — English-language reviewers genuinely experienced Fukui venues more favourably, or English- and Japanese-language reviewers differ in how they express evaluation on a rating scale. This study cannot separate the two.</p>
+<div class='callout'>The most informative result is not the gap itself but the friction (complaint) null. Complaint-evidence prevalence is essentially equal across groups (<a class="stat" href="output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv" target="_blank" title="raw value: 1.744029075804776
+field: H3 friction risk_difference_pct
+source: output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv
+sha256: 86a0c42644ba0d28ea7910077dd3937b04804897716a29f9f28a4e401e638fdf
+script: scripts/test_h3_reviewed_evidence_jp_en.py" data-raw="1.744029075804776" data-source="output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv" data-field="H3 friction risk_difference_pct" data-sha256="86a0c42644ba0d28ea7910077dd3937b04804897716a29f9f28a4e401e638fdf">+1.7 pp<span class="prov-dot">●</span></a>, <a class="stat" href="output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv" target="_blank" title="raw value: 0.5636197062874753
+field: H3 friction p_value_bh_fdr
+source: output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv
+sha256: 86a0c42644ba0d28ea7910077dd3937b04804897716a29f9f28a4e401e638fdf
+script: scripts/test_h3_reviewed_evidence_jp_en.py" data-raw="0.5636197062874753" data-source="output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv" data-field="H3 friction p_value_bh_fdr" data-sha256="86a0c42644ba0d28ea7910077dd3937b04804897716a29f9f28a4e401e638fdf">p = .564<span class="prov-dot">●</span></a>): the groups differ in how much they <b>praise</b>, not in how much they <b>complain</b>. A real difference in venue quality would be expected to move complaints too; a difference confined to praise is the asymmetric signature of a positivity-<em>expression</em> difference — i.e. response style — more than of Fukui serving one group worse.</div>
+<p>The findings are therefore best read as a hierarchy of evidential strength rather than a single claim. The common-scale star rating is the strongest rung; the sentiment-category mix is weaker (tool-dependent and small in magnitude, Cramér's V = <a class="stat" href="output/hypothesis_tests/h1_sentiment_category_jp_en.csv" target="_blank" title="raw value: 0.1383854349134206
+field: H1 primary effect_cramers_v
+source: output/hypothesis_tests/h1_sentiment_category_jp_en.csv
+sha256: 089d60762ef52f55095179c76899ef008e8e5e7996f0601e2b02be8a65d8653d
+script: scripts/test_h1_sentiment_category_jp_en.py" data-raw="0.1383854349134206" data-source="output/hypothesis_tests/h1_sentiment_category_jp_en.csv" data-field="H1 primary effect_cramers_v" data-sha256="089d60762ef52f55095179c76899ef008e8e5e7996f0601e2b02be8a65d8653d">0.14<span class="prov-dot">●</span></a>); the reviewed-evidence prevalence gap is the most caveated, because English texts are markedly longer (<a class="stat" href="output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv" target="_blank" title="raw value: 176.0
+field: H3 text_length english median
+source: output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv
+sha256: 86a0c42644ba0d28ea7910077dd3937b04804897716a29f9f28a4e401e638fdf
+script: scripts/test_h3_reviewed_evidence_jp_en.py" data-raw="176.0" data-source="output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv" data-field="H3 text_length english median" data-sha256="86a0c42644ba0d28ea7910077dd3937b04804897716a29f9f28a4e401e638fdf">176 chars<span class="prov-dot">●</span></a> vs <a class="stat" href="output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv" target="_blank" title="raw value: 62.0
+field: H3 text_length japanese median
+source: output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv
+sha256: 86a0c42644ba0d28ea7910077dd3937b04804897716a29f9f28a4e401e638fdf
+script: scripts/test_h3_reviewed_evidence_jp_en.py" data-raw="62.0" data-source="output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv" data-field="H3 text_length japanese median" data-sha256="86a0c42644ba0d28ea7910077dd3937b04804897716a29f9f28a4e401e638fdf">62 chars<span class="prov-dot">●</span></a>) and longer text mechanically matches more keywords. Where the evidence is weak, this page says so.</p>
+<div class='callout'>Practical reading for Fukui tourism stakeholders. First, raw cross-language review scores should not be benchmarked directly — a lower Japanese-language average does not by itself mean a worse experience, and a dashboard that ranks venues on mixed-language ratings will be misled by response style. Second, because complaint prevalence is language-independent, friction evidence — not rating averages — is the more trustworthy place to look for genuine service issues that affect every group.</div>
+<h3 style='font-size:20px;font-weight:600;margin:22px 0 6px'>Limitations</h3>
+<dl class='dl'>
+<dt>Sample &amp; scope</dt><dd>A Fukui-only convenience cache (Outscraper-derived Google reviews; a single external Chinese checkout). No claim of national or all-Japan representativeness.</dd>
+<dt>Statistical power</dt><dd>The venue-controlled paired test rests on only <a class="stat" href="output/hypothesis_tests/within_poi_paired_jp_en.csv" target="_blank" title="raw value: 14
+field: within-POI n_pairs
+source: output/hypothesis_tests/within_poi_paired_jp_en.csv
+sha256: e50a1ec108d9a07c221dae58c3c123be681febd43c54d2c0ca7e408c14aa9da5
+script: " data-raw="14" data-source="output/hypothesis_tests/within_poi_paired_jp_en.csv" data-field="within-POI n_pairs" data-sha256="e50a1ec108d9a07c221dae58c3c123be681febd43c54d2c0ca7e408c14aa9da5">14<span class="prov-dot">●</span></a> shared POIs; the within-POI star-rating difference (<a class="stat" href="output/hypothesis_tests/within_poi_paired_jp_en.csv" target="_blank" title="raw value: 0.3137931034482757
+field: within-POI rating effect (median diff)
+source: output/hypothesis_tests/within_poi_paired_jp_en.csv
+sha256: e50a1ec108d9a07c221dae58c3c123be681febd43c54d2c0ca7e408c14aa9da5
+script: " data-raw="0.3137931034482757" data-source="output/hypothesis_tests/within_poi_paired_jp_en.csv" data-field="within-POI rating effect (median diff)" data-sha256="e50a1ec108d9a07c221dae58c3c123be681febd43c54d2c0ca7e408c14aa9da5">+0.31 stars<span class="prov-dot">●</span></a>, <a class="stat" href="output/hypothesis_tests/within_poi_paired_jp_en.csv" target="_blank" title="raw value: 0.0579833984375
+field: within-POI rating p_value
+source: output/hypothesis_tests/within_poi_paired_jp_en.csv
+sha256: e50a1ec108d9a07c221dae58c3c123be681febd43c54d2c0ca7e408c14aa9da5
+script: " data-raw="0.0579833984375" data-source="output/hypothesis_tests/within_poi_paired_jp_en.csv" data-field="within-POI rating p_value" data-sha256="e50a1ec108d9a07c221dae58c3c123be681febd43c54d2c0ca7e408c14aa9da5">p = .058<span class="prov-dot">●</span></a>) is therefore <em>inconclusive</em>, not a demonstrated null — the test is underpowered at this venue overlap.</dd>
+<dt>Measurement</dt><dd>VADER, oseti, and SnowNLP are not validated against hand-labelled Fukui tourism text, and the reviewed keyword codebooks are coverage-limited; both skew positive, so the category test meets a ceiling effect.</dd>
+<dt>Design</dt><dd>Holding venue constant removes POI composition as one confound only; reviewer self-selection within a venue and the response-style confound above remain open. No temporal/trend analysis is attempted, given the date-quality gap.</dd>
+<dt>Chinese strand</dt><dd>Single-platform (Xiaohongshu, <a class="stat" href="output/chinese_specific_insights/sentiment_category_by_platform.csv" target="_blank" title="raw value: 81.0
+field: CN XHS positive pct_platform_rows
+source: output/chinese_specific_insights/sentiment_category_by_platform.csv
+sha256: 0f46e5efc950a5616400cf7e4d3b26eda1e74a9d469182ffe46371d7b7dc59f2
+script: " data-raw="81.0" data-source="output/chinese_specific_insights/sentiment_category_by_platform.csv" data-field="CN XHS positive pct_platform_rows" data-sha256="0f46e5efc950a5616400cf7e4d3b26eda1e74a9d469182ffe46371d7b7dc59f2">81.0%<span class="prov-dot">●</span></a> positive) and descriptive only; it generates hypotheses, it does not provide a like-for-like cross-source test.</dd>
+</dl>
+<h3 style='font-size:20px;font-weight:600;margin:22px 0 6px'>Where this should go next</h3>
+<ol class='pipeline'>
+<li><b>Calibrate response style.</b> Within-reviewer cross-language pairs or anchoring vignettes to isolate genuine experience differences from scale-use differences — the central unresolved question.</li>
+<li><b>Power up the venue-controlled test.</b> Widen the shared-POI overlap so the borderline within-POI rating result can be resolved rather than left inconclusive.</li>
+<li><b>Validate the scoring tools.</b> Score a hand-labelled tourism subset in each language to quantify how far VADER / oseti / SnowNLP agree with human judgement before leaning on category shares.</li>
+<li><b>Make the Chinese strand confirmatory.</b> Add a second platform (e.g. Douyin) so source can be held constant and the comparison becomes a test rather than context.</li>
+<li><b>Add a temporal view.</b> Once date precision is sufficient, examine whether the language gap is stable or seasonal.</li>
+</ol>
+<div class='caveat'>In one line: the cross-language gap is real on the clean scale, but its cause is unresolved — and the equal complaint rate across groups suggests it reflects, at least in part, how groups express evaluation rather than how well Fukui serves them.</div>
+</section>
+<section id='prov'><span class='sec-num'>APPENDIX — PROVENANCE</span>
+<h2 class='sec'>Every number, traced</h2>
+<p>Each value above is resolved at build time directly from an analysis-script output file. The table lists every reference in order of first appearance: the displayed value, the exact field it was read from, the source file, and that file's SHA256. Click any source to open it.</p>
+<table class='prov-table'><thead><tr><th>#</th><th>Value</th><th>Field</th><th>Source file</th><th>SHA256</th></tr></thead><tbody>
+<tr><td class='num'>1</td><td class='num'>2,014</td><td>metrics.review_rows_represented</td><td><a href='output/presentation_safe/presentation_manifest.json' target='_blank'>output/presentation_safe/presentation_manifest.json</a></td><td>1dc1f5ee2db1de36…</td></tr>
+<tr><td class='num'>2</td><td class='num'>214</td><td>H2 group_summary n_rating_present[english]</td><td><a href='output/hypothesis_tests/h2_review_rating_jp_en.csv' target='_blank'>output/hypothesis_tests/h2_review_rating_jp_en.csv</a></td><td>d2fee108d6768ca2…</td></tr>
+<tr><td class='num'>3</td><td class='num'>1,800</td><td>H2 group_summary n_rating_present[japanese]</td><td><a href='output/hypothesis_tests/h2_review_rating_jp_en.csv' target='_blank'>output/hypothesis_tests/h2_review_rating_jp_en.csv</a></td><td>d2fee108d6768ca2…</td></tr>
+<tr><td class='num'>4</td><td class='num'>200</td><td>metrics.rows_represented</td><td><a href='output/chinese_specific_insights/chinese_specific_insights_manifest.json' target='_blank'>output/chinese_specific_insights/chinese_specific_insights_manifest.json</a></td><td>db2cf7d29115b943…</td></tr>
+<tr><td class='num'>5</td><td class='num'>+31.3pp</td><td>H3 enjoyment risk_difference_pct</td><td><a href='output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv' target='_blank'>output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv</a></td><td>86a0c42644ba0d28…</td></tr>
+<tr><td class='num'>6</td><td class='num'>p=2.4x10^-22</td><td>H3 enjoyment p_value_bh_fdr</td><td><a href='output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv' target='_blank'>output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv</a></td><td>86a0c42644ba0d28…</td></tr>
+<tr><td class='num'>7</td><td class='num'>53%</td><td>H3 enjoyment english_present_pct</td><td><a href='output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv' target='_blank'>output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv</a></td><td>86a0c42644ba0d28…</td></tr>
+<tr><td class='num'>8</td><td class='num'>22%</td><td>H3 enjoyment japanese_present_pct</td><td><a href='output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv' target='_blank'>output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv</a></td><td>86a0c42644ba0d28…</td></tr>
+<tr><td class='num'>9</td><td class='num'>+23.6pp</td><td>H3 positive_sentiment risk_difference_pct</td><td><a href='output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv' target='_blank'>output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv</a></td><td>86a0c42644ba0d28…</td></tr>
+<tr><td class='num'>10</td><td class='num'>p=3.0x10^-14</td><td>H3 positive_sentiment p_value_bh_fdr</td><td><a href='output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv' target='_blank'>output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv</a></td><td>86a0c42644ba0d28…</td></tr>
+<tr><td class='num'>11</td><td class='num'>+10.8pp</td><td>H3 recommendation risk_difference_pct</td><td><a href='output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv' target='_blank'>output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv</a></td><td>86a0c42644ba0d28…</td></tr>
+<tr><td class='num'>12</td><td class='num'>p=1.8x10^-9</td><td>H3 recommendation p_value_bh_fdr</td><td><a href='output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv' target='_blank'>output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv</a></td><td>86a0c42644ba0d28…</td></tr>
+<tr><td class='num'>13</td><td class='num'>+1.7pp</td><td>H3 friction risk_difference_pct</td><td><a href='output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv' target='_blank'>output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv</a></td><td>86a0c42644ba0d28…</td></tr>
+<tr><td class='num'>14</td><td class='num'>p=.564</td><td>H3 friction p_value_bh_fdr</td><td><a href='output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv' target='_blank'>output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv</a></td><td>86a0c42644ba0d28…</td></tr>
+<tr><td class='num'>15</td><td class='num'>176 chars</td><td>H3 text_length english median</td><td><a href='output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv' target='_blank'>output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv</a></td><td>86a0c42644ba0d28…</td></tr>
+<tr><td class='num'>16</td><td class='num'>62 chars</td><td>H3 text_length japanese median</td><td><a href='output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv' target='_blank'>output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv</a></td><td>86a0c42644ba0d28…</td></tr>
+<tr><td class='num'>17</td><td class='num'>+0.27stars</td><td>H2 welch effect_mean_difference</td><td><a href='output/hypothesis_tests/h2_review_rating_jp_en.csv' target='_blank'>output/hypothesis_tests/h2_review_rating_jp_en.csv</a></td><td>d2fee108d6768ca2…</td></tr>
+<tr><td class='num'>18</td><td class='num'>0.14</td><td>H2 welch ci_95_lower</td><td><a href='output/hypothesis_tests/h2_review_rating_jp_en.csv' target='_blank'>output/hypothesis_tests/h2_review_rating_jp_en.csv</a></td><td>d2fee108d6768ca2…</td></tr>
+<tr><td class='num'>19</td><td class='num'>0.40</td><td>H2 welch ci_95_upper</td><td><a href='output/hypothesis_tests/h2_review_rating_jp_en.csv' target='_blank'>output/hypothesis_tests/h2_review_rating_jp_en.csv</a></td><td>d2fee108d6768ca2…</td></tr>
+<tr><td class='num'>20</td><td class='num'>p=7.7x10^-5</td><td>H2 welch p_value</td><td><a href='output/hypothesis_tests/h2_review_rating_jp_en.csv' target='_blank'>output/hypothesis_tests/h2_review_rating_jp_en.csv</a></td><td>d2fee108d6768ca2…</td></tr>
+<tr><td class='num'>21</td><td class='num'>4.53</td><td>H2 english mean_review_rating</td><td><a href='output/hypothesis_tests/h2_review_rating_jp_en.csv' target='_blank'>output/hypothesis_tests/h2_review_rating_jp_en.csv</a></td><td>d2fee108d6768ca2…</td></tr>
+<tr><td class='num'>22</td><td class='num'>4.26</td><td>H2 japanese mean_review_rating</td><td><a href='output/hypothesis_tests/h2_review_rating_jp_en.csv' target='_blank'>output/hypothesis_tests/h2_review_rating_jp_en.csv</a></td><td>d2fee108d6768ca2…</td></tr>
+<tr><td class='num'>23</td><td class='num'>+0.27stars</td><td>H2 POI-level effect_mean_difference</td><td><a href='output/hypothesis_tests/h2_review_rating_jp_en.csv' target='_blank'>output/hypothesis_tests/h2_review_rating_jp_en.csv</a></td><td>d2fee108d6768ca2…</td></tr>
+<tr><td class='num'>24</td><td class='num'>p=.035</td><td>H2 POI-level p_value</td><td><a href='output/hypothesis_tests/h2_review_rating_jp_en.csv' target='_blank'>output/hypothesis_tests/h2_review_rating_jp_en.csv</a></td><td>d2fee108d6768ca2…</td></tr>
+<tr><td class='num'>25</td><td class='num'>+0.16</td><td>within-POI positive_share effect (median diff)</td><td><a href='output/hypothesis_tests/within_poi_paired_jp_en.csv' target='_blank'>output/hypothesis_tests/within_poi_paired_jp_en.csv</a></td><td>e50a1ec108d9a07c…</td></tr>
+<tr><td class='num'>26</td><td class='num'>p&lt;.001</td><td>within-POI positive_share p_value</td><td><a href='output/hypothesis_tests/within_poi_paired_jp_en.csv' target='_blank'>output/hypothesis_tests/within_poi_paired_jp_en.csv</a></td><td>e50a1ec108d9a07c…</td></tr>
+<tr><td class='num'>27</td><td class='num'>+0.31stars</td><td>within-POI rating effect (median diff)</td><td><a href='output/hypothesis_tests/within_poi_paired_jp_en.csv' target='_blank'>output/hypothesis_tests/within_poi_paired_jp_en.csv</a></td><td>e50a1ec108d9a07c…</td></tr>
+<tr><td class='num'>28</td><td class='num'>p=.058</td><td>within-POI rating p_value</td><td><a href='output/hypothesis_tests/within_poi_paired_jp_en.csv' target='_blank'>output/hypothesis_tests/within_poi_paired_jp_en.csv</a></td><td>e50a1ec108d9a07c…</td></tr>
+<tr><td class='num'>29</td><td class='num'>14</td><td>within-POI n_pairs</td><td><a href='output/hypothesis_tests/within_poi_paired_jp_en.csv' target='_blank'>output/hypothesis_tests/within_poi_paired_jp_en.csv</a></td><td>e50a1ec108d9a07c…</td></tr>
+<tr><td class='num'>30</td><td class='num'>25</td><td>within-POI n_shared_poi_candidates</td><td><a href='output/hypothesis_tests/within_poi_paired_jp_en.csv' target='_blank'>output/hypothesis_tests/within_poi_paired_jp_en.csv</a></td><td>e50a1ec108d9a07c…</td></tr>
+<tr><td class='num'>31</td><td class='num'>38.6</td><td>H1 primary chi-square statistic</td><td><a href='output/hypothesis_tests/h1_sentiment_category_jp_en.csv' target='_blank'>output/hypothesis_tests/h1_sentiment_category_jp_en.csv</a></td><td>089d60762ef52f55…</td></tr>
+<tr><td class='num'>32</td><td class='num'>p=4.2x10^-9</td><td>H1 primary p_value_holm</td><td><a href='output/hypothesis_tests/h1_sentiment_category_jp_en.csv' target='_blank'>output/hypothesis_tests/h1_sentiment_category_jp_en.csv</a></td><td>089d60762ef52f55…</td></tr>
+<tr><td class='num'>33</td><td class='num'>0.14</td><td>H1 primary effect_cramers_v</td><td><a href='output/hypothesis_tests/h1_sentiment_category_jp_en.csv' target='_blank'>output/hypothesis_tests/h1_sentiment_category_jp_en.csv</a></td><td>089d60762ef52f55…</td></tr>
+<tr><td class='num'>34</td><td class='num'>91.1%</td><td>H1 positive share english</td><td><a href='output/hypothesis_tests/h1_sentiment_category_jp_en.csv' target='_blank'>output/hypothesis_tests/h1_sentiment_category_jp_en.csv</a></td><td>089d60762ef52f55…</td></tr>
+<tr><td class='num'>35</td><td class='num'>72.4%</td><td>H1 positive share japanese</td><td><a href='output/hypothesis_tests/h1_sentiment_category_jp_en.csv' target='_blank'>output/hypothesis_tests/h1_sentiment_category_jp_en.csv</a></td><td>089d60762ef52f55…</td></tr>
+<tr><td class='num'>36</td><td class='num'>+0.30</td><td>WL-EN enjoyment mean_score_difference</td><td><a href='output/within_language_sentiment/en_within_language_sentiment_drivers.csv' target='_blank'>output/within_language_sentiment/en_within_language_sentiment_drivers.csv</a></td><td>013c6eab9d537d4c…</td></tr>
+<tr><td class='num'>37</td><td class='num'>p=1.6x10^-11</td><td>WL-EN enjoyment p_value_bh_fdr</td><td><a href='output/within_language_sentiment/en_within_language_sentiment_drivers.csv' target='_blank'>output/within_language_sentiment/en_within_language_sentiment_drivers.csv</a></td><td>013c6eab9d537d4c…</td></tr>
+<tr><td class='num'>38</td><td class='num'>81.0%</td><td>CN XHS positive pct_platform_rows</td><td><a href='output/chinese_specific_insights/sentiment_category_by_platform.csv' target='_blank'>output/chinese_specific_insights/sentiment_category_by_platform.csv</a></td><td>0f46e5efc950a561…</td></tr>
+<tr><td class='num'>39</td><td class='num'>18.0%</td><td>CN XHS negative pct_platform_rows</td><td><a href='output/chinese_specific_insights/sentiment_category_by_platform.csv' target='_blank'>output/chinese_specific_insights/sentiment_category_by_platform.csv</a></td><td>0f46e5efc950a561…</td></tr>
+</tbody></table>
+</section>
+</main>
+<footer><div class='wrap'>Generated by <code>scripts/build_pbl_dashboard.py</code> from tracked aggregate outputs. Presentation manifest generated_at: 2026-06-24T11:23:13+00:00. Group labels are content-language groups, not nationalities. All outputs aggregate-only — no row-level text, authors, URLs, or IDs.</div></footer>
+</body></html>

@@ -38,6 +38,24 @@ All figures are aggregate-only. They omit row-level post/review text, authors, U
 - Question answered: How much more text is available for evidence matching by language group?
 - Caveat: Diagnostic only.
 
+## Hypothesis results at a glance
+
+- Path: `/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/docs/statistical_test_figures/figure_hypothesis_overview.svg`
+- Question answered: Which main hypotheses are supported, and by which aggregate effect sizes?
+- Caveat: Rows remain nested in POIs; adjusted p-values and venue-paired robustness checks answer different threats.
+
+## H2 rating gap robustness ladder
+
+- Path: `/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/docs/statistical_test_figures/figure_h2_rating_gap_robustness_ladder.svg`
+- Question answered: Does the English-minus-Japanese Google rating gap persist as the unit shifts from rows to POIs to shared POIs?
+- Caveat: Common Google stars are companion outcome evidence, not cross-language text-sentiment equivalence.
+
+## Within-POI paired differences
+
+- Path: `/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/docs/statistical_test_figures/figure_within_poi_paired_shift.svg`
+- Question answered: When the same Fukui POIs are compared directly, do English-language reviews still score higher?
+- Caveat: The paired unit is POI, not review row; the rating shift is marginal while positive-share shift is significant.
+
 ## Cross-source sentiment category shares
 
 - Path: `/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/docs/statistical_test_figures/figure_cross_source_sentiment_category.svg`

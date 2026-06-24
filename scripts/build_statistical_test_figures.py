@@ -8,6 +8,7 @@ import html
 import json
 import math
 import sys
+import textwrap
 from pathlib import Path
 from typing import Iterable
 
@@ -127,10 +128,23 @@ def _fmt_p(value: object) -> str:
     return f"p={number:.3f}"
 
 
+def _fmt_p_number(value: object) -> str:
+    if pd.isna(value):
+        return "n/a"
+    number = float(value)
+    if number < 0.001:
+        return f"{number:.1e}"
+    return f"{number:.3f}"
+
+
 def _fmt_effect(value: object, label: str = "effect") -> str:
     if pd.isna(value):
         return f"{label}=n/a"
     return f"{label}={float(value):.3f}"
+
+
+def _fmt_signed(value: object, digits: int = 2) -> str:
+    return f"{float(value):+.{digits}f}"
 
 
 def _as_pct(value: object) -> float:
@@ -141,6 +155,12 @@ def _as_pct(value: object) -> float:
 def _safe_label(value: object, max_len: int = 42) -> str:
     text = str(value).replace("_", " ")
     return text if len(text) <= max_len else text[: max_len - 1] + "..."
+
+
+def _wrapped_label_lines(value: object, max_len: int = 48) -> list[str]:
+    text = str(value).replace("_", " ")
+    lines = textwrap.wrap(text, width=max_len, break_long_words=False, break_on_hyphens=False)
+    return lines or [""]
 
 
 def _text(x: float, y: float, value: object, size: int = 13, weight: int = 400,
@@ -174,6 +194,188 @@ def _legend(parts: list[str], x: float, y: float, items: Iterable[tuple[str, str
         offset += max(118, len(label) * 7 + 32)
 
 
+def _required_row(df: pd.DataFrame, mask: pd.Series, label: str) -> pd.Series:
+    rows = df[mask]
+    if rows.empty:
+        raise FigureBuildError(f"Required row missing for statistical figure: {label}")
+    return rows.iloc[0]
+
+
+def _chip(
+    parts: list[str],
+    x: float,
+    y: float,
+    width: float,
+    height: float,
+    label: str,
+    *,
+    fill: str = PALETTE["bg"],
+    stroke: str = PALETTE["line"],
+    text_fill: str = PALETTE["ink"],
+    size: int = 11,
+    weight: int = 400,
+) -> None:
+    parts.append(
+        f'<rect x="{x:.2f}" y="{y:.2f}" width="{width:.2f}" height="{height:.2f}" '
+        f'rx="4" fill="{fill}" stroke="{stroke}" stroke-width="1"/>'
+    )
+    parts.append(_text(x + width / 2, y + height / 2 + size / 2 - 2, label, size=size, weight=weight, fill=text_fill, anchor="middle"))
+
+
+def _chip_width(label: str, size: int = 12) -> float:
+    return max(34.0, len(label) * size * 0.54 + 16.0)
+
+
+def _status_color(status: object) -> str:
+    normalized = str(status).lower()
+    if normalized == "supported":
+        return PALETTE["positive"]
+    if normalized in {"mixed", "partial"}:
+        return PALETTE["event"]
+    return PALETTE["neutral"]
+
+
+def _label_chip(
+    parts: list[str],
+    x: float,
+    baseline_y: float,
+    label: str,
+    *,
+    anchor: str = "start",
+    canvas_width: float,
+    size: int = 12,
+    text_fill: str = PALETTE["ink"],
+) -> bool:
+    chip_width = _chip_width(label, size=size)
+    chip_height = 22
+    if anchor == "end":
+        chip_x = x - chip_width + 4
+        if chip_x < 32:
+            return False
+    else:
+        chip_x = x - 4
+        if chip_x + chip_width > canvas_width - 32:
+            return False
+    _chip(
+        parts,
+        chip_x,
+        baseline_y - 15,
+        chip_width,
+        chip_height,
+        label,
+        fill=PALETTE["bg"],
+        stroke=PALETTE["line"],
+        text_fill=text_fill,
+        size=size,
+    )
+    return True
+
+
+def _forest_chart(
+    path: Path,
+    title: str,
+    subtitle: str,
+    rows: list[dict[str, object]],
+    note: str,
+    *,
+    x_min: float,
+    x_max: float,
+    ticks: list[float],
+    caption: str | None = None,
+    positive_annotation: str | None = None,
+) -> None:
+    width = 1120
+    top = 118
+    row_height = 62
+    left = 382
+    chart_width = 430
+    chart_right = left + chart_width
+    p_chip_x = chart_right + 18
+    value_chip_x = p_chip_x + 88
+    value_chip_width = width - value_chip_x - 32
+    axis_y = top + len(rows) * row_height + 9
+    caption_space = 24 if caption else 0
+    height = axis_y + 72 + caption_space
+
+    def sx(value: float) -> float:
+        return left + (value - x_min) / (x_max - x_min) * chart_width
+
+    zero_x = sx(0.0)
+    parts = _svg_header(width, height, title, subtitle)
+    parts.append(
+        f'<rect x="{max(left, zero_x):.2f}" y="{top - 28:.2f}" '
+        f'width="{max(0.0, chart_right - max(left, zero_x)):.2f}" height="{len(rows) * row_height + 20:.2f}" '
+        f'fill="{PALETTE["positive"]}" opacity="0.07"/>'
+    )
+    parts.append(
+        f'<line x1="{zero_x:.2f}" x2="{zero_x:.2f}" y1="{top - 31:.2f}" y2="{axis_y:.2f}" '
+        f'stroke="{PALETTE["line"]}" stroke-width="1.5" stroke-dasharray="5 5"/>'
+    )
+
+    if positive_annotation:
+        parts.append(_text(chart_right - 8, top - 13, positive_annotation, size=12, fill=PALETTE["muted"], anchor="end"))
+
+    for idx, row in enumerate(rows):
+        y = top + idx * row_height
+        cy = y + 24
+        point = float(row["point"])
+        color = str(row.get("color", PALETTE["score"]))
+        parts.append(_text(left - 16, cy + 4, _safe_label(row["label"], 48), size=12, anchor="end"))
+        parts.append(f'<line x1="{left:.2f}" x2="{chart_right:.2f}" y1="{cy:.2f}" y2="{cy:.2f}" stroke="{PALETTE["line"]}" stroke-width="1" opacity="0.65"/>')
+        if row.get("ci_low") is not None and row.get("ci_high") is not None:
+            low_x = sx(float(row["ci_low"]))
+            high_x = sx(float(row["ci_high"]))
+            parts.append(f'<line x1="{low_x:.2f}" x2="{high_x:.2f}" y1="{cy:.2f}" y2="{cy:.2f}" stroke="{color}" stroke-width="2.2"/>')
+            parts.append(f'<line x1="{low_x:.2f}" x2="{low_x:.2f}" y1="{cy - 7:.2f}" y2="{cy + 7:.2f}" stroke="{color}" stroke-width="2.2"/>')
+            parts.append(f'<line x1="{high_x:.2f}" x2="{high_x:.2f}" y1="{cy - 7:.2f}" y2="{cy + 7:.2f}" stroke="{color}" stroke-width="2.2"/>')
+        parts.append(f'<circle cx="{sx(point):.2f}" cy="{cy:.2f}" r="5.2" fill="{color}"/>')
+        _chip(parts, p_chip_x, cy - 12, 76, 23, str(row.get("p_chip", "")), fill=PALETTE["bg"], stroke=PALETTE["line"], text_fill=PALETTE["muted"], size=10)
+        _chip(parts, value_chip_x, cy - 13, value_chip_width, 25, str(row.get("value_label", _fmt_signed(point, 2))), fill=PALETTE["bg"], stroke=PALETTE["line"], text_fill=PALETTE["ink"], size=11, weight=700)
+
+    parts.append(f'<line x1="{left:.2f}" x2="{chart_right:.2f}" y1="{axis_y:.2f}" y2="{axis_y:.2f}" stroke="{PALETTE["line"]}" stroke-width="1.2"/>')
+    for tick in ticks:
+        x = sx(float(tick))
+        parts.append(f'<line x1="{x:.2f}" x2="{x:.2f}" y1="{axis_y:.2f}" y2="{axis_y + 6:.2f}" stroke="{PALETTE["line"]}" stroke-width="1"/>')
+        tick_label = "0" if abs(float(tick)) < 0.0005 else f"{float(tick):.2f}".rstrip("0").rstrip(".")
+        parts.append(_text(x, axis_y + 22, tick_label, size=11, fill=PALETTE["muted"], anchor="middle"))
+
+    if caption:
+        parts.append(_text(32, height - 42, caption, size=12, fill=PALETTE["muted"]))
+        parts.append(_text(32, height - 18, note, size=12, fill=PALETTE["muted"]))
+    else:
+        parts.append(_text(32, height - 18, note, size=12, fill=PALETTE["muted"]))
+    _write_svg(path, parts)
+
+
+def _results_panel(
+    path: Path,
+    title: str,
+    subtitle: str,
+    rows: list[dict[str, str]],
+    note: str,
+) -> None:
+    width = 1120
+    top = 104
+    row_height = 70
+    height = top + len(rows) * row_height + 54
+    parts = _svg_header(width, height, title, subtitle)
+    for idx, row in enumerate(rows):
+        y = top + idx * row_height
+        if idx % 2:
+            parts.append(
+                f'<rect x="32" y="{y - 11:.2f}" width="1056" height="56" '
+                f'rx="6" fill="{PALETTE["line"]}" opacity="0.22"/>'
+            )
+        parts.append(_text(58, y + 12, row["label"], size=15, weight=700))
+        parts.append(_text(172, y + 12, row["verdict"], size=13, fill=PALETTE["ink"]))
+        _chip(parts, 590, y - 8, 318, 30, row["effect"], fill=PALETTE["bg"], stroke=PALETTE["line"], text_fill=PALETTE["ink"], size=10, weight=700)
+        _chip(parts, 920, y - 8, 98, 30, row["p"], fill=PALETTE["bg"], stroke=PALETTE["line"], text_fill=PALETTE["muted"], size=10)
+        status_color = _status_color(row["status"])
+        _chip(parts, 1030, y - 8, 58, 30, row["status"], fill=status_color, stroke=status_color, text_fill=PALETTE["bg"], size=9, weight=700)
+    parts.append(_text(32, height - 18, note, size=12, fill=PALETTE["muted"]))
+    _write_svg(path, parts)
+
+
 def _stacked_pct_chart(
     path: Path,
     title: str,
@@ -190,6 +392,13 @@ def _stacked_pct_chart(
     height = top + 92 + max(1, len(rows)) * row_height
     chart_width = width - left - right
     parts = _svg_header(width, height, title, subtitle)
+    grid_bottom = top + (max(1, len(rows)) - 1) * row_height + 38
+    for tick_pct in (0.0, 0.5, 1.0):
+        x = left + tick_pct * chart_width
+        parts.append(
+            f'<line x1="{x:.2f}" x2="{x:.2f}" y1="{top + 2:.2f}" y2="{grid_bottom:.2f}" '
+            f'stroke="{PALETTE["line"]}" stroke-width="1" opacity="0.55"/>'
+        )
     for idx, row in enumerate(rows):
         y = top + idx * row_height
         parts.append(_text(left - 14, y + 26, _safe_label(row["label"], 36), size=13, anchor="end"))
@@ -204,7 +413,9 @@ def _stacked_pct_chart(
                 parts.append(_text(x + segment_width / 2, y + 26, f"{value:.1f}%", size=11, fill="#ffffff", anchor="middle"))
             x += segment_width
         if row.get("n") is not None:
-            parts.append(_text(left + chart_width + 10, y + 26, f"n={_fmt_n(row['n'])}", size=12, fill=PALETTE["muted"]))
+            label = f"n={_fmt_n(row['n'])}"
+            if not _label_chip(parts, left + chart_width + 10, y + 26, label, canvas_width=width, size=12, text_fill=PALETTE["muted"]):
+                parts.append(_text(left + chart_width + 10, y + 26, label, size=12, fill=PALETTE["muted"]))
     _legend(parts, left, height - 42, [(key, color) for key, color in categories])
     parts.append(_text(32, height - 18, note, size=12, fill=PALETTE["muted"]))
     _write_svg(path, parts)
@@ -236,9 +447,17 @@ def _horizontal_bar_chart(
     else:
         limit = max_abs or max(values + [1.0])
     parts = _svg_header(width, height, title, subtitle)
+    y1 = top - 8
+    y2 = height - 62
     if zero_center:
         axis_x = left + chart_width / 2
-        parts.append(f'<line x1="{axis_x:.2f}" x2="{axis_x:.2f}" y1="{top - 8}" y2="{height - 62}" stroke="{PALETTE["line"]}" stroke-width="1"/>')
+        for x in (left, axis_x, left + chart_width):
+            parts.append(f'<line x1="{x:.2f}" x2="{x:.2f}" y1="{y1:.2f}" y2="{y2:.2f}" stroke="{PALETTE["line"]}" stroke-width="1" opacity="0.65"/>')
+    else:
+        for tick_pct in (0.0, 0.5, 1.0):
+            x = left + tick_pct * chart_width
+            parts.append(f'<line x1="{x:.2f}" x2="{x:.2f}" y1="{y1:.2f}" y2="{y2:.2f}" stroke="{PALETTE["line"]}" stroke-width="1" opacity="0.65"/>')
+    parts.append(f'<line x1="{left:.2f}" x2="{left + chart_width:.2f}" y1="{y2:.2f}" y2="{y2:.2f}" stroke="{PALETTE["line"]}" stroke-width="1" opacity="0.75"/>')
     for idx, row in enumerate(rows):
         y = top + idx * row_height
         value = float(row.get(value_key, 0.0) or 0.0)
@@ -255,7 +474,102 @@ def _horizontal_bar_chart(
         text_x = x + bar_width + 8 if value >= 0 or not zero_center else x - 8
         anchor = "start" if value >= 0 or not zero_center else "end"
         label = str(row.get("annotation", f"{value_label}={value:.3f}"))
-        parts.append(_text(text_x, y + 23, label, size=12, anchor=anchor))
+        if not _label_chip(parts, text_x, y + 23, label, anchor=anchor, canvas_width=width, size=12):
+            parts.append(_text(text_x, y + 23, label, size=12, anchor=anchor))
+    parts.append(_text(32, height - 20, note, size=12, fill=PALETTE["muted"]))
+    _write_svg(path, parts)
+
+
+def _driver_effect_chart(
+    path: Path,
+    title: str,
+    subtitle: str,
+    groups: list[dict[str, object]],
+    note: str,
+) -> None:
+    width = 1240
+    top = 102
+    left = 470
+    right = 190
+    chart_width = width - left - right
+    row_base_height = 38
+    line_gap = 14
+    panel_gap = 28
+    axis_height = 30
+
+    visible_groups = [group for group in groups if group["rows"]]
+    for group in visible_groups:
+        rows = group["rows"]
+        for row in rows:
+            row["label_lines"] = _wrapped_label_lines(row["label"], 50)
+            row["height"] = max(row_base_height, 16 + len(row["label_lines"]) * line_gap)
+        group["height"] = 42 + sum(int(row["height"]) for row in rows) + axis_height
+
+    height = top + sum(int(group["height"]) for group in visible_groups) + panel_gap * max(0, len(visible_groups) - 1) + 64
+    parts = _svg_header(width, height, title, subtitle)
+    y = top
+    for group in visible_groups:
+        rows = group["rows"]
+        values = [abs(float(row["value"])) for row in rows]
+        limit = max(values + [float(group.get("min_limit", 0.1))])
+        axis_x = left + chart_width / 2
+        panel_top = y + 28
+        row_y = y + 42
+        panel_bottom = row_y + sum(int(row["height"]) for row in rows) + 2
+
+        parts.append(_text(32, y + 12, group["title"], size=14, weight=700))
+        parts.append(_text(left, y + 12, f"Unit: {group['unit']}", size=12, fill=PALETTE["muted"]))
+        for x in (left, axis_x, left + chart_width):
+            parts.append(
+                f'<line x1="{x:.2f}" x2="{x:.2f}" y1="{panel_top:.2f}" y2="{panel_bottom:.2f}" '
+                f'stroke="{PALETTE["line"]}" stroke-width="1" opacity="0.65"/>'
+            )
+
+        for row in rows:
+            row_height = int(row["height"])
+            cy = row_y + row_height / 2
+            value = float(row["value"])
+            color = str(row.get("color", PALETTE["score"]))
+            label_lines = row["label_lines"]
+            first_baseline = cy - ((len(label_lines) - 1) * line_gap / 2) + 4
+            for line_idx, line in enumerate(label_lines):
+                parts.append(_text(left - 16, first_baseline + line_idx * line_gap, line, size=11, anchor="end"))
+            parts.append(
+                f'<line x1="{left:.2f}" x2="{left + chart_width:.2f}" y1="{cy:.2f}" y2="{cy:.2f}" '
+                f'stroke="{PALETTE["line"]}" stroke-width="1" opacity="0.55"/>'
+            )
+            bar_width = abs(value) / limit * (chart_width / 2) if limit else 0.0
+            x = axis_x - bar_width if value < 0 else axis_x
+            parts.append(f'<rect x="{x:.2f}" y="{cy - 10:.2f}" width="{bar_width:.2f}" height="20" rx="3" fill="{color}"/>')
+            label = str(row["annotation"])
+            chip_width = _chip_width(label, size=11)
+            if value < 0:
+                text_x = axis_x + 8
+                anchor = "start"
+            else:
+                text_x = x + bar_width + 8
+                anchor = "start"
+            if text_x - 4 + chip_width > width - 32:
+                text_x = width - 32
+                anchor = "end"
+            if not _label_chip(parts, text_x, cy + 4, label, anchor=anchor, canvas_width=width, size=11):
+                parts.append(_text(text_x, cy + 4, label, size=11, anchor=anchor))
+            row_y += row_height
+
+        axis_y = panel_bottom + 10
+        parts.append(
+            f'<line x1="{left:.2f}" x2="{left + chart_width:.2f}" y1="{axis_y:.2f}" y2="{axis_y:.2f}" '
+            f'stroke="{PALETTE["line"]}" stroke-width="1" opacity="0.75"/>'
+        )
+        for tick in (-limit, 0.0, limit):
+            x = axis_x + (tick / limit) * (chart_width / 2) if limit else axis_x
+            parts.append(f'<line x1="{x:.2f}" x2="{x:.2f}" y1="{axis_y:.2f}" y2="{axis_y + 6:.2f}" stroke="{PALETTE["line"]}" stroke-width="1"/>')
+            tick_label = "0" if abs(tick) < 0.0005 else f"{tick:+.2f}".rstrip("0").rstrip(".")
+            if group.get("tick_suffix"):
+                tick_label = f"{tick_label}{group['tick_suffix']}"
+            parts.append(_text(x, axis_y + 22, tick_label, size=10, fill=PALETTE["muted"], anchor="middle"))
+        y = panel_bottom + axis_height + panel_gap
+
     parts.append(_text(32, height - 20, note, size=12, fill=PALETTE["muted"]))
     _write_svg(path, parts)
 
@@ -276,6 +590,13 @@ def _grouped_pct_chart(
     height = top + 92 + max(1, len(rows)) * row_height
     chart_width = width - left - right
     parts = _svg_header(width, height, title, subtitle)
+    grid_bottom = top + (max(1, len(rows)) - 1) * row_height + 56
+    for tick_pct in (0.0, 0.5, 1.0):
+        x = left + tick_pct * chart_width
+        parts.append(
+            f'<line x1="{x:.2f}" x2="{x:.2f}" y1="{top - 2:.2f}" y2="{grid_bottom:.2f}" '
+            f'stroke="{PALETTE["line"]}" stroke-width="1" opacity="0.55"/>'
+        )
     for idx, row in enumerate(rows):
         y = top + idx * row_height
         parts.append(_text(left - 14, y + 33, _safe_label(row["label"], 38), size=13, anchor="end"))
@@ -286,7 +607,9 @@ def _grouped_pct_chart(
             bar_y = y + gidx * 19
             bar_width = (value / 100.0) * chart_width
             parts.append(f'<rect x="{left}" y="{bar_y}" width="{bar_width:.2f}" height="{bar_h}" rx="2" fill="{color}"/>')
-            parts.append(_text(left + bar_width + 8, bar_y + 12, f"{value:.1f}%", size=11))
+            label = f"{value:.1f}%"
+            if not _label_chip(parts, left + bar_width + 8, bar_y + 12, label, canvas_width=width, size=11):
+                parts.append(_text(left + bar_width + 8, bar_y + 12, label, size=11))
     legend_items = []
     for group_item in groups:
         key, color = group_item[0], group_item[1]
@@ -568,56 +891,345 @@ def write_cross_source_figures(cross_tests: pd.DataFrame, date_scrub: pd.DataFra
 
     status = "ready" if not chinese_city.empty else "no comparison rows available"
     path = output_dir / "figure_chinese_city_platform_friction_status.svg"
-    rows = [{
-        "label": "Chinese city/platform friction tests",
-        "value": len(chinese_city) if not chinese_city.empty else 1,
-        "color": PALETTE["neutral"] if chinese_city.empty else PALETTE["score"],
-        "annotation": status,
-    }]
-    _horizontal_bar_chart(
-        path,
-        "Chinese City/Platform Friction Status",
-        "Current tracked output is header-only because comparison groups are unavailable",
-        rows,
-        "value",
-        "color",
-        "rows",
-        "Do not present absent city/platform friction rows as evidence.",
-        max_abs=max(1.0, float(len(chinese_city))),
-    )
+    if chinese_city.empty:
+        width = 1120
+        height = 260
+        parts = _svg_header(
+            width,
+            height,
+            "Chinese City/Platform Friction Status",
+            "Current tracked output is header-only because comparison groups are unavailable",
+        )
+        message = (
+            "No within-Chinese city/platform comparison available - current Fukui "
+            "Chinese-language posts are single-platform (Xiaohongshu only)."
+        )
+        parts.append(
+            f'<rect x="172.00" y="104.00" width="776.00" height="74.00" rx="6" '
+            f'fill="{PALETTE["line"]}" opacity="0.22"/>'
+        )
+        parts.append(_text(width / 2, 144, message, size=15, weight=700, fill=PALETTE["ink"], anchor="middle"))
+        parts.append(_text(width / 2, 169, "Do not present absent city/platform friction rows as evidence.", size=12, fill=PALETTE["muted"], anchor="middle"))
+        _write_svg(path, parts)
+    else:
+        rows = [{
+            "label": "Chinese city/platform friction tests",
+            "value": len(chinese_city),
+            "color": PALETTE["score"],
+            "annotation": status,
+        }]
+        _horizontal_bar_chart(
+            path,
+            "Chinese City/Platform Friction Status",
+            "Current tracked output is header-only because comparison groups are unavailable",
+            rows,
+            "value",
+            "color",
+            "rows",
+            "Do not present absent city/platform friction rows as evidence.",
+            max_abs=max(1.0, float(len(chinese_city))),
+        )
     questions.append({"figure": "Chinese city/platform friction status", "path": str(path), "question": "Can current Chinese city/platform friction tests be visualized?", "caveat": "Current files are header-only; no comparison finding."})
     return questions
 
 
 def write_within_language_figure(df: pd.DataFrame, output_dir: Path, slug: str, title: str, subtitle: str) -> dict[str, str]:
     work = df[df["status"] == "ok"].copy()
-    rows = []
+    grouped_rows: dict[str, list[dict[str, object]]] = {
+        "score": [],
+        "event": [],
+        "association": [],
+        "multicategory": [],
+    }
     for _, row in work.iterrows():
-        color = PALETTE["score"] if row["analysis_type"] == "score_by_binary_predictor" else PALETTE["event"]
-        if "association" in str(row["analysis_type"]) or "multicategory" in str(row["analysis_type"]):
-            color = PALETTE["neutral"]
-        rows.append({
-            "label": f"{row['predictor']} / {row['outcome']}",
-            "value": float(row["effect_size"]) if pd.notna(row["effect_size"]) else 0.0,
-            "color": color,
-            "annotation": f"effect={float(row['effect_size']):.3f}; {_fmt_p(row['p_value_bh_fdr'] if pd.notna(row.get('p_value_bh_fdr')) else row['p_value'])}",
-        })
-    rows = sorted(rows, key=lambda item: abs(float(item["value"])), reverse=True)[:12]
-    limit = max([abs(float(row["value"])) for row in rows] + [0.1])
+        analysis_type = str(row["analysis_type"])
+        effect = float(row["effect_size"]) if pd.notna(row["effect_size"]) else 0.0
+        p_value = row["p_value_bh_fdr"] if pd.notna(row.get("p_value_bh_fdr")) else row["p_value"]
+        label = f"{row['predictor']} / {row['outcome']}"
+        if analysis_type == "score_by_binary_predictor":
+            grouped_rows["score"].append({
+                "label": label,
+                "value": effect,
+                "color": PALETTE["score"],
+                "annotation": f"score diff={_fmt_signed(effect, 3)}; {_fmt_p(p_value)}",
+            })
+        elif analysis_type == "category_event_by_binary_predictor":
+            risk_difference_pp = effect * 100
+            grouped_rows["event"].append({
+                "label": label,
+                "value": risk_difference_pp,
+                "color": PALETTE["event"],
+                "annotation": f"risk diff={_fmt_signed(risk_difference_pp, 1)}pp; {_fmt_p(p_value)}",
+            })
+        elif analysis_type == "association":
+            grouped_rows["association"].append({
+                "label": label,
+                "value": effect,
+                "color": PALETTE["neutral"],
+                "annotation": f"rho={_fmt_signed(effect, 3)}; {_fmt_p(p_value)}",
+            })
+        elif "multicategory" in analysis_type:
+            grouped_rows["multicategory"].append({
+                "label": label,
+                "value": effect,
+                "color": PALETTE["neutral"],
+                "annotation": f"epsilon^2={effect:.3f}; {_fmt_p(p_value)}",
+            })
+
+    for rows in grouped_rows.values():
+        rows.sort(key=lambda item: abs(float(item["value"])), reverse=True)
+
     path = output_dir / f"figure_within_{slug}_driver_effects.svg"
-    _horizontal_bar_chart(
+    _driver_effect_chart(
         path,
         title,
         subtitle,
-        rows,
-        "value",
-        "color",
-        "effect",
-        "Score effects and event risk differences are within-language/source only.",
-        zero_center=True,
-        max_abs=max(0.1, limit),
+        [
+            {
+                "title": "Score mean differences",
+                "unit": "mean sentiment-score difference, true minus false, within one scoring tool",
+                "rows": grouped_rows["score"],
+                "tick_suffix": "",
+                "min_limit": 0.1,
+            },
+            {
+                "title": "Positive-event risk differences",
+                "unit": "percentage points, true minus false",
+                "rows": grouped_rows["event"],
+                "tick_suffix": "pp",
+                "min_limit": 1.0,
+            },
+            {
+                "title": "Rating association",
+                "unit": "Spearman rho",
+                "rows": grouped_rows["association"],
+                "tick_suffix": "",
+                "min_limit": 0.1,
+            },
+            {
+                "title": "Multicategory score effects",
+                "unit": "epsilon-squared",
+                "rows": grouped_rows["multicategory"],
+                "tick_suffix": "",
+                "min_limit": 0.1,
+            },
+        ],
+        "Panels use separate axes: score rows are mean score differences; event rows are percentage-point risk differences; rho and epsilon-squared are separate diagnostics.",
     )
     return {"figure": title, "path": str(path), "question": "Which within-language/source predictors best explain sentiment differences?", "caveat": "Within one scoring tool/source only."}
+
+
+def write_hypothesis_overview_figure(h1: pd.DataFrame, h2: pd.DataFrame, h3: pd.DataFrame, within_poi: pd.DataFrame, output_dir: Path) -> dict[str, str]:
+    h1_primary = h1[(h1["analysis_type"] == "primary") & (h1["status"] == "ok")]
+    h1_test = _required_row(h1_primary, h1_primary["test_name"] == "chi_square_sentiment_category", "H1 primary chi-square")
+    h1_en_positive = _required_row(
+        h1_primary,
+        (h1_primary["category"] == "positive") & (h1_primary["language_group"] == "english"),
+        "H1 English positive share",
+    )
+    h1_jp_positive = _required_row(
+        h1_primary,
+        (h1_primary["category"] == "positive") & (h1_primary["language_group"] == "japanese"),
+        "H1 Japanese positive share",
+    )
+
+    h2_row = _required_row(h2, h2["test_name"] == "welch_t_review_rating", "H2 review-level Welch t")
+    h3_enjoyment = _required_row(h3, h3["evidence_family"] == "enjoyment", "H3 enjoyment evidence")
+    h3_positive = _required_row(h3, h3["evidence_family"] == "positive_sentiment", "H3 positive evidence")
+    h3_recommendation = _required_row(h3, h3["evidence_family"] == "recommendation", "H3 recommendation evidence")
+    h3_friction = _required_row(h3, h3["evidence_family"] == "friction", "H3 friction evidence")
+    paired_rating = _required_row(within_poi, within_poi["test_name"] == "within_poi_paired_rating", "within-POI paired rating")
+    paired_positive = _required_row(within_poi, within_poi["test_name"] == "within_poi_paired_positive_share", "within-POI paired positive share")
+    paired_details = _parse_json(paired_rating["details_json"])
+    alpha = 0.05
+    paired_rating_p = float(paired_rating["p_value"])
+    paired_positive_p = float(paired_positive["p_value"])
+    paired_rating_significant = paired_rating_p < alpha
+    paired_positive_significant = paired_positive_p < alpha
+    if paired_rating_significant and paired_positive_significant:
+        paired_status = "supported"
+    elif paired_rating_significant or paired_positive_significant:
+        paired_status = "mixed"
+    else:
+        paired_status = "failed"
+    paired_positive_verdict = "holds" if paired_positive_significant else "does not hold"
+    if paired_rating_significant:
+        paired_rating_verdict = "significant"
+    elif paired_rating_p < alpha * 2:
+        paired_rating_verdict = "borderline/n.s."
+    else:
+        paired_rating_verdict = "n.s."
+    paired_verdict = f"Positive-share {paired_positive_verdict}; rating {paired_rating_verdict}"
+    if not paired_verdict.endswith("."):
+        paired_verdict += "."
+
+    significant_h3_ps = [
+        float(h3_enjoyment["p_value_bh_fdr"]),
+        float(h3_positive["p_value_bh_fdr"]),
+        float(h3_recommendation["p_value_bh_fdr"]),
+    ]
+    h3_p_label = "p(FDR)<1e-8" if max(significant_h3_ps) < 1e-8 else f"p(FDR)<={_fmt_p_number(max(significant_h3_ps))}"
+    rows = [
+        {
+            "label": "H1",
+            "verdict": (
+                "English reviews skew more positive "
+                f"({float(h1_en_positive['category_share']):.0%} vs {float(h1_jp_positive['category_share']):.0%} positive)."
+            ),
+            "effect": f"Cramér's V={float(h1_test['effect_cramers_v']):.2f} (χ²={float(h1_test['statistic']):.1f})",
+            "p": f"p(Holm)={_fmt_p_number(h1_test['p_value_holm'])}",
+            "status": "supported",
+        },
+        {
+            "label": "H2",
+            "verdict": "Holds at review and POI level; within-POI rating borderline.",
+            "effect": (
+                f"ΔEN−JP={_fmt_signed(h2_row['effect_mean_difference'], 2)} stars "
+                f"(95% CI {float(h2_row['ci_95_lower']):.2f}–{float(h2_row['ci_95_upper']):.2f})"
+            ),
+            "p": f"p={_fmt_p_number(h2_row['p_value'])}",
+            "status": "supported",
+        },
+        {
+            "label": "H3",
+            "verdict": f"Friction prevalence does NOT differ ({float(h3_friction['risk_difference_pct']):+.1f}pp, n.s.).",
+            "effect": (
+                f"enjoyment {float(h3_enjoyment['risk_difference_pct']):+.0f}pp; "
+                f"positive {float(h3_positive['risk_difference_pct']):+.0f}pp; "
+                f"recommendation {float(h3_recommendation['risk_difference_pct']):+.0f}pp"
+            ),
+            "p": h3_p_label,
+            "status": "supported",
+        },
+        {
+            "label": "Robustness",
+            "verdict": paired_verdict,
+            "effect": (
+                f"positive-share {_fmt_signed(paired_positive['effect'], 2)} ({_fmt_p(paired_positive['p_value'])}); "
+                f"rating {_fmt_signed(paired_rating['effect'], 2)} ({_fmt_p(paired_rating['p_value'])})"
+            ),
+            "p": f"n={int(paired_details.get('n_pairs', 0))} POIs",
+            "status": paired_status,
+        },
+    ]
+    path = output_dir / "figure_hypothesis_overview.svg"
+    _results_panel(
+        path,
+        "Hypothesis Results at a Glance",
+        "Fukui Google reviews; effect sizes with multiplicity-adjusted p-values",
+        rows,
+        "H1 Holm-adjusted; H3 Benjamini–Hochberg FDR. Rows nested in POIs; the within-POI paired row is the venue-clustering robustness check.",
+    )
+    return {
+        "figure": "Hypothesis results at a glance",
+        "path": str(path),
+        "question": "Which main hypotheses are supported, and by which aggregate effect sizes?",
+        "caveat": "Rows remain nested in POIs; adjusted p-values and venue-paired robustness checks answer different threats.",
+    }
+
+
+def write_h2_rating_gap_robustness_ladder(h2: pd.DataFrame, within_poi: pd.DataFrame, output_dir: Path) -> dict[str, str]:
+    review = _required_row(h2, h2["test_name"] == "welch_t_review_rating", "H2 review-level Welch t")
+    poi = _required_row(h2, h2["test_name"] == "poi_level_welch_t_mean_review_rating", "H2 POI-level Welch t")
+    paired = _required_row(within_poi, within_poi["test_name"] == "within_poi_paired_rating", "within-POI paired rating")
+    review_details = _parse_json(review["details_json"])
+    poi_details = _parse_json(poi["details_json"])
+    paired_details = _parse_json(paired["details_json"])
+    rows = [
+        {
+            "label": f"Review-level Welch t (n={_fmt_n(review_details.get('english_n', review['english_n']))} vs {_fmt_n(review_details.get('japanese_n', review['japanese_n']))})",
+            "point": float(review["effect_mean_difference"]),
+            "ci_low": float(review["ci_95_lower"]),
+            "ci_high": float(review["ci_95_upper"]),
+            "p_chip": _fmt_p(review["p_value"]),
+            "value_label": f"{_fmt_signed(review['effect_mean_difference'], 2)} [{float(review['ci_95_lower']):.2f}, {float(review['ci_95_upper']):.2f}]",
+            "color": PALETTE["score"],
+        },
+        {
+            "label": f"POI-level Welch t ({_fmt_n(poi_details.get('english_n'))} vs {_fmt_n(poi_details.get('japanese_n'))} POIs)",
+            "point": float(poi["effect_mean_difference"]),
+            "ci_low": float(poi["ci_95_lower"]),
+            "ci_high": float(poi["ci_95_upper"]),
+            "p_chip": _fmt_p(poi["p_value"]),
+            "value_label": f"{_fmt_signed(poi['effect_mean_difference'], 2)} [{float(poi['ci_95_lower']):.2f}, {float(poi['ci_95_upper']):.2f}]",
+            "color": PALETTE["event"],
+        },
+        {
+            "label": f"Within-POI paired Wilcoxon ({_fmt_n(paired_details.get('n_pairs'))} shared POIs)",
+            "point": float(paired["effect"]),
+            "ci_low": None,
+            "ci_high": None,
+            "p_chip": _fmt_p(paired["p_value"]),
+            "value_label": _fmt_signed(paired["effect"], 3),
+            "color": PALETTE["positive"],
+        },
+    ]
+    path = output_dir / "figure_h2_rating_gap_robustness_ladder.svg"
+    _forest_chart(
+        path,
+        "English Rating Advantage Holds Across Units of Analysis",
+        "EN−JP mean Google star difference, three nested unit definitions",
+        rows,
+        "Same estimand (English minus Japanese) under progressively stricter venue control; common 1–5 star scale, not text-sentiment equivalence.",
+        x_min=-0.02,
+        x_max=0.55,
+        ticks=[0.0, 0.2, 0.4, 0.55],
+    )
+    return {
+        "figure": "H2 rating gap robustness ladder",
+        "path": str(path),
+        "question": "Does the English-minus-Japanese Google rating gap persist as the unit shifts from rows to POIs to shared POIs?",
+        "caveat": "Common Google stars are companion outcome evidence, not cross-language text-sentiment equivalence.",
+    }
+
+
+def write_within_poi_paired_shift_figure(within_poi: pd.DataFrame, output_dir: Path) -> dict[str, str]:
+    rating = _required_row(within_poi, within_poi["test_name"] == "within_poi_paired_rating", "within-POI paired rating")
+    positive = _required_row(within_poi, within_poi["test_name"] == "within_poi_paired_positive_share", "within-POI paired positive share")
+    details = _parse_json(rating["details_json"])
+    rows = [
+        {
+            "label": "Mean star rating",
+            "point": float(rating["effect"]),
+            "ci_low": None,
+            "ci_high": None,
+            "p_chip": _fmt_p(rating["p_value"]),
+            "value_label": _fmt_signed(rating["effect"], 3),
+            "color": PALETTE["score"],
+        },
+        {
+            "label": "Positive sentiment share",
+            "point": float(positive["effect"]),
+            "ci_low": None,
+            "ci_high": None,
+            "p_chip": f"{_fmt_p(positive['p_value'])} *",
+            "value_label": _fmt_signed(positive["effect"], 3),
+            "color": PALETTE["positive"],
+        },
+    ]
+    caption = (
+        f"{_fmt_n(details.get('n_pairs'))} paired POIs from {_fmt_n(details.get('n_shared_poi_candidates'))} shared candidates; "
+        f"{_fmt_n(details.get('n_english_reviews_paired'))} English + {_fmt_n(details.get('n_japanese_reviews_paired'))} Japanese reviews paired."
+    )
+    path = output_dir / "figure_within_poi_paired_shift.svg"
+    _forest_chart(
+        path,
+        "Within-POI Paired Differences (English minus Japanese)",
+        f"Holding venue constant across {_fmt_n(details.get('n_pairs'))} shared Fukui POIs (≥5 reviews per language)",
+        rows,
+        "Pairing removes venue/POI composition as a confound; Wilcoxon signed-rank on POI-pair differences.",
+        x_min=-0.03,
+        x_max=0.34,
+        ticks=[0.0, 0.1, 0.2, 0.3],
+        caption=caption,
+        positive_annotation="favors English →",
+    )
+    return {
+        "figure": "Within-POI paired differences",
+        "path": str(path),
+        "question": "When the same Fukui POIs are compared directly, do English-language reviews still score higher?",
+        "caveat": "The paired unit is POI, not review row; the rating shift is marginal while positive-share shift is significant.",
+    }
 
 
 def _write_questions(path: Path, questions: list[dict[str, str]]) -> None:
@@ -648,6 +1260,7 @@ def build_statistical_test_figures(
         "h1": input_dir / "hypothesis_tests" / "h1_sentiment_category_jp_en.csv",
         "h2": input_dir / "hypothesis_tests" / "h2_review_rating_jp_en.csv",
         "h3": input_dir / "hypothesis_tests" / "h3_reviewed_evidence_jp_en.csv",
+        "within_poi": input_dir / "hypothesis_tests" / "within_poi_paired_jp_en.csv",
         "cross_tests": input_dir / "cross_language_trends" / "cross_language_statistical_tests.csv",
         "date_scrub": input_dir / "cross_language_trends" / "date_scrub_requirements.csv",
         "chinese_city": input_dir / "chinese_social_media_analysis" / "chinese_city_platform_friction_tests.csv",
@@ -655,9 +1268,10 @@ def build_statistical_test_figures(
         "jp": input_dir / "within_language_sentiment" / "jp_within_language_sentiment_drivers.csv",
         "cn": input_dir / "within_language_sentiment" / "cn_within_source_sentiment_drivers.csv",
     }
-    h1 = _read_csv(paths["h1"], {"analysis_type", "status", "category", "language_group", "observed_count", "category_share", "p_value_holm", "effect_cramers_v", "neutral_band_note", "category_source_column"}, "hypothesis-tests")
-    h2 = _read_csv(paths["h2"], {"analysis_type", "test_name", "status", "language_group", "n_rating_present", "mean_review_rating", "rating_distribution_json", "p_value", "effect_mean_difference"}, "hypothesis-tests")
+    h1 = _read_csv(paths["h1"], {"analysis_type", "test_name", "status", "category", "language_group", "observed_count", "category_share", "statistic", "p_value_holm", "effect_cramers_v", "neutral_band_note", "category_source_column"}, "hypothesis-tests")
+    h2 = _read_csv(paths["h2"], {"analysis_type", "test_name", "status", "language_group", "english_n", "japanese_n", "n_rating_present", "mean_review_rating", "rating_distribution_json", "statistic", "p_value", "effect_mean_difference", "ci_95_lower", "ci_95_upper", "details_json"}, "hypothesis-tests")
     h3 = _read_csv(paths["h3"], {"analysis_type", "evidence_family", "status", "p_value_bh_fdr", "risk_difference_pct", "english_present_pct", "japanese_present_pct", "text_length_summary_json", "details_json"}, "hypothesis-tests")
+    within_poi = _read_csv(paths["within_poi"], {"test_name", "status", "effect", "p_value", "details_json"}, "hypothesis-tests")
     cross_tests = _read_csv(paths["cross_tests"], {"test_name", "comparison", "status", "p_value", "effect", "details_json"}, "cross-language-trends")
     date_scrub = _read_csv(paths["date_scrub"], {"source_kind", "date_precision", "count", "usable_for_monthly_trends"}, "cross-language-trends")
     chinese_city = _read_csv(paths["chinese_city"], {"comparison_type", "group_a", "group_b", "friction_code"}, "chinese-social")
@@ -670,6 +1284,9 @@ def build_statistical_test_figures(
     questions.extend(write_h1_figures(h1, output_dir))
     questions.extend(write_h2_figures(h2, output_dir))
     questions.extend(write_h3_figures(h3, output_dir))
+    questions.append(write_hypothesis_overview_figure(h1, h2, h3, within_poi, output_dir))
+    questions.append(write_h2_rating_gap_robustness_ladder(h2, within_poi, output_dir))
+    questions.append(write_within_poi_paired_shift_figure(within_poi, output_dir))
     questions.extend(write_cross_source_figures(cross_tests, date_scrub, chinese_city, output_dir))
     questions.append(write_within_language_figure(en, output_dir, "english", "Within-English Sentiment Drivers", "Enjoyment/positive evidence has largest VADER-score separation"))
     questions.append(write_within_language_figure(jp, output_dir, "japanese", "Within-Japanese Sentiment Drivers", "Enjoyment/positive evidence drives oseti sentiment most clearly"))
