@@ -8,6 +8,14 @@ openpyxl>=3.1
 snownlp>=0.12
 vaderSentiment>=3.3
 
+# Optional, validation-only. The nudge opportunity analysis estimates aspect
+# associations with a self-contained Firth penalized logistic regression
+# (scripts/build_nudge_opportunity_analysis.py); statsmodels is imported lazily
+# only to cross-check that the Firth odds ratios match an ordinary logit on
+# well-behaved aspects. The build runs and is reproducible without it (the
+# cross-check is skipped gracefully); install it to reproduce that sanity check.
+statsmodels>=0.14
+
 # Chinese-specific insight figures are written as SVG with the Python standard
 # library and pandas; no matplotlib/seaborn/plotly dependency is required.
 

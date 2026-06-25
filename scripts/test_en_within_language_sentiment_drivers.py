@@ -21,6 +21,7 @@ import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+from src.provenance import repo_relative
 from scripts.within_language_sentiment_common import (
     COMMON_WITHIN_CAVEATS,
     DEFAULT_OUTPUT_DIR,
@@ -64,6 +65,10 @@ CAVEATS = COMMON_WITHIN_CAVEATS + [
 ]
 
 
+def _repo_relative_path(path: Path) -> Path:
+    return Path(repo_relative(path))
+
+
 def build_en_within_language_sentiment_drivers(
     input_path: Path = DEFAULT_REVIEW_INPUT_PATH,
     output_dir: Path = DEFAULT_OUTPUT_DIR,
@@ -90,7 +95,7 @@ def build_en_within_language_sentiment_drivers(
     source_hash = sha256_file(input_path)
     caveat = "; ".join(CAVEATS)
 
-    rows = _review_rows(df, input_path, source_hash, command, generated, caveat)
+    rows = _review_rows(df, _repo_relative_path(input_path), source_hash, command, generated, caveat)
     out = pd.DataFrame(rows)
     output_csv = output_dir / OUTPUT_CSV
     output_manifest = output_dir / OUTPUT_MANIFEST
@@ -99,7 +104,7 @@ def build_en_within_language_sentiment_drivers(
         kind="within_language_sentiment_drivers_en",
         command=command,
         generated=generated,
-        input_path=input_path,
+        input_path=_repo_relative_path(input_path),
         output_csv=output_csv,
         manifest_path=output_manifest,
         filters={"prefecture": "Fukui", "language_group": LANGUAGE},

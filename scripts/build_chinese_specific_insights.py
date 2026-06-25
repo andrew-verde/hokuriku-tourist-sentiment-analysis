@@ -18,7 +18,7 @@ import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from src.provenance import assert_no_forbidden_columns, file_record, research_manifest, write_json
+from src.provenance import assert_no_forbidden_columns, file_record, repo_relative, research_manifest, write_json
 from src.utils.logger import setup_logger
 
 # This module reads tagged Chinese social-media rows and generates aggregate insight
@@ -650,13 +650,13 @@ def _write_readiness(path: Path, outputs: dict[str, Path], metrics: dict[str, ob
         f"- Rows represented: {metrics['rows_represented']}",
         f"- Source platform mix: {metrics['source_platform_mix']}",
         f"- Minimum theme slice rows for rates: {metrics['minimum_theme_slice_rows_for_rates']}",
-        f"- Output folder: `{path.parent}`",
+        f"- Output folder: `{repo_relative(path.parent)}`",
         "",
         "## Figures",
     ]
     for name, output_path in outputs.items():
         if output_path.suffix == ".svg":
-            lines.append(f"- `{name}`: `{output_path}`")
+            lines.append(f"- `{name}`: `{repo_relative(output_path)}`")
     lines.extend(
         [
             "",
@@ -665,7 +665,7 @@ def _write_readiness(path: Path, outputs: dict[str, Path], metrics: dict[str, ob
     )
     for name, output_path in outputs.items():
         if output_path.suffix == ".csv":
-            lines.append(f"- `{name}`: `{output_path}`")
+            lines.append(f"- `{name}`: `{repo_relative(output_path)}`")
     lines.extend(
         [
             "",
@@ -851,7 +851,7 @@ def build_chinese_specific_insights(
     write_json(outputs["manifest"], manifest)
 
     logger.info("Chinese-specific insight outputs written: %s", output_dir)
-    return {"outputs": {name: str(path) for name, path in outputs.items()}, "metrics": metrics}
+    return {"outputs": {name: repo_relative(path) for name, path in outputs.items()}, "metrics": metrics}
 
 
 def main() -> None:

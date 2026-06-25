@@ -1,0 +1,73 @@
+{
+  "schema_version": "research_provenance.v1",
+  "kind": "nudge_figure_pack",
+  "generated_at": "2026-06-25T08:12:01+00:00",
+  "command": "scripts/build_nudge_figures.py",
+  "inputs": [
+    {
+      "role": "aspect_opportunity_map",
+      "path": "output/nudge_analysis/aspect_opportunity_map.csv",
+      "exists": true,
+      "bytes": 32806,
+      "sha256": "8b04ba275f24c2ab07cc065a27d3890312916b995c5bc4759ac30a7e388b058d"
+    },
+    {
+      "role": "poi_opportunity_index",
+      "path": "output/nudge_analysis/poi_opportunity_index.csv",
+      "exists": true,
+      "bytes": 149843,
+      "sha256": "d3f5b6ac4f1715f15ae497861c670b01e44842c6b44b21c9cb6c2aaf4584fe6f"
+    }
+  ],
+  "outputs": [
+    {
+      "role": "nudge_figure_index",
+      "path": "docs/statistical_test_figures/nudge_figure_index.csv",
+      "exists": true,
+      "bytes": 720,
+      "sha256": "fb83f7bcefa46cca54705374c12fea6036a9969dd6b62748e06b6110fe7f5901"
+    },
+    {
+      "role": "nudge_figure_questions",
+      "path": "docs/statistical_test_figures/nudge_figure_questions.md",
+      "exists": true,
+      "bytes": 971,
+      "sha256": "e6f608652b6ba33d8a5638f3dcf607ef2a8a4f93689086201f8cd2a17cec478e"
+    },
+    {
+      "role": "nudge_figure_figure_nudge_aspect_opportunity_map",
+      "path": "docs/statistical_test_figures/figure_nudge_aspect_opportunity_map.svg",
+      "exists": true,
+      "bytes": 5291,
+      "sha256": "0408043296970fdf8776e62fc5f2fef7579812d0bca46fe2f03021c43345c782"
+    },
+    {
+      "role": "nudge_figure_figure_nudge_poi_action_map",
+      "path": "docs/statistical_test_figures/figure_nudge_poi_action_map.svg",
+      "exists": true,
+      "bytes": 22433,
+      "sha256": "45c813c9434da73ba806b270599e1d4b41193223319fe26dfda38d13a95e65b4"
+    },
+    {
+      "role": "nudge_figure_figure_nudge_info_levers",
+      "path": "docs/statistical_test_figures/figure_nudge_info_levers.svg",
+      "exists": true,
+      "bytes": 4574,
+      "sha256": "c02e2492f9d06e2db33b223abf67bbf2262b5358863e14d9027b091054ccc2be"
+    }
+  ],
+  "filters": {
+    "output_surface": "aggregate-only SVG",
+    "source": "nudge analysis CSVs"
+  },
+  "metrics": {
+    "figure_count": 3
+  },
+  "caveats": [
+    "Exploratory and hypothesis-generating; not causal.",
+    "Aspect estimates use Firth-penalized models and BH-FDR from the source CSV.",
+    "POI promote-it status is exploratory candidate-generation; small-n intervals are shown.",
+    "Positive share is based on Google star ratings, not sentiment-tool scores.",
+    "Figures are generated from aggregate CSVs and omit row-level text, URLs, authors, POI IDs, and review IDs."
+  ]
+}

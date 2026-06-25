@@ -40,6 +40,7 @@ from scipy import stats
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+from src.provenance import repo_relative
 from scripts.hypothesis_test_common import (
     COMMON_CAVEATS,
     DEFAULT_GROUPS,
@@ -71,6 +72,8 @@ INPUT_PATH = Path(__file__).resolve().parent.parent / "output" / "sentiment_row_
 OUTPUT_DIR = Path(__file__).resolve().parent.parent / "output" / "hypothesis_tests"
 OUTPUT_CSV = OUTPUT_DIR / "h3_reviewed_evidence_jp_en.csv"
 OUTPUT_MANIFEST = OUTPUT_DIR / "h3_reviewed_evidence_jp_en_manifest.json"
+def _repo_relative_path(path: Path) -> Path:
+    return Path(repo_relative(path))
 
 H3_CAVEATS = COMMON_CAVEATS + [
     "Reviewed keyword evidence does not prove motive or satisfaction.",
@@ -228,7 +231,7 @@ def build_h3_reviewed_evidence(
             "min_expected_count": min_expected,
             "sparse_cell_warning": bool(min_expected is not None and min_expected < 5),
             "text_length_summary_json": json.dumps(text_lengths, ensure_ascii=False),
-            "source_input_path": str(input_path),
+            "source_input_path": str(_repo_relative_path(input_path)),
             "source_input_sha256": source_hash,
             "command": command,
             "generated_at": generated_at,
@@ -265,7 +268,7 @@ def build_h3_reviewed_evidence(
         "min_expected_count": None,
         "sparse_cell_warning": None,
         "text_length_summary_json": json.dumps(text_lengths, ensure_ascii=False),
-        "source_input_path": str(input_path),
+        "source_input_path": str(_repo_relative_path(input_path)),
         "source_input_sha256": source_hash,
         "command": command,
         "generated_at": generated_at,

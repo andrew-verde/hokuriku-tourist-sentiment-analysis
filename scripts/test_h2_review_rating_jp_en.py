@@ -39,6 +39,7 @@ from scipy import stats
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+from src.provenance import repo_relative
 from scripts.hypothesis_test_common import (
     COMMON_CAVEATS,
     DEFAULT_GROUPS,
@@ -58,6 +59,8 @@ INPUT_PATH = Path(__file__).resolve().parent.parent / "output" / "sentiment_row_
 OUTPUT_DIR = Path(__file__).resolve().parent.parent / "output" / "hypothesis_tests"
 OUTPUT_CSV = OUTPUT_DIR / "h2_review_rating_jp_en.csv"
 OUTPUT_MANIFEST = OUTPUT_DIR / "h2_review_rating_jp_en_manifest.json"
+def _repo_relative_path(path: Path) -> Path:
+    return Path(repo_relative(path))
 
 H2_CAVEATS = COMMON_CAVEATS + [
     "Google review_rating is common-scale companion outcome evidence, not a replacement for text sentiment.",
@@ -137,7 +140,7 @@ def _base_row(command: str, generated_at: str, input_path: Path, df: pd.DataFram
     denominators = group_denominators(df)
     return {
         "hypothesis": "H2",
-        "source_input_path": str(input_path),
+        "source_input_path": str(_repo_relative_path(input_path)),
         "source_input_sha256": sha256_file(input_path),
         "command": command,
         "generated_at": generated_at,

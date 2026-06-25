@@ -601,6 +601,8 @@ def _base_row(
     caveat: str,
     multiple_testing_family: str,
 ) -> dict:
+    from src.provenance import repo_relative
+
     return {
         "analysis_id": analysis_id,
         "research_question": research_question,
@@ -610,7 +612,7 @@ def _base_row(
         "language_source_group": language_source_group,
         "n": None,
         "multiple_testing_family": multiple_testing_family,
-        "source_input_path": str(source_input_path),
+        "source_input_path": repo_relative(source_input_path),
         "source_input_sha256": source_input_sha256,
         "command": command,
         "generated_at": generated,

@@ -1,0 +1,157 @@
+{
+  "schema_version": "research_provenance.v1",
+  "kind": "nudge_aspect_opportunity_analysis",
+  "generated_at": "2026-06-25T08:11:52+00:00",
+  "command": "scripts/build_nudge_opportunity_analysis.py",
+  "inputs": [
+    {
+      "role": "aspect_tagged_multilingual_reviews",
+      "path": "output/multilingual_review_analysis/tagged_reviews_multilingual.csv",
+      "exists": true,
+      "bytes": 4122603,
+      "sha256": "cca5c56d5a59ef0b582cf9eaea7c817cbc87aac6c2066658a3517affd1a6bcea"
+    },
+    {
+      "role": "jp_en_fukui_row_level_sentiment_for_secondary_join",
+      "path": "output/sentiment_row_level/google_reviews_fukui_japanese-english.csv",
+      "exists": true,
+      "bytes": 451502,
+      "sha256": "72df51c468c6e829c9b121b9c71233e98a3ebc2a9c424d5eda63b83e1883eeed"
+    }
+  ],
+  "outputs": [
+    {
+      "role": "aggregate_nudge_aspect_opportunity_map",
+      "path": "output/nudge_analysis/aspect_opportunity_map.csv",
+      "exists": true,
+      "bytes": 32806,
+      "sha256": "8b04ba275f24c2ab07cc065a27d3890312916b995c5bc4759ac30a7e388b058d"
+    }
+  ],
+  "filters": {
+    "primary_languages": [
+      "english",
+      "japanese",
+      "chinese"
+    ],
+    "secondary_languages": [
+      "english",
+      "japanese"
+    ],
+    "inbound_languages": [
+      "english",
+      "chinese"
+    ],
+    "city_to_prefecture": {
+      "Fukui": "Fukui",
+      "Kanazawa": "Ishikawa",
+      "Toyama": "Toyama"
+    },
+    "low_rating_definition": "review_rating <= 3",
+    "secondary_negative_definition": "sentiment_category == 'negative'",
+    "min_pooled_positive_for_ranking": 20
+  },
+  "metrics": {
+    "tagged_input_rows": 6036,
+    "tagged_language_group_counts": {
+      "japanese": 4037,
+      "other_non_english_non_japanese": 1040,
+      "english": 919,
+      "undetected_or_too_short": 40
+    },
+    "primary_supported_language_rows": 4956,
+    "dropped_unsupported_language_rows": 1080,
+    "dropped_missing_rating_primary_rows": 0,
+    "primary_model_rows": 4956,
+    "primary_low_rating_rows": 821,
+    "secondary_sentiment_input_rows": 2014,
+    "secondary_join_rows": 2014,
+    "secondary_unmatched_sentiment_rows": 0,
+    "secondary_language_group_counts": {
+      "japanese": 1800,
+      "english": 214
+    },
+    "secondary_negative_rows": 143,
+    "A_primary_models_fit": 18,
+    "A_primary_models_skipped": 0,
+    "A_secondary_en_rows": 214,
+    "A_secondary_en_negative_rows": 11,
+    "A_secondary_en_models_fit": 15,
+    "A_secondary_en_models_skipped": 3,
+    "A_secondary_jp_rows": 1800,
+    "A_secondary_jp_negative_rows": 132,
+    "A_secondary_jp_models_fit": 11,
+    "A_secondary_jp_models_skipped": 7,
+    "C_inbound_rows": 919,
+    "C_inbound_languages_present": [
+      "english"
+    ],
+    "C_inbound_models_fit": 3,
+    "C_inbound_models_skipped": 0,
+    "synthetic_zero_cell_firth_or": 0.11111133453484588,
+    "plain_vs_firth_sanity": {
+      "opening_hours_availability": {
+        "firth_or": 3.6114751032793024,
+        "plain_logit_or": 3.6018053066718756,
+        "log_abs_diff": 0.0026811109094222463
+      },
+      "price_value": {
+        "firth_or": 10.11146321617655,
+        "plain_logit_or": 10.335263608654875,
+        "log_abs_diff": 0.02189194705729669
+      },
+      "cleanliness_comfort": {
+        "firth_or": 2.3526909832164793,
+        "plain_logit_or": 2.3197062445877705,
+        "log_abs_diff": 0.014119213321836965
+      },
+      "itinerary_fit_time_cost": {
+        "firth_or": 4.2386943259218235,
+        "plain_logit_or": 4.201122019914334,
+        "log_abs_diff": 0.008903642610015083
+      }
+    },
+    "max_abs_ln_or": 4.074775181622501,
+    "min_model_p_value": 1.109461464879819e-09,
+    "status_counts": {
+      "ok": 47,
+      "prevalence_only": 39,
+      "skipped": 10
+    },
+    "ci_method_counts": {
+      "wald_penalized_information": 47
+    },
+    "total_firth_fit_rows": 47,
+    "total_firth_non_converged_or_unstable_rows": 0,
+    "total_output_rows": 96,
+    "total_models_fit": 47,
+    "total_models_skipped": 10
+  },
+  "caveats": [
+    "Exploratory and hypothesis-generating; not causal.",
+    "Opportunity scores rank candidate follow-up experiments, not intervention effectiveness.",
+    "Primary estimates use low star rating and Firth penalized logistic regression adjusted for text length, language, and prefecture when multiple levels are present.",
+    "POI-level clustering not modeled under Firth; row-level estimates may understate uncertainty from POI nesting; exploratory ranking only.",
+    "Secondary sentiment checks are within-language only and do not compare sentiment tools across languages.",
+    "Small-n inbound and rare-aspect estimates may be unstable; underpowered flags identify pooled positives below 20.",
+    "Opportunity scores are gated to zero unless friction aspects are FDR-significant and harmful (odds ratio above 1).",
+    "Firth implementation is hand-coded in this repository; no external Firth package is used.",
+    "Language groups describe review language, not reviewer nationality."
+  ],
+  "extra": {
+    "dependency_versions": {
+      "pandas": "3.0.3",
+      "numpy": "2.4.6",
+      "scipy": "1.18.0",
+      "statsmodels": "0.14.6",
+      "patsy": "1.0.2"
+    }
+  },
+  "dependency_versions": {
+    "pandas": "3.0.3",
+    "numpy": "2.4.6",
+    "scipy": "1.18.0",
+    "statsmodels": "0.14.6",
+    "patsy": "1.0.2"
+  }
+}

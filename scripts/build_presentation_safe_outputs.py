@@ -34,6 +34,8 @@ from src.provenance import (
     ProvenanceError,
     assert_no_forbidden_columns,
     file_record,
+    repo_relative,
+    resolve_repo_path,
     research_manifest,
     sha256_file,
     write_json,
@@ -207,7 +209,7 @@ def _row_level_path(manifest: dict, override: Path | None) -> Path:
         raise MissingInputError(
             "Sentiment manifest does not name outputs.row_level_path; rerun `make sentiment-analysis`."
         )
-    return Path(row_level)
+    return resolve_repo_path(row_level)
 
 
 def build_metadata_summary(row_level: pd.DataFrame) -> pd.DataFrame:
@@ -651,7 +653,7 @@ def _write_figure_questions(path: Path, figure_questions: list[dict[str, str]]) 
         lines.extend([
             f"## {item['figure']}",
             "",
-            f"- Path: `{item['path']}`",
+            f"- Path: `{repo_relative(item['path'])}`",
             f"- Question answered: {item['question']}",
             f"- Use caveat: {item['caveat']}",
             "",
@@ -829,7 +831,7 @@ def _write_readiness(
         "",
     ])
     for name, figure_path in figure_outputs.items():
-        lines.append(f"- `{name}`: `{figure_path}`")
+        lines.append(f"- `{name}`: `{repo_relative(figure_path)}`")
     lines.extend([
         "",
         "Questions answered by each figure are documented in `presentation_figure_questions.md`.",
@@ -929,13 +931,13 @@ def build_presentation_safe_outputs(
         figure_questions.extend([
             {
                 "figure": f"{label} sentiment profile",
-                "path": str(sentiment_path),
+                "path": repo_relative(sentiment_path),
                 "question": f"What share of {language}-language Fukui Google reviews is positive, neutral, or negative under the secondary library tool?",
                 "caveat": "Secondary library-score check; reviewed JP/EN keyword evidence is an audit/sensitivity path.",
             },
             {
                 "figure": f"{label} tourism priority mix",
-                "path": str(poi_path),
+                "path": repo_relative(poi_path),
                 "question": f"Which POI categories dominate the {language}-language review sample, shaping what tourism priorities the sentiment result reflects?",
                 "caveat": "POI-category mix describes collection/sample composition, not all visitor priorities.",
             },
@@ -950,19 +952,19 @@ def build_presentation_safe_outputs(
     figure_questions.extend([
         {
             "figure": "Multilingual sentiment share",
-            "path": str(figure_outputs["multilingual_sentiment_share"]),
+            "path": repo_relative(figure_outputs["multilingual_sentiment_share"]),
             "question": "How do positive, neutral, and negative category shares differ across English-language reviews, Japanese-language reviews, and Chinese-language social rows?",
             "caveat": "Source platforms and scoring tools differ; use category shares only as descriptive comparison.",
         },
         {
             "figure": "Multilingual volume context",
-            "path": str(figure_outputs["multilingual_volume_context"]),
+            "path": repo_relative(figure_outputs["multilingual_volume_context"]),
             "question": "How imbalanced are the language/source group sample sizes, and which scales are available for each group?",
             "caveat": "Google ratings and SnowNLP sentiment means are different scales and should not be equated.",
         },
         {
             "figure": "Statistical evidence summary",
-            "path": str(figure_outputs["multilingual_statistical_evidence"]),
+            "path": repo_relative(figure_outputs["multilingual_statistical_evidence"]),
             "question": "Which descriptive statistical checks have usable status, and which metric type belongs to each row?",
             "caveat": "Bars are status indicators only; effect metrics differ by row and are not comparable bar-to-bar.",
         },

@@ -30,6 +30,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from src.provenance import (
     assert_no_forbidden_columns,
     file_record,
+    repo_relative,
     research_manifest,
     write_json,
 )
@@ -1384,11 +1385,12 @@ def build_statistical_test_figures(
     questions.append(write_within_language_figure(cn, output_dir, "chinese", "Within-Chinese Social Sentiment Drivers", "Topic tags separate SnowNLP sentiment more than food/friction tags"))
 
     # Write index files (markdown and CSV) describing all figures.
+    question_records = [{**item, "path": repo_relative(item["path"])} for item in questions]
     questions_path = output_dir / "statistical_test_figure_questions.md"
     manifest_path = output_dir / "statistical_test_figure_manifest.json"
     index_path = output_dir / "statistical_test_figure_index.csv"
-    _write_questions(questions_path, questions)
-    pd.DataFrame(questions).to_csv(index_path, index=False)
+    _write_questions(questions_path, question_records)
+    pd.DataFrame(question_records).to_csv(index_path, index=False)
 
     figure_paths = [Path(item["path"]) for item in questions]
     report = research_manifest(

@@ -1,0 +1,364 @@
+<!doctype html><html lang='en'><head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width,initial-scale=1'>
+<title>Next-Semester Nudge Experiment Register</title>
+<style>:root{
+  --paper:#fbfaf7; --ink:#172033; --muted:#5b677a; --teal:#2f6f73; --teal-deep:#1a4d50;
+  --rule:#d7dde8; --neg:#9a031e; --band:#f1efe9; --teal-tint:#eaf1f0;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);
+  font-family:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
+  font-size:18px;line-height:1.62;-webkit-font-smoothing:antialiased}
+.wrap{max-width:840px;margin:0 auto;padding:0 28px}
+header.masthead{border-bottom:2px solid var(--ink);margin-top:56px;padding-bottom:22px}
+.eyebrow{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:12px;
+  letter-spacing:.22em;text-transform:uppercase;color:var(--teal-deep);margin:0 0 14px}
+h1{font-size:40px;line-height:1.12;margin:0 0 14px;font-weight:600;letter-spacing:-.01em}
+.standfirst{font-size:20px;color:#33414f;margin:0;max-width:62ch}
+.meta{font-family:ui-monospace,Menlo,monospace;font-size:12px;color:var(--muted);
+  margin-top:20px;line-height:1.8}
+nav.toc{position:sticky;top:0;background:rgba(251,250,247,.94);backdrop-filter:saturate(1.1) blur(2px);
+  border-bottom:1px solid var(--rule);z-index:5;margin-top:30px}
+nav.toc ol{list-style:none;display:flex;flex-wrap:wrap;gap:4px 22px;margin:0;padding:12px 0;
+  font-family:ui-monospace,Menlo,monospace;font-size:12.5px;letter-spacing:.02em}
+nav.toc a{color:var(--muted);text-decoration:none}
+nav.toc a:hover{color:var(--teal-deep)}
+section{padding:46px 0;border-bottom:1px solid var(--rule)}
+h2.sec{font-size:28px;font-weight:600;margin:0 0 6px;letter-spacing:-.01em}
+.sec-num{font-family:ui-monospace,Menlo,monospace;font-size:13px;color:var(--teal-deep);
+  letter-spacing:.12em;display:block;margin-bottom:8px}
+p{margin:0 0 16px}
+.lead{font-size:19.5px;color:#2b3742}
+.jump-link{display:inline-block;margin:4px 0 18px;padding:8px 12px;border:1px solid var(--teal);
+  color:var(--teal-deep);text-decoration:none;background:#fff;font-family:ui-monospace,Menlo,monospace;
+  font-size:13px;letter-spacing:.02em}
+.jump-link:hover{background:var(--teal-tint)}
+.stat{color:var(--teal-deep);text-decoration:none;border-bottom:1px dotted var(--teal);
+  white-space:nowrap;cursor:help;font-variant-numeric:tabular-nums}
+.stat:hover{background:var(--teal-tint)}
+.stat .prov-dot{font-size:.5em;vertical-align:.5em;color:var(--teal);margin-left:1px;opacity:.55}
+.finding{margin-top:14px}
+.rank{display:flex;align-items:baseline;gap:12px;margin:0 0 4px}
+.rank .badge{font-family:ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:.12em;
+  text-transform:uppercase;padding:3px 9px;border-radius:2px;color:#fff;white-space:nowrap}
+.b-strong{background:var(--teal)} .b-mod{background:#6f8f72} .b-mixed{background:#bc6c25}
+.b-desc{background:#8d99ae}
+.finding h3{font-size:21px;font-weight:600;margin:0;letter-spacing:-.005em}
+figure.fig{margin:24px 0 8px;padding:14px;background:#fff;border:1px solid var(--rule);border-radius:4px}
+figure.fig svg{width:100%;height:auto;display:block}
+figcaption{font-size:13.5px;color:var(--muted);margin-top:10px;line-height:1.5;
+  font-family:"Iowan Old Style",Georgia,serif}
+.figsrc{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;color:var(--teal-deep);
+  word-break:break-all}
+.figsrc-note{font-style:italic}
+.callout{background:var(--band);border-left:3px solid var(--teal);padding:14px 18px;margin:18px 0;
+  font-size:16.5px}
+.caveat{background:#fbf3f0;border-left:3px solid var(--neg);padding:12px 16px;margin:16px 0;
+  font-size:15.5px;color:#5a2630}
+table{width:100%;border-collapse:collapse;margin:18px 0;font-size:14.5px}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--muted);font-weight:400}
+td.num{font-variant-numeric:tabular-nums;font-family:ui-monospace,Menlo,monospace;font-size:13px}
+.prov-table td{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;word-break:break-word}
+.prov-table a{color:var(--teal-deep)}
+.dl{display:grid;grid-template-columns:max-content 1fr;gap:6px 22px;margin:14px 0;font-size:16px}
+.dl dt{font-family:ui-monospace,Menlo,monospace;font-size:12.5px;color:var(--muted);
+  letter-spacing:.03em;padding-top:3px}
+.dl dd{margin:0}
+.hyp{border:1px solid var(--rule);border-left:3px solid var(--teal);border-radius:4px;
+  background:#fff;padding:18px 20px;margin:18px 0}
+.hyp-head{display:flex;align-items:baseline;gap:12px;margin:0 0 12px}
+.hyp-tag{font-family:ui-monospace,Menlo,monospace;font-size:12px;letter-spacing:.1em;
+  font-weight:600;color:#fff;background:var(--teal);padding:3px 9px;border-radius:2px}
+.hyp-head h3{font-size:19px;font-weight:600;margin:0;letter-spacing:-.005em}
+.hyp-grid{display:grid;grid-template-columns:max-content 1fr;gap:7px 20px;font-size:16px}
+.hyp-grid .k{font-family:ui-monospace,Menlo,monospace;font-size:12px;color:var(--muted);
+  letter-spacing:.02em;padding-top:3px;white-space:nowrap}
+.hyp-grid .v{margin:0}
+.hyp-decision{margin-top:14px;padding:11px 14px;background:var(--teal-tint);border-radius:3px;
+  font-size:15.5px;line-height:1.55}
+.hyp-decision .rej{color:var(--teal-deep);font-weight:600}
+.hyp-decision .keep{color:var(--muted);font-weight:600}
+footer{padding:40px 0 80px;color:var(--muted);font-size:13.5px;
+  font-family:ui-monospace,Menlo,monospace;line-height:1.7}
+.pipeline{counter-reset:step;list-style:none;padding:0;margin:18px 0}
+.pipeline li{position:relative;padding:0 0 16px 42px;border-left:1px solid var(--rule);margin-left:14px}
+.pipeline li::before{counter-increment:step;content:counter(step);position:absolute;left:-15px;top:-2px;
+  width:28px;height:28px;border-radius:50%;background:var(--paper);border:1px solid var(--teal);
+  color:var(--teal-deep);font-family:ui-monospace,Menlo,monospace;font-size:13px;
+  display:flex;align-items:center;justify-content:center}
+.pipeline li:last-child{border-left-color:transparent}
+.pipeline b{font-weight:600}
+@media(max-width:600px){h1{font-size:30px}body{font-size:17px}.wrap{padding:0 18px}}</style></head><body>
+<div class='wrap'><header class='masthead'>
+<p><a class='jump-link' href='../PBL-Dashboard.html'>← Back to dashboard</a></p>
+<p class='eyebrow'>Fukui-First Nudge Opportunity Register</p>
+<h1>Next-semester experiments for high-impact nudge opportunities</h1>
+<p class='standfirst'>Concrete exploratory tests derived from aggregate aspect and POI opportunity maps. These cards rank what to test next; they do not claim effectiveness.</p>
+</header></div><main class='wrap'>
+<section><span class='sec-num'>REGISTER — EXPERIMENT CARDS</span>
+<h2 class='sec'>What to test next semester</h2>
+<p class='lead'>Every statistic, POI name, nudge type, and mechanism below is loaded from aggregate CSV outputs at build time and wrapped in a provenance link.</p>
+<div class='hyp'><div class='hyp-head'><span class='hyp-tag'>Experiment</span><h3>Fix-it information levers</h3></div><p><b>Opportunity.</b> Opening-hours availability and itinerary fit / time cost are the strongest nudge-able friction signals.</p><p><b>Nudge type + mechanism.</b> <a class="stat" href="output/nudge_analysis/nudge_taxonomy.csv" target="_blank" title="raw value: information_provision
+field: opening_hours_availability nudge_type
+source: output/nudge_analysis/nudge_taxonomy.csv
+sha256: 6f5e2cb121a2e439e43d97486a312e823131ae8fbd1033b9a0d8b29a375b379c
+script: " data-raw="information_provision" data-source="output/nudge_analysis/nudge_taxonomy.csv" data-source-path="output/nudge_analysis/nudge_taxonomy.csv" data-field="opening_hours_availability nudge_type" data-sha256="6f5e2cb121a2e439e43d97486a312e823131ae8fbd1033b9a0d8b29a375b379c">information_provision<span class="prov-dot">●</span></a>: <a class="stat" href="output/nudge_analysis/nudge_taxonomy.csv" target="_blank" title="raw value: Surface current hours, closure risk, last-entry rules, and backup options before travel.
+field: opening_hours_availability mechanism
+source: output/nudge_analysis/nudge_taxonomy.csv
+sha256: 6f5e2cb121a2e439e43d97486a312e823131ae8fbd1033b9a0d8b29a375b379c
+script: " data-raw="Surface current hours, closure risk, last-entry rules, and backup options before travel." data-source="output/nudge_analysis/nudge_taxonomy.csv" data-source-path="output/nudge_analysis/nudge_taxonomy.csv" data-field="opening_hours_availability mechanism" data-sha256="6f5e2cb121a2e439e43d97486a312e823131ae8fbd1033b9a0d8b29a375b379c">Surface current hours, closure risk, last-entry rules, and backup options before travel.<span class="prov-dot">●</span></a> Also <a class="stat" href="output/nudge_analysis/nudge_taxonomy.csv" target="_blank" title="raw value: pre_commitment
+field: itinerary_fit_time_cost nudge_type
+source: output/nudge_analysis/nudge_taxonomy.csv
+sha256: 6f5e2cb121a2e439e43d97486a312e823131ae8fbd1033b9a0d8b29a375b379c
+script: " data-raw="pre_commitment" data-source="output/nudge_analysis/nudge_taxonomy.csv" data-source-path="output/nudge_analysis/nudge_taxonomy.csv" data-field="itinerary_fit_time_cost nudge_type" data-sha256="6f5e2cb121a2e439e43d97486a312e823131ae8fbd1033b9a0d8b29a375b379c">pre_commitment<span class="prov-dot">●</span></a>: <a class="stat" href="output/nudge_analysis/nudge_taxonomy.csv" target="_blank" title="raw value: Offer realistic visit durations, route-order suggestions, and time-cost bundles before itinerary lock-in.
+field: itinerary_fit_time_cost mechanism
+source: output/nudge_analysis/nudge_taxonomy.csv
+sha256: 6f5e2cb121a2e439e43d97486a312e823131ae8fbd1033b9a0d8b29a375b379c
+script: " data-raw="Offer realistic visit durations, route-order suggestions, and time-cost bundles before itinerary lock-in." data-source="output/nudge_analysis/nudge_taxonomy.csv" data-source-path="output/nudge_analysis/nudge_taxonomy.csv" data-field="itinerary_fit_time_cost mechanism" data-sha256="6f5e2cb121a2e439e43d97486a312e823131ae8fbd1033b9a0d8b29a375b379c">Offer realistic visit durations, route-order suggestions, and time-cost bundles before itinerary lock-in.<span class="prov-dot">●</span></a></p><p><b>Evidence so far.</b> Opening-hours availability prevalence <a class="stat" href="output/nudge_analysis/aspect_opportunity_map.csv" target="_blank" title="raw value: 0.0185633575464083
+field: opening_hours_availability prevalence
+source: output/nudge_analysis/aspect_opportunity_map.csv
+sha256: 8b04ba275f24c2ab07cc065a27d3890312916b995c5bc4759ac30a7e388b058d
+script: scripts/build_nudge_opportunity_analysis.py" data-raw="0.0185633575464083" data-source="output/nudge_analysis/aspect_opportunity_map.csv" data-source-path="output/nudge_analysis/aspect_opportunity_map.csv" data-field="opening_hours_availability prevalence" data-sha256="8b04ba275f24c2ab07cc065a27d3890312916b995c5bc4759ac30a7e388b058d">1.9%<span class="prov-dot">●</span></a>, Firth OR <a class="stat" href="output/nudge_analysis/aspect_opportunity_map.csv" target="_blank" title="raw value: 3.6114751032793024
+field: opening_hours_availability Firth OR
+source: output/nudge_analysis/aspect_opportunity_map.csv
+sha256: 8b04ba275f24c2ab07cc065a27d3890312916b995c5bc4759ac30a7e388b058d
+script: scripts/build_nudge_opportunity_analysis.py" data-raw="3.6114751032793024" data-source="output/nudge_analysis/aspect_opportunity_map.csv" data-source-path="output/nudge_analysis/aspect_opportunity_map.csv" data-field="opening_hours_availability Firth OR" data-sha256="8b04ba275f24c2ab07cc065a27d3890312916b995c5bc4759ac30a7e388b058d">3.61<span class="prov-dot">●</span></a>, <a class="stat" href="output/nudge_analysis/aspect_opportunity_map.csv" target="_blank" title="raw value: 8.19283884588419e-08
+field: opening_hours_availability BH-FDR p
+source: output/nudge_analysis/aspect_opportunity_map.csv
+sha256: 8b04ba275f24c2ab07cc065a27d3890312916b995c5bc4759ac30a7e388b058d
+script: scripts/build_nudge_opportunity_analysis.py" data-raw="8.19283884588419e-08" data-source="output/nudge_analysis/aspect_opportunity_map.csv" data-source-path="output/nudge_analysis/aspect_opportunity_map.csv" data-field="opening_hours_availability BH-FDR p" data-sha256="8b04ba275f24c2ab07cc065a27d3890312916b995c5bc4759ac30a7e388b058d">p = 8.2×10<sup>-8</sup><span class="prov-dot">●</span></a>. Itinerary fit / time cost prevalence <a class="stat" href="output/nudge_analysis/aspect_opportunity_map.csv" target="_blank" title="raw value: 0.0052461662631154
+field: itinerary_fit_time_cost prevalence
+source: output/nudge_analysis/aspect_opportunity_map.csv
+sha256: 8b04ba275f24c2ab07cc065a27d3890312916b995c5bc4759ac30a7e388b058d
+script: scripts/build_nudge_opportunity_analysis.py" data-raw="0.0052461662631154" data-source="output/nudge_analysis/aspect_opportunity_map.csv" data-source-path="output/nudge_analysis/aspect_opportunity_map.csv" data-field="itinerary_fit_time_cost prevalence" data-sha256="8b04ba275f24c2ab07cc065a27d3890312916b995c5bc4759ac30a7e388b058d">0.5%<span class="prov-dot">●</span></a>, Firth OR <a class="stat" href="output/nudge_analysis/aspect_opportunity_map.csv" target="_blank" title="raw value: 4.238694325921824
+field: itinerary_fit_time_cost Firth OR
+source: output/nudge_analysis/aspect_opportunity_map.csv
+sha256: 8b04ba275f24c2ab07cc065a27d3890312916b995c5bc4759ac30a7e388b058d
+script: scripts/build_nudge_opportunity_analysis.py" data-raw="4.238694325921824" data-source="output/nudge_analysis/aspect_opportunity_map.csv" data-source-path="output/nudge_analysis/aspect_opportunity_map.csv" data-field="itinerary_fit_time_cost Firth OR" data-sha256="8b04ba275f24c2ab07cc065a27d3890312916b995c5bc4759ac30a7e388b058d">4.24<span class="prov-dot">●</span></a>, <a class="stat" href="output/nudge_analysis/aspect_opportunity_map.csv" target="_blank" title="raw value: 0.0014402463065686
+field: itinerary_fit_time_cost BH-FDR p
+source: output/nudge_analysis/aspect_opportunity_map.csv
+sha256: 8b04ba275f24c2ab07cc065a27d3890312916b995c5bc4759ac30a7e388b058d
+script: scripts/build_nudge_opportunity_analysis.py" data-raw="0.0014402463065686" data-source="output/nudge_analysis/aspect_opportunity_map.csv" data-source-path="output/nudge_analysis/aspect_opportunity_map.csv" data-field="itinerary_fit_time_cost BH-FDR p" data-sha256="8b04ba275f24c2ab07cc065a27d3890312916b995c5bc4759ac30a7e388b058d">p = .001<span class="prov-dot">●</span></a>.</p><p><b>Proposed experiment.</b> Intervention: clearer hours / closure information plus itinerary-fit prompts before arrival. Unit: POI or visitor session. Primary outcome: low-rating share and complaint-code prevalence. Rough design: stepped rollout or matched POI/session comparison.</p><p><b>Collect next.</b> Pre/post visitor-session exposure, review rating, aspect-code evidence, and POI/date controls.</p><p><b>Why effectiveness is not quantified yet.</b> Current evidence is observational association; assignment and exposure must be measured next semester.</p></div>
+<div class='hyp'><div class='hyp-head'><span class='hyp-tag'>Experiment</span><h3>POI-specific fix-it trials</h3></div><p><b>Opportunity.</b> <a class="stat" href="output/nudge_analysis/poi_opportunity_index.csv" target="_blank" title="raw value: 15
+field: count is_fix_it
+source: output/nudge_analysis/poi_opportunity_index.csv
+sha256: d3f5b6ac4f1715f15ae497861c670b01e44842c6b44b21c9cb6c2aaf4584fe6f
+script: " data-raw="15" data-source="output/nudge_analysis/poi_opportunity_index.csv" data-source-path="output/nudge_analysis/poi_opportunity_index.csv" data-field="count is_fix_it" data-sha256="d3f5b6ac4f1715f15ae497861c670b01e44842c6b44b21c9cb6c2aaf4584fe6f">15<span class="prov-dot">●</span></a> fix-it POIs have high volume and elevated nudge-able friction.</p><p><b>Evidence so far.</b> <a class="stat" href="output/nudge_analysis/poi_opportunity_index.csv" target="_blank" title="raw value: Myoryuji Ninja Temple
+field: top fix-it poi_name
+source: output/nudge_analysis/poi_opportunity_index.csv
+sha256: d3f5b6ac4f1715f15ae497861c670b01e44842c6b44b21c9cb6c2aaf4584fe6f
+script: " data-raw="Myoryuji Ninja Temple" data-source="output/nudge_analysis/poi_opportunity_index.csv" data-source-path="output/nudge_analysis/poi_opportunity_index.csv" data-field="top fix-it poi_name" data-sha256="d3f5b6ac4f1715f15ae497861c670b01e44842c6b44b21c9cb6c2aaf4584fe6f">Myoryuji Ninja Temple<span class="prov-dot">●</span></a> has <a class="stat" href="output/nudge_analysis/poi_opportunity_index.csv" target="_blank" title="raw value: 105
+field: top fix-it n_reviews
+source: output/nudge_analysis/poi_opportunity_index.csv
+sha256: d3f5b6ac4f1715f15ae497861c670b01e44842c6b44b21c9cb6c2aaf4584fe6f
+script: " data-raw="105" data-source="output/nudge_analysis/poi_opportunity_index.csv" data-source-path="output/nudge_analysis/poi_opportunity_index.csv" data-field="top fix-it n_reviews" data-sha256="d3f5b6ac4f1715f15ae497861c670b01e44842c6b44b21c9cb6c2aaf4584fe6f">105<span class="prov-dot">●</span></a> reviews and elevated codes <a class="stat" href="output/nudge_analysis/poi_opportunity_index.csv" target="_blank" title="raw value: english_information_gap;booking_ticketing
+field: top fix-it nudgeable friction codes
+source: output/nudge_analysis/poi_opportunity_index.csv
+sha256: d3f5b6ac4f1715f15ae497861c670b01e44842c6b44b21c9cb6c2aaf4584fe6f
+script: " data-raw="english_information_gap;booking_ticketing" data-source="output/nudge_analysis/poi_opportunity_index.csv" data-source-path="output/nudge_analysis/poi_opportunity_index.csv" data-field="top fix-it nudgeable friction codes" data-sha256="d3f5b6ac4f1715f15ae497861c670b01e44842c6b44b21c9cb6c2aaf4584fe6f">english_information_gap;booking_ticketing<span class="prov-dot">●</span></a>; <a class="stat" href="output/nudge_analysis/poi_opportunity_index.csv" target="_blank" title="raw value: 21st Century Museum of Contemporary Art
+field: second fix-it poi_name
+source: output/nudge_analysis/poi_opportunity_index.csv
+sha256: d3f5b6ac4f1715f15ae497861c670b01e44842c6b44b21c9cb6c2aaf4584fe6f
+script: " data-raw="21st Century Museum of Contemporary Art" data-source="output/nudge_analysis/poi_opportunity_index.csv" data-source-path="output/nudge_analysis/poi_opportunity_index.csv" data-field="second fix-it poi_name" data-sha256="d3f5b6ac4f1715f15ae497861c670b01e44842c6b44b21c9cb6c2aaf4584fe6f">21st Century Museum of Contemporary Art<span class="prov-dot">●</span></a> has <a class="stat" href="output/nudge_analysis/poi_opportunity_index.csv" target="_blank" title="raw value: 105
+field: second fix-it n_reviews
+source: output/nudge_analysis/poi_opportunity_index.csv
+sha256: d3f5b6ac4f1715f15ae497861c670b01e44842c6b44b21c9cb6c2aaf4584fe6f
+script: " data-raw="105" data-source="output/nudge_analysis/poi_opportunity_index.csv" data-source-path="output/nudge_analysis/poi_opportunity_index.csv" data-field="second fix-it n_reviews" data-sha256="d3f5b6ac4f1715f15ae497861c670b01e44842c6b44b21c9cb6c2aaf4584fe6f">105<span class="prov-dot">●</span></a> reviews and elevated codes <a class="stat" href="output/nudge_analysis/poi_opportunity_index.csv" target="_blank" title="raw value: booking_ticketing;opening_hours_availability
+field: second fix-it nudgeable friction codes
+source: output/nudge_analysis/poi_opportunity_index.csv
+sha256: d3f5b6ac4f1715f15ae497861c670b01e44842c6b44b21c9cb6c2aaf4584fe6f
+script: " data-raw="booking_ticketing;opening_hours_availability" data-source="output/nudge_analysis/poi_opportunity_index.csv" data-source-path="output/nudge_analysis/poi_opportunity_index.csv" data-field="second fix-it nudgeable friction codes" data-sha256="d3f5b6ac4f1715f15ae497861c670b01e44842c6b44b21c9cb6c2aaf4584fe6f">booking_ticketing;opening_hours_availability<span class="prov-dot">●</span></a>; <a class="stat" href="output/nudge_analysis/poi_opportunity_index.csv" target="_blank" title="raw value: Echizen Daibutsu
+field: third fix-it poi_name
+source: output/nudge_analysis/poi_opportunity_index.csv
+sha256: d3f5b6ac4f1715f15ae497861c670b01e44842c6b44b21c9cb6c2aaf4584fe6f
+script: " data-raw="Echizen Daibutsu" data-source="output/nudge_analysis/poi_opportunity_index.csv" data-source-path="output/nudge_analysis/poi_opportunity_index.csv" data-field="third fix-it poi_name" data-sha256="d3f5b6ac4f1715f15ae497861c670b01e44842c6b44b21c9cb6c2aaf4584fe6f">Echizen Daibutsu<span class="prov-dot">●</span></a> has <a class="stat" href="output/nudge_analysis/poi_opportunity_index.csv" target="_blank" title="raw value: 103
+field: third fix-it n_reviews
+source: output/nudge_analysis/poi_opportunity_index.csv
+sha256: d3f5b6ac4f1715f15ae497861c670b01e44842c6b44b21c9cb6c2aaf4584fe6f
+script: " data-raw="103" data-source="output/nudge_analysis/poi_opportunity_index.csv" data-source-path="output/nudge_analysis/poi_opportunity_index.csv" data-field="third fix-it n_reviews" data-sha256="d3f5b6ac4f1715f15ae497861c670b01e44842c6b44b21c9cb6c2aaf4584fe6f">103<span class="prov-dot">●</span></a> reviews and elevated codes <a class="stat" href="output/nudge_analysis/poi_opportunity_index.csv" target="_blank" title="raw value: transport_access;opening_hours_availability
+field: third fix-it nudgeable friction codes
+source: output/nudge_analysis/poi_opportunity_index.csv
+sha256: d3f5b6ac4f1715f15ae497861c670b01e44842c6b44b21c9cb6c2aaf4584fe6f
+script: " data-raw="transport_access;opening_hours_availability" data-source="output/nudge_analysis/poi_opportunity_index.csv" data-source-path="output/nudge_analysis/poi_opportunity_index.csv" data-field="third fix-it nudgeable friction codes" data-sha256="d3f5b6ac4f1715f15ae497861c670b01e44842c6b44b21c9cb6c2aaf4584fe6f">transport_access;opening_hours_availability<span class="prov-dot">●</span></a>.</p><p><b>Proposed experiment.</b> Intervention: targeted signage, translation, booking QR, or hours/route prompt matched to the elevated friction codes. Unit: venue entrance, booking page, or visitor session. Primary outcome: friction-code prevalence and low-rating share.</p><p><b>Collect next.</b> Site-level exposure logs, intervention dates, QR scans, visitor counts, review ratings, and reviewed aspect tags.</p><p><b>Why effectiveness is not quantified yet.</b> Current POI ranking identifies where friction concentrates; it does not isolate an intervention effect.</p></div>
+<div class='hyp'><div class='hyp-head'><span class='hyp-tag'>Experiment</span><h3>Promote-it demand redistribution</h3></div><p><b>Opportunity.</b> <a class="stat" href="output/nudge_analysis/poi_opportunity_index.csv" target="_blank" title="raw value: 2
+field: count is_promote_it and is_fukui
+source: output/nudge_analysis/poi_opportunity_index.csv
+sha256: d3f5b6ac4f1715f15ae497861c670b01e44842c6b44b21c9cb6c2aaf4584fe6f
+script: " data-raw="2" data-source="output/nudge_analysis/poi_opportunity_index.csv" data-source-path="output/nudge_analysis/poi_opportunity_index.csv" data-field="count is_promote_it and is_fukui" data-sha256="d3f5b6ac4f1715f15ae497861c670b01e44842c6b44b21c9cb6c2aaf4584fe6f">2<span class="prov-dot">●</span></a> Fukui promote-it candidates can be paired against crowding hotspots.</p><p><b>Nudge type + mechanism.</b> <a class="stat" href="output/nudge_analysis/nudge_taxonomy.csv" target="_blank" title="raw value: demand_redistribution
+field: scenic_value nudge_type
+source: output/nudge_analysis/nudge_taxonomy.csv
+sha256: 6f5e2cb121a2e439e43d97486a312e823131ae8fbd1033b9a0d8b29a375b379c
+script: " data-raw="demand_redistribution" data-source="output/nudge_analysis/nudge_taxonomy.csv" data-source-path="output/nudge_analysis/nudge_taxonomy.csv" data-field="scenic_value nudge_type" data-sha256="6f5e2cb121a2e439e43d97486a312e823131ae8fbd1033b9a0d8b29a375b379c">demand_redistribution<span class="prov-dot">●</span></a>: <a class="stat" href="output/nudge_analysis/nudge_taxonomy.csv" target="_blank" title="raw value: Highlight viewpoints, seasonal timing, and route placement to shift demand toward attractive sites.
+field: scenic_value mechanism
+source: output/nudge_analysis/nudge_taxonomy.csv
+sha256: 6f5e2cb121a2e439e43d97486a312e823131ae8fbd1033b9a0d8b29a375b379c
+script: " data-raw="Highlight viewpoints, seasonal timing, and route placement to shift demand toward attractive sites." data-source="output/nudge_analysis/nudge_taxonomy.csv" data-source-path="output/nudge_analysis/nudge_taxonomy.csv" data-field="scenic_value mechanism" data-sha256="6f5e2cb121a2e439e43d97486a312e823131ae8fbd1033b9a0d8b29a375b379c">Highlight viewpoints, seasonal timing, and route placement to shift demand toward attractive sites.<span class="prov-dot">●</span></a></p><p><b>Evidence so far.</b> <a class="stat" href="output/nudge_analysis/poi_opportunity_index.csv" target="_blank" title="raw value: Kitamaebune Sakai Port
+field: top Fukui promote-it poi_name
+source: output/nudge_analysis/poi_opportunity_index.csv
+sha256: d3f5b6ac4f1715f15ae497861c670b01e44842c6b44b21c9cb6c2aaf4584fe6f
+script: " data-raw="Kitamaebune Sakai Port" data-source="output/nudge_analysis/poi_opportunity_index.csv" data-source-path="output/nudge_analysis/poi_opportunity_index.csv" data-field="top Fukui promote-it poi_name" data-sha256="d3f5b6ac4f1715f15ae497861c670b01e44842c6b44b21c9cb6c2aaf4584fe6f">Kitamaebune Sakai Port<span class="prov-dot">●</span></a> positive share <a class="stat" href="output/nudge_analysis/poi_opportunity_index.csv" target="_blank" title="raw value: 0.9032258064516128
+field: top Fukui promote-it positive_share
+source: output/nudge_analysis/poi_opportunity_index.csv
+sha256: d3f5b6ac4f1715f15ae497861c670b01e44842c6b44b21c9cb6c2aaf4584fe6f
+script: " data-raw="0.9032258064516128" data-source="output/nudge_analysis/poi_opportunity_index.csv" data-source-path="output/nudge_analysis/poi_opportunity_index.csv" data-field="top Fukui promote-it positive_share" data-sha256="d3f5b6ac4f1715f15ae497861c670b01e44842c6b44b21c9cb6c2aaf4584fe6f">90.3%<span class="prov-dot">●</span></a> (CI <a class="stat" href="output/nudge_analysis/poi_opportunity_index.csv" target="_blank" title="raw value: 0.7510006155660716
+field: top Fukui promote-it positive_share_ci_low
+source: output/nudge_analysis/poi_opportunity_index.csv
+sha256: d3f5b6ac4f1715f15ae497861c670b01e44842c6b44b21c9cb6c2aaf4584fe6f
+script: " data-raw="0.7510006155660716" data-source="output/nudge_analysis/poi_opportunity_index.csv" data-source-path="output/nudge_analysis/poi_opportunity_index.csv" data-field="top Fukui promote-it positive_share_ci_low" data-sha256="d3f5b6ac4f1715f15ae497861c670b01e44842c6b44b21c9cb6c2aaf4584fe6f">75.1%<span class="prov-dot">●</span></a>–<a class="stat" href="output/nudge_analysis/poi_opportunity_index.csv" target="_blank" title="raw value: 0.9665353558368026
+field: top Fukui promote-it positive_share_ci_high
+source: output/nudge_analysis/poi_opportunity_index.csv
+sha256: d3f5b6ac4f1715f15ae497861c670b01e44842c6b44b21c9cb6c2aaf4584fe6f
+script: " data-raw="0.9665353558368026" data-source="output/nudge_analysis/poi_opportunity_index.csv" data-source-path="output/nudge_analysis/poi_opportunity_index.csv" data-field="top Fukui promote-it positive_share_ci_high" data-sha256="d3f5b6ac4f1715f15ae497861c670b01e44842c6b44b21c9cb6c2aaf4584fe6f">96.7%<span class="prov-dot">●</span></a>), confidence <a class="stat" href="output/nudge_analysis/poi_opportunity_index.csv" target="_blank" title="raw value: moderate
+field: top Fukui promote-it confidence
+source: output/nudge_analysis/poi_opportunity_index.csv
+sha256: d3f5b6ac4f1715f15ae497861c670b01e44842c6b44b21c9cb6c2aaf4584fe6f
+script: " data-raw="moderate" data-source="output/nudge_analysis/poi_opportunity_index.csv" data-source-path="output/nudge_analysis/poi_opportunity_index.csv" data-field="top Fukui promote-it confidence" data-sha256="d3f5b6ac4f1715f15ae497861c670b01e44842c6b44b21c9cb6c2aaf4584fe6f">moderate<span class="prov-dot">●</span></a>; <a class="stat" href="output/nudge_analysis/poi_opportunity_index.csv" target="_blank" title="raw value: Asuwa River Promenade
+field: second Fukui promote-it poi_name
+source: output/nudge_analysis/poi_opportunity_index.csv
+sha256: d3f5b6ac4f1715f15ae497861c670b01e44842c6b44b21c9cb6c2aaf4584fe6f
+script: " data-raw="Asuwa River Promenade" data-source="output/nudge_analysis/poi_opportunity_index.csv" data-source-path="output/nudge_analysis/poi_opportunity_index.csv" data-field="second Fukui promote-it poi_name" data-sha256="d3f5b6ac4f1715f15ae497861c670b01e44842c6b44b21c9cb6c2aaf4584fe6f">Asuwa River Promenade<span class="prov-dot">●</span></a> positive share <a class="stat" href="output/nudge_analysis/poi_opportunity_index.csv" target="_blank" title="raw value: 0.9583333333333334
+field: second Fukui promote-it positive_share
+source: output/nudge_analysis/poi_opportunity_index.csv
+sha256: d3f5b6ac4f1715f15ae497861c670b01e44842c6b44b21c9cb6c2aaf4584fe6f
+script: " data-raw="0.9583333333333334" data-source="output/nudge_analysis/poi_opportunity_index.csv" data-source-path="output/nudge_analysis/poi_opportunity_index.csv" data-field="second Fukui promote-it positive_share" data-sha256="d3f5b6ac4f1715f15ae497861c670b01e44842c6b44b21c9cb6c2aaf4584fe6f">95.8%<span class="prov-dot">●</span></a> (CI <a class="stat" href="output/nudge_analysis/poi_opportunity_index.csv" target="_blank" title="raw value: 0.8602434412954456
+field: second Fukui promote-it positive_share_ci_low
+source: output/nudge_analysis/poi_opportunity_index.csv
+sha256: d3f5b6ac4f1715f15ae497861c670b01e44842c6b44b21c9cb6c2aaf4584fe6f
+script: " data-raw="0.8602434412954456" data-source="output/nudge_analysis/poi_opportunity_index.csv" data-source-path="output/nudge_analysis/poi_opportunity_index.csv" data-field="second Fukui promote-it positive_share_ci_low" data-sha256="d3f5b6ac4f1715f15ae497861c670b01e44842c6b44b21c9cb6c2aaf4584fe6f">86.0%<span class="prov-dot">●</span></a>–<a class="stat" href="output/nudge_analysis/poi_opportunity_index.csv" target="_blank" title="raw value: 0.9884981065106132
+field: second Fukui promote-it positive_share_ci_high
+source: output/nudge_analysis/poi_opportunity_index.csv
+sha256: d3f5b6ac4f1715f15ae497861c670b01e44842c6b44b21c9cb6c2aaf4584fe6f
+script: " data-raw="0.9884981065106132" data-source="output/nudge_analysis/poi_opportunity_index.csv" data-source-path="output/nudge_analysis/poi_opportunity_index.csv" data-field="second Fukui promote-it positive_share_ci_high" data-sha256="d3f5b6ac4f1715f15ae497861c670b01e44842c6b44b21c9cb6c2aaf4584fe6f">98.8%<span class="prov-dot">●</span></a>), confidence <a class="stat" href="output/nudge_analysis/poi_opportunity_index.csv" target="_blank" title="raw value: moderate
+field: second Fukui promote-it confidence
+source: output/nudge_analysis/poi_opportunity_index.csv
+sha256: d3f5b6ac4f1715f15ae497861c670b01e44842c6b44b21c9cb6c2aaf4584fe6f
+script: " data-raw="moderate" data-source="output/nudge_analysis/poi_opportunity_index.csv" data-source-path="output/nudge_analysis/poi_opportunity_index.csv" data-field="second Fukui promote-it confidence" data-sha256="d3f5b6ac4f1715f15ae497861c670b01e44842c6b44b21c9cb6c2aaf4584fe6f">moderate<span class="prov-dot">●</span></a>. Redirect-from hotspots include <a class="stat" href="output/nudge_analysis/poi_opportunity_index.csv" target="_blank" title="raw value: Fukui Dinosaur Museum
+field: top crowding hotspot poi_name
+source: output/nudge_analysis/poi_opportunity_index.csv
+sha256: d3f5b6ac4f1715f15ae497861c670b01e44842c6b44b21c9cb6c2aaf4584fe6f
+script: " data-raw="Fukui Dinosaur Museum" data-source="output/nudge_analysis/poi_opportunity_index.csv" data-source-path="output/nudge_analysis/poi_opportunity_index.csv" data-field="top crowding hotspot poi_name" data-sha256="d3f5b6ac4f1715f15ae497861c670b01e44842c6b44b21c9cb6c2aaf4584fe6f">Fukui Dinosaur Museum<span class="prov-dot">●</span></a> with waiting/crowding <a class="stat" href="output/nudge_analysis/poi_opportunity_index.csv" target="_blank" title="raw value: 0.1428571428571428
+field: top crowding hotspot waiting_crowding_prevalence
+source: output/nudge_analysis/poi_opportunity_index.csv
+sha256: d3f5b6ac4f1715f15ae497861c670b01e44842c6b44b21c9cb6c2aaf4584fe6f
+script: " data-raw="0.1428571428571428" data-source="output/nudge_analysis/poi_opportunity_index.csv" data-source-path="output/nudge_analysis/poi_opportunity_index.csv" data-field="top crowding hotspot waiting_crowding_prevalence" data-sha256="d3f5b6ac4f1715f15ae497861c670b01e44842c6b44b21c9cb6c2aaf4584fe6f">14.3%<span class="prov-dot">●</span></a> versus base <a class="stat" href="output/nudge_analysis/poi_opportunity_index.csv" target="_blank" title="raw value: 0.0347912524850894
+field: waiting_crowding global base prevalence
+source: output/nudge_analysis/poi_opportunity_index.csv
+sha256: d3f5b6ac4f1715f15ae497861c670b01e44842c6b44b21c9cb6c2aaf4584fe6f
+script: " data-raw="0.0347912524850894" data-source="output/nudge_analysis/poi_opportunity_index.csv" data-source-path="output/nudge_analysis/poi_opportunity_index.csv" data-field="waiting_crowding global base prevalence" data-sha256="d3f5b6ac4f1715f15ae497861c670b01e44842c6b44b21c9cb6c2aaf4584fe6f">3.5%<span class="prov-dot">●</span></a>, and <a class="stat" href="output/nudge_analysis/poi_opportunity_index.csv" target="_blank" title="raw value: Nomura Samurai House
+field: second crowding hotspot poi_name
+source: output/nudge_analysis/poi_opportunity_index.csv
+sha256: d3f5b6ac4f1715f15ae497861c670b01e44842c6b44b21c9cb6c2aaf4584fe6f
+script: " data-raw="Nomura Samurai House" data-source="output/nudge_analysis/poi_opportunity_index.csv" data-source-path="output/nudge_analysis/poi_opportunity_index.csv" data-field="second crowding hotspot poi_name" data-sha256="d3f5b6ac4f1715f15ae497861c670b01e44842c6b44b21c9cb6c2aaf4584fe6f">Nomura Samurai House<span class="prov-dot">●</span></a> with <a class="stat" href="output/nudge_analysis/poi_opportunity_index.csv" target="_blank" title="raw value: 0.1333333333333333
+field: second crowding hotspot waiting_crowding_prevalence
+source: output/nudge_analysis/poi_opportunity_index.csv
+sha256: d3f5b6ac4f1715f15ae497861c670b01e44842c6b44b21c9cb6c2aaf4584fe6f
+script: " data-raw="0.1333333333333333" data-source="output/nudge_analysis/poi_opportunity_index.csv" data-source-path="output/nudge_analysis/poi_opportunity_index.csv" data-field="second crowding hotspot waiting_crowding_prevalence" data-sha256="d3f5b6ac4f1715f15ae497861c670b01e44842c6b44b21c9cb6c2aaf4584fe6f">13.3%<span class="prov-dot">●</span></a>.</p><p><b>Proposed experiment.</b> Intervention: itinerary card, map placement, hotel/front-desk prompt, or transit/wayfinding message that steers visitors from crowded hotspots toward high-satisfaction under-visited POIs. Unit: itinerary channel or visitor session. Primary outcome: visit-share redistribution plus satisfaction / complaint prevalence.</p><p><b>Collect next.</b> Channel exposure, click/scan or itinerary choice, POI visit counts, short satisfaction intercepts, and follow-up review aspect tags.</p><p><b>Why effectiveness is not quantified yet.</b> Current evidence ranks candidate redirect-to and redirect-from POIs; randomized or staggered exposure is needed to estimate behaviour change.</p></div>
+<div class='hyp'><div class='hyp-head'><span class='hyp-tag'>Experiment</span><h3>Underpowered but promising inbound information gaps</h3></div><p><b>Opportunity.</b> English-information gap, wayfinding signage, and transport access are rare but stakeholder-relevant inbound levers.</p><p><b>Nudge type + mechanism.</b> <a class="stat" href="output/nudge_analysis/nudge_taxonomy.csv" target="_blank" title="raw value: information_provision
+field: english_information_gap nudge_type
+source: output/nudge_analysis/nudge_taxonomy.csv
+sha256: 6f5e2cb121a2e439e43d97486a312e823131ae8fbd1033b9a0d8b29a375b379c
+script: " data-raw="information_provision" data-source="output/nudge_analysis/nudge_taxonomy.csv" data-source-path="output/nudge_analysis/nudge_taxonomy.csv" data-field="english_information_gap nudge_type" data-sha256="6f5e2cb121a2e439e43d97486a312e823131ae8fbd1033b9a0d8b29a375b379c">information_provision<span class="prov-dot">●</span></a>: <a class="stat" href="output/nudge_analysis/nudge_taxonomy.csv" target="_blank" title="raw value: Provide short English summaries, labels, FAQs, and translated decision cues at planning and arrival points.
+field: english_information_gap mechanism
+source: output/nudge_analysis/nudge_taxonomy.csv
+sha256: 6f5e2cb121a2e439e43d97486a312e823131ae8fbd1033b9a0d8b29a375b379c
+script: " data-raw="Provide short English summaries, labels, FAQs, and translated decision cues at planning and arrival points." data-source="output/nudge_analysis/nudge_taxonomy.csv" data-source-path="output/nudge_analysis/nudge_taxonomy.csv" data-field="english_information_gap mechanism" data-sha256="6f5e2cb121a2e439e43d97486a312e823131ae8fbd1033b9a0d8b29a375b379c">Provide short English summaries, labels, FAQs, and translated decision cues at planning and arrival points.<span class="prov-dot">●</span></a> <a class="stat" href="output/nudge_analysis/nudge_taxonomy.csv" target="_blank" title="raw value: information_provision
+field: wayfinding_signage nudge_type
+source: output/nudge_analysis/nudge_taxonomy.csv
+sha256: 6f5e2cb121a2e439e43d97486a312e823131ae8fbd1033b9a0d8b29a375b379c
+script: " data-raw="information_provision" data-source="output/nudge_analysis/nudge_taxonomy.csv" data-source-path="output/nudge_analysis/nudge_taxonomy.csv" data-field="wayfinding_signage nudge_type" data-sha256="6f5e2cb121a2e439e43d97486a312e823131ae8fbd1033b9a0d8b29a375b379c">information_provision<span class="prov-dot">●</span></a>: <a class="stat" href="output/nudge_analysis/nudge_taxonomy.csv" target="_blank" title="raw value: Provide map pins, landmark cues, and pre-arrival direction prompts where fixed signage is weak.
+field: wayfinding_signage mechanism
+source: output/nudge_analysis/nudge_taxonomy.csv
+sha256: 6f5e2cb121a2e439e43d97486a312e823131ae8fbd1033b9a0d8b29a375b379c
+script: " data-raw="Provide map pins, landmark cues, and pre-arrival direction prompts where fixed signage is weak." data-source="output/nudge_analysis/nudge_taxonomy.csv" data-source-path="output/nudge_analysis/nudge_taxonomy.csv" data-field="wayfinding_signage mechanism" data-sha256="6f5e2cb121a2e439e43d97486a312e823131ae8fbd1033b9a0d8b29a375b379c">Provide map pins, landmark cues, and pre-arrival direction prompts where fixed signage is weak.<span class="prov-dot">●</span></a> <a class="stat" href="output/nudge_analysis/nudge_taxonomy.csv" target="_blank" title="raw value: information_provision
+field: transport_access nudge_type
+source: output/nudge_analysis/nudge_taxonomy.csv
+sha256: 6f5e2cb121a2e439e43d97486a312e823131ae8fbd1033b9a0d8b29a375b379c
+script: " data-raw="information_provision" data-source="output/nudge_analysis/nudge_taxonomy.csv" data-source-path="output/nudge_analysis/nudge_taxonomy.csv" data-field="transport_access nudge_type" data-sha256="6f5e2cb121a2e439e43d97486a312e823131ae8fbd1033b9a0d8b29a375b379c">information_provision<span class="prov-dot">●</span></a>: <a class="stat" href="output/nudge_analysis/nudge_taxonomy.csv" target="_blank" title="raw value: Show station links, bus timing, walking time, and transfer choices before visitors commit to a route.
+field: transport_access mechanism
+source: output/nudge_analysis/nudge_taxonomy.csv
+sha256: 6f5e2cb121a2e439e43d97486a312e823131ae8fbd1033b9a0d8b29a375b379c
+script: " data-raw="Show station links, bus timing, walking time, and transfer choices before visitors commit to a route." data-source="output/nudge_analysis/nudge_taxonomy.csv" data-source-path="output/nudge_analysis/nudge_taxonomy.csv" data-field="transport_access mechanism" data-sha256="6f5e2cb121a2e439e43d97486a312e823131ae8fbd1033b9a0d8b29a375b379c">Show station links, bus timing, walking time, and transfer choices before visitors commit to a route.<span class="prov-dot">●</span></a></p><p><b>Evidence so far.</b> Inbound English-information gap prevalence <a class="stat" href="output/nudge_analysis/aspect_opportunity_map.csv" target="_blank" title="raw value: 0.0076169749727965
+field: C_inbound english_information_gap prevalence
+source: output/nudge_analysis/aspect_opportunity_map.csv
+sha256: 8b04ba275f24c2ab07cc065a27d3890312916b995c5bc4759ac30a7e388b058d
+script: scripts/build_nudge_opportunity_analysis.py" data-raw="0.0076169749727965" data-source="output/nudge_analysis/aspect_opportunity_map.csv" data-source-path="output/nudge_analysis/aspect_opportunity_map.csv" data-field="C_inbound english_information_gap prevalence" data-sha256="8b04ba275f24c2ab07cc065a27d3890312916b995c5bc4759ac30a7e388b058d">0.8%<span class="prov-dot">●</span></a>, underpowered <a class="stat" href="output/nudge_analysis/aspect_opportunity_map.csv" target="_blank" title="raw value: True
+field: C_inbound english_information_gap underpowered
+source: output/nudge_analysis/aspect_opportunity_map.csv
+sha256: 8b04ba275f24c2ab07cc065a27d3890312916b995c5bc4759ac30a7e388b058d
+script: scripts/build_nudge_opportunity_analysis.py" data-raw="True" data-source="output/nudge_analysis/aspect_opportunity_map.csv" data-source-path="output/nudge_analysis/aspect_opportunity_map.csv" data-field="C_inbound english_information_gap underpowered" data-sha256="8b04ba275f24c2ab07cc065a27d3890312916b995c5bc4759ac30a7e388b058d">yes<span class="prov-dot">●</span></a>; wayfinding signage prevalence <a class="stat" href="output/nudge_analysis/aspect_opportunity_map.csv" target="_blank" title="raw value: 0.0021762785636561
+field: C_inbound wayfinding_signage prevalence
+source: output/nudge_analysis/aspect_opportunity_map.csv
+sha256: 8b04ba275f24c2ab07cc065a27d3890312916b995c5bc4759ac30a7e388b058d
+script: scripts/build_nudge_opportunity_analysis.py" data-raw="0.0021762785636561" data-source="output/nudge_analysis/aspect_opportunity_map.csv" data-source-path="output/nudge_analysis/aspect_opportunity_map.csv" data-field="C_inbound wayfinding_signage prevalence" data-sha256="8b04ba275f24c2ab07cc065a27d3890312916b995c5bc4759ac30a7e388b058d">0.2%<span class="prov-dot">●</span></a>, underpowered <a class="stat" href="output/nudge_analysis/aspect_opportunity_map.csv" target="_blank" title="raw value: True
+field: C_inbound wayfinding_signage underpowered
+source: output/nudge_analysis/aspect_opportunity_map.csv
+sha256: 8b04ba275f24c2ab07cc065a27d3890312916b995c5bc4759ac30a7e388b058d
+script: scripts/build_nudge_opportunity_analysis.py" data-raw="True" data-source="output/nudge_analysis/aspect_opportunity_map.csv" data-source-path="output/nudge_analysis/aspect_opportunity_map.csv" data-field="C_inbound wayfinding_signage underpowered" data-sha256="8b04ba275f24c2ab07cc065a27d3890312916b995c5bc4759ac30a7e388b058d">yes<span class="prov-dot">●</span></a>; transport access prevalence <a class="stat" href="output/nudge_analysis/aspect_opportunity_map.csv" target="_blank" title="raw value: 0.0130576713819368
+field: C_inbound transport_access prevalence
+source: output/nudge_analysis/aspect_opportunity_map.csv
+sha256: 8b04ba275f24c2ab07cc065a27d3890312916b995c5bc4759ac30a7e388b058d
+script: scripts/build_nudge_opportunity_analysis.py" data-raw="0.0130576713819368" data-source="output/nudge_analysis/aspect_opportunity_map.csv" data-source-path="output/nudge_analysis/aspect_opportunity_map.csv" data-field="C_inbound transport_access prevalence" data-sha256="8b04ba275f24c2ab07cc065a27d3890312916b995c5bc4759ac30a7e388b058d">1.3%<span class="prov-dot">●</span></a>, underpowered <a class="stat" href="output/nudge_analysis/aspect_opportunity_map.csv" target="_blank" title="raw value: True
+field: C_inbound transport_access underpowered
+source: output/nudge_analysis/aspect_opportunity_map.csv
+sha256: 8b04ba275f24c2ab07cc065a27d3890312916b995c5bc4759ac30a7e388b058d
+script: scripts/build_nudge_opportunity_analysis.py" data-raw="True" data-source="output/nudge_analysis/aspect_opportunity_map.csv" data-source-path="output/nudge_analysis/aspect_opportunity_map.csv" data-field="C_inbound transport_access underpowered" data-sha256="8b04ba275f24c2ab07cc065a27d3890312916b995c5bc4759ac30a7e388b058d">yes<span class="prov-dot">●</span></a>.</p><p><b>Proposed experiment.</b> Intervention: targeted oversampling and hand-labelled collection around signage, English information, and access prompts before choosing a full trial. Unit: sampled visitor session or reviewed POI-language stratum. Primary outcome: powered aspect prevalence and low-rating association.</p><p><b>Collect next.</b> More inbound-language reviews, intercept notes, QR exposure counts, and human-reviewed aspect labels for the rare information codes.</p><p><b>Why effectiveness is not quantified yet.</b> The current inbound slice is too sparse for confident effect ranking; collection comes before effectiveness testing.</p></div>
+</section>
+<section id='prov'><span class='sec-num'>PROVENANCE</span>
+<h2 class='sec'>Every value, traced to source</h2>
+<table class='prov-table'><thead><tr><th>#</th><th>Value</th><th>Field</th><th>Source file</th><th>SHA256</th></tr></thead><tbody>
+<tr><td class='num'>1</td><td class='num'>information_provision</td><td>opening_hours_availability nudge_type</td><td><a href='output/nudge_analysis/nudge_taxonomy.csv' target='_blank'>output/nudge_analysis/nudge_taxonomy.csv</a></td><td>6f5e2cb121a2e439…</td></tr>
+<tr><td class='num'>2</td><td class='num'>Surface current hours, closure risk, last-entry rules, and backup options before travel.</td><td>opening_hours_availability mechanism</td><td><a href='output/nudge_analysis/nudge_taxonomy.csv' target='_blank'>output/nudge_analysis/nudge_taxonomy.csv</a></td><td>6f5e2cb121a2e439…</td></tr>
+<tr><td class='num'>3</td><td class='num'>1.9%</td><td>opening_hours_availability prevalence</td><td><a href='output/nudge_analysis/aspect_opportunity_map.csv' target='_blank'>output/nudge_analysis/aspect_opportunity_map.csv</a></td><td>8b04ba275f24c2ab…</td></tr>
+<tr><td class='num'>4</td><td class='num'>3.61</td><td>opening_hours_availability Firth OR</td><td><a href='output/nudge_analysis/aspect_opportunity_map.csv' target='_blank'>output/nudge_analysis/aspect_opportunity_map.csv</a></td><td>8b04ba275f24c2ab…</td></tr>
+<tr><td class='num'>5</td><td class='num'>p=8.2x10^-8</td><td>opening_hours_availability BH-FDR p</td><td><a href='output/nudge_analysis/aspect_opportunity_map.csv' target='_blank'>output/nudge_analysis/aspect_opportunity_map.csv</a></td><td>8b04ba275f24c2ab…</td></tr>
+<tr><td class='num'>6</td><td class='num'>pre_commitment</td><td>itinerary_fit_time_cost nudge_type</td><td><a href='output/nudge_analysis/nudge_taxonomy.csv' target='_blank'>output/nudge_analysis/nudge_taxonomy.csv</a></td><td>6f5e2cb121a2e439…</td></tr>
+<tr><td class='num'>7</td><td class='num'>Offer realistic visit durations, route-order suggestions, and time-cost bundles before itinerary lock-in.</td><td>itinerary_fit_time_cost mechanism</td><td><a href='output/nudge_analysis/nudge_taxonomy.csv' target='_blank'>output/nudge_analysis/nudge_taxonomy.csv</a></td><td>6f5e2cb121a2e439…</td></tr>
+<tr><td class='num'>8</td><td class='num'>0.5%</td><td>itinerary_fit_time_cost prevalence</td><td><a href='output/nudge_analysis/aspect_opportunity_map.csv' target='_blank'>output/nudge_analysis/aspect_opportunity_map.csv</a></td><td>8b04ba275f24c2ab…</td></tr>
+<tr><td class='num'>9</td><td class='num'>4.24</td><td>itinerary_fit_time_cost Firth OR</td><td><a href='output/nudge_analysis/aspect_opportunity_map.csv' target='_blank'>output/nudge_analysis/aspect_opportunity_map.csv</a></td><td>8b04ba275f24c2ab…</td></tr>
+<tr><td class='num'>10</td><td class='num'>p=.001</td><td>itinerary_fit_time_cost BH-FDR p</td><td><a href='output/nudge_analysis/aspect_opportunity_map.csv' target='_blank'>output/nudge_analysis/aspect_opportunity_map.csv</a></td><td>8b04ba275f24c2ab…</td></tr>
+<tr><td class='num'>11</td><td class='num'>15</td><td>count is_fix_it</td><td><a href='output/nudge_analysis/poi_opportunity_index.csv' target='_blank'>output/nudge_analysis/poi_opportunity_index.csv</a></td><td>d3f5b6ac4f1715f1…</td></tr>
+<tr><td class='num'>12</td><td class='num'>Myoryuji Ninja Temple</td><td>top fix-it poi_name</td><td><a href='output/nudge_analysis/poi_opportunity_index.csv' target='_blank'>output/nudge_analysis/poi_opportunity_index.csv</a></td><td>d3f5b6ac4f1715f1…</td></tr>
+<tr><td class='num'>13</td><td class='num'>105</td><td>top fix-it n_reviews</td><td><a href='output/nudge_analysis/poi_opportunity_index.csv' target='_blank'>output/nudge_analysis/poi_opportunity_index.csv</a></td><td>d3f5b6ac4f1715f1…</td></tr>
+<tr><td class='num'>14</td><td class='num'>english_information_gap;booking_ticketing</td><td>top fix-it nudgeable friction codes</td><td><a href='output/nudge_analysis/poi_opportunity_index.csv' target='_blank'>output/nudge_analysis/poi_opportunity_index.csv</a></td><td>d3f5b6ac4f1715f1…</td></tr>
+<tr><td class='num'>15</td><td class='num'>21st Century Museum of Contemporary Art</td><td>second fix-it poi_name</td><td><a href='output/nudge_analysis/poi_opportunity_index.csv' target='_blank'>output/nudge_analysis/poi_opportunity_index.csv</a></td><td>d3f5b6ac4f1715f1…</td></tr>
+<tr><td class='num'>16</td><td class='num'>105</td><td>second fix-it n_reviews</td><td><a href='output/nudge_analysis/poi_opportunity_index.csv' target='_blank'>output/nudge_analysis/poi_opportunity_index.csv</a></td><td>d3f5b6ac4f1715f1…</td></tr>
+<tr><td class='num'>17</td><td class='num'>booking_ticketing;opening_hours_availability</td><td>second fix-it nudgeable friction codes</td><td><a href='output/nudge_analysis/poi_opportunity_index.csv' target='_blank'>output/nudge_analysis/poi_opportunity_index.csv</a></td><td>d3f5b6ac4f1715f1…</td></tr>
+<tr><td class='num'>18</td><td class='num'>Echizen Daibutsu</td><td>third fix-it poi_name</td><td><a href='output/nudge_analysis/poi_opportunity_index.csv' target='_blank'>output/nudge_analysis/poi_opportunity_index.csv</a></td><td>d3f5b6ac4f1715f1…</td></tr>
+<tr><td class='num'>19</td><td class='num'>103</td><td>third fix-it n_reviews</td><td><a href='output/nudge_analysis/poi_opportunity_index.csv' target='_blank'>output/nudge_analysis/poi_opportunity_index.csv</a></td><td>d3f5b6ac4f1715f1…</td></tr>
+<tr><td class='num'>20</td><td class='num'>transport_access;opening_hours_availability</td><td>third fix-it nudgeable friction codes</td><td><a href='output/nudge_analysis/poi_opportunity_index.csv' target='_blank'>output/nudge_analysis/poi_opportunity_index.csv</a></td><td>d3f5b6ac4f1715f1…</td></tr>
+<tr><td class='num'>21</td><td class='num'>demand_redistribution</td><td>scenic_value nudge_type</td><td><a href='output/nudge_analysis/nudge_taxonomy.csv' target='_blank'>output/nudge_analysis/nudge_taxonomy.csv</a></td><td>6f5e2cb121a2e439…</td></tr>
+<tr><td class='num'>22</td><td class='num'>Highlight viewpoints, seasonal timing, and route placement to shift demand toward attractive sites.</td><td>scenic_value mechanism</td><td><a href='output/nudge_analysis/nudge_taxonomy.csv' target='_blank'>output/nudge_analysis/nudge_taxonomy.csv</a></td><td>6f5e2cb121a2e439…</td></tr>
+<tr><td class='num'>23</td><td class='num'>2</td><td>count is_promote_it and is_fukui</td><td><a href='output/nudge_analysis/poi_opportunity_index.csv' target='_blank'>output/nudge_analysis/poi_opportunity_index.csv</a></td><td>d3f5b6ac4f1715f1…</td></tr>
+<tr><td class='num'>24</td><td class='num'>Kitamaebune Sakai Port</td><td>top Fukui promote-it poi_name</td><td><a href='output/nudge_analysis/poi_opportunity_index.csv' target='_blank'>output/nudge_analysis/poi_opportunity_index.csv</a></td><td>d3f5b6ac4f1715f1…</td></tr>
+<tr><td class='num'>25</td><td class='num'>90.3%</td><td>top Fukui promote-it positive_share</td><td><a href='output/nudge_analysis/poi_opportunity_index.csv' target='_blank'>output/nudge_analysis/poi_opportunity_index.csv</a></td><td>d3f5b6ac4f1715f1…</td></tr>
+<tr><td class='num'>26</td><td class='num'>75.1%</td><td>top Fukui promote-it positive_share_ci_low</td><td><a href='output/nudge_analysis/poi_opportunity_index.csv' target='_blank'>output/nudge_analysis/poi_opportunity_index.csv</a></td><td>d3f5b6ac4f1715f1…</td></tr>
+<tr><td class='num'>27</td><td class='num'>96.7%</td><td>top Fukui promote-it positive_share_ci_high</td><td><a href='output/nudge_analysis/poi_opportunity_index.csv' target='_blank'>output/nudge_analysis/poi_opportunity_index.csv</a></td><td>d3f5b6ac4f1715f1…</td></tr>
+<tr><td class='num'>28</td><td class='num'>moderate</td><td>top Fukui promote-it confidence</td><td><a href='output/nudge_analysis/poi_opportunity_index.csv' target='_blank'>output/nudge_analysis/poi_opportunity_index.csv</a></td><td>d3f5b6ac4f1715f1…</td></tr>
+<tr><td class='num'>29</td><td class='num'>Asuwa River Promenade</td><td>second Fukui promote-it poi_name</td><td><a href='output/nudge_analysis/poi_opportunity_index.csv' target='_blank'>output/nudge_analysis/poi_opportunity_index.csv</a></td><td>d3f5b6ac4f1715f1…</td></tr>
+<tr><td class='num'>30</td><td class='num'>95.8%</td><td>second Fukui promote-it positive_share</td><td><a href='output/nudge_analysis/poi_opportunity_index.csv' target='_blank'>output/nudge_analysis/poi_opportunity_index.csv</a></td><td>d3f5b6ac4f1715f1…</td></tr>
+<tr><td class='num'>31</td><td class='num'>86.0%</td><td>second Fukui promote-it positive_share_ci_low</td><td><a href='output/nudge_analysis/poi_opportunity_index.csv' target='_blank'>output/nudge_analysis/poi_opportunity_index.csv</a></td><td>d3f5b6ac4f1715f1…</td></tr>
+<tr><td class='num'>32</td><td class='num'>98.8%</td><td>second Fukui promote-it positive_share_ci_high</td><td><a href='output/nudge_analysis/poi_opportunity_index.csv' target='_blank'>output/nudge_analysis/poi_opportunity_index.csv</a></td><td>d3f5b6ac4f1715f1…</td></tr>
+<tr><td class='num'>33</td><td class='num'>moderate</td><td>second Fukui promote-it confidence</td><td><a href='output/nudge_analysis/poi_opportunity_index.csv' target='_blank'>output/nudge_analysis/poi_opportunity_index.csv</a></td><td>d3f5b6ac4f1715f1…</td></tr>
+<tr><td class='num'>34</td><td class='num'>Fukui Dinosaur Museum</td><td>top crowding hotspot poi_name</td><td><a href='output/nudge_analysis/poi_opportunity_index.csv' target='_blank'>output/nudge_analysis/poi_opportunity_index.csv</a></td><td>d3f5b6ac4f1715f1…</td></tr>
+<tr><td class='num'>35</td><td class='num'>14.3%</td><td>top crowding hotspot waiting_crowding_prevalence</td><td><a href='output/nudge_analysis/poi_opportunity_index.csv' target='_blank'>output/nudge_analysis/poi_opportunity_index.csv</a></td><td>d3f5b6ac4f1715f1…</td></tr>
+<tr><td class='num'>36</td><td class='num'>3.5%</td><td>waiting_crowding global base prevalence</td><td><a href='output/nudge_analysis/poi_opportunity_index.csv' target='_blank'>output/nudge_analysis/poi_opportunity_index.csv</a></td><td>d3f5b6ac4f1715f1…</td></tr>
+<tr><td class='num'>37</td><td class='num'>Nomura Samurai House</td><td>second crowding hotspot poi_name</td><td><a href='output/nudge_analysis/poi_opportunity_index.csv' target='_blank'>output/nudge_analysis/poi_opportunity_index.csv</a></td><td>d3f5b6ac4f1715f1…</td></tr>
+<tr><td class='num'>38</td><td class='num'>13.3%</td><td>second crowding hotspot waiting_crowding_prevalence</td><td><a href='output/nudge_analysis/poi_opportunity_index.csv' target='_blank'>output/nudge_analysis/poi_opportunity_index.csv</a></td><td>d3f5b6ac4f1715f1…</td></tr>
+<tr><td class='num'>39</td><td class='num'>information_provision</td><td>english_information_gap nudge_type</td><td><a href='output/nudge_analysis/nudge_taxonomy.csv' target='_blank'>output/nudge_analysis/nudge_taxonomy.csv</a></td><td>6f5e2cb121a2e439…</td></tr>
+<tr><td class='num'>40</td><td class='num'>Provide short English summaries, labels, FAQs, and translated decision cues at planning and arrival points.</td><td>english_information_gap mechanism</td><td><a href='output/nudge_analysis/nudge_taxonomy.csv' target='_blank'>output/nudge_analysis/nudge_taxonomy.csv</a></td><td>6f5e2cb121a2e439…</td></tr>
+<tr><td class='num'>41</td><td class='num'>0.8%</td><td>C_inbound english_information_gap prevalence</td><td><a href='output/nudge_analysis/aspect_opportunity_map.csv' target='_blank'>output/nudge_analysis/aspect_opportunity_map.csv</a></td><td>8b04ba275f24c2ab…</td></tr>
+<tr><td class='num'>42</td><td class='num'>yes</td><td>C_inbound english_information_gap underpowered</td><td><a href='output/nudge_analysis/aspect_opportunity_map.csv' target='_blank'>output/nudge_analysis/aspect_opportunity_map.csv</a></td><td>8b04ba275f24c2ab…</td></tr>
+<tr><td class='num'>43</td><td class='num'>information_provision</td><td>wayfinding_signage nudge_type</td><td><a href='output/nudge_analysis/nudge_taxonomy.csv' target='_blank'>output/nudge_analysis/nudge_taxonomy.csv</a></td><td>6f5e2cb121a2e439…</td></tr>
+<tr><td class='num'>44</td><td class='num'>Provide map pins, landmark cues, and pre-arrival direction prompts where fixed signage is weak.</td><td>wayfinding_signage mechanism</td><td><a href='output/nudge_analysis/nudge_taxonomy.csv' target='_blank'>output/nudge_analysis/nudge_taxonomy.csv</a></td><td>6f5e2cb121a2e439…</td></tr>
+<tr><td class='num'>45</td><td class='num'>0.2%</td><td>C_inbound wayfinding_signage prevalence</td><td><a href='output/nudge_analysis/aspect_opportunity_map.csv' target='_blank'>output/nudge_analysis/aspect_opportunity_map.csv</a></td><td>8b04ba275f24c2ab…</td></tr>
+<tr><td class='num'>46</td><td class='num'>yes</td><td>C_inbound wayfinding_signage underpowered</td><td><a href='output/nudge_analysis/aspect_opportunity_map.csv' target='_blank'>output/nudge_analysis/aspect_opportunity_map.csv</a></td><td>8b04ba275f24c2ab…</td></tr>
+<tr><td class='num'>47</td><td class='num'>information_provision</td><td>transport_access nudge_type</td><td><a href='output/nudge_analysis/nudge_taxonomy.csv' target='_blank'>output/nudge_analysis/nudge_taxonomy.csv</a></td><td>6f5e2cb121a2e439…</td></tr>
+<tr><td class='num'>48</td><td class='num'>Show station links, bus timing, walking time, and transfer choices before visitors commit to a route.</td><td>transport_access mechanism</td><td><a href='output/nudge_analysis/nudge_taxonomy.csv' target='_blank'>output/nudge_analysis/nudge_taxonomy.csv</a></td><td>6f5e2cb121a2e439…</td></tr>
+<tr><td class='num'>49</td><td class='num'>1.3%</td><td>C_inbound transport_access prevalence</td><td><a href='output/nudge_analysis/aspect_opportunity_map.csv' target='_blank'>output/nudge_analysis/aspect_opportunity_map.csv</a></td><td>8b04ba275f24c2ab…</td></tr>
+<tr><td class='num'>50</td><td class='num'>yes</td><td>C_inbound transport_access underpowered</td><td><a href='output/nudge_analysis/aspect_opportunity_map.csv' target='_blank'>output/nudge_analysis/aspect_opportunity_map.csv</a></td><td>8b04ba275f24c2ab…</td></tr>
+</tbody></table></section></main>
+<footer><div class='wrap'>Generated by <code>scripts/build_nudge_experiment_register.py</code> from aggregate nudge outputs. Exploratory only; no causal or effectiveness claims.</div></footer>
+</body></html>

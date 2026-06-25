@@ -22,6 +22,7 @@ from scipy import stats
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+from src.provenance import repo_relative
 from scripts.hypothesis_test_common import (
     DEFAULT_GROUPS,
     group_denominators,
@@ -41,6 +42,8 @@ OUTPUT_MANIFEST = OUTPUT_DIR / "within_poi_paired_jp_en_manifest.json"
 COMPARISON = "english_vs_japanese_within_shared_fukui_poi"
 MIN_EN_REVIEWS = 5
 MIN_JP_REVIEWS = 5
+def _repo_relative_path(path: Path) -> Path:
+    return Path(repo_relative(path))
 
 WITHIN_POI_CAVEATS = [
     "Group labels describe review language, not reviewer nationality.",
@@ -222,7 +225,7 @@ def build_within_poi_paired_jp_en(
         kind="hypothesis_within_poi_paired_jp_en",
         command=command,
         generated=generated_at,
-        input_path=input_path,
+        input_path=_repo_relative_path(input_path),
         output_csv=output_csv,
         manifest_path=output_manifest,
         metrics={

@@ -30,3 +30,6 @@ docs/codebook_reviews/source/XHS_NOTES_DATA_v1.xml
 *.sqlite
 *.db
 .DS_Store
+
+# Seminar deck preview (derived view, gitignored like the rest of output)
+SEMINAR-Slides-Preview.html

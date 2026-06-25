@@ -38,7 +38,7 @@ from scipy import stats
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from src.utils.logger import setup_logger
-from src.provenance import file_record, research_manifest, sha256_file, write_json
+from src.provenance import file_record, repo_relative, research_manifest, sha256_file, write_json
 from src.scope import (
     MissingScopeColumnsError,
     MissingScopeInputError,
@@ -891,13 +891,13 @@ def build_cross_language_trends(
         "schema_version": "cross_language_trends_manifest.v2",
         "prefecture": prefecture,
         "neighboring_prefecture_scaffold": NEIGHBORING_PREFECTURE_SCAFFOLD,
-        "reviews_input": str(reviews_path),
+        "reviews_input": repo_relative(reviews_path),
         "reviews_input_sha256": sha256_file(reviews_path),
-        "poi_metadata_input": str(poi_metadata_path),
+        "poi_metadata_input": repo_relative(poi_metadata_path),
         "poi_metadata_input_sha256": sha256_file(poi_metadata_path),
-        "chinese_input": str(chinese_path),
+        "chinese_input": repo_relative(chinese_path),
         "chinese_input_sha256": sha256_file(chinese_path),
-        "sentiment_summary_input": str(sentiment_summary_path),
+        "sentiment_summary_input": repo_relative(sentiment_summary_path),
         "sentiment_summary_input_sha256": sha256_file(sentiment_summary_path)
         if sentiment_summary_path.exists() else None,
         "review_rows_retained": int(len(reviews)),
@@ -912,10 +912,10 @@ def build_cross_language_trends(
             "Chinese post dates are mostly inferred or scrape-anchored; aggregate baseline is safer."
         ),
         "outputs": {
-            "cross_language_baseline_snapshot": str(baseline_path),
-            "date_scrub_requirements": str(date_scrub_path),
-            "cross_language_statistical_tests": str(tests_path),
-            "cross_language_trends_readiness": str(report_md_path),
+            "cross_language_baseline_snapshot": repo_relative(baseline_path),
+            "date_scrub_requirements": repo_relative(date_scrub_path),
+            "cross_language_statistical_tests": repo_relative(tests_path),
+            "cross_language_trends_readiness": repo_relative(report_md_path),
         },
     }
     _write_readiness(report, report_md_path)

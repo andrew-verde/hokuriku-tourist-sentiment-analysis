@@ -1,7 +1,7 @@
 PYTHON = .venv/bin/python3
 PBL_SITE ?= $(HOME)/pbl-site
 
-.PHONY: help test chinese-codebook-template reviewed-codebook-config reviewed-codebook-status chinese-social chinese-social-xhs-only chinese-social-with-douyin chinese-insights chinese-insights-xhs-only multilingual-reviews cross-language-trends sentiment-env sentiment-analysis hypothesis-h1 hypothesis-h2 hypothesis-h3 hypothesis-within-poi hypothesis-tests within-en-sentiment within-jp-sentiment within-cn-sentiment within-language-sentiment presentation-safe statistical-test-figures dashboard deploy
+.PHONY: help test chinese-codebook-template reviewed-codebook-config reviewed-codebook-status chinese-social chinese-social-xhs-only chinese-social-with-douyin chinese-insights chinese-insights-xhs-only multilingual-reviews cross-language-trends sentiment-env sentiment-analysis hypothesis-h1 hypothesis-h2 hypothesis-h3 hypothesis-within-poi hypothesis-tests nudge-analysis poi-opportunity nudge-figures nudge-register nudge-all within-en-sentiment within-jp-sentiment within-cn-sentiment within-language-sentiment presentation-safe statistical-test-figures dashboard deploy
 
 help:
 	@echo "Hokuriku tourist sentiment analysis"
@@ -23,6 +23,11 @@ help:
 	@echo "  make hypothesis-h3           Run JP-EN reviewed-evidence hypothesis tests"
 	@echo "  make hypothesis-within-poi   Run within-POI paired JP-EN robustness check"
 	@echo "  make hypothesis-tests        Run H1, H2, H3, and within-POI robustness scripts"
+	@echo "  make nudge-analysis          Build aggregate aspect nudge opportunity map"
+	@echo "  make poi-opportunity         Build aggregate POI nudge opportunity index"
+	@echo "  make nudge-figures           Build aggregate nudge opportunity SVG figures"
+	@echo "  make nudge-register          Build HTML next-semester nudge experiment register"
+	@echo "  make nudge-all               Build all nudge outputs, figures, register, and dashboard"
 	@echo "  make within-en-sentiment     Run English within-language sentiment drivers"
 	@echo "  make within-jp-sentiment     Run Japanese within-language sentiment drivers"
 	@echo "  make within-cn-sentiment     Run Chinese within-source sentiment drivers"
@@ -83,6 +88,20 @@ hypothesis-within-poi:
 
 hypothesis-tests: hypothesis-h1 hypothesis-h2 hypothesis-h3 hypothesis-within-poi
 
+nudge-analysis:
+	$(PYTHON) scripts/build_nudge_opportunity_analysis.py
+
+poi-opportunity:
+	$(PYTHON) scripts/build_poi_opportunity_index.py
+
+nudge-figures:
+	$(PYTHON) scripts/build_nudge_figures.py
+
+nudge-register:
+	$(PYTHON) scripts/build_nudge_experiment_register.py
+
+nudge-all: nudge-analysis poi-opportunity nudge-figures nudge-register dashboard
+
 within-en-sentiment:
 	$(PYTHON) scripts/test_en_within_language_sentiment_drivers.py
 
@@ -103,21 +122,25 @@ statistical-test-figures:
 dashboard:
 	$(PYTHON) scripts/build_pbl_dashboard.py
 
-# Regenerate figures + dashboard, then sync the page and only the assets it
-# references (figure SVGs + provenance source files) into the served directory.
-# The asset list is parsed from PBL-Dashboard.html so it stays in sync with the
-# page; override the destination with `make deploy PBL_SITE=/path`.
-deploy: statistical-test-figures dashboard
+# Regenerate figures + both HTML pages, then sync landing page plus referenced
+# assets (figure SVGs + provenance source files) into the served directory.
+# Asset list is parsed from both HTML pages so register-only provenance assets
+# are included too; override destination with `make deploy PBL_SITE=/path`.
+deploy: statistical-test-figures nudge-register dashboard
 	@mkdir -p "$(PBL_SITE)"
 	@cp -f PBL-Dashboard.html "$(PBL_SITE)/index.html"
-	@grep -oE "(href|data-source)=['\"](docs|output)/[^'\"]+" PBL-Dashboard.html \
-		| sed -E "s/.*['\"]//" | sort -u \
+	@cp -f PBL-Dashboard.html "$(PBL_SITE)/PBL-Dashboard.html"
+	@for html in PBL-Dashboard.html docs/nudge_experiment_register.html; do \
+		grep -oE "(href|data-source)=['\"](docs|output)/[^'\"]+" "$$html"; \
+	done | sed -E "s/.*['\"]//" | sort -u \
 		| while read -r p; do \
 			mkdir -p "$(PBL_SITE)/$$(dirname "$$p")"; \
 			cp -f "$$p" "$(PBL_SITE)/$$p"; \
 		done
-	@n=$$(grep -oE "(href|data-source)=['\"](docs|output)/[^'\"]+" PBL-Dashboard.html | sed -E "s/.*['\"]//" | sort -u | wc -l); \
-		echo "deployed index.html + $$n referenced assets to $(PBL_SITE)"
+	@n=$$(for html in PBL-Dashboard.html docs/nudge_experiment_register.html; do \
+		grep -oE "(href|data-source)=['\"](docs|output)/[^'\"]+" "$$html"; \
+	done | sed -E "s/.*['\"]//" | sort -u | wc -l); \
+		echo "deployed index.html + PBL-Dashboard.html + $$n referenced assets to $(PBL_SITE)"
 
 test:
 	$(PYTHON) -m pytest

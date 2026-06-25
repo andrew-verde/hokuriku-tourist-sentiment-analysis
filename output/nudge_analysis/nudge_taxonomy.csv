@@ -1,0 +1,19 @@
+aspect,signal_type,nudge_able,nudge_type,mechanism,acts_on_unit
+transport_access,friction,yes,information_provision,"Show station links, bus timing, walking time, and transfer choices before visitors commit to a route.",tourist_decision
+wayfinding_signage,friction,yes,information_provision,"Provide map pins, landmark cues, and pre-arrival direction prompts where fixed signage is weak.",tourist_decision
+english_information_gap,friction,yes,information_provision,"Provide short English summaries, labels, FAQs, and translated decision cues at planning and arrival points.",tourist_decision
+staff_communication,friction,no,operator_fix,"Improve service scripts, translation aids, and escalation routines managed by the operator.",operator
+booking_ticketing,friction,yes,pre_commitment,"Show reservation steps, ticket choices, deadlines, and required inputs before travel.",tourist_decision
+waiting_crowding,friction,yes,demand_redistribution,"Steer visitors toward quieter times, alternate entrances, or nearby substitutes.",tourist_decision
+price_value,friction,no,operator_fix,"Adjust pricing, inclusions, or value delivery rather than relying mainly on a behavioral prompt.",operator
+cleanliness_comfort,friction,no,operator_fix,"Improve maintenance, comfort, and facility operations controlled by the site operator.",operator
+opening_hours_availability,friction,yes,information_provision,"Surface current hours, closure risk, last-entry rules, and backup options before travel.",tourist_decision
+itinerary_fit_time_cost,friction,yes,pre_commitment,"Offer realistic visit durations, route-order suggestions, and time-cost bundles before itinerary lock-in.",tourist_decision
+accessibility_mobility,friction,no,operator_fix,"Upgrade or maintain accessible routes, rest points, elevators, and mobility support infrastructure.",operator
+food_amenities_gap,friction,no,operator_fix,"Improve nearby amenity provision or operator coordination for food, toilets, lockers, and rest areas.",operator
+scenic_value,draw,yes,demand_redistribution,"Highlight viewpoints, seasonal timing, and route placement to shift demand toward attractive sites.",tourist_decision
+worthwhile_destination,draw,yes,demand_redistribution,"Frame visit payoff with concise reasons to go, dwell time, and fit with trip goals.",tourist_decision
+friendly_service,draw,no,operator_fix,"Maintain service culture and staff availability through operator training and staffing choices.",operator
+underpromoted_feature,draw,yes,demand_redistribution,"Expose overlooked exhibits, views, stories, or local products through itinerary prompts.",tourist_decision
+easy_if_guided,draw,yes,information_provision,"Make guide, audio-guide, model-route, or staff-supported options visible before arrival.",tourist_decision
+good_for_itinerary_bundle,draw,yes,demand_redistribution,"Pair the attraction with nearby stops, transport windows, meals, and seasonal events.",tourist_decision

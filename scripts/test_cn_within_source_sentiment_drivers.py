@@ -20,6 +20,7 @@ import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+from src.provenance import repo_relative
 from scripts.within_language_sentiment_common import (
     COMMON_WITHIN_CAVEATS,
     DEFAULT_CHINESE_INPUT_PATH,
@@ -72,6 +73,10 @@ CAVEATS = COMMON_WITHIN_CAVEATS + [
     "Chinese rows mix social platform forms; platform diagnostics are source-sensitivity checks.",
     "Theme diagnostics treat unclassified as unresolved coverage, not a substantive theme.",
 ]
+
+
+def _repo_relative_path(path: Path) -> Path:
+    return Path(repo_relative(path))
 
 
 def _read_chinese_readiness(input_path: Path) -> dict:
@@ -138,7 +143,7 @@ def build_cn_within_source_sentiment_drivers(
         if key in readiness_metrics:
             denominators[key] = readiness_metrics[key]
 
-    rows = _cn_rows(df, input_path, source_hash, command, generated, caveat)
+    rows = _cn_rows(df, _repo_relative_path(input_path), source_hash, command, generated, caveat)
     out = pd.DataFrame(rows)
     output_csv = output_dir / OUTPUT_CSV
     output_manifest = output_dir / OUTPUT_MANIFEST
@@ -147,7 +152,7 @@ def build_cn_within_source_sentiment_drivers(
         kind="within_source_sentiment_drivers_cn",
         command=command,
         generated=generated,
-        input_path=input_path,
+        input_path=_repo_relative_path(input_path),
         output_csv=output_csv,
         manifest_path=output_manifest,
         filters={"scope": "Fukui when city column is present", "text": "body/comment text present"},

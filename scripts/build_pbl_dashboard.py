@@ -52,6 +52,9 @@ SOURCES: dict[str, Path] = {
     "cn_manifest": ROOT / "output/chinese_specific_insights/chinese_specific_insights_manifest.json",
     "pres_manifest": ROOT / "output/presentation_safe/presentation_manifest.json",
     "pres_ready": ROOT / "output/presentation_safe/presentation_readiness.md",
+    "nudge_aspect": ROOT / "output/nudge_analysis/aspect_opportunity_map.csv",
+    "nudge_poi": ROOT / "output/nudge_analysis/poi_opportunity_index.csv",
+    "nudge_tax": ROOT / "output/nudge_analysis/nudge_taxonomy.csv",
 }
 
 # FIGURES: Script-generated SVG charts (aggregate-only, no row-level info)
@@ -66,6 +69,9 @@ FIGURES = {
     "wen_drivers": ROOT / "docs/statistical_test_figures/figure_within_english_driver_effects.svg",
     "cross_cat": ROOT / "docs/statistical_test_figures/figure_cross_source_sentiment_category.svg",
     "cn_plat": ROOT / "output/chinese_specific_insights/figure_sentiment_category_by_platform.svg",
+    "nudge_aspect": ROOT / "docs/statistical_test_figures/figure_nudge_aspect_opportunity_map.svg",
+    "nudge_poi": ROOT / "docs/statistical_test_figures/figure_nudge_poi_action_map.svg",
+    "nudge_info": ROOT / "docs/statistical_test_figures/figure_nudge_info_levers.svg",
 }
 
 # Global caches: DATA holds loaded files, SHA holds file hashes, COMMAND holds the
@@ -274,6 +280,82 @@ def manifest_metric(src_id, *path):
     return g
 
 
+def aspect_value(aspect, col, segment="pooled"):
+    def g(d):
+        r = d[(d["analysis"] == "A_primary") & (d["segment"] == segment) & (d["aspect"] == aspect)]
+        if r.empty:
+            raise KeyError(f"missing aspect row: {aspect}/{segment}")
+        return r[col].iloc[0]
+    return g
+
+
+def aspect_n(segment):
+    def g(d):
+        r = d[(d["analysis"] == "A_primary") & (d["segment"] == segment)]
+        if r.empty:
+            raise KeyError(f"missing A_primary segment: {segment}")
+        return int(r["n"].iloc[0])
+    return g
+
+
+def secondary_total_n():
+    def g(d):
+        en = d[d["analysis"] == "A_secondary_en"]
+        jp = d[d["analysis"] == "A_secondary_jp"]
+        if en.empty or jp.empty:
+            raise KeyError("missing secondary EN/JP rows")
+        return int(en["n"].iloc[0]) + int(jp["n"].iloc[0])
+    return g
+
+
+def poi_metric(col):
+    def g(d):
+        return d[col].iloc[0]
+    return g
+
+
+def poi_sum(col, fukui: bool | None = None):
+    def g(d):
+        work = d
+        if fukui is not None:
+            work = work[work["is_fukui"].astype(bool) == fukui]
+        return int(work[col].astype(bool).sum())
+    return g
+
+
+def poi_total_reviews():
+    def g(d):
+        return int(d["n_reviews"].sum())
+    return g
+
+
+def poi_ranked(kind, index, col):
+    def g(d):
+        if kind == "promote_fukui":
+            work = d[(d["is_promote_it"].astype(bool)) & (d["is_fukui"].astype(bool))].sort_values("promote_it_score", ascending=False)
+        elif kind == "fix":
+            work = d[d["is_fix_it"].astype(bool)].sort_values("fix_it_score", ascending=False)
+        elif kind == "crowding":
+            work = d[d["is_crowding_hotspot"].astype(bool)].sort_values("waiting_crowding_prevalence", ascending=False)
+        elif kind == "promote":
+            work = d[d["is_promote_it"].astype(bool)].sort_values("promote_it_score", ascending=False)
+        else:
+            raise KeyError(f"unknown POI rank kind: {kind}")
+        if len(work) <= index:
+            raise KeyError(f"missing POI rank {kind}[{index}]")
+        return work.iloc[index][col]
+    return g
+
+
+def taxonomy_value(aspect, col):
+    def g(d):
+        r = d[d["aspect"] == aspect]
+        if r.empty:
+            raise KeyError(f"missing taxonomy row: {aspect}")
+        return r[col].iloc[0]
+    return g
+
+
 def fig(key: str, caption: str) -> str:
     path = FIGURES[key]
     if not path.exists():
@@ -282,11 +364,12 @@ def fig(key: str, caption: str) -> str:
     # drop any xml prolog, let CSS size it responsively
     svg = svg[svg.find("<svg"):]
     src = rel(path)
+    fig_sha = _sha256(path)
     return (
         f'<figure class="fig">{svg}'
         f'<figcaption>{caption} '
         f'<a class="figsrc" href="{src}" target="_blank">{src}</a> '
-        f'<span class="figsrc-note">(script-generated, aggregate-only)</span>'
+        f'<span class="figsrc-note">(script-generated, aggregate-only; sha256 {fig_sha[:16]}…)</span>'
         f'</figcaption></figure>'
     )
 
@@ -307,10 +390,60 @@ def build_html() -> str:
 
     # --- PULL HEADLINE VALUES: each is resolved from a source file at build time ---
     # These will appear in the HTML with traced links; if any getter fails, the build fails
-    total_rows = n("pres_manifest", manifest_metric("pres_manifest", "review_rows_represented"), "metrics.review_rows_represented")
+    total_rows = n("nudge_poi", poi_total_reviews(), "sum(n_reviews) true tagged review records")
+    all_en_n = stat("nudge_aspect", aspect_n("english"), "{:,.0f}", "", "A_primary english n")
+    all_jp_n = stat("nudge_aspect", aspect_n("japanese"), "{:,.0f}", "", "A_primary japanese n")
+    pooled_model_n = stat("nudge_aspect", aspect_n("pooled"), "{:,.0f}", "", "A_primary pooled n")
+    jp_en_fukui_n = stat("nudge_aspect", secondary_total_n(), "{:,.0f}", "", "A_secondary EN+JP n")
     en_n = stat("h2", h2_n("english"), "{:,.0f}", "", "H2 group_summary n_rating_present[english]")
     jp_n = stat("h2", h2_n("japanese"), "{:,.0f}", "", "H2 group_summary n_rating_present[japanese]")
     cn_n = n("cn_manifest", manifest_metric("cn_manifest", "rows_represented"), "metrics.rows_represented")
+
+    # --- Nudge opportunity map: aspect estimates, POI archetypes, taxonomy labels ---
+    open_prev = stat("nudge_aspect", aspect_value("opening_hours_availability", "prevalence"), lambda x: f"{float(x)*100:.1f}%", "", "opening_hours_availability pooled prevalence")
+    open_or = stat("nudge_aspect", aspect_value("opening_hours_availability", "odds_ratio"), "{:.2f}", "", "opening_hours_availability Firth OR")
+    open_p = stat("nudge_aspect", aspect_value("opening_hours_availability", "p_value_bh_fdr"), pfmt, "", "opening_hours_availability BH-FDR p")
+    time_prev = stat("nudge_aspect", aspect_value("itinerary_fit_time_cost", "prevalence"), lambda x: f"{float(x)*100:.1f}%", "", "itinerary_fit_time_cost pooled prevalence")
+    time_or = stat("nudge_aspect", aspect_value("itinerary_fit_time_cost", "odds_ratio"), "{:.2f}", "", "itinerary_fit_time_cost Firth OR")
+    time_p = stat("nudge_aspect", aspect_value("itinerary_fit_time_cost", "p_value_bh_fdr"), pfmt, "", "itinerary_fit_time_cost BH-FDR p")
+    eng_gap_prev = stat("nudge_aspect", aspect_value("english_information_gap", "prevalence"), lambda x: f"{float(x)*100:.1f}%", "", "english_information_gap pooled prevalence")
+    sign_prev = stat("nudge_aspect", aspect_value("wayfinding_signage", "prevalence"), lambda x: f"{float(x)*100:.1f}%", "", "wayfinding_signage pooled prevalence")
+    access_prev = stat("nudge_aspect", aspect_value("transport_access", "prevalence"), lambda x: f"{float(x)*100:.1f}%", "", "transport_access pooled prevalence")
+    booking_prev = stat("nudge_aspect", aspect_value("booking_ticketing", "prevalence"), lambda x: f"{float(x)*100:.1f}%", "", "booking_ticketing pooled prevalence")
+    fix_count = stat("nudge_poi", poi_sum("is_fix_it"), "{:,.0f}", "", "count is_fix_it")
+    fix_fukui = stat("nudge_poi", poi_sum("is_fix_it", True), "{:,.0f}", "", "count is_fix_it and is_fukui")
+    promote_count = stat("nudge_poi", poi_sum("is_promote_it"), "{:,.0f}", "", "count is_promote_it")
+    promote_fukui = stat("nudge_poi", poi_sum("is_promote_it", True), "{:,.0f}", "", "count is_promote_it and is_fukui")
+    crowd_count = stat("nudge_poi", poi_sum("is_crowding_hotspot"), "{:,.0f}", "", "count is_crowding_hotspot")
+    low_vol = stat("nudge_poi", poi_metric("low_volume_threshold"), "{:.0f}", "", "low_volume_threshold")
+    high_vol = stat("nudge_poi", poi_metric("high_volume_threshold"), "{:.0f}", "", "high_volume_threshold")
+    fukui_promote_1 = stat("nudge_poi", poi_ranked("promote_fukui", 0, "poi_name"), "{}", "", "top Fukui promote-it poi_name")
+    fukui_promote_1_share = stat("nudge_poi", poi_ranked("promote_fukui", 0, "positive_share"), lambda x: f"{float(x)*100:.1f}%", "", "top Fukui promote-it positive_share")
+    fukui_promote_1_low = stat("nudge_poi", poi_ranked("promote_fukui", 0, "positive_share_ci_low"), lambda x: f"{float(x)*100:.1f}%", "", "top Fukui promote-it positive_share_ci_low")
+    fukui_promote_1_high = stat("nudge_poi", poi_ranked("promote_fukui", 0, "positive_share_ci_high"), lambda x: f"{float(x)*100:.1f}%", "", "top Fukui promote-it positive_share_ci_high")
+    fukui_promote_1_conf = stat("nudge_poi", poi_ranked("promote_fukui", 0, "promote_confidence"), "{}", "", "top Fukui promote-it confidence")
+    fukui_promote_2 = stat("nudge_poi", poi_ranked("promote_fukui", 1, "poi_name"), "{}", "", "second Fukui promote-it poi_name")
+    fukui_promote_2_share = stat("nudge_poi", poi_ranked("promote_fukui", 1, "positive_share"), lambda x: f"{float(x)*100:.1f}%", "", "second Fukui promote-it positive_share")
+    fukui_promote_2_low = stat("nudge_poi", poi_ranked("promote_fukui", 1, "positive_share_ci_low"), lambda x: f"{float(x)*100:.1f}%", "", "second Fukui promote-it positive_share_ci_low")
+    fukui_promote_2_high = stat("nudge_poi", poi_ranked("promote_fukui", 1, "positive_share_ci_high"), lambda x: f"{float(x)*100:.1f}%", "", "second Fukui promote-it positive_share_ci_high")
+    fukui_promote_2_conf = stat("nudge_poi", poi_ranked("promote_fukui", 1, "promote_confidence"), "{}", "", "second Fukui promote-it confidence")
+    fix_1 = stat("nudge_poi", poi_ranked("fix", 0, "poi_name"), "{}", "", "top fix-it poi_name")
+    fix_1_codes = stat("nudge_poi", poi_ranked("fix", 0, "dominant_nudgeable_friction_codes"), "{}", "", "top fix-it nudgeable friction codes")
+    fix_2 = stat("nudge_poi", poi_ranked("fix", 1, "poi_name"), "{}", "", "second fix-it poi_name")
+    fix_2_codes = stat("nudge_poi", poi_ranked("fix", 1, "dominant_nudgeable_friction_codes"), "{}", "", "second fix-it nudgeable friction codes")
+    crowd_1 = stat("nudge_poi", poi_ranked("crowding", 0, "poi_name"), "{}", "", "top crowding hotspot poi_name")
+    crowd_1_prev = stat("nudge_poi", poi_ranked("crowding", 0, "waiting_crowding_prevalence"), lambda x: f"{float(x)*100:.1f}%", "", "top crowding hotspot waiting_crowding_prevalence")
+    crowd_base = stat("nudge_poi", poi_ranked("crowding", 0, "waiting_crowding_global_base_prevalence"), lambda x: f"{float(x)*100:.1f}%", "", "waiting_crowding global base prevalence")
+    crowd_2 = stat("nudge_poi", poi_ranked("crowding", 1, "poi_name"), "{}", "", "second crowding hotspot poi_name")
+    crowd_2_prev = stat("nudge_poi", poi_ranked("crowding", 1, "waiting_crowding_prevalence"), lambda x: f"{float(x)*100:.1f}%", "", "second crowding hotspot waiting_crowding_prevalence")
+    open_type = stat("nudge_tax", taxonomy_value("opening_hours_availability", "nudge_type"), "{}", "", "taxonomy opening_hours_availability nudge_type")
+    open_mech = stat("nudge_tax", taxonomy_value("opening_hours_availability", "mechanism"), "{}", "", "taxonomy opening_hours_availability mechanism")
+    time_type = stat("nudge_tax", taxonomy_value("itinerary_fit_time_cost", "nudge_type"), "{}", "", "taxonomy itinerary_fit_time_cost nudge_type")
+    time_mech = stat("nudge_tax", taxonomy_value("itinerary_fit_time_cost", "mechanism"), "{}", "", "taxonomy itinerary_fit_time_cost mechanism")
+    scenic_type = stat("nudge_tax", taxonomy_value("scenic_value", "nudge_type"), "{}", "", "taxonomy scenic_value nudge_type")
+    scenic_mech = stat("nudge_tax", taxonomy_value("scenic_value", "mechanism"), "{}", "", "taxonomy scenic_value mechanism")
+    crowd_type = stat("nudge_tax", taxonomy_value("waiting_crowding", "nudge_type"), "{}", "", "taxonomy waiting_crowding nudge_type")
+    crowd_mech = stat("nudge_tax", taxonomy_value("waiting_crowding", "mechanism"), "{}", "", "taxonomy waiting_crowding mechanism")
 
     # --- H3: Reviewed Evidence Prevalence (friction, enjoyment, recommendation, positive) ---
     h3_enj = stat("h3", h3_fam("enjoyment", "risk_difference_pct"), pp, "", "H3 enjoyment risk_difference_pct")
@@ -393,6 +526,10 @@ h2.sec{font-size:28px;font-weight:600;margin:0 0 6px;letter-spacing:-.01em}
   letter-spacing:.12em;display:block;margin-bottom:8px}
 p{margin:0 0 16px}
 .lead{font-size:19.5px;color:#2b3742}
+.jump-link{display:inline-block;margin:4px 0 18px;padding:8px 12px;border:1px solid var(--teal);
+  color:var(--teal-deep);text-decoration:none;background:#fff;font-family:ui-monospace,Menlo,monospace;
+  font-size:13px;letter-spacing:.02em}
+.jump-link:hover{background:var(--teal-tint)}
 .stat{color:var(--teal-deep);text-decoration:none;border-bottom:1px dotted var(--teal);
   white-space:nowrap;cursor:help;font-variant-numeric:tabular-nums}
 .stat:hover{background:var(--teal-tint)}
@@ -462,16 +599,15 @@ footer{padding:40px 0 80px;color:var(--muted);font-size:13.5px;
     # masthead
     H.append("<div class='wrap'><header class='masthead'>")
     H.append("<p class='eyebrow'>Fukui-First Cross-Language Tourism Text Analysis</p>")
-    H.append("<h1>What different language groups say about Fukui tourism</h1>")
+    H.append("<h1>Where to nudge next in Fukui tourism</h1>")
     H.append(
-        "<p class='standfirst'>A descriptive and statistical comparison of "
-        "English-language and Japanese-language Google reviews and Chinese-language "
-        "Xiaohongshu posts, scored with transparent reviewed keyword codebooks and "
-        "secondary sentiment libraries.</p>"
+        "<p class='standfirst'>A Fukui-first opportunity map that turns cross-language "
+        "review evidence into exploratory nudge candidates for next-semester testing, "
+        "with the older JP/EN measurement checks retained as appendix evidence.</p>"
     )
     H.append(
-        f"<div class='meta'>Scope: Fukui Prefecture &nbsp;|&nbsp; "
-        f"{total_rows} review/post rows represented &nbsp;|&nbsp; "
+        f"<div class='meta'>Scope: Fukui-first Hokuriku review cache &nbsp;|&nbsp; "
+        f"{total_rows} tagged review records &nbsp;|&nbsp; "
         f"reviews input SHA256 <span title='sha256 of the scored hypothesis input'>{rev_sha[:16]}…</span><br>"
         f"CRITICAL: Every figure on this page is script-generated from analysis outputs; "
         f"every number is resolved from a CSV/JSON file at build time (never hand-typed). "
@@ -482,22 +618,84 @@ footer{padding:40px 0 80px;color:var(--muted);font-size:13.5px;
     # nav
     H.append(
         "<nav class='toc'><div class='wrap'><ol>"
+        "<li><a href='#opportunity'>Lead · Opportunity map</a></li>"
         "<li><a href='#data'>00 · Raw data</a></li>"
         "<li><a href='#pipeline'>01 · Processing</a></li>"
-        "<li><a href='#hyp'>02 · Hypotheses</a></li>"
-        "<li><a href='#summary'>03 · Results overview</a></li>"
-        "<li><a href='#f1'>F1 · Rating gap</a></li>"
-        "<li><a href='#f2'>F2 · Within-POI</a></li>"
-        "<li><a href='#f3'>F3 · Evidence prevalence</a></li>"
-        "<li><a href='#f4'>F4 · Sentiment mix</a></li>"
-        "<li><a href='#f5'>F5 · Drivers</a></li>"
-        "<li><a href='#f6'>F6 · Cross-source</a></li>"
+        "<li><a href='#hyp'>Appendix A · Checks</a></li>"
+        "<li><a href='#summary'>Appendix A · Overview</a></li>"
+        "<li><a href='#a1'>A1 · Rating gap</a></li>"
+        "<li><a href='#a2'>A2 · Within-POI</a></li>"
+        "<li><a href='#a3'>A3 · Evidence prevalence</a></li>"
+        "<li><a href='#a4'>A4 · Sentiment mix</a></li>"
+        "<li><a href='#a5'>A5 · Drivers</a></li>"
+        "<li><a href='#a6'>A6 · Cross-source</a></li>"
         "<li><a href='#discuss'>04 · Discussion</a></li>"
         "<li><a href='#prov'>Provenance</a></li>"
         "</ol></div></nav>"
     )
 
     H.append("<main class='wrap'>")
+
+    # ---- Lead opportunity map ----
+    H.append("<section id='opportunity'><span class='sec-num'>LEAD — OPPORTUNITY MAP</span>")
+    H.append("<h2 class='sec'>Opportunity Map — where to nudge next</h2>")
+    H.append(
+        f"<p class='lead'>The old cross-language score gap is not the headline. The useful bridge is the "
+        f"friction null: complaint-evidence prevalence is effectively language-invariant "
+        f"({h3_fri}, {h3_fri_p}). That means aspect evidence — not raw cross-language rating gaps — is the "
+        f"more trustworthy, actionable signal. We therefore mine reviewed aspect codes for low-cost nudge "
+        f"opportunities to test next semester. These are exploratory, hypothesis-generating rankings; they "
+        f"do <b>not</b> claim intervention effectiveness.</p>"
+    )
+    H.append("<p><a class='jump-link' href='docs/nudge_experiment_register.html'>Next-semester experiment register →</a></p>")
+    H.append(fig("nudge_aspect", "Penalty-by-prevalence map from the live aspect-opportunity CSV; significant friction aspects are labelled."))
+    H.append(fig("nudge_info", "Nudge-able information levers with Wilson prevalence intervals and Firth odds ratios from the source CSV."))
+    H.append(
+        f"<p>The FDR-significant nudge-able friction levers are opening-hours availability "
+        f"(prevalence {open_prev}, Firth OR {open_or}, {open_p}) and itinerary fit / time cost "
+        f"(prevalence {time_prev}, Firth OR {time_or}, {time_p}). Other information levers are present "
+        f"but not yet evidenced strongly enough for ranking: English-information gaps ({eng_gap_prev}), "
+        f"wayfinding signage ({sign_prev}), transport access ({access_prev}), and booking / ticketing "
+        f"({booking_prev}). Those are targeted-collection candidates, not effectiveness claims.</p>"
+    )
+    H.append(fig("nudge_poi", "POI action map: fix-it, promote-it, and crowding-hotspot candidates with rating-based Wilson intervals."))
+    H.append(
+        f"<p><b>Fix-it</b> candidates are high-volume POIs with elevated nudge-able friction: {fix_count} total, "
+        f"{fix_fukui} in Fukui. Top examples include {fix_1} ({fix_1_codes}) and {fix_2} ({fix_2_codes}). "
+        f"<b>Promote-it</b> candidates are low-volume, high-satisfaction POIs for demand redistribution: "
+        f"{promote_count} total, {promote_fukui} in Fukui, using the low-volume cutoff of {low_vol} reviews "
+        f"and high-volume guide of {high_vol} reviews. Fukui gems include {fukui_promote_1} "
+        f"({fukui_promote_1_share}, CI {fukui_promote_1_low}–{fukui_promote_1_high}, confidence {fukui_promote_1_conf}) "
+        f"and {fukui_promote_2} ({fukui_promote_2_share}, CI {fukui_promote_2_low}–{fukui_promote_2_high}, "
+        f"confidence {fukui_promote_2_conf}). Redirect-from crowding hotspots number {crowd_count}; "
+        f"{crowd_1} has waiting/crowding prevalence {crowd_1_prev} versus base {crowd_base}, and "
+        f"{crowd_2} has {crowd_2_prev}.</p>"
+    )
+    H.append("<table><thead><tr><th>Opportunity</th><th>Nudge type + mechanism</th><th>Evidence</th><th>Confidence</th></tr></thead><tbody>")
+    H.append(
+        f"<tr><td>Opening-hours availability</td><td>{open_type}<br>{open_mech}</td>"
+        f"<td>Prevalence {open_prev}; OR {open_or}; {open_p}</td><td>FDR-significant; exploratory</td></tr>"
+    )
+    H.append(
+        f"<tr><td>Itinerary fit / time cost</td><td>{time_type}<br>{time_mech}</td>"
+        f"<td>Prevalence {time_prev}; OR {time_or}; {time_p}</td><td>FDR-significant; exploratory</td></tr>"
+    )
+    H.append(
+        f"<tr><td>Demand redistribution to Fukui gems</td><td>{scenic_type}<br>{scenic_mech}</td>"
+        f"<td>{promote_fukui} Fukui promote-it candidates; examples {fukui_promote_1} and {fukui_promote_2}</td>"
+        f"<td>{fukui_promote_1_conf} / {fukui_promote_2_conf}; small-n CIs shown</td></tr>"
+    )
+    H.append(
+        f"<tr><td>Redirect from crowded hotspots</td><td>{crowd_type}<br>{crowd_mech}</td>"
+        f"<td>{crowd_count} hotspots; {crowd_1} at {crowd_1_prev} versus base {crowd_base}</td>"
+        f"<td>Exploratory pairing input; no matching algorithm yet</td></tr>"
+    )
+    H.append("</tbody></table>")
+    H.append(
+        "<div class='caveat'>Opportunity scores rank where to investigate next. They do not prove that a "
+        "nudge will change behaviour; next-semester experiments would be needed for effectiveness claims.</div>"
+    )
+    H.append("</section>")
 
     # ---- 00 raw data ----
     H.append("<section id='data'><span class='sec-num'>00 — RAW DATA</span>")
@@ -508,10 +706,10 @@ footer{padding:40px 0 80px;color:var(--muted);font-size:13.5px;
         "or reviewer.</p>"
     )
     H.append("<dl class='dl'>")
-    H.append(f"<dt>English reviews</dt><dd>{en_n} Google review rows (Fukui), scored with VADER.</dd>")
-    H.append(f"<dt>Japanese reviews</dt><dd>{jp_n} Google review rows (Fukui), scored with oseti (MeCab + polarity dictionaries).</dd>")
+    H.append(f"<dt>Tagged Google reviews</dt><dd>{total_rows} true CSV records across the three-city Hokuriku review cache.</dd>")
+    H.append(f"<dt>Pooled opportunity model</dt><dd>{pooled_model_n} English/Japanese/Chinese-supported rows: {all_en_n} English-language and {all_jp_n} Japanese-language rows.</dd>")
+    H.append(f"<dt>JP/EN Fukui sentiment subset</dt><dd>{jp_en_fukui_n} row-level sentiment rows: {en_n} English-language and {jp_n} Japanese-language rows.</dd>")
     H.append(f"<dt>Chinese posts</dt><dd>{cn_n} Xiaohongshu rows, scored with SnowNLP plus a reviewed Chinese codebook. Douyin is held out of the main pipeline.</dd>")
-    H.append(f"<dt>Total</dt><dd>{total_rows} aggregate rows represented across the project.</dd>")
     H.append("</dl>")
     H.append(
         "<p>Google review text is an Outscraper-derived local cache; Chinese posts come from an "
@@ -546,20 +744,18 @@ footer{padding:40px 0 80px;color:var(--muted);font-size:13.5px;
         "<div class='caveat'>Measurement honesty: VADER, oseti, and SnowNLP scores are <em>not</em> a common "
         "scale, so raw scores are never compared across languages. Cross-language comparison uses category "
         "shares, common 1–5 Google star ratings, and reviewed evidence prevalence. Review rows are nested in "
-        "POIs, so single-level p-values are descriptive; the within-POI paired test (F2) is the venue-clustering "
+        "POIs, so single-level p-values are descriptive; the within-POI paired test (A2) is the venue-clustering "
         "robustness check.</div>"
     )
     H.append("</section>")
 
-    # ---- 02 hypotheses ----
-    H.append("<section id='hyp'><span class='sec-num'>02 — HYPOTHESES</span>")
-    H.append("<h2 class='sec'>The hypotheses under test</h2>")
+    # ---- Appendix A hypotheses ----
+    H.append("<section id='hyp'><span class='sec-num'>APPENDIX A — MEASUREMENT CHECKS</span>")
+    H.append("<h2 class='sec'>Cross-language measurement checks</h2>")
     H.append(
-        "<p class='lead'>The confirmatory comparison is between English-language and "
-        "Japanese-language Fukui Google reviews. Three pre-specified hypotheses (H1–H3) are "
-        "stated below with their null and alternative, the test used, the multiplicity control, "
-        "and the rejection rule; a fourth, venue-controlled robustness hypothesis re-tests the "
-        "rating and sentiment results within shared POIs.</p>"
+        "<p class='lead'>These checks explain why raw cross-language scores are not the headline. "
+        "They show a real rating / positivity gap, but also the response-style and measurement caveats "
+        "that motivate pivoting to reviewed aspect evidence for the opportunity map above.</p>"
     )
     H.append(
         "<p>Decision threshold is &alpha; = .05 (two-sided) throughout. Because review rows are "
@@ -634,14 +830,14 @@ footer{padding:40px 0 80px;color:var(--muted);font-size:13.5px;
     ))
     H.append("</section>")
 
-    # ---- 03 overview ----
-    H.append("<section id='summary'><span class='sec-num'>03 — RESULTS OVERVIEW</span>")
-    H.append("<h2 class='sec'>The findings at a glance</h2>")
+    # ---- Appendix A overview ----
+    H.append("<section id='summary'><span class='sec-num'>APPENDIX A — OVERVIEW</span>")
+    H.append("<h2 class='sec'>Why raw scores are not the centerpiece</h2>")
     H.append(
         "<p class='lead'>English-language reviews consistently give higher ratings and carry more positive "
         "experience evidence than Japanese-language reviews of the same Fukui venues, and the gap survives "
         "controlling for which venues each group reviews. The cleanest comparison is the shared 1–5 star "
-        "scale (F1); findings below descend from that cleanest, most interpretable result to the most "
+        "scale (A1); findings below descend from that cleanest, most interpretable result to the most "
         "caveated.</p>"
     )
     H.append(
@@ -654,14 +850,14 @@ footer{padding:40px 0 80px;color:var(--muted);font-size:13.5px;
         f"complaint-evidence prevalence does <em>not</em> differ between groups "
         f"({h3_fri}, {h3_fri_p}), meaning the groups differ in how much they praise, not in how much "
         f"they complain — exactly the asymmetric pattern a positivity-expression difference would produce. "
-        f"The within-POI check (F2) controls for <em>which</em> venues are reviewed but does not rule "
+        f"The within-POI check (A2) controls for <em>which</em> venues are reviewed but does not rule "
         f"out this response-style confound.</div>"
     )
     H.append(fig("overview", "Results panel across the four confirmatory checks; effect sizes shown with multiplicity-adjusted p-values."))
     H.append("</section>")
 
-    # ---- F1 H2 rating gap — lead finding ----
-    H.append("<section id='f1'><span class='sec-num'>FINDING 1 — CLEANEST COMPARISON</span>")
+    # ---- Appendix A1 H2 rating gap ----
+    H.append("<section id='a1'><span class='sec-num'>APPENDIX A1 — RATING CHECK</span>")
     H.append("<div class='rank'><span class='badge b-strong'>Strongest · common 1–5 scale</span></div>")
     H.append("<h3 style='font-size:25px;font-weight:600;margin:0 0 6px'>English reviewers give higher star ratings</h3>")
     H.append(
@@ -672,14 +868,14 @@ footer{padding:40px 0 80px;color:var(--muted);font-size:13.5px;
     )
     H.append(
         f"<p>The gap holds when the unit of analysis is tightened from individual reviews to POI averages "
-        f"({h2_poi_diff}, {h2_poi_p}), and again under the within-POI paired check (F2 below).</p>"
+        f"({h2_poi_diff}, {h2_poi_p}), and again under the within-POI paired check (A2 below).</p>"
     )
     H.append(fig("h2_ladder", "The English-minus-Japanese rating gap under three nested unit definitions; the effect stays right of zero throughout."))
     H.append(fig("h2_dist", "Full 1–5 star distribution by language group — both skew high, but English has proportionally more 5-star rows."))
     H.append("</section>")
 
-    # ---- F2 within-POI robustness check ----
-    H.append("<section id='f2'><span class='sec-num'>FINDING 2 — ROBUSTNESS CHECK</span>")
+    # ---- Appendix A2 within-POI robustness check ----
+    H.append("<section id='a2'><span class='sec-num'>APPENDIX A2 — VENUE-CONTROL CHECK</span>")
     H.append("<div class='rank'><span class='badge b-mixed'>Mixed · venue-controlled</span></div>")
     H.append("<h3 style='font-size:25px;font-weight:600;margin:0 0 6px'>Venue composition is one removed confound — results are partially consistent</h3>")
     H.append(
@@ -699,8 +895,8 @@ footer{padding:40px 0 80px;color:var(--muted);font-size:13.5px;
     H.append(fig("wpoi_shift", "Within-POI paired differences (English minus Japanese) for both outcomes; positive on the scale favours English."))
     H.append("</section>")
 
-    # ---- F3 H3 evidence prevalence — demoted ----
-    H.append("<section id='f3'><span class='sec-num'>FINDING 3</span>")
+    # ---- Appendix A3 H3 evidence prevalence ----
+    H.append("<section id='a3'><span class='sec-num'>APPENDIX A3 — EVIDENCE-PREVALENCE CHECK</span>")
     H.append("<div class='rank'><span class='badge b-mixed'>Significant · length-confounded</span></div>")
     H.append("<h3 style='font-size:25px;font-weight:600;margin:0 0 6px'>English reviews carry more positive experience evidence — but English texts are longer</h3>")
     H.append(
@@ -724,8 +920,8 @@ footer{padding:40px 0 80px;color:var(--muted);font-size:13.5px;
     )
     H.append("</section>")
 
-    # ---- F4 H1 sentiment mix ----
-    H.append("<section id='f4'><span class='sec-num'>FINDING 4</span>")
+    # ---- Appendix A4 H1 sentiment mix ----
+    H.append("<section id='a4'><span class='sec-num'>APPENDIX A4 — SENTIMENT-MIX CHECK</span>")
     H.append("<div class='rank'><span class='badge b-mixed'>Highly significant · small effect</span></div>")
     H.append("<h3 style='font-size:25px;font-weight:600;margin:0 0 6px'>Sentiment mix differs by review language</h3>")
     H.append(
@@ -737,8 +933,8 @@ footer{padding:40px 0 80px;color:var(--muted);font-size:13.5px;
     H.append(fig("h1_share", "Positive / neutral / negative category shares by language group under the secondary sentiment libraries."))
     H.append("</section>")
 
-    # ---- F5 drivers ----
-    H.append("<section id='f5'><span class='sec-num'>FINDING 5 — MECHANISM</span>")
+    # ---- Appendix A5 drivers ----
+    H.append("<section id='a5'><span class='sec-num'>APPENDIX A5 — MECHANISM</span>")
     H.append("<div class='rank'><span class='badge b-desc'>Descriptive · within-tool</span></div>")
     H.append("<h3 style='font-size:25px;font-weight:600;margin:0 0 6px'>What moves sentiment inside each language</h3>")
     H.append(
@@ -751,8 +947,8 @@ footer{padding:40px 0 80px;color:var(--muted);font-size:13.5px;
     H.append(fig("wen_drivers", "Within-English sentiment drivers; bar length is the within-tool effect size for each predictor."))
     H.append("</section>")
 
-    # ---- F6 cross-source / chinese ----
-    H.append("<section id='f6'><span class='sec-num'>FINDING 6 — MOST CAVEATED</span>")
+    # ---- Appendix A6 cross-source / chinese ----
+    H.append("<section id='a6'><span class='sec-num'>APPENDIX A6 — MOST CAVEATED</span>")
     H.append("<div class='rank'><span class='badge b-desc'>Descriptive only · gaps noted</span></div>")
     H.append("<h3 style='font-size:25px;font-weight:600;margin:0 0 6px'>Chinese social posts and cross-source comparison</h3>")
     H.append(

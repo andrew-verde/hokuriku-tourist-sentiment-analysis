@@ -19,6 +19,7 @@ import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+from src.provenance import repo_relative
 from scripts.within_language_sentiment_common import DEFAULT_OUTPUT_DIR, DEFAULT_REVIEW_INPUT_PATH, parse_args
 from scripts.test_en_within_language_sentiment_drivers import CAVEATS as EN_CAVEATS
 from scripts.test_en_within_language_sentiment_drivers import REQUIRED_COLUMNS, _review_rows
@@ -41,6 +42,10 @@ CAVEATS = COMMON_WITHIN_CAVEATS + [
     "Japanese sentiment_score is oseti document score and is interpreted within Japanese only; it is not compared as a raw scale to VADER or SnowNLP.",
     "Google review rows are nested in POIs; row-level p-values are descriptive without a clustered model.",
 ]
+
+
+def _repo_relative_path(path: Path) -> Path:
+    return Path(repo_relative(path))
 
 
 def build_jp_within_language_sentiment_drivers(
@@ -67,7 +72,7 @@ def build_jp_within_language_sentiment_drivers(
     caveat = "; ".join(CAVEATS)
 
     # Run tests using shared logic from English module, then adapt labels for Japanese
-    rows = _review_rows(df, input_path, source_hash, command, generated, caveat)
+    rows = _review_rows(df, _repo_relative_path(input_path), source_hash, command, generated, caveat)
     for row in rows:
         # Replace WL-EN with WL-JP to mark this as a Japanese analysis
         row["analysis_id"] = row["analysis_id"].replace("WL-EN", "WL-JP")
@@ -91,7 +96,7 @@ def build_jp_within_language_sentiment_drivers(
         kind="within_language_sentiment_drivers_jp",
         command=command,
         generated=generated,
-        input_path=input_path,
+        input_path=_repo_relative_path(input_path),
         output_csv=output_csv,
         manifest_path=output_manifest,
         filters={"prefecture": "Fukui", "language_group": LANGUAGE},

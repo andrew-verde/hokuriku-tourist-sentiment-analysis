@@ -1,12 +1,12 @@
 {
   "schema_version": "research_provenance.v1",
   "kind": "hypothesis_within_poi_paired_jp_en",
-  "generated_at": "2026-06-24T01:31:53+00:00",
+  "generated_at": "2026-06-25T08:10:58+00:00",
   "command": "scripts/test_within_poi_paired_jp_en.py",
   "inputs": [
     {
       "role": "ignored_scored_review_audit_file",
-      "path": "/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/output/sentiment_row_level/google_reviews_fukui_japanese-english.csv",
+      "path": "output/sentiment_row_level/google_reviews_fukui_japanese-english.csv",
       "exists": true,
       "bytes": 451502,
       "sha256": "72df51c468c6e829c9b121b9c71233e98a3ebc2a9c424d5eda63b83e1883eeed"
@@ -15,7 +15,7 @@
   "outputs": [
     {
       "role": "tracked_hypothesis_test_csv",
-      "path": "/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/output/hypothesis_tests/within_poi_paired_jp_en.csv",
+      "path": "output/hypothesis_tests/within_poi_paired_jp_en.csv",
       "exists": true,
       "bytes": 913,
       "sha256": "e50a1ec108d9a07c221dae58c3c123be681febd43c54d2c0ca7e408c14aa9da5"

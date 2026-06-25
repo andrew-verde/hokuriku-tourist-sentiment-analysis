@@ -16,6 +16,7 @@ from pathlib import Path
 from typing import Any, Iterable
 
 
+REPO_ROOT = Path(__file__).resolve().parent.parent
 SCHEMA_VERSION = "research_provenance.v1"
 
 FORBIDDEN_ROW_LEVEL_COLUMNS = {
@@ -54,13 +55,36 @@ def sha256_file(path: Path) -> str:
     return digest.hexdigest()
 
 
+def repo_relative(path: Path | str) -> str:
+    record_path = Path(path)
+    if not record_path.is_absolute():
+        return record_path.as_posix()
+    try:
+        return record_path.resolve().relative_to(REPO_ROOT.resolve()).as_posix()
+    except ValueError:
+        return record_path.as_posix()
+
+
+def repo_relative_command(command: str | None) -> str | None:
+    if command is None:
+        return None
+    return str(command).replace(f"{REPO_ROOT.resolve().as_posix()}/", "")
+
+
+def resolve_repo_path(path: Path | str) -> Path:
+    record_path = Path(path)
+    if record_path.is_absolute():
+        return record_path
+    return REPO_ROOT / record_path
+
+
 def file_record(path: Path, role: str, required: bool = False) -> dict[str, Any]:
     # Create a provenance record for a single file: its path, size, and SHA256 hash.
     # If the file is required and missing, raise an error. If it's optional and
     # missing, still include it in the record (marked as not existing).
     record: dict[str, Any] = {
         "role": role,
-        "path": str(path),
+        "path": repo_relative(path),
         "exists": path.exists(),
     }
     if not path.exists():
@@ -106,7 +130,7 @@ def research_manifest(
         "schema_version": SCHEMA_VERSION,
         "kind": kind,
         "generated_at": generated_at or utc_now_iso(),
-        "command": command,
+        "command": repo_relative_command(command),
         "inputs": inputs,
         "outputs": outputs,
         "filters": filters or {},

@@ -38,6 +38,7 @@ from src.provenance import (
     ProvenanceError,
     assert_no_forbidden_columns,
     file_record,
+    repo_relative,
     research_manifest,
     sha256_file,
     write_json,
@@ -1203,8 +1204,8 @@ def build_sentiment_analysis(
         "codebook_evidence_status": "active",
         "dependency_versions": dependency_versions(),
         "dependency_reproducibility": {
-            "sentiment_lock": str(SENTIMENT_LOCK_PATH),
-            "environment_doc": str(SENTIMENT_ENV_DOC_PATH),
+            "sentiment_lock": repo_relative(SENTIMENT_LOCK_PATH),
+            "environment_doc": repo_relative(SENTIMENT_ENV_DOC_PATH),
             "setup_command": ".venv/bin/python3 scripts/bootstrap_sentiment_environment.py",
             "known_metadata_exception": (
                 "oseti 0.4.3.1 declares legacy mecab; runtime uses "
@@ -1212,19 +1213,19 @@ def build_sentiment_analysis(
             ),
         },
         "input": {
-            "path": str(paths.reviews_path),
+            "path": repo_relative(paths.reviews_path),
             "sha256": input_hash,
-            "poi_metadata_path": str(paths.poi_metadata_path) if prefecture else None,
+            "poi_metadata_path": repo_relative(paths.poi_metadata_path) if prefecture else None,
             "poi_metadata_sha256": metadata_hash,
-            "reviewed_codebook_path": str(paths.reviewed_codebook_path),
+            "reviewed_codebook_path": repo_relative(paths.reviewed_codebook_path),
             "reviewed_codebook_sha256": codebook_hash,
         },
         "outputs": {
-            "row_level_path": str(row_path),
+            "row_level_path": repo_relative(row_path),
             "row_level_sha256": row_hash,
-            "summary_path": str(summary_path),
-            "tests_path": str(tests_path),
-            "readiness_path": str(readiness_path),
+            "summary_path": repo_relative(summary_path),
+            "tests_path": repo_relative(tests_path),
+            "readiness_path": repo_relative(readiness_path),
         },
         "denominators": json.loads(summary.to_json(orient="records")),
     }

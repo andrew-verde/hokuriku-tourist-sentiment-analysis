@@ -1,6 +1,6 @@
 {
   "schema_version": "sentiment_manifest.v2",
-  "generated_at": "2026-06-23T09:10:42+00:00",
+  "generated_at": "2026-06-25T08:10:50+00:00",
   "command": "scripts/build_sentiment_analysis.py --groups japanese,english --prefecture Fukui",
   "filters": {
     "city": null,
@@ -25,25 +25,25 @@
     "emoji": "1.7.0"
   },
   "dependency_reproducibility": {
-    "sentiment_lock": "/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/requirements-sentiment.lock.txt",
-    "environment_doc": "/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/docs/sentiment_environment.md",
+    "sentiment_lock": "requirements-sentiment.lock.txt",
+    "environment_doc": "docs/sentiment_environment.md",
     "setup_command": ".venv/bin/python3 scripts/bootstrap_sentiment_environment.py",
     "known_metadata_exception": "oseti 0.4.3.1 declares legacy mecab; runtime uses mecab-python3 plus ipadic and initializes MeCab with -r /dev/null."
   },
   "input": {
-    "path": "/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/output/multilingual_review_analysis/reviews_multilingual.csv",
+    "path": "output/multilingual_review_analysis/reviews_multilingual.csv",
     "sha256": "6bc06f34848954674506f6fefb84ffd9689b4cc9b2c90780fd5c8fc45eafaa56",
-    "poi_metadata_path": "/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/output/checkpoints/poi_metadata.json",
+    "poi_metadata_path": "output/checkpoints/poi_metadata.json",
     "poi_metadata_sha256": "34b088a57c0e61d23471cf3745ca2ec6e2811dce71aa7ab2a5a508fa5178e79a",
-    "reviewed_codebook_path": "/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/config/reviewed_jp_en_codebook.yaml",
+    "reviewed_codebook_path": "config/reviewed_jp_en_codebook.yaml",
     "reviewed_codebook_sha256": "8626d2c47effd2e51d9d95e67a03a7fb2db317857f60ea0b9b97f351a0bb3944"
   },
   "outputs": {
-    "row_level_path": "/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/output/sentiment_row_level/google_reviews_fukui_japanese-english.csv",
+    "row_level_path": "output/sentiment_row_level/google_reviews_fukui_japanese-english.csv",
     "row_level_sha256": "72df51c468c6e829c9b121b9c71233e98a3ebc2a9c424d5eda63b83e1883eeed",
-    "summary_path": "/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/output/sentiment_aggregates/source_group_sentiment_summary.csv",
-    "tests_path": "/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/output/sentiment_aggregates/source_group_sentiment_tests.csv",
-    "readiness_path": "/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/output/sentiment_aggregates/sentiment_readiness.md"
+    "summary_path": "output/sentiment_aggregates/source_group_sentiment_summary.csv",
+    "tests_path": "output/sentiment_aggregates/source_group_sentiment_tests.csv",
+    "readiness_path": "output/sentiment_aggregates/sentiment_readiness.md"
   },
   "denominators": [
     {
@@ -132,26 +132,26 @@
   "provenance": {
     "schema_version": "research_provenance.v1",
     "kind": "jp_en_sentiment_analysis",
-    "generated_at": "2026-06-23T09:10:42+00:00",
+    "generated_at": "2026-06-25T08:10:50+00:00",
     "command": "scripts/build_sentiment_analysis.py --groups japanese,english --prefecture Fukui",
     "inputs": [
       {
         "role": "reviews_multilingual",
-        "path": "/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/output/multilingual_review_analysis/reviews_multilingual.csv",
+        "path": "output/multilingual_review_analysis/reviews_multilingual.csv",
         "exists": true,
         "bytes": 3366331,
         "sha256": "6bc06f34848954674506f6fefb84ffd9689b4cc9b2c90780fd5c8fc45eafaa56"
       },
       {
         "role": "poi_metadata",
-        "path": "/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/output/checkpoints/poi_metadata.json",
+        "path": "output/checkpoints/poi_metadata.json",
         "exists": true,
         "bytes": 26466,
         "sha256": "34b088a57c0e61d23471cf3745ca2ec6e2811dce71aa7ab2a5a508fa5178e79a"
       },
       {
         "role": "reviewed_jp_en_codebook_config",
-        "path": "/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/config/reviewed_jp_en_codebook.yaml",
+        "path": "config/reviewed_jp_en_codebook.yaml",
         "exists": true,
         "bytes": 187983,
         "sha256": "8626d2c47effd2e51d9d95e67a03a7fb2db317857f60ea0b9b97f351a0bb3944"
@@ -160,31 +160,31 @@
     "outputs": [
       {
         "role": "ignored_row_level_scored_reviews",
-        "path": "/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/output/sentiment_row_level/google_reviews_fukui_japanese-english.csv",
+        "path": "output/sentiment_row_level/google_reviews_fukui_japanese-english.csv",
         "exists": true,
         "bytes": 451502,
         "sha256": "72df51c468c6e829c9b121b9c71233e98a3ebc2a9c424d5eda63b83e1883eeed"
       },
       {
         "role": "tracked_aggregate_summary",
-        "path": "/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/output/sentiment_aggregates/source_group_sentiment_summary.csv",
+        "path": "output/sentiment_aggregates/source_group_sentiment_summary.csv",
         "exists": true,
         "bytes": 1522,
         "sha256": "dbe8f4b59457e0b8ec152c9e896ff26859d549fe34bb33e222ece00f99e0aefc"
       },
       {
         "role": "tracked_statistical_tests",
-        "path": "/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/output/sentiment_aggregates/source_group_sentiment_tests.csv",
+        "path": "output/sentiment_aggregates/source_group_sentiment_tests.csv",
         "exists": true,
         "bytes": 5332,
         "sha256": "3314b4f3afb598eaf6f697f7a4df8067409caa605976c550b92715b7d396842e"
       },
       {
         "role": "tracked_readiness_markdown",
-        "path": "/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/output/sentiment_aggregates/sentiment_readiness.md",
+        "path": "output/sentiment_aggregates/sentiment_readiness.md",
         "exists": true,
-        "bytes": 3937,
-        "sha256": "d5897894d0d4ca1afc64ccad3daf2e4a2c56b89e3004aedc24ee0925260155f2"
+        "bytes": 3457,
+        "sha256": "4b2e8f509645d40a49d6fa39eb099374ac069fb976094ccc00233eb8d397f83c"
       }
     ],
     "filters": {
@@ -309,8 +309,8 @@
         "emoji": "1.7.0"
       },
       "dependency_reproducibility": {
-        "sentiment_lock": "/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/requirements-sentiment.lock.txt",
-        "environment_doc": "/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/docs/sentiment_environment.md",
+        "sentiment_lock": "requirements-sentiment.lock.txt",
+        "environment_doc": "docs/sentiment_environment.md",
         "setup_command": ".venv/bin/python3 scripts/bootstrap_sentiment_environment.py",
         "known_metadata_exception": "oseti 0.4.3.1 declares legacy mecab; runtime uses mecab-python3 plus ipadic and initializes MeCab with -r /dev/null."
       }

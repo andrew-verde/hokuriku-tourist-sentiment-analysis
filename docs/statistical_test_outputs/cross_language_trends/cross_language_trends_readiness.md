@@ -5,7 +5,7 @@ Fukui-first aggregate comparison for English-language Google reviews, Japanese-l
 - Active prefecture: Fukui
 - Review rows retained after POI-prefecture filter: 2014
 - Chinese posts retained: 200
-- Statistical tests output: `/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/output/cross_language_trends/cross_language_statistical_tests.csv`
+- Statistical tests output: `output/cross_language_trends/cross_language_statistical_tests.csv`
 - Neighboring-prefecture scaffold kept for later: ['Ishikawa', 'Toyama']
 
 ## Current Decision

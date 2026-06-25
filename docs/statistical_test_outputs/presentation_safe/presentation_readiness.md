@@ -33,13 +33,13 @@ Table statistical sensitivity: H1-H3 rows are descriptive support. The within-PO
 
 ## Figure Folders
 
-- `japanese_sentiment_profile`: `/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/output/presentation_safe/japanese/figure_japanese_sentiment_profile.svg`
-- `japanese_poi_priority_mix`: `/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/output/presentation_safe/japanese/figure_japanese_poi_priority_mix.svg`
-- `english_sentiment_profile`: `/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/output/presentation_safe/english/figure_english_sentiment_profile.svg`
-- `english_poi_priority_mix`: `/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/output/presentation_safe/english/figure_english_poi_priority_mix.svg`
-- `multilingual_sentiment_share`: `/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/output/presentation_safe/multilingual/figure_sentiment_share_by_language_source.svg`
-- `multilingual_volume_context`: `/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/output/presentation_safe/multilingual/figure_volume_context.svg`
-- `multilingual_statistical_evidence`: `/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/output/presentation_safe/multilingual/figure_statistical_evidence_summary.svg`
+- `japanese_sentiment_profile`: `output/presentation_safe/japanese/figure_japanese_sentiment_profile.svg`
+- `japanese_poi_priority_mix`: `output/presentation_safe/japanese/figure_japanese_poi_priority_mix.svg`
+- `english_sentiment_profile`: `output/presentation_safe/english/figure_english_sentiment_profile.svg`
+- `english_poi_priority_mix`: `output/presentation_safe/english/figure_english_poi_priority_mix.svg`
+- `multilingual_sentiment_share`: `output/presentation_safe/multilingual/figure_sentiment_share_by_language_source.svg`
+- `multilingual_volume_context`: `output/presentation_safe/multilingual/figure_volume_context.svg`
+- `multilingual_statistical_evidence`: `output/presentation_safe/multilingual/figure_statistical_evidence_summary.svg`
 
 Questions answered by each figure are documented in `presentation_figure_questions.md`.
 

@@ -37,6 +37,7 @@ from scipy import stats
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+from src.provenance import repo_relative
 from scripts.hypothesis_test_common import (
     COMMON_CAVEATS,
     DEFAULT_GROUPS,
@@ -57,6 +58,8 @@ INPUT_PATH = Path(__file__).resolve().parent.parent / "output" / "sentiment_row_
 OUTPUT_DIR = Path(__file__).resolve().parent.parent / "output" / "hypothesis_tests"
 OUTPUT_CSV = OUTPUT_DIR / "h1_sentiment_category_jp_en.csv"
 OUTPUT_MANIFEST = OUTPUT_DIR / "h1_sentiment_category_jp_en_manifest.json"
+def _repo_relative_path(path: Path) -> Path:
+    return Path(repo_relative(path))
 
 # Define three chi-square tests with different neutral-band definitions:
 # - Primary test: neutral band of +/- 0.05
@@ -130,7 +133,7 @@ def _analysis_rows(
             "sparse_expected_warning": True,
             "english_n": denominators["english"],
             "japanese_n": denominators["japanese"],
-            "source_input_path": str(input_path),
+            "source_input_path": str(_repo_relative_path(input_path)),
             "source_input_sha256": source_hash,
             "command": command,
             "generated_at": generated_at,
@@ -168,7 +171,7 @@ def _analysis_rows(
             "sparse_expected_warning": True,
             "english_n": denominators["english"],
             "japanese_n": denominators["japanese"],
-            "source_input_path": str(input_path),
+            "source_input_path": str(_repo_relative_path(input_path)),
             "source_input_sha256": source_hash,
             "command": command,
             "generated_at": generated_at,
@@ -231,7 +234,7 @@ def _analysis_rows(
                 "sparse_expected_warning": sparse_warning,
                 "english_n": denominators["english"],
                 "japanese_n": denominators["japanese"],
-                "source_input_path": str(input_path),
+                "source_input_path": str(_repo_relative_path(input_path)),
                 "source_input_sha256": source_hash,
                 "command": command,
                 "generated_at": generated_at,

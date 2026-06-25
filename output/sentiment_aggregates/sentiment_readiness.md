@@ -1,14 +1,14 @@
 # Sentiment Readiness
 
-- generated_at: 2026-06-23T09:10:42+00:00
+- generated_at: 2026-06-25T08:10:50+00:00
 - command: `scripts/build_sentiment_analysis.py --groups japanese,english --prefecture Fukui`
-- input: `/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/output/multilingual_review_analysis/reviews_multilingual.csv`
+- input: `output/multilingual_review_analysis/reviews_multilingual.csv`
 - input_sha256: `6bc06f34848954674506f6fefb84ffd9689b4cc9b2c90780fd5c8fc45eafaa56`
-- poi_metadata: `/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/output/checkpoints/poi_metadata.json`
+- poi_metadata: `output/checkpoints/poi_metadata.json`
 - poi_metadata_sha256: `34b088a57c0e61d23471cf3745ca2ec6e2811dce71aa7ab2a5a508fa5178e79a`
-- reviewed_codebook: `/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/config/reviewed_jp_en_codebook.yaml`
+- reviewed_codebook: `config/reviewed_jp_en_codebook.yaml`
 - reviewed_codebook_sha256: `8626d2c47effd2e51d9d95e67a03a7fb2db317857f60ea0b9b97f351a0bb3944`
-- row_level_output: `/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/output/sentiment_row_level/google_reviews_fukui_japanese-english.csv`
+- row_level_output: `output/sentiment_row_level/google_reviews_fukui_japanese-english.csv`
 - row_level_sha256: `72df51c468c6e829c9b121b9c71233e98a3ebc2a9c424d5eda63b83e1883eeed`
 - filters: city == `None`, prefecture == `Fukui`, language_group in ['japanese', 'english']
 - primary_unit: one Google review row
@@ -31,8 +31,8 @@
 ## Dependency Reproducibility
 
 - setup_command: `.venv/bin/python3 scripts/bootstrap_sentiment_environment.py`
-- sentiment_lock: `/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/requirements-sentiment.lock.txt`
-- environment_doc: `/home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/docs/sentiment_environment.md`
+- sentiment_lock: `requirements-sentiment.lock.txt`
+- environment_doc: `docs/sentiment_environment.md`
 - known_metadata_exception: oseti 0.4.3.1 declares legacy mecab; runtime uses mecab-python3 plus ipadic and initializes MeCab with -r /dev/null.
 
 ## Denominators
