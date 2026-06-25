@@ -9,29 +9,41 @@
 <line x1="890.00" x2="890.00" y1="90.00" y2="404.00" stroke="#d7dde8" opacity="0.55"/>
 <text x="890.00" y="428.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#5b677a">2.6%</text>
 <text x="316.00" y="124.00" text-anchor="end" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">english information gap</text>
-<line x1="396.35" x2="479.11" y1="120.00" y2="120.00" stroke="#bc6c25" stroke-width="2.0"/>
 <rect x="330.00" y="111.00" width="99.51" height="18" rx="3" fill="#bc6c25" opacity="0.78"/>
+<line x1="396.35" x2="479.11" y1="120.00" y2="120.00" stroke="#172033" stroke-width="1.4" opacity="0.85"/>
+<line x1="396.35" x2="396.35" y1="115.00" y2="125.00" stroke="#172033" stroke-width="1.4" opacity="0.85"/>
+<line x1="479.11" x2="479.11" y1="115.00" y2="125.00" stroke="#172033" stroke-width="1.4" opacity="0.85"/>
 <text x="908.00" y="124.00" text-anchor="start" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">OR 1.22; FDR 0.340</text>
 <text x="316.00" y="178.00" text-anchor="end" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">itinerary fit time cost</text>
-<line x1="406.82" x2="494.58" y1="174.00" y2="174.00" stroke="#9a031e" stroke-width="2.0"/>
 <rect x="330.00" y="165.00" width="112.48" height="18" rx="3" fill="#9a031e" opacity="0.78"/>
+<line x1="406.82" x2="494.58" y1="174.00" y2="174.00" stroke="#172033" stroke-width="1.4" opacity="0.85"/>
+<line x1="406.82" x2="406.82" y1="169.00" y2="179.00" stroke="#172033" stroke-width="1.4" opacity="0.85"/>
+<line x1="494.58" x2="494.58" y1="169.00" y2="179.00" stroke="#172033" stroke-width="1.4" opacity="0.85"/>
 <text x="908.00" y="178.00" text-anchor="start" font-family="Arial, sans-serif" font-size="11" font-weight="700" fill="#172033">OR 4.24; FDR 0.001 *</text>
 <text x="316.00" y="232.00" text-anchor="end" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">wayfinding signage</text>
-<line x1="413.87" x2="504.82" y1="228.00" y2="228.00" stroke="#bc6c25" stroke-width="2.0"/>
 <rect x="330.00" y="219.00" width="121.14" height="18" rx="3" fill="#bc6c25" opacity="0.78"/>
+<line x1="413.87" x2="504.82" y1="228.00" y2="228.00" stroke="#172033" stroke-width="1.4" opacity="0.85"/>
+<line x1="413.87" x2="413.87" y1="223.00" y2="233.00" stroke="#172033" stroke-width="1.4" opacity="0.85"/>
+<line x1="504.82" x2="504.82" y1="223.00" y2="233.00" stroke="#172033" stroke-width="1.4" opacity="0.85"/>
 <text x="908.00" y="232.00" text-anchor="start" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">OR 1.80; FDR 0.125</text>
 <text x="316.00" y="286.00" text-anchor="end" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">booking ticketing</text>
-<line x1="431.75" x2="530.18" y1="282.00" y2="282.00" stroke="#bc6c25" stroke-width="2.0"/>
 <rect x="330.00" y="273.00" width="142.77" height="18" rx="3" fill="#bc6c25" opacity="0.78"/>
+<line x1="431.75" x2="530.18" y1="282.00" y2="282.00" stroke="#172033" stroke-width="1.4" opacity="0.85"/>
+<line x1="431.75" x2="431.75" y1="277.00" y2="287.00" stroke="#172033" stroke-width="1.4" opacity="0.85"/>
+<line x1="530.18" x2="530.18" y1="277.00" y2="287.00" stroke="#172033" stroke-width="1.4" opacity="0.85"/>
 <text x="908.00" y="286.00" text-anchor="start" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">OR 1.66; FDR 0.125</text>
 <text x="316.00" y="340.00" text-anchor="end" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">transport access</text>
-<line x1="449.89" x2="555.27" y1="336.00" y2="336.00" stroke="#bc6c25" stroke-width="2.0"/>
 <rect x="330.00" y="327.00" width="164.40" height="18" rx="3" fill="#bc6c25" opacity="0.78"/>
+<line x1="449.89" x2="555.27" y1="336.00" y2="336.00" stroke="#172033" stroke-width="1.4" opacity="0.85"/>
+<line x1="449.89" x2="449.89" y1="331.00" y2="341.00" stroke="#172033" stroke-width="1.4" opacity="0.85"/>
+<line x1="555.27" x2="555.27" y1="331.00" y2="341.00" stroke="#172033" stroke-width="1.4" opacity="0.85"/>
 <text x="908.00" y="340.00" text-anchor="start" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">OR 1.14; FDR 0.277</text>
 <text x="316.00" y="394.00" text-anchor="end" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">opening hours availability</text>
-<line x1="655.08" x2="816.96" y1="390.00" y2="390.00" stroke="#9a031e" stroke-width="2.0"/>
 <rect x="330.00" y="381.00" width="398.02" height="18" rx="3" fill="#9a031e" opacity="0.78"/>
-<text x="908.00" y="394.00" text-anchor="start" font-family="Arial, sans-serif" font-size="11" font-weight="700" fill="#172033">OR 3.61; FDR 8.2e-08 *</text>
+<line x1="655.08" x2="816.96" y1="390.00" y2="390.00" stroke="#172033" stroke-width="1.4" opacity="0.85"/>
+<line x1="655.08" x2="655.08" y1="385.00" y2="395.00" stroke="#172033" stroke-width="1.4" opacity="0.85"/>
+<line x1="816.96" x2="816.96" y1="385.00" y2="395.00" stroke="#172033" stroke-width="1.4" opacity="0.85"/>
+<text x="908.00" y="394.00" text-anchor="start" font-family="Arial, sans-serif" font-size="11" font-weight="700" fill="#172033">OR 3.61; FDR &lt;0.001 *</text>
 <text x="610.00" y="466.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="700" fill="#172033">Pooled prevalence with Wilson 95% CI</text>
 <text x="32.00" y="502.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#5b677a">Asterisk marks BH-FDR significance; rare or underpowered levers remain visible with uncertainty.</text>
 </svg>

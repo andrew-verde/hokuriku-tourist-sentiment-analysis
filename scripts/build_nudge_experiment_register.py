@@ -222,7 +222,14 @@ def build_html() -> str:
     H.append("<!doctype html><html lang='en'><head><meta charset='utf-8'>")
     H.append("<meta name='viewport' content='width=device-width,initial-scale=1'>")
     H.append("<title>Next-Semester Nudge Experiment Register</title>")
-    H.append(f"<style>{css}</style></head><body>")
+    H.append(f"<style>{css}</style>")
+    # The dashboard's .stat provenance links are nowrap (fine for short numbers),
+    # but in the register a provenance-wrapped value can be a full mechanism
+    # sentence, which then overflows the card. Inside cards, let those links wrap.
+    H.append(
+        "<style>.hyp .stat{white-space:normal;overflow-wrap:break-word}"
+        ".hyp p{overflow-wrap:break-word}</style></head><body>"
+    )
     H.append("<div class='wrap'><header class='masthead'>")
     H.append("<p><a class='jump-link' href='../PBL-Dashboard.html'>← Back to dashboard</a></p>")
     H.append("<p class='eyebrow'>Fukui-First Nudge Opportunity Register</p>")

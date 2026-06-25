@@ -121,9 +121,6 @@ def rel(path: Path) -> str:
 def pfmt(p: float) -> str:
     """Format a p-value the way a methods section would."""
     p = float(p)
-    if p < 1e-4:
-        mant, exp = f"{p:.1e}".split("e")
-        return f"p = {mant}×10<sup>{int(exp)}</sup>"
     if p < 0.001:
         return "p &lt; .001"
     return f"p = {p:.3f}".replace("0.", ".")

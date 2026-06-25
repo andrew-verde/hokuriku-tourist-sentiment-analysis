@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1120" height="304" viewBox="0 0 1120 304">
 <rect width="100%" height="100%" fill="#fbfaf7"/>
 <text x="32.00" y="39.00" text-anchor="start" font-family="Arial, sans-serif" font-size="24" font-weight="700" fill="#172033">H1 Sentiment Category Shares</text>
-<text x="32.00" y="66.00" text-anchor="start" font-family="Arial, sans-serif" font-size="14" font-weight="400" fill="#5b677a">JP/EN Google reviews; p=4.2e-09, Cramer&#x27;s V=0.138</text>
+<text x="32.00" y="66.00" text-anchor="start" font-family="Arial, sans-serif" font-size="14" font-weight="400" fill="#5b677a">JP/EN Google reviews; p&lt;0.001, Cramer&#x27;s V=0.138</text>
 <line x1="295.00" x2="295.00" y1="106.00" y2="196.00" stroke="#d7dde8" stroke-width="1" opacity="0.55"/>
 <line x1="648.50" x2="648.50" y1="106.00" y2="196.00" stroke="#d7dde8" stroke-width="1" opacity="0.55"/>
 <line x1="1002.00" x2="1002.00" y1="106.00" y2="196.00" stroke="#d7dde8" stroke-width="1" opacity="0.55"/>

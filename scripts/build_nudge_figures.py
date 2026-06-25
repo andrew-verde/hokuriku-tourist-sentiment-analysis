@@ -15,6 +15,7 @@ are exploratory visual summaries, not causal-effect estimates.
 from __future__ import annotations
 
 import argparse
+import collections
 import html
 import math
 import sys
@@ -127,6 +128,33 @@ def _text(x: float, y: float, value: object, size: int = 13, weight: int = 400,
     )
 
 
+def _vtext(x: float, y: float, value: object, size: int = 13, weight: int = 700,
+           fill: str = PALETTE["ink"], anchor: str = "middle") -> str:
+    # Vertical (rotated -90) axis title, kept outside the plot area so it never
+    # overprints the tick labels.
+    return (
+        f'<text x="{x:.2f}" y="{y:.2f}" transform="rotate(-90 {x:.2f} {y:.2f})" '
+        f'text-anchor="{anchor}" font-family="Arial, sans-serif" font-size="{size}" '
+        f'font-weight="{weight}" fill="{fill}">{html.escape(str(value))}</text>'
+    )
+
+
+def _text_halo(x: float, y: float, value: object, size: int = 10, weight: int = 700,
+               fill: str = PALETTE["ink"], anchor: str = "start") -> str:
+    # Draw the label twice: a thick background-coloured stroke underneath, then
+    # the fill on top. This keeps point labels legible where they cross markers
+    # or CI whiskers, without renderer-specific paint-order support.
+    common = (
+        f'x="{x:.2f}" y="{y:.2f}" text-anchor="{anchor}" '
+        f'font-family="Arial, sans-serif" font-size="{size}" font-weight="{weight}"'
+    )
+    esc = html.escape(str(value))
+    return (
+        f'<text {common} fill="none" stroke="{PALETTE["bg"]}" stroke-width="3.2" stroke-linejoin="round">{esc}</text>'
+        f'<text {common} fill="{fill}">{esc}</text>'
+    )
+
+
 def _svg_header(width: int, height: int, title: str, subtitle: str) -> list[str]:
     return [
         f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}">',
@@ -159,8 +187,10 @@ def _fmt_p(value: object) -> str:
     if pd.isna(value):
         return "FDR n/a"
     number = float(value)
+    # Round very small FDR p-values to a clean threshold for presentation
+    # instead of scientific notation like 8.2e-08.
     if number < 0.001:
-        return f"FDR {number:.1e}"
+        return "FDR <0.001"
     return f"FDR {number:.3f}"
 
 
@@ -233,10 +263,13 @@ def write_aspect_opportunity_map(aspects: pd.DataFrame, output_dir: Path) -> dic
         x = sx(tick)
         parts.append(f'<line x1="{x:.2f}" x2="{x:.2f}" y1="{top:.2f}" y2="{top + chart_h:.2f}" stroke="{PALETTE["line"]}" opacity="0.55"/>')
         parts.append(_text(x, top + chart_h + 24, f"{tick * 100:.1f}%", size=11, fill=PALETTE["muted"], anchor="middle"))
-    for tick in (0.0, 1.0, y_max / 2, y_max):
+    # Evenly spaced integer odds-ratio ticks (plus the OR=1 reference) read more
+    # cleanly than quarter-of-max ticks that land on awkward decimals.
+    y_ticks = sorted({0.0, 1.0, *(float(v) for v in range(2, int(math.floor(y_max)) + 1, 2))})
+    for tick in y_ticks:
         y = sy(tick)
         parts.append(f'<line x1="{left:.2f}" x2="{left + chart_w:.2f}" y1="{y:.2f}" y2="{y:.2f}" stroke="{PALETTE["line"]}" opacity="0.55"/>')
-        parts.append(_text(left - 12, y + 4, f"{tick:.1f}", size=11, fill=PALETTE["muted"], anchor="end"))
+        parts.append(_text(left - 12, y + 4, f"{tick:.0f}", size=11, fill=PALETTE["muted"], anchor="end"))
     parts.append(f'<line x1="{left:.2f}" x2="{left + chart_w:.2f}" y1="{sy(1.0):.2f}" y2="{sy(1.0):.2f}" stroke="{PALETTE["negative"]}" stroke-dasharray="6 5" stroke-width="1.7"/>')
     parts.append(_text(left + chart_w - 4, sy(1.0) - 8, "OR=1 reference", size=11, fill=PALETTE["negative"], anchor="end"))
 
@@ -253,7 +286,7 @@ def write_aspect_opportunity_map(aspects: pd.DataFrame, output_dir: Path) -> dic
             label = str(row["aspect"]).replace("_", " ")
             parts.append(_text(min(x + 10, left + chart_w - 8), max(y - 8, top + 14), label, size=11, weight=700, fill=PALETTE["ink"]))
     parts.append(_text(left + chart_w / 2, height - 78, "Pooled prevalence of aspect code", size=13, weight=700, anchor="middle"))
-    parts.append(_text(24, top + chart_h / 2, "Adjusted odds ratio for low rating", size=13, weight=700, anchor="start"))
+    parts.append(_vtext(34, top + chart_h / 2, "Adjusted odds ratio for low rating", size=13, weight=700))
     _legend(parts, left, height - 42, [("FDR-significant", PALETTE["negative"]), ("not FDR-significant", PALETTE["neutral"])])
     parts.append(_text(32, height - 18, "Firth-penalized logit; text length, language, and prefecture adjusted; BH-FDR; exploratory ranking only.", size=12, fill=PALETTE["muted"]))
     _write_svg(path, parts)
@@ -321,32 +354,66 @@ def write_poi_action_map(pois: pd.DataFrame, output_dir: Path) -> dict[str, str]
             parts.append(f'<line x1="{left:.2f}" x2="{left + chart_w:.2f}" y1="{y:.2f}" y2="{y:.2f}" stroke="{PALETTE["line"]}" opacity="0.55"/>')
             parts.append(_text(left - 12, y + 4, f"{tick * 100:.0f}%", size=11, fill=PALETTE["muted"], anchor="end"))
 
-    label_rows = data[
-        data["is_promote_it"].map(_bool_value) | data["is_crowding_hotspot"].map(_bool_value)
-    ].copy()
+    data = data.reset_index(drop=True)
+    # Most POIs pile up at the review-collection cap (~100-105), so points that
+    # share an n_reviews value get a small symmetric horizontal jitter to keep
+    # them from drawing on top of one another.
+    cap_counts = collections.Counter(round(float(n)) for n in data["n_reviews"])
+    cap_seen: dict[int, int] = collections.defaultdict(int)
+
+    def _jitter(n: float) -> float:
+        key = round(float(n))
+        total = cap_counts[key]
+        if total <= 1:
+            return 0.0
+        i = cap_seen[key]
+        cap_seen[key] += 1
+        spread = min(42.0, total * 7.0)
+        return (i - (total - 1) / 2.0) / max(total - 1, 1) * spread
+
+    marker_x: list[float] = []
     for _, row in data.iterrows():
-        x = sx(float(row["n_reviews"]))
+        jx = sx(float(row["n_reviews"])) + _jitter(row["n_reviews"])
+        marker_x.append(jx)
         y = sy(float(row["positive_share"]))
         y_low = sy(float(row["positive_share_ci_low"]))
         y_high = sy(float(row["positive_share_ci_high"]))
         klass, color = _poi_class(row)
-        parts.append(f'<line x1="{x:.2f}" x2="{x:.2f}" y1="{y_low:.2f}" y2="{y_high:.2f}" stroke="{color}" stroke-width="1.2" opacity="0.55"/>')
-        marker = "rect" if klass == "fix-it" else "circle"
-        if marker == "rect":
-            parts.append(f'<rect x="{x - 5:.2f}" y="{y - 5:.2f}" width="10" height="10" fill="{color}" opacity="0.78"/>')
+        parts.append(f'<line x1="{jx:.2f}" x2="{jx:.2f}" y1="{y_low:.2f}" y2="{y_high:.2f}" stroke="{color}" stroke-width="1.2" opacity="0.40"/>')
+        if klass == "fix-it":
+            parts.append(f'<rect x="{jx - 5:.2f}" y="{y - 5:.2f}" width="10" height="10" fill="{color}" opacity="0.82"/>')
         else:
-            parts.append(f'<circle cx="{x:.2f}" cy="{y:.2f}" r="5.5" fill="{color}" opacity="0.78"/>')
+            parts.append(f'<circle cx="{jx:.2f}" cy="{y:.2f}" r="5.5" fill="{color}" opacity="0.82"/>')
         if _bool_value(row["is_fukui"]):
-            parts.append(f'<circle cx="{x:.2f}" cy="{y:.2f}" r="9.0" fill="none" stroke="{PALETTE["ink"]}" stroke-width="1.5" opacity="0.85"/>')
+            parts.append(f'<circle cx="{jx:.2f}" cy="{y:.2f}" r="9.0" fill="none" stroke="{PALETTE["ink"]}" stroke-width="1.5" opacity="0.85"/>')
 
-    for _, row in label_rows.sort_values(["is_promote_it", "is_crowding_hotspot"], ascending=False).iterrows():
-        x = sx(float(row["n_reviews"]))
-        y = sy(float(row["positive_share"]))
-        label = _safe_label(row["poi_name"], 30)
-        parts.append(_text(min(x + 9, left + chart_w - 6), max(y - 9, top + 12), label, size=10, weight=700))
+    # Label only the named candidates (promote-it + crowding hotspots). Promote
+    # gems sit at low volume (label to the right, into open space); hotspots sit
+    # at the high-volume cap (label to the left, off the crowded right edge).
+    # A greedy vertical stagger plus leader lines stops names overprinting.
+    placed_left: list[float] = []
+    placed_right: list[float] = []
+    label_items = []
+    for i, row in data.iterrows():
+        if _bool_value(row["is_promote_it"]) or _bool_value(row["is_crowding_hotspot"]):
+            label_items.append((marker_x[i], sy(float(row["positive_share"])), _safe_label(row["poi_name"], 28)))
+    for jx, y, text in sorted(label_items, key=lambda t: t[1]):
+        prefer_left = jx > left + chart_w * 0.5
+        placed = placed_left if prefer_left else placed_right
+        ty = y
+        while any(abs(ty - p) < 14 for p in placed):
+            ty += 14
+        placed.append(ty)
+        if prefer_left:
+            tx, anchor, lead = max(jx - 12, left + 4), "end", -4
+        else:
+            tx, anchor, lead = min(jx + 12, left + chart_w - 4), "start", 4
+        if abs(ty - y) > 4:
+            parts.append(f'<line x1="{jx:.2f}" x2="{tx + lead:.2f}" y1="{y:.2f}" y2="{ty:.2f}" stroke="{PALETTE["muted"]}" stroke-width="0.8" opacity="0.6"/>')
+        parts.append(_text_halo(tx, ty + 3, text, size=10, weight=700, anchor=anchor))
 
     parts.append(_text(left + chart_w / 2, height - 84, "Review volume (n reviews)", size=13, weight=700, anchor="middle"))
-    parts.append(_text(24, top + chart_h / 2, "Positive share (4-5 star reviews)", size=13, weight=700))
+    parts.append(_vtext(30, top + chart_h / 2, "Positive share (4-5 star reviews)", size=13, weight=700))
     _legend(
         parts,
         left,
@@ -416,8 +483,14 @@ def write_info_levers(aspects: pd.DataFrame, output_dir: Path) -> dict[str, str]
         low = float(row.prevalence_ci_low)
         high = float(row.prevalence_ci_high)
         parts.append(_text(left - 14, cy + 4, _safe_label(row.aspect, 38), size=12, anchor="end"))
-        parts.append(f'<line x1="{sx(low):.2f}" x2="{sx(high):.2f}" y1="{cy:.2f}" y2="{cy:.2f}" stroke="{color}" stroke-width="2.0"/>')
-        parts.append(f'<rect x="{left:.2f}" y="{cy - 9:.2f}" width="{sx(prevalence) - left:.2f}" height="18" rx="3" fill="{color}" opacity="0.78"/>')
+        # Bar = point prevalence. The Wilson CI is drawn on top as a capped
+        # I-beam error bar in dark ink, so it reads as uncertainty rather than a
+        # second stray bar extending past the prevalence bar.
+        parts.append(f'<rect x="{left:.2f}" y="{cy - 9:.2f}" width="{max(sx(prevalence) - left, 0.0):.2f}" height="18" rx="3" fill="{color}" opacity="0.78"/>')
+        cap = 5.0
+        parts.append(f'<line x1="{sx(low):.2f}" x2="{sx(high):.2f}" y1="{cy:.2f}" y2="{cy:.2f}" stroke="{PALETTE["ink"]}" stroke-width="1.4" opacity="0.85"/>')
+        for cap_x in (sx(low), sx(high)):
+            parts.append(f'<line x1="{cap_x:.2f}" x2="{cap_x:.2f}" y1="{cy - cap:.2f}" y2="{cy + cap:.2f}" stroke="{PALETTE["ink"]}" stroke-width="1.4" opacity="0.85"/>')
         star = " *" if sig else ""
         under = " underpowered" if _bool_value(row.underpowered) else ""
         if pd.notna(row.odds_ratio):

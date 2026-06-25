@@ -10,13 +10,13 @@
 <text x="454.00" y="167.00" text-anchor="end" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">any enjoyment evidence / sentiment score</text>
 <line x1="470.00" x2="1050.00" y1="163.00" y2="163.00" stroke="#d7dde8" stroke-width="1" opacity="0.55"/>
 <rect x="760.00" y="153.00" width="290.00" height="20" rx="3" fill="#5b6c94"/>
-<rect x="1029.68" y="152.00" width="182.32" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
-<text x="1120.84" y="166.50" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">score diff=+0.299; p=1.6e-11</text>
+<rect x="1041.56" y="152.00" width="170.44" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="1126.78" y="166.50" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">score diff=+0.299; p&lt;0.001</text>
 <text x="454.00" y="205.00" text-anchor="end" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">any positive evidence / sentiment score</text>
 <line x1="470.00" x2="1050.00" y1="201.00" y2="201.00" stroke="#d7dde8" stroke-width="1" opacity="0.55"/>
 <rect x="760.00" y="191.00" width="270.45" height="20" rx="3" fill="#5b6c94"/>
-<rect x="1029.68" y="190.00" width="182.32" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
-<text x="1120.84" y="204.50" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">score diff=+0.279; p=2.2e-10</text>
+<rect x="1034.45" y="190.00" width="170.44" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="1119.67" y="204.50" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">score diff=+0.279; p&lt;0.001</text>
 <text x="454.00" y="243.00" text-anchor="end" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">any friction / sentiment score</text>
 <line x1="470.00" x2="1050.00" y1="239.00" y2="239.00" stroke="#d7dde8" stroke-width="1" opacity="0.55"/>
 <rect x="518.45" y="229.00" width="241.55" height="20" rx="3" fill="#5b6c94"/>
@@ -48,8 +48,8 @@
 <text x="454.00" y="469.00" text-anchor="end" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">category=positive</text>
 <line x1="470.00" x2="1050.00" y1="458.00" y2="458.00" stroke="#d7dde8" stroke-width="1" opacity="0.55"/>
 <rect x="760.00" y="448.00" width="219.66" height="20" rx="3" fill="#bc6c25"/>
-<rect x="983.66" y="447.00" width="182.32" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
-<text x="1074.82" y="461.50" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">risk diff=+15.2pp; p=6.4e-04</text>
+<rect x="983.66" y="447.00" width="170.44" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="1068.88" y="461.50" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">risk diff=+15.2pp; p&lt;0.001</text>
 <text x="454.00" y="499.00" text-anchor="end" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">any positive evidence / sentiment</text>
 <text x="454.00" y="513.00" text-anchor="end" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">category=positive</text>
 <line x1="470.00" x2="1050.00" y1="502.00" y2="502.00" stroke="#d7dde8" stroke-width="1" opacity="0.55"/>
@@ -77,8 +77,8 @@
 <text x="454.00" y="693.00" text-anchor="end" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">review rating / sentiment score</text>
 <line x1="470.00" x2="1050.00" y1="689.00" y2="689.00" stroke="#d7dde8" stroke-width="1" opacity="0.55"/>
 <rect x="760.00" y="679.00" width="290.00" height="20" rx="3" fill="#8d99ae"/>
-<rect x="1054.00" y="678.00" width="140.74" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
-<text x="1124.37" y="692.50" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">rho=+0.348; p=1.7e-07</text>
+<rect x="1054.00" y="678.00" width="128.86" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="1118.43" y="692.50" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#172033">rho=+0.348; p&lt;0.001</text>
 <line x1="470.00" x2="1050.00" y1="720.00" y2="720.00" stroke="#d7dde8" stroke-width="1" opacity="0.75"/>
 <line x1="470.00" x2="470.00" y1="720.00" y2="726.00" stroke="#d7dde8" stroke-width="1"/>
 <text x="470.00" y="742.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="400" fill="#5b677a">-0.35</text>

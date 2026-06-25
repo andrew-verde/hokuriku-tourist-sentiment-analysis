@@ -8,16 +8,16 @@
 <line x1="365.00" x2="950.00" y1="428.00" y2="428.00" stroke="#d7dde8" stroke-width="1" opacity="0.75"/>
 <text x="351.00" y="125.00" text-anchor="end" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">cross source sentiment category independence</text>
 <rect x="365.00" y="110.00" width="197.06" height="20" rx="3" fill="#5b6c94"/>
-<rect x="566.06" y="110.00" width="158.56" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
-<text x="645.34" y="125.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">ok; V=0.152; p=4.2e-21</text>
+<rect x="566.06" y="110.00" width="145.60" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="638.86" y="125.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">ok; V=0.152; p&lt;0.001</text>
 <text x="351.00" y="164.00" text-anchor="end" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">pairwise cross source sentiment category indepe...</text>
 <rect x="365.00" y="149.00" width="282.12" height="20" rx="3" fill="#5b6c94"/>
-<rect x="651.12" y="149.00" width="158.56" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
-<text x="730.40" y="164.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">ok; V=0.217; p=5.8e-05</text>
+<rect x="651.12" y="149.00" width="145.60" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="723.92" y="164.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">ok; V=0.217; p&lt;0.001</text>
 <text x="351.00" y="203.00" text-anchor="end" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">pairwise cross source sentiment category indepe...</text>
 <rect x="365.00" y="188.00" width="230.10" height="20" rx="3" fill="#5b6c94"/>
-<rect x="599.10" y="188.00" width="158.56" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
-<text x="678.38" y="203.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">ok; V=0.177; p=2.5e-14</text>
+<rect x="599.10" y="188.00" width="145.60" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="671.90" y="203.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">ok; V=0.177; p&lt;0.001</text>
 <text x="351.00" y="242.00" text-anchor="end" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">within chinese platform sentiment category inde...</text>
 <rect x="365.00" y="227.00" width="39.00" height="20" rx="3" fill="#8d99ae"/>
 <rect x="408.00" y="227.00" width="152.08" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
@@ -32,11 +32,11 @@
 <text x="484.04" y="320.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">skipped; V=n/a; p=n/a</text>
 <text x="351.00" y="359.00" text-anchor="end" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">cross source friction prevalence</text>
 <rect x="365.00" y="344.00" width="408.88" height="20" rx="3" fill="#5b6c94"/>
-<rect x="777.88" y="344.00" width="158.56" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
-<text x="857.16" y="359.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">ok; V=0.315; p=2.8e-48</text>
+<rect x="777.88" y="344.00" width="145.60" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="850.68" y="359.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">ok; V=0.315; p&lt;0.001</text>
 <text x="351.00" y="398.00" text-anchor="end" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">cross source enjoyment recommendation prevalence</text>
 <rect x="365.00" y="383.00" width="540.61" height="20" rx="3" fill="#5b6c94"/>
-<rect x="909.61" y="383.00" width="158.56" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
-<text x="988.89" y="398.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">ok; V=0.416; p=7.2e-84</text>
+<rect x="909.61" y="383.00" width="145.60" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="982.41" y="398.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">ok; V=0.416; p&lt;0.001</text>
 <text x="32.00" y="470.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#5b677a">Skipped rows mark unavailable comparison groups, not null results.</text>
 </svg>

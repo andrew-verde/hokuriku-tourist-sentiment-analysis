@@ -11,7 +11,7 @@
 <line x1="701.76" x2="701.76" y1="135.00" y2="149.00" stroke="#5b6c94" stroke-width="2.2"/>
 <circle cx="601.56" cy="142.00" r="5.2" fill="#5b6c94"/>
 <rect x="830.00" y="130.00" width="76.00" height="23.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
-<text x="868.00" y="144.50" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="400" fill="#5b677a">p=7.7e-05</text>
+<text x="868.00" y="144.50" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="400" fill="#5b677a">p&lt;0.001</text>
 <rect x="918.00" y="129.00" width="170.00" height="25.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
 <text x="1003.00" y="145.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="700" fill="#172033">+0.27 [0.14, 0.40]</text>
 <text x="366.00" y="208.00" text-anchor="end" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">POI-level Welch t (25 vs 28 POIs)</text>

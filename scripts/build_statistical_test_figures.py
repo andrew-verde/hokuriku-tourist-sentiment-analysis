@@ -139,23 +139,32 @@ def _fmt_pct(value: object) -> str:
 
 
 def _fmt_p(value: object) -> str:
-    # Format p-value for display: "p=n/a", "p=0.001", or "p=1e-08" if very small.
+    # Format p-value for display: "p=n/a", "p=0.001", or "p<0.001" when very
+    # small (rounded to a clean threshold instead of scientific notation).
     if pd.isna(value):
         return "p=n/a"
     number = float(value)
     if number < 0.001:
-        return f"p={number:.1e}"
+        return "p<0.001"
     return f"p={number:.3f}"
 
 
 def _fmt_p_number(value: object) -> str:
-    # Format p-value as plain number without "p=" prefix: "n/a", "0.001", or "1e-08".
+    # Format p-value as plain number without "p=" prefix: "n/a", "0.001", or
+    # "<0.001" when very small (no scientific notation).
     if pd.isna(value):
         return "n/a"
     number = float(value)
     if number < 0.001:
-        return f"{number:.1e}"
+        return "<0.001"
     return f"{number:.3f}"
+
+
+def _p_prefixed(prefix: str, value: object) -> str:
+    # Join a label prefix to a formatted p-value. Uses "<" without an "=" so the
+    # rounded threshold reads "p(FDR)<0.001", never "p(FDR)=<0.001".
+    number = _fmt_p_number(value)
+    return f"{prefix}{number}" if number.startswith("<") else f"{prefix}={number}"
 
 
 def _fmt_effect(value: object, label: str = "effect") -> str:
@@ -1148,7 +1157,7 @@ def write_hypothesis_overview_figure(h1: pd.DataFrame, h2: pd.DataFrame, h3: pd.
         float(h3_positive["p_value_bh_fdr"]),
         float(h3_recommendation["p_value_bh_fdr"]),
     ]
-    h3_p_label = "p(FDR)<1e-8" if max(significant_h3_ps) < 1e-8 else f"p(FDR)<={_fmt_p_number(max(significant_h3_ps))}"
+    h3_p_label = _p_prefixed("p(FDR)", max(significant_h3_ps))
     rows = [
         {
             "label": "H1",
@@ -1157,7 +1166,7 @@ def write_hypothesis_overview_figure(h1: pd.DataFrame, h2: pd.DataFrame, h3: pd.
                 f"({float(h1_en_positive['category_share']):.0%} vs {float(h1_jp_positive['category_share']):.0%} positive)."
             ),
             "effect": f"Cramér's V={float(h1_test['effect_cramers_v']):.2f} (χ²={float(h1_test['statistic']):.1f})",
-            "p": f"p(Holm)={_fmt_p_number(h1_test['p_value_holm'])}",
+            "p": _p_prefixed("p(Holm)", h1_test['p_value_holm']),
             "status": "supported",
         },
         {
@@ -1167,7 +1176,7 @@ def write_hypothesis_overview_figure(h1: pd.DataFrame, h2: pd.DataFrame, h3: pd.
                 f"ΔEN−JP={_fmt_signed(h2_row['effect_mean_difference'], 2)} stars "
                 f"(95% CI {float(h2_row['ci_95_lower']):.2f}–{float(h2_row['ci_95_upper']):.2f})"
             ),
-            "p": f"p={_fmt_p_number(h2_row['p_value'])}",
+            "p": _p_prefixed("p", h2_row['p_value']),
             "status": "supported",
         },
         {

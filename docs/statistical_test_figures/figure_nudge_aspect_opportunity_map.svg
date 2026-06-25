@@ -9,13 +9,19 @@
 <line x1="1050.00" x2="1050.00" y1="102.00" y2="588.00" stroke="#d7dde8" opacity="0.55"/>
 <text x="1050.00" y="612.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#5b677a">5.7%</text>
 <line x1="110.00" x2="1050.00" y1="588.00" y2="588.00" stroke="#d7dde8" opacity="0.55"/>
-<text x="98.00" y="592.00" text-anchor="end" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#5b677a">0.0</text>
+<text x="98.00" y="592.00" text-anchor="end" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#5b677a">0</text>
 <line x1="110.00" x2="1050.00" y1="545.09" y2="545.09" stroke="#d7dde8" opacity="0.55"/>
-<text x="98.00" y="549.09" text-anchor="end" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#5b677a">1.0</text>
-<line x1="110.00" x2="1050.00" y1="345.00" y2="345.00" stroke="#d7dde8" opacity="0.55"/>
-<text x="98.00" y="349.00" text-anchor="end" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#5b677a">5.7</text>
-<line x1="110.00" x2="1050.00" y1="102.00" y2="102.00" stroke="#d7dde8" opacity="0.55"/>
-<text x="98.00" y="106.00" text-anchor="end" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#5b677a">11.3</text>
+<text x="98.00" y="549.09" text-anchor="end" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#5b677a">1</text>
+<line x1="110.00" x2="1050.00" y1="502.17" y2="502.17" stroke="#d7dde8" opacity="0.55"/>
+<text x="98.00" y="506.17" text-anchor="end" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#5b677a">2</text>
+<line x1="110.00" x2="1050.00" y1="416.34" y2="416.34" stroke="#d7dde8" opacity="0.55"/>
+<text x="98.00" y="420.34" text-anchor="end" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#5b677a">4</text>
+<line x1="110.00" x2="1050.00" y1="330.51" y2="330.51" stroke="#d7dde8" opacity="0.55"/>
+<text x="98.00" y="334.51" text-anchor="end" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#5b677a">6</text>
+<line x1="110.00" x2="1050.00" y1="244.68" y2="244.68" stroke="#d7dde8" opacity="0.55"/>
+<text x="98.00" y="248.68" text-anchor="end" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#5b677a">8</text>
+<line x1="110.00" x2="1050.00" y1="158.85" y2="158.85" stroke="#d7dde8" opacity="0.55"/>
+<text x="98.00" y="162.85" text-anchor="end" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#5b677a">10</text>
 <line x1="110.00" x2="1050.00" y1="545.09" y2="545.09" stroke="#9a031e" stroke-dasharray="6 5" stroke-width="1.7"/>
 <text x="1046.00" y="537.09" text-anchor="end" font-family="Arial, sans-serif" font-size="11" font-weight="400" fill="#9a031e">OR=1 reference</text>
 <circle cx="236.13" cy="539.15" r="5.00" fill="#fbfaf7" stroke="#8d99ae" stroke-width="2" opacity="0.35"/>
@@ -35,7 +41,7 @@
 <text x="206.30" y="398.10" text-anchor="start" font-family="Arial, sans-serif" font-size="11" font-weight="700" fill="#172033">itinerary fit time cost</text>
 <circle cx="906.61" cy="555.23" r="7.50" fill="#9a031e" stroke="#9a031e" stroke-width="2" opacity="0.90"/>
 <text x="580.00" y="642.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="700" fill="#172033">Pooled prevalence of aspect code</text>
-<text x="24.00" y="345.00" text-anchor="start" font-family="Arial, sans-serif" font-size="13" font-weight="700" fill="#172033">Adjusted odds ratio for low rating</text>
+<text x="34.00" y="345.00" transform="rotate(-90 34.00 345.00)" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="700" fill="#172033">Adjusted odds ratio for low rating</text>
 <rect x="110.00" y="668.00" width="10" height="10" fill="#9a031e"/>
 <text x="126.00" y="678.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#5b677a">FDR-significant</text>
 <rect x="247.00" y="668.00" width="10" height="10" fill="#8d99ae"/>

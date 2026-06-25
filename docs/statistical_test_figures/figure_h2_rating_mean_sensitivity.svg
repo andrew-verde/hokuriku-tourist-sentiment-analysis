@@ -16,8 +16,8 @@
 <text x="933.94" y="164.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">mean=4.26; n=1,800</text>
 <text x="351.00" y="203.00" text-anchor="end" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">welch t review rating</text>
 <rect x="365.00" y="188.00" width="31.71" height="20" rx="3" fill="#bc6c25"/>
-<rect x="400.71" y="188.00" width="152.08" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
-<text x="476.75" y="203.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">EN-JP=0.27; p=7.7e-05</text>
+<rect x="400.71" y="188.00" width="139.12" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="470.27" y="203.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">EN-JP=0.27; p&lt;0.001</text>
 <text x="351.00" y="242.00" text-anchor="end" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">poi level welch t mean review rating</text>
 <rect x="365.00" y="227.00" width="31.28" height="20" rx="3" fill="#bc6c25"/>
 <rect x="400.28" y="227.00" width="139.12" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
