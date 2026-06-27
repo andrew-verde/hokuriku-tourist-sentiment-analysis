@@ -1,7 +1,7 @@
 PYTHON = .venv/bin/python3
 PBL_SITE ?= $(HOME)/pbl-site
 
-.PHONY: help test chinese-codebook-template reviewed-codebook-config reviewed-codebook-status chinese-social chinese-social-xhs-only chinese-social-with-douyin chinese-insights chinese-insights-xhs-only multilingual-reviews cross-language-trends sentiment-env sentiment-analysis hypothesis-h1 hypothesis-h2 hypothesis-h3 hypothesis-within-poi hypothesis-tests nudge-analysis poi-opportunity nudge-figures nudge-register nudge-all within-en-sentiment within-jp-sentiment within-cn-sentiment within-language-sentiment presentation-safe statistical-test-figures dashboard nudge-slides nudge-pptx deploy
+.PHONY: help test chinese-codebook-template reviewed-codebook-config reviewed-codebook-status chinese-social chinese-social-xhs-only chinese-social-with-douyin chinese-insights chinese-insights-xhs-only multilingual-reviews cross-language-trends sentiment-env sentiment-analysis hypothesis-h1 hypothesis-h2 hypothesis-h3 hypothesis-within-poi hypothesis-tests nudge-analysis poi-opportunity nudge-priorities nudge-figures nudge-register nudge-all within-en-sentiment within-jp-sentiment within-cn-sentiment within-language-sentiment presentation-safe statistical-test-figures dashboard nudge-slides nudge-pptx deploy
 
 help:
 	@echo "Hokuriku tourist sentiment analysis"
@@ -25,6 +25,7 @@ help:
 	@echo "  make hypothesis-tests        Run H1, H2, H3, and within-POI robustness scripts"
 	@echo "  make nudge-analysis          Build aggregate aspect nudge opportunity map"
 	@echo "  make poi-opportunity         Build aggregate POI nudge opportunity index"
+	@echo "  make nudge-priorities        Rank cross-language solution families"
 	@echo "  make nudge-figures           Build aggregate nudge opportunity SVG figures"
 	@echo "  make nudge-register          Build HTML next-semester nudge experiment register"
 	@echo "  make nudge-all               Build all nudge outputs, figures, register, and dashboard"
@@ -99,7 +100,10 @@ poi-opportunity:
 nudge-figures:
 	$(PYTHON) scripts/build_nudge_figures.py
 
-nudge-register:
+nudge-priorities: nudge-analysis hypothesis-h3 within-cn-sentiment
+	$(PYTHON) scripts/build_cross_language_solution_priorities.py
+
+nudge-register: nudge-priorities
 	$(PYTHON) scripts/build_nudge_experiment_register.py
 
 nudge-all: nudge-analysis poi-opportunity nudge-figures nudge-register dashboard
@@ -124,10 +128,10 @@ statistical-test-figures:
 dashboard:
 	$(PYTHON) scripts/build_pbl_dashboard.py
 
-nudge-slides:
+nudge-slides: nudge-priorities
 	$(PYTHON) scripts/build_nudge_seminar_slides.py
 
-nudge-pptx:
+nudge-pptx: nudge-priorities
 	$(PYTHON) scripts/build_nudge_pptx.py
 
 # Regenerate figures + both HTML pages, then sync landing page plus referenced

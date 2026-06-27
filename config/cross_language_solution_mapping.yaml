@@ -1,0 +1,76 @@
+schema_version: cross_language_solution_mapping.v1
+
+solutions:
+  - solution_id: visit_readiness_card
+    solution_label_en: Multilingual visit-readiness card
+    solution_label_ja: 多言語の来訪準備カード
+    nudge_type: information_provision
+    ease_tier: Easy
+    ease_order: 1
+    evidence:
+      review_aspects:
+        - opening_hours_availability
+        - itinerary_fit_time_cost
+        - transport_access
+        - booking_ticketing
+      chinese_friction_codes:
+        - opening_hours_availability
+        - itinerary_fit_time_cost
+        - transport_access
+        - booking_ticketing
+      primary_review_aspect: opening_hours_availability
+      primary_chinese_code: opening_hours_availability
+    evidence_summary_en: All 3 groups show planning friction; Google models put hours and itinerary fit through FDR.
+    evidence_summary_ja: 3群すべてに計画上の摩擦があり、Googleモデルでは営業時間と旅程適合がFDRを通過。
+    experiment_hypothesis_en: A concise readiness card reduces planning uncertainty and increases itinerary commitment.
+    experiment_hypothesis_ja: 簡潔な準備カードは計画時の不確実性を減らし、旅程への追加を増やす。
+    intervention_en: A/B test one card with hours, duration, transfers, booking, and backups.
+    intervention_ja: 営業時間、所要時間、乗換、予約、代替案をまとめたカードをA/Bテスト。
+    randomization_unit: visitor_session
+    primary_outcomes: card_clicks;saves;itinerary_additions
+    secondary_outcomes: friction_evidence_prevalence;low_rating_share
+
+  - solution_id: localized_discovery_card
+    solution_label_en: Localized discovery and itinerary card
+    solution_label_ja: ローカライズした発見・旅程カード
+    nudge_type: demand_redistribution
+    ease_tier: Moderate
+    ease_order: 2
+    evidence:
+      review_family: enjoyment
+      chinese_enjoyment_code: positive_sentiment
+      chinese_topic_codes:
+        - dinosaurs_museums
+        - scenic_nature
+    evidence_summary_en: All 3 groups show pull evidence; XHS dinosaur and scenic topics clear FDR.
+    evidence_summary_ja: 3群すべてに魅力の根拠があり、XHSの恐竜と景観はFDRを通過。
+    experiment_hypothesis_en: Language-specific discovery cards increase saves and redistribute itinerary interest toward matched attractions.
+    experiment_hypothesis_ja: 言語別の発見カードは保存を増やし、適合する観光地へ旅程関心を分散する。
+    intervention_en: A/B test localized attraction cards with nearby itinerary bundles.
+    intervention_ja: 周辺旅程を組み合わせた言語別の観光地カードをA/Bテスト。
+    randomization_unit: visitor_session
+    primary_outcomes: card_clicks;saves;itinerary_additions
+    secondary_outcomes: destination_mix;follow_up_positive_evidence
+
+  - solution_id: off_peak_alternative_prompt
+    solution_label_en: Off-peak and alternative-site prompt
+    solution_label_ja: オフピーク・代替地プロンプト
+    nudge_type: demand_redistribution
+    ease_tier: Harder
+    ease_order: 3
+    evidence:
+      review_aspects:
+        - waiting_crowding
+      chinese_friction_codes:
+        - waiting_crowding
+      primary_review_aspect: waiting_crowding
+      primary_chinese_code: waiting_crowding
+    evidence_summary_en: All 3 groups show crowding evidence; its low-rating link does not clear FDR.
+    evidence_summary_ja: 3群すべてに混雑の根拠があるが、低評価との関連はFDRを通過しない。
+    experiment_hypothesis_en: Off-peak timing and substitute-site prompts shift visits without reducing itinerary commitment.
+    experiment_hypothesis_ja: オフピーク時間と代替地の提示は旅程への追加を減らさずに来訪を分散する。
+    intervention_en: A/B test quieter-time and nearby-substitute prompts.
+    intervention_ja: 空いている時間帯と近隣代替地の提示をA/Bテスト。
+    randomization_unit: visitor_session
+    primary_outcomes: alternative_clicks;off_peak_selection;itinerary_additions
+    secondary_outcomes: destination_mix;waiting_crowding_evidence_prevalence

@@ -34,7 +34,7 @@ SCRATCH = Path(
     "10c07a34-3a17-4c5a-aa81-7faf2262a082/scratchpad"
 )
 SCRATCH.mkdir(parents=True, exist_ok=True)
-N_SLIDES = 11
+N_SLIDES = 13
 
 
 # --- import the HTML deck module and reuse its getters / SOURCES / FIGURES -----
@@ -162,6 +162,49 @@ ENG_GAP_PREV = fpct1(asp("english_information_gap", "prevalence"))
 SIGN_PREV = fpct1(asp("wayfinding_signage", "prevalence"))
 ACCESS_PREV = fpct1(asp("transport_access", "prevalence"))
 BOOKING_PREV = fpct1(asp("booking_ticketing", "prevalence"))
+
+# Chinese-language Xiaohongshu context
+CN_ROWS = fnum(raw("cn_mfst", deck.manifest_metric("denominators", "chinese_social_rows")))
+CN_XHS_ROWS = fnum(raw("cn_mfst", deck.manifest_metric("denominators", "n_total_xhs_rows")))
+
+
+def cnv(predictor, col):
+    return raw(
+        "cn_drivers",
+        deck.cn_driver_value(predictor, "sentiment_category=positive", col),
+    )
+
+
+DINO_N = fnum(cnv("dinosaurs_museums", "group_a_n"))
+DINO_POS = fnum(cnv("dinosaurs_museums", "group_a_event_count"))
+DINO_PCT = fpct1(cnv("dinosaurs_museums", "group_a_event_pct"))
+DINO_OTHER_PCT = fpct1(cnv("dinosaurs_museums", "group_b_event_pct"))
+DINO_FDR = fp(cnv("dinosaurs_museums", "p_value_bh_fdr"))
+SCENIC_N = fnum(cnv("scenic_nature", "group_a_n"))
+SCENIC_POS = fnum(cnv("scenic_nature", "group_a_event_count"))
+SCENIC_PCT = fpct1(cnv("scenic_nature", "group_a_event_pct"))
+SCENIC_OTHER_PCT = fpct1(cnv("scenic_nature", "group_b_event_pct"))
+SCENIC_FDR = fp(cnv("scenic_nature", "p_value_bh_fdr"))
+
+
+def prv(rank, col):
+    return raw("solution_priorities", deck.priority_value(rank, col))
+
+
+PRIORITIES = [
+    {
+        "rank": fnum(prv(rank, "rank")),
+        "name_en": ftext(prv(rank, "solution_label_en")),
+        "name_ja": ftext(prv(rank, "solution_label_ja")),
+        "impact": ftext(prv(rank, "impact_tier")),
+        "ease": ftext(prv(rank, "ease_tier")),
+        "summary_en": ftext(prv(rank, "evidence_summary_en")),
+        "summary_ja": ftext(prv(rank, "evidence_summary_ja")),
+        "test_en": ftext(prv(rank, "intervention_en")),
+        "test_ja": ftext(prv(rank, "intervention_ja")),
+    }
+    for rank in (1, 2, 3)
+]
 
 # POI action map
 FIX_COUNT = fnum(raw("nudge_poi", deck.poi_sum("is_fix_it")))
@@ -601,9 +644,9 @@ def build():
             "Per-source volume. The Google review scale and the social-post scale are not directly comparable, so they sit side by side rather than being merged.",
             "ソース別の件数。Google 口コミの尺度と SNS 投稿の尺度は直接比較できないため、統合せず並置している。")
     foot(s, 3)
-    notes(s, "Lynn takes this slide. Each review row is tagged with the aspects it mentions, across three Hokuriku "
-              "prefectures. The 'other' language bucket is mostly Chinese-script rows used for prevalence but not for "
-              "the within-language sentiment checks. Privacy line matters for a Japanese audience: only aggregates "
+    notes(s, f"Lynn takes this slide. Each review row is tagged with the aspects it mentions, across three Hokuriku "
+              "prefectures. The 'other' bucket contains mixed-language Google reviews. It is separate from the "
+              f"{CN_ROWS} Xiaohongshu posts shown later. Privacy line matters for a Japanese audience: only aggregates "
               "leave the project.")
 
     # ---- 4 METHODS PIPELINE ----
@@ -766,7 +809,54 @@ def build():
               "Price and cleanliness are larger effects but belong to the operator, so we are honest and exclude them "
               "from the nudge set.")
 
-    # ---- 9 RESULTS: POI action map ----
+    # ---- 9 RESULTS: Chinese-language Xiaohongshu context ----
+    s = new()
+    label(s, "III.  RESULTS")
+    title(s, "A separate promotion hypothesis from Xiaohongshu", "小紅書から得た、別枠のプロモーション仮説")
+    _, c1 = card(s, MX, Inches(2.0), Inches(5.7), Inches(3.15))
+    pe = c1.paragraphs[0]
+    rr = pe.add_run()
+    rr.text = "Descriptive evidence grade"
+    _style_run(rr, 16, NAVY, bold=True, font=HEAD_FONT)
+    pj = c1.add_paragraph()
+    rj = pj.add_run()
+    rj.text = "記述的エビデンス"
+    _style_run(rj, 11.5, GREY, font=JP_FONT)
+    en_jp(c1, f"{CN_ROWS} Chinese-language Fukui social posts, all {CN_XHS_ROWS} from Xiaohongshu. No star-rating outcome.",
+          f"福井に関する中国語 SNS 投稿 {CN_ROWS} 件。全 {CN_XHS_ROWS} 件が小紅書。星評価の結果変数はない。",
+          en_size=14, jp_size=11, space_after=12)
+    en_jp(c1, "SnowNLP categories are interpreted only within this source.",
+          "SnowNLP の分類は、このソース内だけで解釈する。",
+          en_size=13.5, jp_size=10.8, en_color=GREY, space_after=0)
+    _, c2 = card(s, Inches(6.55), Inches(2.0), Inches(6.1), Inches(3.15))
+    pe = c2.paragraphs[0]
+    rr = pe.add_run()
+    rr.text = "Signals worth testing"
+    _style_run(rr, 16, NAVY, bold=True, font=HEAD_FONT)
+    pj = c2.add_paragraph()
+    rj = pj.add_run()
+    rj.text = "検証する価値のあるシグナル"
+    _style_run(rj, 11.5, GREY, font=JP_FONT)
+    en_jp(c2, f"Dinosaur / museum: {DINO_POS} of {DINO_N} posts positive ({DINO_PCT}) versus {DINO_OTHER_PCT} without this tag; BH-FDR {DINO_FDR}.",
+          f"恐竜・博物館:{DINO_N} 件中 {DINO_POS} 件がポジティブ({DINO_PCT})。タグなしは {DINO_OTHER_PCT}、BH-FDR {DINO_FDR}。",
+          en_size=14, jp_size=11, space_after=12)
+    en_jp(c2, f"Scenic nature: {SCENIC_POS} of {SCENIC_N} positive ({SCENIC_PCT}) versus {SCENIC_OTHER_PCT}; BH-FDR {SCENIC_FDR}.",
+          f"自然景観:{SCENIC_N} 件中 {SCENIC_POS} 件がポジティブ({SCENIC_PCT})。タグなしは {SCENIC_OTHER_PCT}、BH-FDR {SCENIC_FDR}。",
+          en_size=14, jp_size=11, space_after=0)
+    infobox(s, MX, Inches(5.45), Inches(12.05), Inches(0.92),
+            "Candidate nudge: A/B test a Chinese-language discovery card foregrounding dinosaur / museum and scenic-nature content. Measure clicks, saves, and itinerary intent.",
+            "候補ナッジ:恐竜・博物館と自然景観を前面に出した中国語の発見カードを A/B テストし、クリック・保存・旅程への追加意向を測定する。")
+    _, tf = textbox(s, MX, Inches(6.48), Inches(12.0), Inches(0.42))
+    en_jp(tf, "Hypothesis-generating only: one platform, reviewed keyword tags, SnowNLP secondary sentiment, no rating model, no causal claim.",
+          "仮説生成に限定:単一プラットフォーム、レビュー済みキーワードタグ、SnowNLP の副次的感情分析、星評価モデルなし、因果主張なし。",
+          first=True, en_size=11.5, jp_size=9.5, en_color=GREY, space_after=0)
+    foot(s, 9)
+    notes(s, f"Lynn: Present this as a separate evidence stream. The {CN_ROWS} Xiaohongshu posts cannot enter the "
+              "star-rating model because they have no ratings. Within Xiaohongshu, dinosaur and scenic-nature tags "
+              "coincide with higher SnowNLP-positive shares after topic-family FDR correction. This supports an "
+              "A/B-test candidate, not a proven effect. Do not compare SnowNLP with VADER or oseti.")
+
+    # ---- 10 RESULTS: POI action map ----
     s = new()
     label(s, "III.  RESULTS")
     title(s, "Where to act: fix-it and promote-it sites", "どこで動くか:改善型と推奨型のスポット")
@@ -784,14 +874,63 @@ def build():
           f"福井の推奨型トップ:{PROMO1} {PROMO1_SHARE}(Wilson 95%CI {PROMO1_LOW}〜{PROMO1_HIGH});次に {PROMO2} {PROMO2_SHARE}({PROMO2_LOW}〜{PROMO2_HIGH})。",
           en_size=14, jp_size=11, space_after=0)
     picture_fit(s, "nudge_poi_fig", Inches(7.15), Inches(1.95), Inches(5.5), Inches(4.9))
-    foot(s, 9)
+    foot(s, 10)
     notes(s, "Lynn: Your slide. Three archetypes from the POI index. Fix-it sites are busy with fixable friction. "
               "Promote-it sites have high satisfaction but low volume, the demand-redistribution targets. Crowding "
               "hotspots are where you would redirect demand away from. Read the two top Fukui promote-it sites with "
               "their Wilson intervals, and note the small-sample uncertainty honestly. Positive share is computed from "
               "Google star ratings, so thin sites are not over-read.")
 
-    # ---- 10 DISCUSSION ----
+    # ---- 11 RESULTS: FINAL CROSS-LANGUAGE PRIORITIES ----
+    s = new()
+    label(s, "III.  RESULTS")
+    title(s, "Rank common nudges by impact, then ease",
+          "共通ナッジをインパクト、次に実装容易性で順位づける")
+    _, tf = textbox(s, MX, Inches(1.82), CW, Inches(0.55))
+    en_jp(tf,
+          "Each solution has reviewed support from English, Japanese, and Chinese-language sources. Evidence types remain separate.",
+          "各施策には英語・日本語・中国語ソースのレビュー済みエビデンスがある。エビデンス種別は統合しない。",
+          first=True, en_size=13.5, jp_size=10.5, en_color=GREY, space_after=0)
+    gt = s.shapes.add_table(4, 4, MX, Inches(2.48), Inches(12.05), Inches(3.92)).table
+    widths = [Inches(0.75), Inches(2.55), Inches(4.35), Inches(4.4)]
+    for i, width in enumerate(widths):
+        gt.columns[i].width = width
+    headers = [
+        ("Rank", "順位"),
+        ("Common solution", "共通施策"),
+        ("Evidence and ease", "エビデンスと実装容易性"),
+        ("Next-semester test", "来学期の実験"),
+    ]
+    for j, (en, jp) in enumerate(headers):
+        _cell(gt.cell(0, j), en, 11.5, WHITE, bold=True, align=PP_ALIGN.CENTER, fill=NAVY, jp=jp)
+    for row_index, priority in enumerate(PRIORITIES, start=1):
+        row_fill = WHITE if row_index % 2 else CARD_BG
+        _cell(gt.cell(row_index, 0), priority["rank"], 16, NAVY, bold=True,
+              align=PP_ALIGN.CENTER, fill=row_fill)
+        _cell(gt.cell(row_index, 1), priority["name_en"], 11.5, INK, bold=True,
+              fill=row_fill, jp=priority["name_ja"])
+        _cell(
+            gt.cell(row_index, 2),
+            f"{priority['impact']} impact, {priority['ease']}\n{priority['summary_en']}",
+            10.5,
+            INK,
+            fill=row_fill,
+            jp=f"インパクト {priority['impact']}・実装容易性 {priority['ease']}\n{priority['summary_ja']}",
+        )
+        _cell(gt.cell(row_index, 3), priority["test_en"], 10.5, INK,
+              fill=row_fill, jp=priority["test_ja"])
+    infobox(
+        s, MX, Inches(6.55), Inches(12.05), Inches(0.52),
+        "Ordinal opportunity ranking, not causal effectiveness. Impact tier first; implementation ease breaks ties.",
+        "因果的効果ではなく機会ランキング。インパクト層を優先し、同じ層では実装容易性で順位づける。",
+    )
+    foot(s, 11)
+    notes(s, "Both: This is the decision slide. Read only the first row in detail. Each solution has reviewed "
+              "support from English, Japanese, and Chinese-language sources, although evidence types differ. "
+              "Priority one comes first because it combines high-impact evidence with the easiest prototype. "
+              "The experiment register carries these exact ranks into next semester.")
+
+    # ---- 12 DISCUSSION ----
     s = new()
     label(s, "IV.  DISCUSSION")
     title(s, "What this can and cannot claim", "主張できること・できないこと")
@@ -808,13 +947,14 @@ def build():
     infobox(s, MX, Inches(6.25), Inches(12.13), Inches(0.7),
             "Every caveat here is quoted from the analysis manifest, not paraphrased on the slide.",
             "ここに挙げた注意点はすべて分析マニフェストからの引用であり、スライド上で言い換えていない。")
-    foot(s, 10)
+    foot(s, 12)
     notes(s, "Andrew: Slowly. This is the intellectual honesty slide. Each bullet is the verbatim caveat string from "
               "the manifest, so the limitations we present are exactly the ones the analysis itself records. The four: "
               "not causal, ranks experiments rather than effects, POI clustering unmodelled, and language is not "
-              "nationality. Pause here.")
+              "nationality. These limits are why the ranked solutions become randomized experiments next semester. "
+              "Pause here.")
 
-    # ---- 11 FUTURE WORK (close, white) ----
+    # ---- 13 FUTURE WORK (close, white) ----
     s = new()
     label(s, "IV.  DISCUSSION")
     title(s, "From ranking to experiments", "順位づけから実験へ")
@@ -837,14 +977,14 @@ def build():
     _, c2 = card(s, Inches(6.95), Inches(2.1), Inches(5.7), Inches(2.55))
     pe = c2.paragraphs[0]
     rr = pe.add_run()
-    rr.text = "The pipeline behind it"
+    rr.text = "First experiment"
     _style_run(rr, 17, NAVY, bold=True, font=HEAD_FONT)
     pj = c2.add_paragraph()
     rj = pj.add_run()
-    rj.text = "背後のパイプライン"
+    rj.text = "最初の実験"
     _style_run(rj, 11.5, GREY, font=JP_FONT)
-    en_jp(c2, f"{MODELS_TOTAL} fitted models and {FIX_COUNT} fix-it sites feed the register's shortlist.",
-          f"{MODELS_TOTAL} の推定済みモデルと {FIX_COUNT} の改善型スポットが、レジスターの候補リストに供給される。",
+    en_jp(c2, f"Begin with priority {PRIORITIES[0]['rank']}: {PRIORITIES[0]['name_en']}. Randomize exposure, log interactions, then estimate behavior change.",
+          f"優先順位 {PRIORITIES[0]['rank']} の「{PRIORITIES[0]['name_ja']}」から開始。提示を無作為化し、反応を記録して行動変化を推定する。",
           en_size=13.5, jp_size=11, space_after=0)
     cl_tb, cl_tf = textbox(s, MX, Inches(5.2), CW, Inches(1.3))
     pe = cl_tf.paragraphs[0]
@@ -861,10 +1001,11 @@ def build():
     rr = pe2.add_run()
     rr.text = "Thank you.  ありがとうございました。"
     _style_run(rr, 15, NAVY, bold=True, font=JP_FONT)
-    foot(s, 11)
-    notes(s, "Both: Lynn delivers the register hand-off and clicks through to it if time allows. Andrew closes on the "
-              "one-line conclusion, slowly: this deck ranks where to experiment, the register records how. Then invite "
-              "questions. Do not rush the last line.")
+    foot(s, 13)
+    notes(s, f"Both: Lynn delivers the register hand-off. Next semester begins with priority "
+              f"{PRIORITIES[0]['rank']}, {PRIORITIES[0]['name_en']}, randomized by visitor session with exposure "
+              "and interaction logging. Andrew closes slowly: this deck ranks where to experiment, the register "
+              "records how. Then invite questions.")
 
     prs.save(str(OUT_PPTX))
     return prs

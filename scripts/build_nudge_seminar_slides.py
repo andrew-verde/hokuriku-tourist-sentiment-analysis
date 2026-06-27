@@ -1,19 +1,19 @@
 #!/usr/bin/env python3
-"""Build NUDGE-Seminar-Slides-Preview.html — a 16:9 bilingual IMRAD seminar deck.
+"""Build NUDGE-Seminar-Slides-Preview.html: a 16:9 bilingual IMRAD seminar deck.
 
 This is the nudge-refocused successor to scripts/build_seminar_slides.py. It keeps
 the SAME provenance contract: EVERY NUMBER ON EVERY SLIDE IS A LIVE REFERENCE TO AN
-ANALYSIS OUTPUT FILE. No numeric value is typed by hand — in either language. Each
+ANALYSIS OUTPUT FILE. No numeric value is typed by hand in either language. Each
 is fetched via stat() with an explicit getter pointing at a CSV cell or JSON field;
 a missing value fails the build loud rather than inventing a number. Figures are the
 same script-generated SVGs the dashboard embeds.
 
 BILINGUAL: every on-slide line appears in English, then a Japanese translation
 directly below it via the .jp class (smaller, lighter, ja font stack). When a line
-carries a number, the Japanese reuses the SAME traced stat() span — the digits stay
+carries a number, the Japanese reuses the SAME traced stat() span; the digits stay
 a live reference, never retyped. Speaker notes (orange .notes boxes) stay English.
 
-This file is a PREVIEW of what the PowerPoint will look like (~10–12 minute talk,
+This file is a PREVIEW of what the PowerPoint will look like (~10-12 minute talk,
 English spoken slowly for a Japanese audience, two co-presenters). It is a derived
 view, not source of truth.
 
@@ -38,6 +38,9 @@ SOURCES: dict[str, Path] = {
     "nudge_tax": ROOT / "output/nudge_analysis/nudge_taxonomy.csv",
     "aspect_mfst": ROOT / "output/nudge_analysis/aspect_opportunity_map_manifest.json",
     "poi_mfst": ROOT / "output/nudge_analysis/poi_opportunity_index_manifest.json",
+    "cn_drivers": ROOT / "output/within_language_sentiment/cn_within_source_sentiment_drivers.csv",
+    "cn_mfst": ROOT / "output/within_language_sentiment/cn_within_source_sentiment_manifest.json",
+    "solution_priorities": ROOT / "output/nudge_analysis/cross_language_solution_priorities.csv",
 }
 
 FIGURES = {
@@ -171,6 +174,28 @@ def taxonomy_value(aspect, col):
         r = d[d["aspect"] == aspect]
         if r.empty:
             raise KeyError(f"missing taxonomy row: {aspect}")
+        return r[col].iloc[0]
+    return g
+
+
+def cn_driver_value(predictor, outcome, col):
+    """Resolve one within-Chinese predictor result from the aggregate test output."""
+    def g(d):
+        r = d[(d["predictor"] == predictor) & (d["outcome"] == outcome) & (d["status"] == "ok")]
+        if len(r) != 1:
+            raise KeyError(f"expected one Chinese driver row: {predictor}/{outcome}; found {len(r)}")
+        return r[col].iloc[0]
+    return g
+
+
+def priority_value(rank, col):
+    """Resolve one ranked cross-language solution field."""
+    def g(d):
+        r = d[d["rank"] == rank]
+        if len(r) != 1:
+            raise KeyError(f"expected one solution priority rank {rank}; found {len(r)}")
+        if col not in r.columns:
+            raise KeyError(f"missing solution priority column: {col}")
         return r[col].iloc[0]
     return g
 
@@ -312,7 +337,36 @@ def build() -> str:
     booking_prev = stat("nudge_aspect", aspect_value("booking_ticketing", "prevalence"), pct1, "", "booking_ticketing pooled prevalence")
     price_or = stat("nudge_aspect", aspect_value("price_value", "odds_ratio"), "{:.2f}", "", "price_value Firth OR")
 
-    # POI action map (slide 9)
+    # Chinese-language Xiaohongshu promotion hypothesis (slide 9)
+    cn_rows = stat("cn_mfst", manifest_metric("denominators", "chinese_social_rows"), ncomma, "", "cn_mfst metrics.denominators.chinese_social_rows")
+    cn_xhs_rows = stat("cn_mfst", manifest_metric("denominators", "n_total_xhs_rows"), ncomma, "", "cn_mfst metrics.denominators.n_total_xhs_rows")
+    dino_n = stat("cn_drivers", cn_driver_value("dinosaurs_museums", "sentiment_category=positive", "group_a_n"), "{:.0f}", "", "dinosaurs_museums positive-category group_a_n")
+    dino_pos = stat("cn_drivers", cn_driver_value("dinosaurs_museums", "sentiment_category=positive", "group_a_event_count"), "{:.0f}", "", "dinosaurs_museums positive-category group_a_event_count")
+    dino_pct = stat("cn_drivers", cn_driver_value("dinosaurs_museums", "sentiment_category=positive", "group_a_event_pct"), pct1, "", "dinosaurs_museums positive-category group_a_event_pct")
+    dino_other_pct = stat("cn_drivers", cn_driver_value("dinosaurs_museums", "sentiment_category=positive", "group_b_event_pct"), pct1, "", "dinosaurs_museums positive-category group_b_event_pct")
+    dino_fdr = stat("cn_drivers", cn_driver_value("dinosaurs_museums", "sentiment_category=positive", "p_value_bh_fdr"), pfmt, "", "dinosaurs_museums positive-category BH-FDR p")
+    scenic_n = stat("cn_drivers", cn_driver_value("scenic_nature", "sentiment_category=positive", "group_a_n"), "{:.0f}", "", "scenic_nature positive-category group_a_n")
+    scenic_pos = stat("cn_drivers", cn_driver_value("scenic_nature", "sentiment_category=positive", "group_a_event_count"), "{:.0f}", "", "scenic_nature positive-category group_a_event_count")
+    scenic_pct = stat("cn_drivers", cn_driver_value("scenic_nature", "sentiment_category=positive", "group_a_event_pct"), pct1, "", "scenic_nature positive-category group_a_event_pct")
+    scenic_other_pct = stat("cn_drivers", cn_driver_value("scenic_nature", "sentiment_category=positive", "group_b_event_pct"), pct1, "", "scenic_nature positive-category group_b_event_pct")
+    scenic_fdr = stat("cn_drivers", cn_driver_value("scenic_nature", "sentiment_category=positive", "p_value_bh_fdr"), pfmt, "", "scenic_nature positive-category BH-FDR p")
+
+    # Final cross-language recommendation ranking (slide 11)
+    priorities = []
+    for rank in (1, 2, 3):
+        priorities.append({
+            "rank": stat("solution_priorities", priority_value(rank, "rank"), "{:.0f}", "", f"priority rank {rank}"),
+            "name_en": stat("solution_priorities", priority_value(rank, "solution_label_en"), keep, "", f"priority rank {rank} solution_label_en"),
+            "name_ja": stat("solution_priorities", priority_value(rank, "solution_label_ja"), keep, "", f"priority rank {rank} solution_label_ja"),
+            "impact": stat("solution_priorities", priority_value(rank, "impact_tier"), keep, "", f"priority rank {rank} impact_tier"),
+            "ease": stat("solution_priorities", priority_value(rank, "ease_tier"), keep, "", f"priority rank {rank} ease_tier"),
+            "summary_en": stat("solution_priorities", priority_value(rank, "evidence_summary_en"), keep, "", f"priority rank {rank} evidence_summary_en"),
+            "summary_ja": stat("solution_priorities", priority_value(rank, "evidence_summary_ja"), keep, "", f"priority rank {rank} evidence_summary_ja"),
+            "test_en": stat("solution_priorities", priority_value(rank, "intervention_en"), keep, "", f"priority rank {rank} intervention_en"),
+            "test_ja": stat("solution_priorities", priority_value(rank, "intervention_ja"), keep, "", f"priority rank {rank} intervention_ja"),
+        })
+
+    # POI action map (slide 10)
     fix_count = stat("nudge_poi", poi_sum("is_fix_it"), "{:.0f}", "", "count is_fix_it")
     fix_fukui = stat("nudge_poi", poi_sum("is_fix_it", True), "{:.0f}", "", "count is_fix_it and is_fukui")
     promote_count = stat("nudge_poi", poi_sum("is_promote_it"), "{:.0f}", "", "count is_promote_it")
@@ -331,7 +385,7 @@ def build() -> str:
     promo2_high = stat("nudge_poi", poi_ranked("promote_fukui", 1, "positive_share_ci_high"), pct1, "", "second Fukui promote-it positive_share_ci_high")
     promo2_conf = stat("nudge_poi", poi_ranked("promote_fukui", 1, "promote_confidence"), keep, "", "second Fukui promote-it confidence")
 
-    # Discussion caveats (slide 10) — verbatim manifest strings
+    # Discussion caveats (slide 10): verbatim manifest strings
     cav_not_causal = stat("aspect_mfst", caveat_text(0), keep, "", "caveats[0]")
     cav_rank = stat("aspect_mfst", caveat_text(1), keep, "", "caveats[1]")
     cav_cluster = stat("aspect_mfst", caveat_text(3), keep, "", "caveats[3]")
@@ -352,7 +406,7 @@ def build() -> str:
             f'<div class="notes"><b>⏱ {time}</b> &nbsp;{notes}</div></div>'
         )
 
-    # 1 — TITLE
+    # 1: TITLE
     slide("title", "Title", f"""
       <p class="kicker">PBL Seminar · IMRAD format</p>
       <h1>Turning Hokuriku review text<br>into testable nudges</h1>
@@ -371,23 +425,23 @@ def build() -> str:
         three prefectures · every number traced to a source file ●</p>
       {jp(f'対象:3県・{n_pois}スポットの{total_reviews}件のタグ付き口コミ・'
           'すべての数値はソースファイルに紐づく ●')}
-    """, f"{BOTH} Greet the audience. Andrew: \"We will speak slowly — please stop us if "
+    """, f"{BOTH} Greet the audience. Andrew: \"We will speak slowly; please stop us if "
          "you need a word repeated.\" State the one-line goal: read review text, then rank "
          "which signals are nudge-able and where to experiment next. This is the nudge-refocused "
          "successor to last seminar's measurement deck. Note the provenance dot: every number "
          "is a live reference to a source file.",
-         "0:00–0:55")
+         "0:00-0:55")
 
-    # 2 — INTRODUCTION
+    # 2: INTRODUCTION
     slide("text", "Introduction", f"""
-      <p class="secnum">I — INTRODUCTION</p>
+      <p class="secnum">I. INTRODUCTION</p>
       <h2>The question</h2>
       {jp('問い')}
       <ul class="big">
         <li>Visitors leave <b>friction and draw signals</b> in their reviews.</li>
         {jp('訪問者は口コミに<b>不満と魅力のシグナル</b>を残す。')}
-        <li>Which are <b>nudge-able</b> — information provision, pre-commitment,
-          demand redistribution — versus an <b>operator fix</b>?</li>
+        <li>Which are <b>nudge-able</b>: information provision, pre-commitment,
+          demand redistribution, versus an <b>operator fix</b>?</li>
         {jp('そのうちどれが<b>ナッジ可能</b>(情報提供・事前コミットメント・需要の再配分)で、'
             'どれが<b>事業者側の改善</b>が必要か?')}
         <li>And which POIs are <b>fix-it</b> versus <b>promote-it</b>?</li>
@@ -397,13 +451,13 @@ def build() -> str:
         experiments</b>, not effects.</div>
       {jp('探索的・仮説生成型:私たちは<b>効果ではなく、候補となる実験を順位づけ</b>する。')}
     """, f"{A} Keep it to three sentences, slowly. The pivot from last time: not 'is there a "
-         "language gap' but 'where can a low-cost nudge plausibly help'. Stress the honest frame — "
+         "language gap' but 'where can a low-cost nudge plausibly help'. Stress the honest frame: "
          "we rank where to experiment, we do not claim any nudge works yet. This sets up Methods.",
-         "0:55–2:05")
+         "0:55-2:05")
 
-    # 3 — METHODS · DATA
+    # 3: METHODS · DATA
     slide("text", "Methods · Data", f"""
-      <p class="secnum">M — METHODS · WHERE THE TEXT COMES FROM</p>
+      <p class="secnum">II. METHODS · WHERE THE TEXT COMES FROM</p>
       <h2>The corpus</h2>
       {jp('コーパス')}
       <div class="cols2 vtop">
@@ -422,23 +476,23 @@ def build() -> str:
             {jp('口コミの言語であり、国籍ではない。')}</div>
         </div>
         <div>{fig("volume", 250)}
-          <p class="cap">Per-source volume lens — the within-language sentiment
+          <p class="cap">Per-source volume lens: the within-language sentiment
             subset, not the full model corpus.</p>
-          {jp('ソース別の件数の見方 — 全モデルコーパスではなく、'
+          {jp('ソース別の件数の見方:全モデルコーパスではなく、'
               '同一言語内の感情サブセット。')}</div>
       </div>
-      <p class="scope">Raw text, authors, URLs, and IDs never leave the project — only
+      <p class="scope">Raw text, authors, URLs, and IDs never leave the project; only
         aggregate counts and statistics are published. {tagged_rows} rows total ●</p>
       {jp(f'原文・執筆者・URL・IDはプロジェクト外に出さず、集計値のみ公開。合計 {tagged_rows} 行 ●')}
     """, f"{C} Takes this slide. Explain: each review row is tagged with the aspects it mentions, "
-         "across three Hokuriku prefectures. The 'other' language bucket is mostly Chinese-script "
-         "rows used for prevalence but not the JP/EN secondary checks. Privacy line matters for a "
+         "across three Hokuriku prefectures. The 'other' bucket contains mixed-language Google reviews. "
+         f"It is separate from the {cn_rows} Xiaohongshu posts shown later. Privacy line matters for a "
          "Japanese audience: only aggregates leave the project.",
-         "2:05–3:20")
+         "2:05-3:20")
 
-    # 4 — METHODS · PIPELINE
+    # 4: METHODS · PIPELINE
     slide("text", "Methods · Pipeline", f"""
-      <p class="secnum">M — METHODS · TEXT TO MODELED OUTCOME</p>
+      <p class="secnum">II. METHODS · TEXT TO MODELED OUTCOME</p>
       <h2>From text to a modeled outcome</h2>
       {jp('テキストからモデル化された結果へ')}
       <ol class="pipe">
@@ -454,15 +508,15 @@ def build() -> str:
         languages</b>. Secondary sentiment checks are within-language only.</div>
       {jp('誠実性ルール:感情分析ツールを<b>言語間で比較することは決してしない</b>。'
           '副次的な感情チェックは同一言語内のみ。')}
-    """, f"{A} Slowly: the modeled outcome is a LOW star rating — a shared 1–5 scale, no sentiment "
+    """, f"{A} Slowly: the modeled outcome is a LOW star rating, a shared 1-5 scale, no sentiment "
          f"tool in the loop. {model_rows} rows have a supported language and a rating; {low_rating_rows} "
-         "of them are low-rated. The aspect tags are the predictors. Emphasise the honesty rule — "
+         "of them are low-rated. The aspect tags are the predictors. Emphasise the honesty rule: "
          "it is the methodological backbone reviewers will probe. Then hand to Co-presenter for the model.",
-         "3:20–4:35")
+         "3:20-4:35")
 
-    # 5 — METHODS · MODEL + GUARDS
+    # 5: METHODS · MODEL + GUARDS
     slide("text", "Methods · Model + guards", f"""
-      <p class="secnum">M — METHODS · MODEL &amp; GUARDS</p>
+      <p class="secnum">II. METHODS · MODEL &amp; GUARDS</p>
       <h2>Firth penalized logistic regression</h2>
       {jp('Firth ペナルティ付きロジスティック回帰')}
       <div class="cols2">
@@ -495,15 +549,15 @@ def build() -> str:
       {jp('機会スコアは、摩擦アスペクトが FDR 有意かつ有害(オッズ比が 1 超)でない限り、'
           'ゼロにゲートされる。')}
     """, f"{C} Don't read every number. Two ideas: (1) Firth penalization keeps estimates stable "
-         "when an aspect is rare or a cell is near-zero — and it barely moves the answer versus a "
+         "when an aspect is rare or a cell is near-zero, and it barely moves the answer versus a "
          "plain logit, which is the sanity check. (2) The gate is the integrity move: an opportunity "
          "score is forced to zero unless the friction aspect is FDR-significant AND harmful. No "
          "cherry-picking. Andrew can field nesting questions.",
-         "4:35–5:50")
+         "4:35-5:50")
 
-    # 6 — METHODS · NUDGE TAXONOMY
+    # 6: METHODS · NUDGE TAXONOMY
     slide("text", "Methods · Taxonomy", f"""
-      <p class="secnum">M — METHODS · NUDGE TAXONOMY</p>
+      <p class="secnum">II. METHODS · NUDGE TAXONOMY</p>
       <h2>Mapping each signal to a lever</h2>
       {jp('各シグナルをレバーに対応づける')}
       <table class="stats">
@@ -534,14 +588,14 @@ def build() -> str:
       {jp('4つのナッジ類型:情報提供・事前コミットメント・需要の再配分・'
           '事業者側の改善(ナッジの対象外)。')}
     """, f"{C} The taxonomy is the bridge from statistics to action. Every cell here is pulled live "
-         "from the taxonomy CSV — labels and mechanisms are not typed by hand. The key distinction: "
+         "from the taxonomy CSV; labels and mechanisms are not typed by hand. The key distinction: "
          "the first three types are things a planning app or signage can do (nudge-able); 'operator "
          "fix' (staff, pricing) is flagged honestly as out of scope for a behavioral nudge.",
-         "5:50–7:00")
+         "5:50-7:00")
 
-    # 7 — RESULTS · ASPECT OPPORTUNITY MAP
+    # 7: RESULTS · ASPECT OPPORTUNITY MAP
     slide("fig", "Result · Aspect map", f"""
-      <p class="secnum">R — RESULTS · ASPECT OPPORTUNITY MAP</p>
+      <p class="secnum">III. RESULTS · ASPECT OPPORTUNITY MAP</p>
       <h2>Two nudge-able friction levers stand out</h2>
       {jp('2つのナッジ可能な摩擦レバーが際立つ')}
       <div class="cols2 vtop">
@@ -560,22 +614,22 @@ def build() -> str:
                 f'案内表示 {sign_prev}、交通 {access_prev}、予約 {booking_prev}。')}
           </ul>
           <div class="pill warn">Honesty: price/value has a high OR ({price_or}) but is an
-            <b>operator fix</b> — flagged, not nudge-able.</div>
+            <b>operator fix</b>: flagged, not nudge-able.</div>
           {jp(f'誠実性:価格・コスパは OR が高い({price_or})が<b>事業者側の改善</b>であり、'
               'ナッジ対象としては除外。')}
         </div>
         <div>{fig("nudge_aspect_fig", 320)}</div>
       </div>
     """, f"{A} The map plots penalty (odds ratio) against prevalence. Two friction aspects clear "
-         "the gate — opening hours and itinerary/time-cost — both information/pre-commitment levers. "
+         "the gate: opening hours and itinerary/time-cost, both information/pre-commitment levers. "
          "Several others are common enough to see but not yet evidenced strongly, so they are "
          "targeted-collection candidates, not rankings. The price_value line is the integrity point: "
          "big effect, but you cannot nudge your way out of pricing, so we exclude it.",
-         "7:00–7:50")
+         "7:00-7:50")
 
-    # 8 — RESULTS · INFORMATION LEVERS
+    # 8: RESULTS · INFORMATION LEVERS
     slide("fig", "Result · Info levers", f"""
-      <p class="secnum">R — RESULTS · INFORMATION LEVERS</p>
+      <p class="secnum">III. RESULTS · INFORMATION LEVERS</p>
       <h2>Nudge-able levers are the actionable set</h2>
       {jp('ナッジ可能なレバーが、実行可能な対象')}
       {fig("nudge_info_fig", 360)}
@@ -586,49 +640,130 @@ def build() -> str:
     """, f"{A} Let the picture talk for a moment. The chart isolates the nudge-able friction levers "
          "with their Wilson prevalence intervals and Firth odds ratios. The story: these are where a "
          "low-cost information or pre-commitment prompt could plausibly move the low-rating outcome. "
-         "Operator-fix aspects are deliberately greyed out of the action set — same honesty rule as before.",
-         "7:50–8:25")
+         "Operator-fix aspects are deliberately greyed out of the action set, following the same honesty rule.",
+         "7:50-8:25")
 
-    # 9 — RESULTS · POI ACTION MAP
+    # 9: RESULTS · XHS CONTEXT
+    slide("text", "Result · XHS context", f"""
+      <p class="secnum">III. RESULTS · CHINESE-LANGUAGE XIAOHONGSHU CONTEXT</p>
+      <h2>A separate promotion hypothesis from Xiaohongshu</h2>
+      {jp('小紅書から得た、別枠のプロモーション仮説')}
+      <div class="cols2 vtop">
+        <div class="card">
+          <h3>Descriptive evidence grade</h3>
+          {jp('記述的エビデンス')}
+          <p>{cn_rows} Chinese-language Fukui social posts, all {cn_xhs_rows} from Xiaohongshu.
+            These posts have no star-rating outcome.</p>
+          {jp(f'福井に関する中国語 SNS 投稿 {cn_rows} 件。全 {cn_xhs_rows} 件が小紅書。'
+              '星評価の結果変数はない。')}
+          <p>SnowNLP categories are interpreted only within this source.</p>
+          {jp('SnowNLP の分類は、このソース内だけで解釈する。')}
+        </div>
+        <div class="card">
+          <h3>Signals worth testing</h3>
+          {jp('検証する価値のあるシグナル')}
+          <p><b>Dinosaur / museum:</b> {dino_pos} of {dino_n} posts positive
+            ({dino_pct}) versus {dino_other_pct} without this tag; BH-FDR {dino_fdr}.</p>
+          {jp(f'<b>恐竜・博物館:</b>{dino_n} 件中 {dino_pos} 件がポジティブ'
+              f'({dino_pct})。タグなしは {dino_other_pct}、BH-FDR {dino_fdr}。')}
+          <p><b>Scenic nature:</b> {scenic_pos} of {scenic_n} positive
+            ({scenic_pct}) versus {scenic_other_pct}; BH-FDR {scenic_fdr}.</p>
+          {jp(f'<b>自然景観:</b>{scenic_n} 件中 {scenic_pos} 件がポジティブ'
+              f'({scenic_pct})。タグなしは {scenic_other_pct}、BH-FDR {scenic_fdr}。')}
+        </div>
+      </div>
+      <div class="pill"><b>Candidate nudge:</b> A/B test a Chinese-language discovery card
+        foregrounding dinosaur / museum and scenic-nature content. Measure clicks, saves,
+        and itinerary intent.</div>
+      {jp('<b>候補ナッジ:</b>恐竜・博物館と自然景観を前面に出した中国語の発見カードを'
+          'A/B テストし、クリック・保存・旅程への追加意向を測定する。')}
+      <p class="scope">Hypothesis-generating only: one platform, reviewed keyword tags,
+        SnowNLP secondary sentiment, no rating model, no causal claim.</p>
+      {jp('仮説生成に限定:単一プラットフォーム、レビュー済みキーワードタグ、'
+          'SnowNLP の副次的感情分析、星評価モデルなし、因果主張なし。')}
+    """, f"{C} Present this as a separate evidence stream. The {cn_rows} Xiaohongshu posts cannot enter "
+         "the star-rating model because they have no ratings. Within Xiaohongshu, dinosaur and scenic-nature "
+         "tags coincide with higher SnowNLP-positive shares after topic-family FDR correction. This supports "
+         "an A/B-test candidate, not a proven effect. Do not compare SnowNLP with VADER or oseti.",
+         "8:25-9:15")
+
+    # 10: RESULTS · POI ACTION MAP
     slide("fig", "Result · POI map", f"""
-      <p class="secnum">R — RESULTS · POI ACTION MAP</p>
+      <p class="secnum">III. RESULTS · POI ACTION MAP</p>
       <h2>Fix-it, promote-it, and crowding hotspots</h2>
       {jp('改善型・推奨型・混雑ホットスポット')}
       <div class="cols2 vtop">
         <div>
           <ul class="big">
-            <li><b>Fix-it</b>: {fix_count} POIs ({fix_fukui} in Fukui) — high-volume with
+            <li><b>Fix-it</b>: {fix_count} POIs ({fix_fukui} in Fukui), high-volume with
               nudge-able friction.</li>
-            {jp(f'<b>改善型</b>:{fix_count} スポット(うち福井 {fix_fukui})— 来訪が多く'
+            {jp(f'<b>改善型</b>:{fix_count} スポット(うち福井 {fix_fukui})、来訪が多く'
                 'ナッジ可能な摩擦あり。')}
-            <li><b>Promote-it</b>: {promote_count} POIs ({promote_fukui} in Fukui) —
+            <li><b>Promote-it</b>: {promote_count} POIs ({promote_fukui} in Fukui),
               low-volume, high-satisfaction.</li>
-            {jp(f'<b>推奨型</b>:{promote_count} スポット(うち福井 {promote_fukui})— '
+            {jp(f'<b>推奨型</b>:{promote_count} スポット(うち福井 {promote_fukui})、'
                 '来訪は少ないが満足度が高い。')}
-            <li><b>Crowding hotspots</b>: {crowd_count} — demand-redistribution candidates.</li>
-            {jp(f'<b>混雑ホットスポット</b>:{crowd_count} — 需要再配分の候補。')}
+            <li><b>Crowding hotspots</b>: {crowd_count}, demand-redistribution candidates.</li>
+            {jp(f'<b>混雑ホットスポット</b>:{crowd_count}、需要再配分の候補。')}
           </ul>
           <p class="muted">Volume thresholds: low &lt; {low_vol} reviews · high &gt; {high_vol}.</p>
           {jp(f'件数しきい値:低 &lt; {low_vol} 件 · 高 &gt; {high_vol} 件。')}
-          <p class="lead">Top Fukui promote-it: <b>{promo1}</b> — positive share {promo1_share}
-            (CI {promo1_low}–{promo1_high}, {promo1_conf}); then <b>{promo2}</b>
-            {promo2_share} (CI {promo2_low}–{promo2_high}, {promo2_conf}).</p>
-          {jp(f'福井の推奨型トップ:<b>{promo1}</b> — ポジティブ割合 {promo1_share}'
-              f'(信頼区間 {promo1_low}–{promo1_high}、{promo1_conf});次に <b>{promo2}</b> '
-              f'{promo2_share}(信頼区間 {promo2_low}–{promo2_high}、{promo2_conf})。')}
+          <p class="lead">Top Fukui promote-it: <b>{promo1}</b>, positive share {promo1_share}
+            (CI {promo1_low} to {promo1_high}, {promo1_conf}); then <b>{promo2}</b>
+            {promo2_share} (CI {promo2_low} to {promo2_high}, {promo2_conf}).</p>
+          {jp(f'福井の推奨型トップ:<b>{promo1}</b>、ポジティブ割合 {promo1_share}'
+              f'(信頼区間 {promo1_low}から{promo1_high}、{promo1_conf});次に <b>{promo2}</b> '
+              f'{promo2_share}(信頼区間 {promo2_low}から{promo2_high}、{promo2_conf})。')}
         </div>
         <div>{fig("nudge_poi_fig", 330)}</div>
       </div>
     """, f"{C} Your slide. Three archetypes from the POI index: fix-it (busy + fixable friction), "
-         "promote-it (hidden gems with high satisfaction but low volume — the demand-redistribution "
+         "promote-it (hidden gems with high satisfaction but low volume, the demand-redistribution "
          "targets), and crowding hotspots (where you'd redirect demand FROM). Read the two top Fukui "
-         "gems with their confidence intervals — note the small-n CIs honestly. POI names are proper "
+         "gems with their confidence intervals; note the small-n CIs honestly. POI names are proper "
          "nouns, so we keep them as-is in both languages.",
-         "8:25–9:20")
+         "9:15-10:10")
 
-    # 10 — DISCUSSION
+    # 11: RESULTS · FINAL CROSS-LANGUAGE PRIORITIES
+    p1, p2, p3 = priorities
+    slide("text", "Result · Final priorities", f"""
+      <p class="secnum">III. RESULTS · FINAL CROSS-LANGUAGE PRIORITIES</p>
+      <h2>Rank common nudges by impact, then ease</h2>
+      {jp('共通ナッジをインパクト、次に実装容易性で順位づける')}
+      <table class="stats">
+        <tr><th>Priority</th><th>Common solution</th><th>Evidence and ease</th><th>Next-semester test</th></tr>
+        <tr>
+          <td>{p1['rank']}</td>
+          <td><b>{p1['name_en']}</b>{jp(p1['name_ja'])}</td>
+          <td><b>{p1['impact']} impact · {p1['ease']}</b><br>{p1['summary_en']}{jp(p1['summary_ja'])}</td>
+          <td>{p1['test_en']}{jp(p1['test_ja'])}</td>
+        </tr>
+        <tr>
+          <td>{p2['rank']}</td>
+          <td><b>{p2['name_en']}</b>{jp(p2['name_ja'])}</td>
+          <td><b>{p2['impact']} impact · {p2['ease']}</b><br>{p2['summary_en']}{jp(p2['summary_ja'])}</td>
+          <td>{p2['test_en']}{jp(p2['test_ja'])}</td>
+        </tr>
+        <tr>
+          <td>{p3['rank']}</td>
+          <td><b>{p3['name_en']}</b>{jp(p3['name_ja'])}</td>
+          <td><b>{p3['impact']} impact · {p3['ease']}</b><br>{p3['summary_en']}{jp(p3['summary_ja'])}</td>
+          <td>{p3['test_en']}{jp(p3['test_ja'])}</td>
+        </tr>
+      </table>
+      <div class="pill">Ordinal opportunity ranking, not causal effectiveness.
+        Impact tier comes first; implementation ease breaks ties.</div>
+      {jp('因果的な効果ではなく、順序尺度による機会ランキング。'
+          'インパクト層を優先し、同じ層では実装容易性で順位づける。')}
+    """, f"{BOTH} This is the decision slide. Read only the first row in detail. Each solution "
+         "has reviewed support from English, Japanese, and Chinese-language sources, although the "
+         "evidence types differ. Priority one comes first because it combines high-impact evidence "
+         "with the easiest prototype. The experiment register carries these exact ranks into next semester.",
+         "10:10-11:00")
+
+    # 12: DISCUSSION
     slide("text", "Discussion", f"""
-      <p class="secnum">D — DISCUSSION</p>
+      <p class="secnum">IV. DISCUSSION</p>
       <h2>What this can and cannot claim</h2>
       {jp('主張できること・できないこと')}
       <ul class="big">
@@ -642,19 +777,20 @@ def build() -> str:
         <li>{cav_lang}</li>
         {jp('言語グループは口コミの言語を表し、執筆者の国籍ではない。')}
       </ul>
-      <div class="pill">Every caveat above is pulled verbatim from the analysis manifest —
+      <div class="pill">Every caveat above is pulled verbatim from the analysis manifest,
         not paraphrased on the slide.</div>
       {jp('上記の注意点はすべて分析マニフェストから逐語的に引用しており、スライド上で'
           '言い換えていない。')}
-    """, f"{A} Slowly — this is the intellectual honesty slide. Each bullet is the verbatim caveat "
+    """, f"{A} Slowly. This is the intellectual honesty slide. Each bullet is the verbatim caveat "
          "string from the manifest, so the limitations we present are exactly the ones the analysis "
          "itself records. The big four: not causal, ranks experiments not effects, POI clustering "
-         "unmodeled, and language ≠ nationality. Pause here.",
-         "9:20–10:25")
+         "unmodeled, and language ≠ nationality. These limits are why the ranked solutions become "
+         "randomized experiments next semester. Pause here.",
+         "11:00-11:45")
 
-    # 11 — FUTURE WORK
+    # 13: FUTURE WORK
     slide("text", "Future work", f"""
-      <p class="secnum">D — FUTURE WORK</p>
+      <p class="secnum">IV. FUTURE WORK</p>
       <h2>From ranking to experiments</h2>
       {jp('順位づけから実験へ')}
       <div class="cols2">
@@ -667,21 +803,21 @@ def build() -> str:
             experiment register →</a></p>
           {jp('<a class="reglink" href="docs/nudge_experiment_register.html">'
               '実験レジスターを開く →</a>')}</div>
-        <div class="card"><h3>The feeding pipeline</h3>
-          {jp('供給するパイプライン')}
-          <p>{models_total} fitted models and {fix_count} fix-it POIs feed the register's
-            prioritised candidates.</p>
-          {jp(f'{models_total} の推定済みモデルと {fix_count} の改善型スポットが、'
-              'レジスターの優先候補に供給される。')}</div>
+        <div class="card"><h3>First experiment</h3>
+          {jp('最初の実験')}
+          <p>Begin with priority {p1['rank']}: <b>{p1['name_en']}</b>. Randomize exposure,
+            log interactions, then estimate behavior change.</p>
+          {jp(f'優先順位 {p1["rank"]} の<b>{p1["name_ja"]}</b>から開始。'
+              '提示を無作為化し、反応を記録して行動変化を推定する。')}</div>
       </div>
       <p class="closing">This deck ranks <b>where</b> to experiment; the register says
         <b>how</b>. &nbsp;Thank you.</p>
       {jp('このデッキは<b>どこで</b>実験するかを順位づけし、レジスターは<b>どのように</b>'
           '行うかを示す。 &nbsp;ありがとうございました。')}
-    """, f"{BOTH} Co-presenter delivers the register hand-off and clicks through to it if time allows. "
-         "Andrew closes on the one-line conclusion — deck ranks WHERE, register says HOW — slowly, then "
-         "invites questions. Don't rush the last line.",
-         "10:25–11:30")
+    """, f"{BOTH} Co-presenter delivers the register hand-off. Next semester begins with priority "
+         f"{p1['rank']}, {p1['name_en']}, randomized by visitor session with exposure and interaction "
+         "logging. Andrew closes: deck ranks WHERE, register says HOW. Then invite questions.",
+         "11:45-12:30")
 
     # ---- assemble -------------------------------------------------------------
     css = r"""
@@ -781,7 +917,7 @@ table.stats .jp{margin:2px 0 0}
     out = [
         "<!doctype html><html lang='en'><head><meta charset='utf-8'>",
         "<meta name='viewport' content='width=device-width,initial-scale=1'>",
-        "<title>Hokuriku Nudge — Seminar Slides Preview</title>",
+        "<title>Hokuriku Nudge: Seminar Slides Preview</title>",
         f"<style>{css}</style></head><body>",
         "<div class='bar'><span><b>NUDGE SEMINAR DECK PREVIEW</b> · IMRAD · bilingual · ~11 min · 2 presenters</span>"
         "<span>orange box = English speaker notes (not on slide) · ● = traced to source file · "
@@ -789,7 +925,7 @@ table.stats .jp{margin:2px 0 0}
         "<div class='deck'>",
         "".join(slides),
         f"<p style='text-align:center;color:#5b677a;font-family:ui-monospace,Menlo,monospace;"
-        f"font-size:12px;margin:30px 0 0'>Generated by scripts/build_nudge_seminar_slides.py — "
+        f"font-size:12px;margin:30px 0 0'>Generated by scripts/build_nudge_seminar_slides.py: "
         f"every number resolved from a source file at build time ({len(REFS)} traced values). "
         f"Print to PDF for a clean export. Derived preview; not source of truth.</p>",
         "</div></body></html>",

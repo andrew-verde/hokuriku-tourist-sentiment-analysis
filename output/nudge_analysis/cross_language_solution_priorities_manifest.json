@@ -1,0 +1,107 @@
+{
+  "schema_version": "research_provenance.v1",
+  "kind": "cross_language_solution_priorities",
+  "generated_at": "2026-06-27T03:21:42+00:00",
+  "command": "scripts/build_cross_language_solution_priorities.py",
+  "inputs": [
+    {
+      "role": "solution mapping config",
+      "path": "config/cross_language_solution_mapping.yaml",
+      "exists": true,
+      "bytes": 4193,
+      "sha256": "a471da8277d89da9af21ec56ab6af1e32884bb8df2deac4182fec3ed636684ca"
+    },
+    {
+      "role": "review aspect opportunity aggregates",
+      "path": "output/nudge_analysis/aspect_opportunity_map.csv",
+      "exists": true,
+      "bytes": 32806,
+      "sha256": "8b04ba275f24c2ab07cc065a27d3890312916b995c5bc4759ac30a7e388b058d"
+    },
+    {
+      "role": "reviewed JP-EN evidence aggregates",
+      "path": "output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv",
+      "exists": true,
+      "bytes": 7313,
+      "sha256": "94e7d871bdbbd3194985e1e72a6aa3cfa5900a0962a7b66e13b5caea1144a70b"
+    },
+    {
+      "role": "reviewed Chinese friction aggregates",
+      "path": "output/chinese_social_media_analysis/chinese_vs_review_language_friction_comparison.csv",
+      "exists": true,
+      "bytes": 4833,
+      "sha256": "b4c55d4e4004b81861f0d14ae4ff16a5c5baff0e85f3a96e56d5d1c77240c2ad"
+    },
+    {
+      "role": "reviewed Chinese enjoyment aggregates",
+      "path": "output/chinese_social_media_analysis/chinese_enjoyment_evidence_by_city_platform.csv",
+      "exists": true,
+      "bytes": 268,
+      "sha256": "54dafbe483d925d8480c1f9768b50fcc63ce76c24d25038c899459dedea1455d"
+    },
+    {
+      "role": "within-XHS association aggregates",
+      "path": "output/within_language_sentiment/cn_within_source_sentiment_drivers.csv",
+      "exists": true,
+      "bytes": 35073,
+      "sha256": "359b96eb767b3551becce2fc899d3253d83627494d627826f5df161b982678bc"
+    }
+  ],
+  "outputs": [
+    {
+      "role": "ranked aggregate priorities",
+      "path": "output/nudge_analysis/cross_language_solution_priorities.csv",
+      "exists": true,
+      "bytes": 4134,
+      "sha256": "d2cc802fcc854e1b7b34c54b8a22eeea34820c5cbcf95bb520b04aa5ed13a837"
+    },
+    {
+      "role": "source-specific aggregate evidence",
+      "path": "output/nudge_analysis/cross_language_solution_evidence.csv",
+      "exists": true,
+      "bytes": 2450,
+      "sha256": "edf732f66eebd08c11acb3f965a48b7482f653f4246d7bf966a0682b60baf375"
+    }
+  ],
+  "filters": {
+    "prefecture": "Fukui",
+    "groups": [
+      "english",
+      "japanese",
+      "chinese"
+    ],
+    "all_three_required_when_available": true,
+    "two_of_three_fallback_only_when_no_all_three": true
+  },
+  "metrics": {
+    "candidate_solutions": 3,
+    "ranked_solutions": 3,
+    "evidence_rows": 9,
+    "fallback_used": false,
+    "ranked_solution_ids": [
+      "visit_readiness_card",
+      "localized_discovery_card",
+      "off_peak_alternative_prompt"
+    ]
+  },
+  "caveats": [
+    "Language/source groups do not imply nationality.",
+    "Counts and denominators remain source-specific and are not pooled.",
+    "VADER, oseti, and SnowNLP raw scores are not compared across languages.",
+    "Chinese-language XHS posts have no star-rating outcome.",
+    "Associations rank hypotheses for future experiments and are not causal effects."
+  ],
+  "extra": {
+    "ranking_rule": [
+      "impact tier",
+      "implementation ease",
+      "evidence breadth",
+      "stable solution ID"
+    ],
+    "impact_rule": {
+      "High": "all-three support plus FDR-supported harmful-rating or within-XHS positive association",
+      "Medium": "all-three descriptive support without qualifying FDR association"
+    },
+    "mapping_schema_version": "cross_language_solution_mapping.v1"
+  }
+}

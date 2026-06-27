@@ -28,6 +28,7 @@ SOURCES = {
     "aspect": ROOT / "output" / "nudge_analysis" / "aspect_opportunity_map.csv",
     "poi": ROOT / "output" / "nudge_analysis" / "poi_opportunity_index.csv",
     "tax": ROOT / "output" / "nudge_analysis" / "nudge_taxonomy.csv",
+    "priority": ROOT / "output" / "nudge_analysis" / "cross_language_solution_priorities.csv",
 }
 FORBIDDEN_COLUMNS = {
     "review_text",
@@ -127,6 +128,17 @@ def taxonomy_value(aspect: str, col: str):
     return g
 
 
+def priority_value(rank: int, col: str):
+    def g(d: pd.DataFrame):
+        r = d[d["rank"] == rank]
+        if len(r) != 1:
+            raise KeyError(f"expected one priority rank {rank}; found {len(r)}")
+        if col not in r.columns:
+            raise KeyError(f"missing priority column: {col}")
+        return r[col].iloc[0]
+    return g
+
+
 def poi_ranked(kind: str, index: int, col: str):
     def g(d: pd.DataFrame):
         if kind == "fix":
@@ -211,12 +223,43 @@ def source_values() -> dict[str, str]:
     return values
 
 
+def ranked_solution_values() -> list[dict[str, str]]:
+    """Resolve register cards from the same ranked output used by the deck."""
+    rows: list[dict[str, str]] = []
+    fields = [
+        "rank",
+        "solution_id",
+        "solution_label_en",
+        "impact_tier",
+        "ease_tier",
+        "evidence_summary_en",
+        "experiment_hypothesis_en",
+        "intervention_en",
+        "randomization_unit",
+        "primary_outcomes",
+        "secondary_outcomes",
+        "evidence_caveat",
+    ]
+    for rank in (1, 2, 3):
+        row: dict[str, str] = {}
+        for field in fields:
+            row[field] = stat(
+                "priority",
+                priority_value(rank, field),
+                "{:.0f}" if field == "rank" else "{}",
+                field=f"priority rank {rank} {field}",
+            )
+        rows.append(row)
+    return rows
+
+
 def card(title: str, body: str) -> str:
     return f"<div class='hyp'><div class='hyp-head'><span class='hyp-tag'>Experiment</span><h3>{title}</h3></div>{body}</div>"
 
 
 def build_html() -> str:
     v = source_values()
+    ranked = ranked_solution_values()
     css = dashboard_css()
     H: list[str] = []
     H.append("<!doctype html><html lang='en'><head><meta charset='utf-8'>")
@@ -240,6 +283,23 @@ def build_html() -> str:
     H.append("<section><span class='sec-num'>REGISTER — EXPERIMENT CARDS</span>")
     H.append("<h2 class='sec'>What to test next semester</h2>")
     H.append("<p class='lead'>Every statistic, POI name, nudge type, and mechanism below is loaded from aggregate CSV outputs at build time and wrapped in a provenance link.</p>")
+
+    for row in ranked:
+        H.append(card(
+            f"Priority {row['rank']}: {row['solution_label_en']}",
+            f"<p><b>Solution ID.</b> {row['solution_id']}</p>"
+            f"<p><b>Ranking.</b> {row['impact_tier']} impact; implementation ease {row['ease_tier']}.</p>"
+            f"<p><b>Cross-language evidence.</b> {row['evidence_summary_en']}</p>"
+            f"<p><b>Hypothesis.</b> {row['experiment_hypothesis_en']}</p>"
+            f"<p><b>Intervention.</b> {row['intervention_en']}</p>"
+            f"<p><b>Randomization unit.</b> {row['randomization_unit']}</p>"
+            f"<p><b>Primary outcomes.</b> {row['primary_outcomes']}</p>"
+            f"<p><b>Secondary outcomes.</b> {row['secondary_outcomes']}</p>"
+            f"<p><b>Evidence boundary.</b> {row['evidence_caveat']}</p>"
+        ))
+
+    H.append("<h2 class='sec'>Supporting analysis cards</h2>")
+    H.append("<p class='lead'>These preserve the aspect-level and POI-level rationale behind the ranked solution families.</p>")
 
     H.append(card(
         "Fix-it information levers",
