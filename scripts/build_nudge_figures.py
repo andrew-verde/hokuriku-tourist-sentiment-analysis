@@ -6,6 +6,7 @@ small figure pack:
 1. Aspect penalty-by-prevalence map for friction codes.
 2. POI action map for fix-it, promote-it, and crowding-hotspot candidates.
 3. Information-lever prevalence chart for nudge-able friction aspects.
+4. Hokuriku modelled-review volume by language.
 
 All numbers are fetched from aggregate CSVs at build time. Missing required
 rows or fields fail the build rather than producing guessed values. The figures
@@ -85,6 +86,7 @@ NUDGEABLE_FRICTION_ASPECTS = [
 ]
 SIGNIFICANT_LABEL_ASPECTS = {
     "opening_hours_availability",
+    "wayfinding_signage",
     "price_value",
     "cleanliness_comfort",
     "itinerary_fit_time_cost",
@@ -119,7 +121,7 @@ def _read_csv(path: Path, required: set[str], make_target: str) -> pd.DataFrame:
     return df
 
 
-def _text(x: float, y: float, value: object, size: int = 13, weight: int = 400,
+def _text(x: float, y: float, value: object, size: int = 16, weight: int = 400,
           fill: str = PALETTE["ink"], anchor: str = "start") -> str:
     return (
         f'<text x="{x:.2f}" y="{y:.2f}" text-anchor="{anchor}" '
@@ -128,7 +130,7 @@ def _text(x: float, y: float, value: object, size: int = 13, weight: int = 400,
     )
 
 
-def _vtext(x: float, y: float, value: object, size: int = 13, weight: int = 700,
+def _vtext(x: float, y: float, value: object, size: int = 16, weight: int = 700,
            fill: str = PALETTE["ink"], anchor: str = "middle") -> str:
     # Vertical (rotated -90) axis title, kept outside the plot area so it never
     # overprints the tick labels.
@@ -139,7 +141,7 @@ def _vtext(x: float, y: float, value: object, size: int = 13, weight: int = 700,
     )
 
 
-def _text_halo(x: float, y: float, value: object, size: int = 10, weight: int = 700,
+def _text_halo(x: float, y: float, value: object, size: int = 16, weight: int = 700,
                fill: str = PALETTE["ink"], anchor: str = "start") -> str:
     # Draw the label twice: a thick background-coloured stroke underneath, then
     # the fill on top. This keeps point labels legible where they cross markers
@@ -234,12 +236,12 @@ def write_aspect_opportunity_map(aspects: pd.DataFrame, output_dir: Path) -> dic
     if required_labels:
         raise NudgeFigureError(f"Required significant aspect rows missing: {', '.join(sorted(required_labels))}")
 
-    width = 1080
-    height = 600
-    left = 98
-    right = 36
-    top = 90
-    bottom = 108
+    width = 1200
+    height = 660
+    left = 116
+    right = 48
+    top = 96
+    bottom = 124
     chart_w = width - left - right
     chart_h = height - top - bottom
     x_max = max(float(data["prevalence"].max()) * 1.18, 0.01)
@@ -256,7 +258,7 @@ def write_aspect_opportunity_map(aspects: pd.DataFrame, output_dir: Path) -> dic
         width,
         height,
         "Nudge Aspect Opportunity Map",
-        "Primary friction aspects: prevalence vs adjusted odds of low rating",
+        "Primary pain point aspects: prevalence vs adjusted odds of low rating",
     )
     # Axis grid and OR=1 reference line.
     for tick in (0.0, x_max / 2, x_max):
@@ -316,12 +318,12 @@ def write_poi_action_map(pois: pd.DataFrame, output_dir: Path) -> dict[str, str]
     low_threshold = float(data["low_volume_threshold"].dropna().iloc[0])
     high_threshold = float(data["high_volume_threshold"].dropna().iloc[0])
 
-    width = 1200
-    height = 650
-    left = 92
-    right = 42
-    top = 90
-    bottom = 112
+    width = 1320
+    height = 720
+    left = 112
+    right = 56
+    top = 96
+    bottom = 128
     chart_w = width - left - right
     chart_h = height - top - bottom
     x_max = max(float(data["n_reviews"].max()) * 1.08, high_threshold * 1.08)
@@ -453,12 +455,12 @@ def write_info_levers(aspects: pd.DataFrame, output_dir: Path) -> dict[str, str]
         rows.append(row)
     data = pd.DataFrame(rows).sort_values("prevalence", ascending=True)
 
-    width = 1160
-    height = 450
-    left = 335
-    right = 275
-    top = 86
-    row_h = 47
+    width = 1280
+    height = 510
+    left = 370
+    right = 305
+    top = 94
+    row_h = 54
     chart_w = width - left - right
     x_max = max(float(data["prevalence_ci_high"].max()) * 1.15, 0.01)
 
@@ -470,7 +472,7 @@ def write_info_levers(aspects: pd.DataFrame, output_dir: Path) -> dict[str, str]
         width,
         height,
         "Nudge-Able Information Levers",
-        "Prevalence and adjusted low-rating association for six friction aspects",
+        "Prevalence and adjusted low-rating association for six pain point aspects",
     )
     grid_bottom = top + (len(data) - 1) * row_h + 36
     for tick in (0.0, x_max / 2, x_max):
@@ -509,6 +511,55 @@ def write_info_levers(aspects: pd.DataFrame, output_dir: Path) -> dict[str, str]
         "path": str(path),
         "question": "Which nudge-able friction levers are present and statistically evidenced?",
         "caveat": "Rare aspects stay visible; underpowered flags should temper interpretation.",
+    }
+
+
+def write_review_volume_context(aspects: pd.DataFrame, output_dir: Path) -> dict[str, str]:
+    """Plot Hokuriku modelled-review counts without sentiment-tool results."""
+    pooled = aspects[
+        (aspects["analysis"] == "A_primary")
+        & (aspects["aspect"] == "transport_access")
+        & (aspects["segment"].isin(["japanese", "english", "chinese"]))
+    ][["segment", "n"]].copy()
+    if set(pooled["segment"]) != {"japanese", "english", "chinese"}:
+        raise NudgeFigureError("Missing Hokuriku A_primary language segments for volume context")
+    pooled["n"] = pooled["n"].astype(int)
+    pooled = pooled.sort_values("n", ascending=False)
+
+    width, height = 1080, 340
+    left, right, top, row_h = 280, 100, 88, 66
+    chart_w = width - left - right
+    max_n = int(pooled["n"].max())
+    path = output_dir / "figure_nudge_hokuriku_volume_context.svg"
+    parts = _svg_header(
+        width,
+        height,
+        "Hokuriku Modelled Review Volume",
+        "Supported-language Google reviews across Fukui, Ishikawa, and Toyama",
+    )
+    for idx, row in enumerate(pooled.itertuples(index=False)):
+        y = top + idx * row_h
+        bar_w = float(row.n) / max_n * chart_w
+        color = PALETTE[str(row.segment)]
+        parts.append(_text(left - 16, y + 24, f"{row.segment}-language reviews", size=19, anchor="end"))
+        parts.append(f'<rect x="{left}" y="{y + 5}" width="{bar_w:.2f}" height="28" rx="3" fill="{color}"/>')
+        inside = bar_w > 120
+        parts.append(_text(
+            left + bar_w - 10 if inside else left + bar_w + 10,
+            y + 26,
+            f"n={int(row.n):,}",
+            size=18,
+            weight=700,
+            fill="#ffffff" if inside else PALETTE["ink"],
+            anchor="end" if inside else "start",
+        ))
+    parts.append(_text(24, height - 10, "Counts come from the pooled Hokuriku low-rating model; no sentiment score is shown.", size=16, fill=PALETTE["muted"]))
+    _write_svg(path, parts)
+    return {
+        "figure": "Hokuriku modelled review volume",
+        "path": str(path),
+        "question": "How many supported-language Google reviews enter the Hokuriku model?",
+        "caveat": "Counts exclude unsupported or undetected language rows; no sentiment-tool result is shown.",
     }
 
 
@@ -581,6 +632,7 @@ def build_nudge_figures(
         write_aspect_opportunity_map(aspects, output_dir),
         write_poi_action_map(pois, output_dir),
         write_info_levers(aspects, output_dir),
+        write_review_volume_context(aspects, output_dir),
     ]
 
     question_records = [{**item, "path": repo_relative(item["path"])} for item in questions]

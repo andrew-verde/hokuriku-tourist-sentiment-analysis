@@ -1,29 +1,29 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1000" height="386" viewBox="0 0 1000 386">
 <rect width="100%" height="100%" fill="#fbfaf7"/>
-<text x="32" y="38" font-family="Arial, sans-serif" font-size="24" font-weight="700" fill="#1f2933">Statistical Check Status</text>
-<text x="32" y="66" font-family="Arial, sans-serif" font-size="14" fill="#52616b">Effect metrics differ by row and are NOT comparable bar-to-bar</text>
+<text x="32" y="38" font-family="Arial, sans-serif" font-size="30" font-weight="700" fill="#1f2933">Statistical Check Status</text>
+<text x="32" y="66" font-family="Arial, sans-serif" font-size="18" fill="#52616b">Effect metrics differ by row and are NOT comparable bar-to-bar</text>
 <line x1="365.00" x2="365.00" y1="100.00" y2="298.00" stroke="#d7dde8" stroke-width="1" opacity="0.58"/>
 <line x1="642.50" x2="642.50" y1="100.00" y2="298.00" stroke="#d7dde8" stroke-width="1" opacity="0.58"/>
 <line x1="920.00" x2="920.00" y1="100.00" y2="298.00" stroke="#d7dde8" stroke-width="1" opacity="0.58"/>
-<text x="351" y="122" text-anchor="end" font-family="Arial, sans-serif" font-size="12" fill="#1f2933">chi square sentiment category</text>
+<text x="351" y="122" text-anchor="end" font-family="Arial, sans-serif" font-size="16" fill="#1f2933">chi square sentiment category</text>
 <rect x="365" y="107" width="76.80" height="20" rx="3" fill="#5b6c94"/>
-<rect x="445.80" y="107.00" width="178.00" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
-<text x="534.80" y="122.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#1f2933">effect=0.138 (Cramér&#x27;s V)</text>
-<text x="351" y="164" text-anchor="end" font-family="Arial, sans-serif" font-size="12" fill="#1f2933">cluster bootstrap poi mean difference sentiment scor</text>
+<rect x="445.80" y="107.00" width="232.00" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="561.80" y="122.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="400" fill="#1f2933">effect=0.138 (Cramér&#x27;s V)</text>
+<text x="351" y="164" text-anchor="end" font-family="Arial, sans-serif" font-size="16" fill="#1f2933">cluster bootstrap poi mean difference sentiment scor</text>
 <rect x="365" y="149" width="162.66" height="20" rx="3" fill="#5b6c94"/>
-<rect x="531.66" y="149.00" width="249.28" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
-<text x="656.30" y="164.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#1f2933">effect=0.293 (mean diff, tool score)</text>
-<text x="351" y="206" text-anchor="end" font-family="Arial, sans-serif" font-size="12" fill="#1f2933">poi level welch t mean review rating</text>
+<rect x="531.66" y="149.00" width="327.04" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="695.18" y="164.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="400" fill="#1f2933">effect=0.293 (mean diff, tool score)</text>
+<text x="351" y="206" text-anchor="end" font-family="Arial, sans-serif" font-size="16" fill="#1f2933">poi level welch t mean review rating</text>
 <rect x="365" y="191" width="148.40" height="20" rx="3" fill="#5b6c94"/>
-<rect x="517.40" y="191.00" width="216.88" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
-<text x="625.84" y="206.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#1f2933">effect=0.267 (mean diff, stars)</text>
-<text x="351" y="248" text-anchor="end" font-family="Arial, sans-serif" font-size="12" fill="#1f2933">cross source sentiment category independence</text>
+<rect x="517.40" y="191.00" width="283.84" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="659.32" y="206.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="400" fill="#1f2933">effect=0.267 (mean diff, stars)</text>
+<text x="351" y="248" text-anchor="end" font-family="Arial, sans-serif" font-size="16" fill="#1f2933">cross source sentiment category independence</text>
 <rect x="365" y="233" width="84.13" height="20" rx="3" fill="#5b6c94"/>
-<rect x="453.13" y="233.00" width="178.00" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
-<text x="542.13" y="248.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#1f2933">effect=0.152 (Cramér&#x27;s V)</text>
-<text x="351" y="290" text-anchor="end" font-family="Arial, sans-serif" font-size="12" fill="#1f2933">within chinese platform sentiment category independe</text>
+<rect x="453.13" y="233.00" width="232.00" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="569.13" y="248.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="400" fill="#1f2933">effect=0.152 (Cramér&#x27;s V)</text>
+<text x="351" y="290" text-anchor="end" font-family="Arial, sans-serif" font-size="16" fill="#1f2933">within chinese platform sentiment category independe</text>
 <rect x="365" y="275" width="99.90" height="20" rx="3" fill="#8d99ae"/>
-<rect x="468.90" y="275.00" width="145.60" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
-<text x="541.70" y="290.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#1f2933">skipped (Cramér&#x27;s V)</text>
-<text x="32.00" y="362.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#52616b">Bars are status indicators only; compare each effect to its own metric, not across rows.</text>
+<rect x="468.90" y="275.00" width="188.80" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="563.30" y="290.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="400" fill="#1f2933">skipped (Cramér&#x27;s V)</text>
+<text x="32.00" y="362.00" text-anchor="start" font-family="Arial, sans-serif" font-size="16" font-weight="400" fill="#52616b">Bars are status indicators only; compare each effect to its own metric, not across rows.</text>
 </svg>

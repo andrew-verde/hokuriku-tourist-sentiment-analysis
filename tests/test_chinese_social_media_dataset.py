@@ -280,6 +280,22 @@ def test_reviewed_chinese_codebook_supersedes_legacy_yaml_terms():
     assert "推荐" in codebook["recommendation_intent"]["keywords"]
 
 
+def test_supplementary_chinese_codebook_loads_only_reviewed_candidates(tmp_path):
+    candidates = tmp_path / "candidates.csv"
+    candidates.write_text(
+        "code,proposed_keyword,status\n"
+        "opening_hours_availability,收铺,reviewed\n"
+        "waiting_crowding,未审核词,pending\n",
+        encoding="utf-8",
+    )
+
+    codebook = load_chinese_codebook(supplementary_path=candidates)
+
+    assert "收铺" in codebook["opening_hours_availability"]["keywords"]
+    assert "收鋪" in codebook["opening_hours_availability"]["keywords"]
+    assert "未审核词" not in codebook["waiting_crowding"]["keywords"]
+
+
 def test_parse_author_and_date_handles_xhs_display_forms():
     # Xiaohongshu dates appear in several display formats; this verifies the
     # precision label that tells downstream code how trustworthy the date is.

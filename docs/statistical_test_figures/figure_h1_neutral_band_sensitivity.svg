@@ -1,22 +1,22 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1120" height="295" viewBox="0 0 1120 295">
 <rect width="100%" height="100%" fill="#fbfaf7"/>
 <text x="32.00" y="39.00" text-anchor="start" font-family="Arial, sans-serif" font-size="24" font-weight="700" fill="#172033">H1 Neutral-Band Sensitivity</text>
-<text x="32.00" y="66.00" text-anchor="start" font-family="Arial, sans-serif" font-size="14" font-weight="400" fill="#5b677a">Effect remains visible as neutral band widens</text>
+<text x="32.00" y="66.00" text-anchor="start" font-family="Arial, sans-serif" font-size="16" font-weight="400" fill="#5b677a">Effect remains visible as neutral band widens</text>
 <line x1="365.00" x2="365.00" y1="94.00" y2="233.00" stroke="#d7dde8" stroke-width="1" opacity="0.65"/>
 <line x1="657.50" x2="657.50" y1="94.00" y2="233.00" stroke="#d7dde8" stroke-width="1" opacity="0.65"/>
 <line x1="950.00" x2="950.00" y1="94.00" y2="233.00" stroke="#d7dde8" stroke-width="1" opacity="0.65"/>
 <line x1="365.00" x2="950.00" y1="233.00" y2="233.00" stroke="#d7dde8" stroke-width="1" opacity="0.75"/>
-<text x="351.00" y="125.00" text-anchor="end" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">neutral band +/-0.05</text>
+<text x="351.00" y="125.00" text-anchor="end" font-family="Arial, sans-serif" font-size="16" font-weight="400" fill="#172033">neutral band +/-0.05</text>
 <rect x="365.00" y="110.00" width="404.78" height="20" rx="3" fill="#5b6c94"/>
-<rect x="773.78" y="110.00" width="119.68" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
-<text x="833.62" y="125.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">V=0.138; p&lt;0.001</text>
-<text x="351.00" y="164.00" text-anchor="end" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">neutral band +/-0.10</text>
+<rect x="773.78" y="110.00" width="154.24" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="850.90" y="125.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="400" fill="#172033">V=0.138; p&lt;0.001</text>
+<text x="351.00" y="164.00" text-anchor="end" font-family="Arial, sans-serif" font-size="16" font-weight="400" fill="#172033">neutral band +/-0.10</text>
 <rect x="365.00" y="149.00" width="433.48" height="20" rx="3" fill="#5b6c94"/>
-<rect x="802.48" y="149.00" width="119.68" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
-<text x="862.32" y="164.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">V=0.148; p&lt;0.001</text>
-<text x="351.00" y="203.00" text-anchor="end" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">neutral band +/-0.20</text>
+<rect x="802.48" y="149.00" width="154.24" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="879.60" y="164.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="400" fill="#172033">V=0.148; p&lt;0.001</text>
+<text x="351.00" y="203.00" text-anchor="end" font-family="Arial, sans-serif" font-size="16" font-weight="400" fill="#172033">neutral band +/-0.20</text>
 <rect x="365.00" y="188.00" width="487.65" height="20" rx="3" fill="#5b6c94"/>
-<rect x="856.65" y="188.00" width="119.68" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
-<text x="916.49" y="203.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#172033">V=0.167; p&lt;0.001</text>
-<text x="32.00" y="275.00" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#5b677a">Sensitivity rows are robustness checks, not new independent hypotheses.</text>
+<rect x="856.65" y="188.00" width="154.24" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="933.77" y="203.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="400" fill="#172033">V=0.167; p&lt;0.001</text>
+<text x="32.00" y="275.00" text-anchor="start" font-family="Arial, sans-serif" font-size="16" font-weight="400" fill="#5b677a">Sensitivity rows are robustness checks, not new independent hypotheses.</text>
 </svg>

@@ -4,14 +4,16 @@ The project carries two complementary Chinese sources:
   - Xiaohongshu (XHS): Fukui-only mainland social posts, pre-trip, promotional.
   - Chinese-language Google reviews: Hokuriku-wide, post-visit, star-rated.
 
-Both are SnowNLP-scored with the same instrument, so their sentiment bars are
-comparable. This figure draws both CN bars (labeled by source + scope) alongside
-the English/Japanese review volumes for context. Every number is read live from
-the two cross-language baseline snapshots — none is hand-typed.
+The Chinese-language Google reviews are the primary, star-rated source, so their
+bar shows the Google star rating (like English/Japanese) — NOT SnowNLP, which is
+unvalidated on short Chinese text. Xiaohongshu has no rating, so its bar shows the
+SnowNLP mean as a directional guidepost only. Every number is read live from the
+cross-language baseline snapshots and the Chinese-Google manifest — none is hand-typed.
 """
 
 from __future__ import annotations
 
+import json
 import sys
 from pathlib import Path
 
@@ -25,7 +27,15 @@ from build_presentation_safe_outputs import _write_multilingual_volume_context  
 
 XHS_BASELINE = ROOT / "output" / "cross_language_trends" / "cross_language_baseline_snapshot.csv"
 GOOGLE_BASELINE = ROOT / "output" / "cross_language_trends_hokuriku" / "cross_language_baseline_snapshot.csv"
+CN_GOOGLE_MANIFEST = ROOT / "output" / "chinese_google_reviews_analysis" / "tagged_chinese_google_reviews_manifest.json"
 OUTPUT = ROOT / "output" / "presentation_safe" / "multilingual" / "figure_cn_anchor_comparison.svg"
+
+
+def _chinese_google_rating() -> float:
+    # Chinese Google reviews are star-rated; pull the authoritative mean from the
+    # dataset manifest (the cross-language baseline does not carry it).
+    manifest = json.loads(CN_GOOGLE_MANIFEST.read_text())
+    return round(float(manifest["metrics"]["mean_review_rating"]), 4)
 
 
 def _agg(df: pd.DataFrame, mask: pd.Series, label: str, source_kind: str) -> dict:
@@ -53,9 +63,14 @@ def _agg(df: pd.DataFrame, mask: pd.Series, label: str, source_kind: str) -> dic
 def build(output: Path = OUTPUT) -> Path:
     xhs = pd.read_csv(XHS_BASELINE)
     goo = pd.read_csv(GOOGLE_BASELINE)
+    # Chinese Google reviews are star-rated: render them as a rating bar (like EN/JP)
+    # and suppress SnowNLP so the figure never presents unvalidated CN sentiment.
+    cn_google = _agg(goo, goo["source_kind"] == "chinese_social_post", "Chinese · Google reviews (Hokuriku)", "google_review")
+    cn_google["rating_mean"] = _chinese_google_rating()
+    cn_google["sentiment_norm_mean"] = None
     rows = [
         _agg(xhs, xhs["source_kind"] == "chinese_social_post", "Chinese · Xiaohongshu (Fukui, social)", "chinese_social_post"),
-        _agg(goo, goo["source_kind"] == "chinese_social_post", "Chinese · Google reviews (Hokuriku)", "chinese_social_post"),
+        cn_google,
         _agg(goo, goo["group"] == "english", "english", "google_review"),
         _agg(goo, goo["group"] == "japanese", "japanese", "google_review"),
     ]

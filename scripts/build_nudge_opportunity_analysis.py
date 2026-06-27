@@ -877,7 +877,7 @@ def write_outputs(
             "POI-level clustering not modeled under Firth; row-level estimates may understate uncertainty from POI nesting; exploratory ranking only.",
             "Secondary sentiment checks are within-language only and do not compare sentiment tools across languages.",
             "Small-n inbound and rare-aspect estimates may be unstable; underpowered flags identify pooled positives below 20.",
-            "Opportunity scores are gated to zero unless friction aspects are FDR-significant and harmful (odds ratio above 1).",
+            "Opportunity scores are gated to zero unless pain point aspects are FDR-significant and harmful (odds ratio above 1).",
             "Firth implementation is hand-coded in this repository; no external Firth package is used.",
             "Language groups describe review language, not reviewer nationality.",
         ],

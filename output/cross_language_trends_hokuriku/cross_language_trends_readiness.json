@@ -10,7 +10,7 @@
   "poi_metadata_input": "output/checkpoints/poi_metadata.json",
   "poi_metadata_input_sha256": "34b088a57c0e61d23471cf3745ca2ec6e2811dce71aa7ab2a5a508fa5178e79a",
   "chinese_input": "output/chinese_google_reviews_analysis/tagged_chinese_google_reviews.csv",
-  "chinese_input_sha256": "e521c2e38e362d560ade9ba137749c5477cbb4182e259157effc6c620a8fff42",
+  "chinese_input_sha256": "9e8bf9e65cd8c3323f112482699df584eed5b63f6f6b7a9343b34a5587bc8aec",
   "sentiment_summary_input": "output/sentiment_aggregates_hokuriku/source_group_sentiment_summary.csv",
   "sentiment_summary_input_sha256": "0e17c09ad873494dee34f4716296cdefe1b15745e95ce8cf9bd0296c4dac5116",
   "review_rows_retained": 4956,
@@ -27,13 +27,13 @@
     "cross_language_trends_readiness": "output/cross_language_trends_hokuriku/cross_language_trends_readiness.md",
     "cross_language_baseline_snapshot_sha256": "7b3340de319465701795ef805153ae6a20a05e767a532f69a0fde6643ecb3825",
     "date_scrub_requirements_sha256": "a52e89bfba6cef9da94082653a1aab5c204b7b817cf395665406e0cab4cea034",
-    "cross_language_statistical_tests_sha256": "b003f27513e4f678ab6f90d916796851718244d83123b815497dfaf5bb3b5645",
+    "cross_language_statistical_tests_sha256": "d7fddf7da6d3d894597e1a5f6a1f92172e27be8fa7131084dc0bfdcbb77c80e0",
     "cross_language_trends_readiness_sha256": "cd1b03f096e3d1dc0999b6bbc46a11c0f5d93b47adb7f9a6a0513aa275b6d8f3"
   },
   "provenance": {
     "schema_version": "research_provenance.v1",
     "kind": "cross_language_baseline",
-    "generated_at": "2026-06-27T07:33:14+00:00",
+    "generated_at": "2026-06-27T13:39:04+00:00",
     "command": "scripts/build_cross_language_trends.py --prefecture Hokuriku --reviews-path output/multilingual_review_analysis/reviews_multilingual.csv --chinese-path output/chinese_google_reviews_analysis/tagged_chinese_google_reviews.csv --sentiment-summary-path output/sentiment_aggregates_hokuriku/source_group_sentiment_summary.csv --output-dir output/cross_language_trends_hokuriku",
     "inputs": [
       {
@@ -54,8 +54,8 @@
         "role": "tagged_chinese_social_posts",
         "path": "output/chinese_google_reviews_analysis/tagged_chinese_google_reviews.csv",
         "exists": true,
-        "bytes": 164786,
-        "sha256": "e521c2e38e362d560ade9ba137749c5477cbb4182e259157effc6c620a8fff42"
+        "bytes": 164951,
+        "sha256": "9e8bf9e65cd8c3323f112482699df584eed5b63f6f6b7a9343b34a5587bc8aec"
       },
       {
         "role": "jp_en_sentiment_summary",
@@ -84,8 +84,8 @@
         "role": "aggregate_cross_language_statistical_tests",
         "path": "output/cross_language_trends_hokuriku/cross_language_statistical_tests.csv",
         "exists": true,
-        "bytes": 8458,
-        "sha256": "b003f27513e4f678ab6f90d916796851718244d83123b815497dfaf5bb3b5645"
+        "bytes": 8456,
+        "sha256": "d7fddf7da6d3d894597e1a5f6a1f92172e27be8fa7131084dc0bfdcbb77c80e0"
       },
       {
         "role": "readiness_markdown",
@@ -176,10 +176,10 @@
           "test_name": "cross_source_friction_prevalence",
           "comparison": "google_review_english_vs_google_review_japanese_vs_chinese_social_xhs",
           "status": "ok",
-          "statistic": 27.993621405545035,
-          "p_value": 9.422299605312632e-05,
-          "effect": 0.07337863584196365,
-          "details_json": "{\"method\": \"chi_square\", \"dof\": 6, \"expected\": {\"not_present\": {\"google_review_english\": 147.643393, \"google_review_japanese\": 1036.998269, \"chinese_social_all\": 212.291979}, \"present\": {\"google_review_english\": 21.356607, \"google_review_japanese\": 150.001731, \"chinese_social_all\": 30.708021}}, \"observed\": {\"not_present\": {\"google_review_english\": 156, \"google_review_japanese\": 1081, \"chinese_social_all\": 210}, \"present\": {\"google_review_english\": 13, \"google_review_japanese\": 106, \"chinese_social_all\": 33}}, \"denominators\": {\"google_review_english\": 169, \"google_review_japanese\": 1187, \"chinese_social_all\": 243}, \"row_units\": {\"google_review_english\": \"one Google review\", \"google_review_japanese\": \"one Google review\", \"chinese_social_all\": \"one Xiaohongshu note row\"}, \"interpretation\": \"Descriptive cross-source discourse prevalence test using reviewed keyword evidence; platform/source contexts differ.\", \"evidence_column\": \"any_friction\", \"chinese_layer\": \"Xiaohongshu-only by default; Douyin can be supplied later with --chinese-path\"}"
+          "statistic": 30.6519805205519,
+          "p_value": 2.9536729963579145e-05,
+          "effect": 0.0767837576298976,
+          "details_json": "{\"method\": \"chi_square\", \"dof\": 6, \"expected\": {\"not_present\": {\"google_review_english\": 147.415849, \"google_review_japanese\": 1035.400077, \"chinese_social_all\": 211.964801}, \"present\": {\"google_review_english\": 21.584151, \"google_review_japanese\": 151.599923, \"chinese_social_all\": 31.035199}}, \"observed\": {\"not_present\": {\"google_review_english\": 156, \"google_review_japanese\": 1081, \"chinese_social_all\": 203}, \"present\": {\"google_review_english\": 13, \"google_review_japanese\": 106, \"chinese_social_all\": 40}}, \"denominators\": {\"google_review_english\": 169, \"google_review_japanese\": 1187, \"chinese_social_all\": 243}, \"row_units\": {\"google_review_english\": \"one Google review\", \"google_review_japanese\": \"one Google review\", \"chinese_social_all\": \"one Xiaohongshu note row\"}, \"interpretation\": \"Descriptive cross-source discourse prevalence test using reviewed keyword evidence; platform/source contexts differ.\", \"evidence_column\": \"any_friction\", \"chinese_layer\": \"Xiaohongshu-only by default; Douyin can be supplied later with --chinese-path\"}"
         },
         {
           "test_name": "cross_source_enjoyment_recommendation_prevalence",

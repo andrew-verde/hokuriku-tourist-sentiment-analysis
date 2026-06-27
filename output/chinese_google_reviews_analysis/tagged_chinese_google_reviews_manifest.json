@@ -1,7 +1,7 @@
 {
   "schema_version": "research_provenance.v1",
   "kind": "chinese_google_reviews_tagged",
-  "generated_at": "2026-06-27T07:32:57+00:00",
+  "generated_at": "2026-06-27T13:38:46+00:00",
   "command": "scripts/build_chinese_google_reviews_dataset.py",
   "inputs": [
     {
@@ -19,6 +19,13 @@
       "sha256": "e9a23098e950fea0af7b252b41fb0ccb123c5a3a09354f3a65bf1e2e76bbc390"
     },
     {
+      "role": "reviewed_chinese_google_review_candidates",
+      "path": "docs/codebook_templates/chinese_google_review_friction_candidates.csv",
+      "exists": true,
+      "bytes": 3421,
+      "sha256": "4871ef0a5a020b22919874ffba2353397ac120a0a287b82b9bacd0665b3d8516"
+    },
+    {
       "role": "legacy_yaml_codebook",
       "path": "config/chinese_social_friction_codebook.yaml",
       "exists": true,
@@ -31,8 +38,8 @@
       "role": "tagged_chinese_google_reviews",
       "path": "output/chinese_google_reviews_analysis/tagged_chinese_google_reviews.csv",
       "exists": true,
-      "bytes": 164786,
-      "sha256": "e521c2e38e362d560ade9ba137749c5477cbb4182e259157effc6c620a8fff42"
+      "bytes": 164951,
+      "sha256": "9e8bf9e65cd8c3323f112482699df584eed5b63f6f6b7a9343b34a5587bc8aec"
     }
   ],
   "filters": {},
@@ -54,7 +61,7 @@
     },
     "snownlp_centered_score_mean": 0.257,
     "mean_review_rating": 4.432,
-    "any_friction_rate": 0.1358,
+    "any_friction_rate": 0.1646,
     "unique_pois": 56,
     "snownlp_validation": {
       "snownlp_negative_n": 81,

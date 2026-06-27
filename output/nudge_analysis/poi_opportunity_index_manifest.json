@@ -1,7 +1,7 @@
 {
   "schema_version": "research_provenance.v1",
   "kind": "poi_nudge_opportunity_index",
-  "generated_at": "2026-06-27T07:33:18+00:00",
+  "generated_at": "2026-06-27T11:24:27+00:00",
   "command": "scripts/build_poi_opportunity_index.py",
   "inputs": [
     {
@@ -9,7 +9,7 @@
       "path": "output/multilingual_review_analysis/tagged_reviews_multilingual_chinese_folded.csv",
       "exists": true,
       "bytes": 3660205,
-      "sha256": "015c05a465cc68556afddc41f6ab4ef33dd3a900177bbd815e40161c9e77061b"
+      "sha256": "369e525176f27a1e92a650b171df65e101800da13fde8f7b43d921a13ccc25ee"
     }
   ],
   "outputs": [
@@ -17,8 +17,8 @@
       "role": "aggregate_poi_opportunity_index",
       "path": "output/nudge_analysis/poi_opportunity_index.csv",
       "exists": true,
-      "bytes": 152930,
-      "sha256": "8d8abcf2b473d2e16e861c2c57756bcc59afbaee8479fc0c3ed2c0d11ea426c0"
+      "bytes": 152936,
+      "sha256": "4271bc8e366502e170f8bd253dacdc7ee2ef9bf519a20bc98a872b69aabdc252"
     }
   ],
   "filters": {
@@ -59,12 +59,12 @@
       "Toyama": 24
     },
     "n_low_confidence_pois": 4,
-    "n_fix_it": 11,
+    "n_fix_it": 10,
     "n_promote_it": 7,
     "n_promote_it_strict": 0,
     "n_fix_it_fukui": 6,
     "n_promote_it_fukui": 2,
-    "n_crowding_hotspots": 6,
+    "n_crowding_hotspots": 7,
     "high_volume_threshold_n_reviews": 100.0,
     "low_volume_threshold_n_reviews": 48,
     "low_volume_quantile_raw": 47.75,
@@ -76,11 +76,11 @@
       "english_information_gap": 0.003810470510271703,
       "staff_communication": 0.0016567263088137839,
       "booking_ticketing": 0.0066269052352551355,
-      "waiting_crowding": 0.03561961563949635,
-      "price_value": 0.0054671968190854875,
-      "cleanliness_comfort": 0.009443339960238568,
-      "opening_hours_availability": 0.015407554671968192,
-      "itinerary_fit_time_cost": 0.004307488402915839,
+      "waiting_crowding": 0.03578528827037773,
+      "price_value": 0.005632869449966865,
+      "cleanliness_comfort": 0.009774685222001325,
+      "opening_hours_availability": 0.015573227302849569,
+      "itinerary_fit_time_cost": 0.004804506295559973,
       "accessibility_mobility": 0.04009277667329357,
       "food_amenities_gap": 0.0006626905235255136,
       "scenic_value": 0.052186878727634195,

@@ -31,7 +31,9 @@ from src.provenance import (  # noqa: E402
 ROOT = Path(__file__).resolve().parent.parent
 CONFIG = ROOT / "config" / "cross_language_solution_mapping.yaml"
 ASPECT_INPUT = ROOT / "output" / "nudge_analysis" / "aspect_opportunity_map.csv"
-H3_INPUT = ROOT / "output" / "hypothesis_tests" / "h3_reviewed_evidence_jp_en.csv"
+# Hokuriku-wide reviewed-evidence (H3) to match the region-wide framing of the deck;
+# the Fukui-only H3 remains the within-POI/Fukui confirmatory artifact elsewhere.
+H3_INPUT = ROOT / "output" / "hypothesis_tests_hokuriku" / "h3_reviewed_evidence_jp_en.csv"
 CN_FRICTION_INPUT = (
     ROOT
     / "output"

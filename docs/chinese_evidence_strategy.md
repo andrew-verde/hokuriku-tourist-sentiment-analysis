@@ -38,9 +38,12 @@ The reviewed Chinese codebook keywords are all **simplified**; Google reviews ar
 貴 vs 贵). Fix: `load_chinese_codebook()` now expands every keyword to its traditional form at
 load time via `zhconv` (single chokepoint; tagging + reviewed-terms both inherit it). Effect:
 Google-zh negatives-with-friction 7% → 22%; XHS unchanged; **Lynn's reviewed CSV is never edited.**
-Remaining colloquial review-register gaps (收舖, 全是人, 態度冰冷, …) are staged as candidates
-for human review in `docs/codebook_templates/chinese_google_review_friction_candidates.csv`
-(status=pending, reviewer=auto). Until Lynn approves, Chinese friction is **under-counted**.
+Colloquial review-register gaps (收舖, 全是人, 態度冰冷, …) were staged in
+`docs/codebook_templates/chinese_google_review_friction_candidates.csv` and have now been
+**reviewed and approved by Lynn** (status=reviewed, reviewer=Lynn). The loader merges
+approved candidates at the same chokepoint, so they are applied in tagging. Effect: folded
+Chinese any_friction coverage 13.6% → 16.5% (≤3★ Chinese 7/30 → 11/30). The approved-candidate
+merge is gated on `status=reviewed`, so any future pending terms stay excluded until approved.
 
 ## 4. Folding Chinese into the POI pipeline
 `scripts/build_chinese_folded_multilingual.py` is a **local post-sync stage**: it reads the
@@ -66,21 +69,23 @@ Consequence: Chinese contributes fully to the **fix-it** lever, partially to **p
 drive the positive signal directly, so SnowNLP noise does not corrupt promote-it.
 
 ### Headline effect of the fold
-`is_fix_it`: Higashi Chaya District **in**, TAD Toyama **out**. *Correction:* this flip does **not**
-trace to a closes-too-early / opening-hours signal — the tagged data has **zero**
-`opening_hours_availability` tags for Higashi Chaya Chinese reviews (收舖 is uncoded, on the pending
-candidate list). The real driver was **polarity-blind `transport_access` matching on 2 reviews**, one
-of which is a 5★ crowd-avoidance review, so the flip is spurious; the orchestrator is removing it by
-fixing the gate. `is_promote_it_strict`: 0 → 1 (Asuwa River cherry promenade).
-`off_peak_alternative_prompt` impact Medium → High (Chinese crowding evidence). Promotion was
+A naive fold (pre-gate) produced thin-Chinese-driven flips — e.g. Higashi Chaya District into
+`is_fix_it` and Asuwa River into `is_promote_it_strict` — each resting on 1–6 Chinese reviews. A
+**language-aware confidence gate** now blocks any flip whose driving aspect is supported by
+<3 tags or is plurality-driven by a per-POI-thin language group (n<10 at that POI), so those
+spurious flips are removed: Higashi Chaya is **not** `is_fix_it` (Chinese n=9 < 10, gate blocked)
+even though 收舖 now codes `opening_hours_availability` after Lynn's approval, and Asuwa is **not**
+`is_promote_it_strict` (Chinese n=6 < 10). Region-wide totals after the gate + approved keywords:
+**10 fix-it, 7 promote-it, 0 promote-it-strict**. Surviving flips pass via non-thin EN/JP aspects.
+`off_peak_alternative_prompt` impact Medium → High (Chinese crowding evidence; directional). Promotion was
 run into the committed headline but **left uncommitted** in git, pending this review.
 
 ## 5. Known limitations (for the reviewer)
-- **POI-level Chinese is thin**: median ~3 reviews/POI; only 5/56 POIs clear `LOW_CONFIDENCE_N=10`; 16 POIs have ≤2. Per-POI Chinese friction (and the fix-it/promote flips above) may rest on 1–2 reviews — directional, not confirmatory.
+- **POI-level Chinese is thin**: median ~3 reviews/POI; only 5/56 POIs clear `LOW_CONFIDENCE_N=10`; 16 POIs have ≤2. The language-aware gate (§4) now prevents this thinness from driving headline flips; per-POI Chinese friction remains directional, not confirmatory.
 - **SnowNLP sentiment is unvalidated** on short Chinese review text (median ~30 chars). Of the 243 zh Google reviews, SnowNLP tags **81 "negative"**, but **64 of those 81 (79%) are rated 4-5 stars** and only **6 are ≤2 stars** — i.e. the "negative" category is mostly false negatives. The Google-zh "0.63 / 33% negative" figure is therefore **not a reportable Chinese sentiment outcome**; POI positives correctly use star ratings instead.
-- **Chinese friction tags are topic-presence, not polarity.** The friction codes are keyword matches that fire regardless of sentiment — e.g. `transport_access` tags 5★ reviews like 自駕停車很方便 ("parking very convenient") and 搭巴士很快抵達 ("quick by bus"). A Chinese "friction" tag means the topic was *mentioned*, not that there was a problem, so per-POI Chinese "friction" overstates problems. Human validation (Lynn) pending.
+- **Chinese friction tags are topic-presence, not polarity.** The friction codes are keyword matches that fire regardless of sentiment — e.g. `transport_access` tags 5★ reviews like 自駕停車很方便 ("parking very convenient") and 搭巴士很快抵達 ("quick by bus"). A Chinese "friction" tag means the topic was *mentioned*, not that there was a problem, so per-POI Chinese "friction" overstates problems. Lynn has approved the colloquial *keyword vocabulary* (improving recall), but the tagging is still polarity-blind — keyword approval does not add negation/positive-context handling, so this limitation stands.
 - **Mixed instruments** across languages: EN=VADER, JP=oseti, CN=SnowNLP. Cross-language *sentiment* comparison is apples-to-oranges (caveated in code); friction/topic comparison is keyword-based and more comparable.
-- **Codebook transfer is mechanical-only** (zhconv) until Lynn approves the colloquial candidates.
+- **Codebook transfer** is zhconv s2t expansion plus Lynn-approved colloquial candidates (merged at the loader chokepoint, gated on status=reviewed); tagging recall improved, polarity-blindness unchanged.
 - **Provenance**: `build_chinese_google_reviews_dataset.py` and `build_chinese_folded_multilingual.py` now emit manifests (SHA + dep versions + caveats), consistent with the rest of the pipeline.
 
 ## 6. Reproducibility

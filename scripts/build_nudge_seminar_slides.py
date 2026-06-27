@@ -48,7 +48,7 @@ FIGURES = {
     "nudge_poi_fig": ROOT / "docs/statistical_test_figures/figure_nudge_poi_action_map.svg",
     "nudge_info_fig": ROOT / "docs/statistical_test_figures/figure_nudge_info_levers.svg",
     "txtlen": ROOT / "docs/statistical_test_figures/figure_h3_text_length_diagnostic.svg",
-    "volume": ROOT / "output/presentation_safe/multilingual/figure_volume_context.svg",
+    "volume": ROOT / "docs/statistical_test_figures/figure_nudge_hokuriku_volume_context.svg",
 }
 
 DATA: dict[str, object] = {}
@@ -294,6 +294,7 @@ def build() -> str:
     tagged_rows = stat("aspect_mfst", manifest_metric("tagged_input_rows"), ncomma, "", "aspect_mfst metrics.tagged_input_rows")
     lang_jp = stat("aspect_mfst", manifest_metric("tagged_language_group_counts", "japanese"), ncomma, "", "tagged_language_group_counts.japanese")
     lang_en = stat("aspect_mfst", manifest_metric("tagged_language_group_counts", "english"), ncomma, "", "tagged_language_group_counts.english")
+    lang_cn = stat("aspect_mfst", manifest_metric("tagged_language_group_counts", "chinese"), ncomma, "", "tagged_language_group_counts.chinese")
     lang_other = stat("aspect_mfst", manifest_metric("tagged_language_group_counts", "other_non_english_non_japanese"), ncomma, "", "tagged_language_group_counts.other")
     poi_fukui = stat("poi_mfst", manifest_metric("n_pois_by_prefecture", "Fukui"), "{:.0f}", "", "n_pois_by_prefecture.Fukui")
     poi_ishikawa = stat("poi_mfst", manifest_metric("n_pois_by_prefecture", "Ishikawa"), "{:.0f}", "", "n_pois_by_prefecture.Ishikawa")
@@ -333,6 +334,8 @@ def build() -> str:
     time_p = stat("nudge_aspect", aspect_value("itinerary_fit_time_cost", "p_value_bh_fdr"), pfmt, "", "itinerary_fit_time_cost BH-FDR p")
     eng_gap_prev = stat("nudge_aspect", aspect_value("english_information_gap", "prevalence"), pct1, "", "english_information_gap pooled prevalence")
     sign_prev = stat("nudge_aspect", aspect_value("wayfinding_signage", "prevalence"), pct1, "", "wayfinding_signage pooled prevalence")
+    sign_or = stat("nudge_aspect", aspect_value("wayfinding_signage", "odds_ratio"), "{:.2f}", "", "wayfinding_signage Firth OR")
+    sign_p = stat("nudge_aspect", aspect_value("wayfinding_signage", "p_value_bh_fdr"), pfmt, "", "wayfinding_signage BH-FDR p")
     access_prev = stat("nudge_aspect", aspect_value("transport_access", "prevalence"), pct1, "", "transport_access pooled prevalence")
     booking_prev = stat("nudge_aspect", aspect_value("booking_ticketing", "prevalence"), pct1, "", "booking_ticketing pooled prevalence")
     price_or = stat("nudge_aspect", aspect_value("price_value", "odds_ratio"), "{:.2f}", "", "price_value Firth OR")
@@ -411,7 +414,7 @@ def build() -> str:
       <p class="kicker">PBL Seminar · IMRAD format</p>
       <h1>Turning Hokuriku review text<br>into testable nudges</h1>
       {jp('<span class="jp-h1">北陸の口コミテキストを、検証可能なナッジへ</span>')}
-      <p class="sub">An exploratory opportunity map: which friction and draw signals in
+      <p class="sub">An exploratory opportunity map: which pain points and draw signals in
         reviews are <b>nudge-able</b>, and which POIs are fix-it vs promote-it.</p>
       {jp('口コミに表れる「不満」と「魅力」のうち、どれが<b>ナッジ可能</b>か、'
           'どのスポットが「改善型」か「推奨型」かを探索的に地図化します。')}
@@ -438,7 +441,7 @@ def build() -> str:
       <h2>The question</h2>
       {jp('問い')}
       <ul class="big">
-        <li>Visitors leave <b>friction and draw signals</b> in their reviews.</li>
+        <li>Visitors leave <b>pain points and draw signals</b> in their reviews.</li>
         {jp('訪問者は口コミに<b>不満と魅力のシグナル</b>を残す。')}
         <li>Which are <b>nudge-able</b>: information provision, pre-commitment,
           demand redistribution, versus an <b>operator fix</b>?</li>
@@ -466,8 +469,8 @@ def build() -> str:
             {jp('タグ付き口コミ')}
             <p class="n">{tagged_rows} rows</p>
             {jp(f'{tagged_rows} 行')}
-            <p class="n">JP {lang_jp} · EN {lang_en} · other {lang_other}</p>
-            {jp(f'日本語 {lang_jp} · 英語 {lang_en} · その他 {lang_other}')}</div>
+            <p class="n">JP {lang_jp} · EN {lang_en} · CN {lang_cn} · other {lang_other}</p>
+            {jp(f'日本語 {lang_jp} · 英語 {lang_en} · 中国語 {lang_cn} · その他 {lang_other}')}</div>
           <div class="card t"><h3>POIs by prefecture</h3>
             {jp('県別スポット数')}
             <p>Fukui {poi_fukui} · Ishikawa {poi_ishikawa} · Toyama {poi_toyama}.</p>
@@ -476,10 +479,9 @@ def build() -> str:
             {jp('口コミの言語であり、国籍ではない。')}</div>
         </div>
         <div>{fig("volume", 250)}
-          <p class="cap">Per-source volume lens: the within-language sentiment
-            subset, not the full model corpus.</p>
-          {jp('ソース別の件数の見方:全モデルコーパスではなく、'
-              '同一言語内の感情サブセット。')}</div>
+          <p class="cap">Hokuriku supported-language rows entering the pooled
+            low-rating model; no sentiment score shown.</p>
+          {jp('北陸の統合低評価モデルに入る対応言語の行数。感情スコアは非表示。')}</div>
       </div>
       <p class="scope">Raw text, authors, URLs, and IDs never leave the project; only
         aggregate counts and statistics are published. {tagged_rows} rows total ●</p>
@@ -496,7 +498,7 @@ def build() -> str:
       <h2>From text to a modeled outcome</h2>
       {jp('テキストからモデル化された結果へ')}
       <ol class="pipe">
-        <li><b>Tag</b> each review against 18 reviewed aspect codes (friction + draw).</li>
+        <li><b>Tag</b> each review against 18 reviewed aspect codes (pain points + draw).</li>
         {jp('各口コミを18のレビュー済みアスペクトコード(不満+魅力)に照合してタグ付け。')}
         <li><b>Model rows</b> with a supported language and a star rating: {model_rows}.</li>
         {jp(f'対応言語かつ星評価ありのモデル対象行:{model_rows}。')}
@@ -540,18 +542,22 @@ def build() -> str:
             <p>Smallest model p-value: {min_p}. Multiplicity: BH-FDR.</p>
             {jp(f'最小のモデル p 値:{min_p}。多重比較:BH-FDR。')}</div>
           {fig("txtlen", 200)}
-          <p class="cap">Why we adjust for text length: review length differs sharply
-            by language.</p>
-          {jp('文字数を調整する理由:口コミの長さは言語によって大きく異なる。')}
+          <p class="cap"><b>Text length by language:</b> JP/EN are the Fukui confirmatory
+            sensitivity check; Chinese (Hokuriku Google reviews) is added for comparison and is
+            the shortest, so it has the least keyword-match opportunity. CJK vs Latin chars are
+            not 1:1 comparable.</p>
+          {jp('<b>言語別の文字数:</b>日本語・英語は福井の確認用感度チェック。'
+              '比較のため中国語(北陸のGoogleレビュー)を追加。最短で一致機会が最小。'
+              'CJKとラテン文字は同等比較不可。')}
         </div>
       </div>
       <div class="pill warn">{caveat_gate}</div>
-      {jp('機会スコアは、摩擦アスペクトが FDR 有意かつ有害(オッズ比が 1 超)でない限り、'
+      {jp('機会スコアは、不満点アスペクトが FDR 有意かつ有害(オッズ比が 1 超)でない限り、'
           'ゼロにゲートされる。')}
     """, f"{C} Don't read every number. Two ideas: (1) Firth penalization keeps estimates stable "
          "when an aspect is rare or a cell is near-zero, and it barely moves the answer versus a "
          "plain logit, which is the sanity check. (2) The gate is the integrity move: an opportunity "
-         "score is forced to zero unless the friction aspect is FDR-significant AND harmful. No "
+         "score is forced to zero unless the pain-point aspect is FDR-significant AND harmful. No "
          "cherry-picking. Andrew can field nesting questions.",
          "4:35-5:50")
 
@@ -596,8 +602,8 @@ def build() -> str:
     # 7: RESULTS · ASPECT OPPORTUNITY MAP
     slide("fig", "Result · Aspect map", f"""
       <p class="secnum">III. RESULTS · ASPECT OPPORTUNITY MAP</p>
-      <h2>Two nudge-able friction levers stand out</h2>
-      {jp('2つのナッジ可能な摩擦レバーが際立つ')}
+      <h2>Two nudge-able pain-point levers stand out</h2>
+      {jp('2つのナッジ可能な不満点レバーが際立つ')}
       <div class="cols2 vtop">
         <div>
           <ul class="big">
@@ -607,11 +613,16 @@ def build() -> str:
             <li>Itinerary fit / time cost: prevalence {time_prev}, OR {time_or},
               {time_p}.</li>
             {jp(f'行程との適合・所要時間:有病率 {time_prev}、OR {time_or}、{time_p}。')}
+            <li class="key">Emerging (confirm later): wayfinding / signage,
+              prevalence {sign_prev}, OR {sign_or}, {sign_p} — its odds-ratio range still
+              includes no-effect, so it is a signal to confirm, not yet an action.</li>
+            {jp(f'今後の確証課題:道案内・表示(有病率 {sign_prev}、OR {sign_or}、{sign_p})。'
+                'オッズ比の範囲が「効果なし」を含むため、まだ実行対象ではない。')}
             <li class="key">Prevalence-only (not yet rankable): English info gap
-              {eng_gap_prev}, signage {sign_prev}, transport {access_prev},
+              {eng_gap_prev}, transport {access_prev},
               booking {booking_prev}.</li>
             {jp(f'有病率のみ(まだ順位づけ不可):英語情報の不足 {eng_gap_prev}、'
-                f'案内表示 {sign_prev}、交通 {access_prev}、予約 {booking_prev}。')}
+                f'交通 {access_prev}、予約 {booking_prev}。')}
           </ul>
           <div class="pill warn">Honesty: price/value has a high OR ({price_or}) but is an
             <b>operator fix</b>: flagged, not nudge-able.</div>
@@ -620,8 +631,10 @@ def build() -> str:
         </div>
         <div>{fig("nudge_aspect_fig", 320)}</div>
       </div>
-    """, f"{A} The map plots penalty (odds ratio) against prevalence. Two friction aspects clear "
-         "the gate: opening hours and itinerary/time-cost, both information/pre-commitment levers. "
+    """, f"{A} The map plots penalty (odds ratio) against prevalence. Two nudge-able pain-point aspects clear "
+         "the gate with robust evidence: opening hours and itinerary/time-cost (their odds-ratio "
+         "confidence ranges stay above no-effect). Wayfinding/signage is an emerging third signal but "
+         "its range still includes no-effect, so it is a confirm-later candidate, not an action. "
          "Several others are common enough to see but not yet evidenced strongly, so they are "
          "targeted-collection candidates, not rankings. The price_value line is the integrity point: "
          "big effect, but you cannot nudge your way out of pricing, so we exclude it.",
@@ -637,7 +650,7 @@ def build() -> str:
         levers; operator-fix aspects are flagged but out of nudging scope.</p>
       {jp('情報提供・事前コミットメントのアスペクトが実行可能なレバー。'
           '事業者側の改善アスペクトは記録するがナッジの対象外。')}
-    """, f"{A} Let the picture talk for a moment. The chart isolates the nudge-able friction levers "
+    """, f"{A} Let the picture talk for a moment. The chart isolates the nudge-able pain-point levers "
          "with their Wilson prevalence intervals and Firth odds ratios. The story: these are where a "
          "low-cost information or pre-commitment prompt could plausibly move the low-rating outcome. "
          "Operator-fix aspects are deliberately greyed out of the action set, following the same honesty rule.",
@@ -696,9 +709,9 @@ def build() -> str:
         <div>
           <ul class="big">
             <li><b>Fix-it</b>: {fix_count} POIs ({fix_fukui} in Fukui), high-volume with
-              nudge-able friction.</li>
+              nudge-able pain points.</li>
             {jp(f'<b>改善型</b>:{fix_count} スポット(うち福井 {fix_fukui})、来訪が多く'
-                'ナッジ可能な摩擦あり。')}
+                'ナッジ可能な不満点あり。')}
             <li><b>Promote-it</b>: {promote_count} POIs ({promote_fukui} in Fukui),
               low-volume, high-satisfaction.</li>
             {jp(f'<b>推奨型</b>:{promote_count} スポット(うち福井 {promote_fukui})、'
@@ -717,7 +730,7 @@ def build() -> str:
         </div>
         <div>{fig("nudge_poi_fig", 330)}</div>
       </div>
-    """, f"{C} Your slide. Three archetypes from the POI index: fix-it (busy + fixable friction), "
+    """, f"{C} Your slide. Three archetypes from the POI index: fix-it (busy + fixable pain points), "
          "promote-it (hidden gems with high satisfaction but low volume, the demand-redistribution "
          "targets), and crowding hotspots (where you'd redirect demand FROM). Read the two top Fukui "
          "gems with their confidence intervals; note the small-n CIs honestly. POI names are proper "

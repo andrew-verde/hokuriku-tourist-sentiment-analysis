@@ -1,7 +1,7 @@
 {
   "schema_version": "research_provenance.v1",
   "kind": "nudge_aspect_opportunity_analysis",
-  "generated_at": "2026-06-27T10:13:14+00:00",
+  "generated_at": "2026-06-27T13:39:41+00:00",
   "command": "scripts/build_nudge_opportunity_analysis.py",
   "inputs": [
     {
@@ -9,7 +9,7 @@
       "path": "output/multilingual_review_analysis/tagged_reviews_multilingual_chinese_folded.csv",
       "exists": true,
       "bytes": 3660205,
-      "sha256": "015c05a465cc68556afddc41f6ab4ef33dd3a900177bbd815e40161c9e77061b"
+      "sha256": "369e525176f27a1e92a650b171df65e101800da13fde8f7b43d921a13ccc25ee"
     },
     {
       "role": "jp_en_fukui_row_level_sentiment_for_secondary_join",
@@ -24,8 +24,8 @@
       "role": "aggregate_nudge_aspect_opportunity_map",
       "path": "output/nudge_analysis/aspect_opportunity_map.csv",
       "exists": true,
-      "bytes": 38228,
-      "sha256": "2bee5c6bba559106e3e608ebe23a949721275d326328f98f00cc8144e29dc571"
+      "bytes": 38272,
+      "sha256": "6726a743db95739291eb3521e924b7e160a1e65e1f9269e632ea8cf42b7ab96f"
     }
   ],
   "filters": {
@@ -93,28 +93,28 @@
     "synthetic_zero_cell_firth_or": 0.11111133453484588,
     "plain_vs_firth_sanity": {
       "opening_hours_availability": {
-        "firth_or": 3.7146940077350497,
-        "plain_logit_or": 3.70642895072441,
-        "log_abs_diff": 0.002227441985305667
+        "firth_or": 3.8233311559385568,
+        "plain_logit_or": 3.8166700449074584,
+        "log_abs_diff": 0.0017437465109833017
       },
       "price_value": {
-        "firth_or": 8.567230155184449,
-        "plain_logit_or": 8.699383905934672,
-        "log_abs_diff": 0.015307729803559766
+        "firth_or": 8.063174016318705,
+        "plain_logit_or": 8.170069141004928,
+        "log_abs_diff": 0.013170094076457417
       },
       "cleanliness_comfort": {
-        "firth_or": 2.6038128157486917,
-        "plain_logit_or": 2.574975860438152,
-        "log_abs_diff": 0.01113667892492154
+        "firth_or": 2.49267139213819,
+        "plain_logit_or": 2.4637999323317006,
+        "log_abs_diff": 0.01165013755376676
       },
       "itinerary_fit_time_cost": {
-        "firth_or": 4.227432004187145,
-        "plain_logit_or": 4.1898051046819305,
-        "log_abs_diff": 0.008940499038491367
+        "firth_or": 4.773585304323055,
+        "plain_logit_or": 4.758854810960209,
+        "log_abs_diff": 0.0030906053245498555
       }
     },
     "max_abs_ln_or": 4.074775181622501,
-    "min_model_p_value": 1.869821383330454e-09,
+    "min_model_p_value": 1.2037194843652734e-09,
     "status_counts": {
       "prevalence_only": 60,
       "ok": 47,
@@ -136,7 +136,7 @@
     "POI-level clustering not modeled under Firth; row-level estimates may understate uncertainty from POI nesting; exploratory ranking only.",
     "Secondary sentiment checks are within-language only and do not compare sentiment tools across languages.",
     "Small-n inbound and rare-aspect estimates may be unstable; underpowered flags identify pooled positives below 20.",
-    "Opportunity scores are gated to zero unless friction aspects are FDR-significant and harmful (odds ratio above 1).",
+    "Opportunity scores are gated to zero unless pain point aspects are FDR-significant and harmful (odds ratio above 1).",
     "Firth implementation is hand-coded in this repository; no external Firth package is used.",
     "Language groups describe review language, not reviewer nationality."
   ],

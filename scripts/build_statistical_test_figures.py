@@ -38,6 +38,9 @@ from src.provenance import (
 ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_INPUT_DIR = ROOT / "docs" / "statistical_test_outputs"
 DEFAULT_OUTPUT_DIR = ROOT / "docs" / "statistical_test_figures"
+# Chinese-language Google reviews (Hokuriku-wide); used only for a descriptive
+# text-length bar in the H3 length diagnostic, not for the JP/EN H3 test itself.
+CHINESE_REVIEWS_PATH = ROOT / "output" / "chinese_google_reviews_analysis" / "tagged_chinese_google_reviews.csv"
 
 FORBIDDEN_AGGREGATE_COLUMNS = {
     "review_text",
@@ -78,6 +81,7 @@ PALETTE = {
 GROUP_LABELS = {
     "english": "English-language reviews",
     "japanese": "Japanese-language reviews",
+    "chinese": "Chinese-language reviews",
     "google_review_english": "English-language Google reviews",
     "google_review_japanese": "Japanese-language Google reviews",
     "chinese_social_all": "Chinese-language social rows",
@@ -194,8 +198,9 @@ def _wrapped_label_lines(value: object, max_len: int = 48) -> list[str]:
     return lines or [""]
 
 
-def _text(x: float, y: float, value: object, size: int = 13, weight: int = 400,
+def _text(x: float, y: float, value: object, size: int = 16, weight: int = 400,
           fill: str = PALETTE["ink"], anchor: str = "start") -> str:
+    size = max(size, 16)
     return (
         f'<text x="{x:.2f}" y="{y:.2f}" text-anchor="{anchor}" '
         f'font-family="Arial, sans-serif" font-size="{size}" font-weight="{weight}" '
@@ -209,8 +214,8 @@ def _svg_header(
     title: str,
     subtitle: str,
     *,
-    title_size: int = 24,
-    subtitle_size: int = 14,
+    title_size: int = 30,
+    subtitle_size: int = 18,
 ) -> list[str]:
     return [
         f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}">',
@@ -262,6 +267,7 @@ def _chip(
 
 
 def _chip_width(label: str, size: int = 12) -> float:
+    size = max(size, 16)
     return max(34.0, len(label) * size * 0.54 + 16.0)
 
 
@@ -877,16 +883,28 @@ def write_h3_figures(h3: pd.DataFrame, output_dir: Path) -> list[dict[str, str]]
                 "color": PALETTE.get(language, PALETTE["score"]),
                 "annotation": f"mean={float(values.get('mean', 0.0)):.1f}; median={float(values.get('median', 0.0)):.1f}",
             })
+    # Append a descriptive Chinese bar (Hokuriku Chinese Google reviews). Read only
+    # the length column so no forbidden text/author/id columns are loaded. Chinese
+    # reviews are the shortest, so they have the least keyword-match opportunity.
+    if CHINESE_REVIEWS_PATH.exists():
+        cn_len = pd.read_csv(CHINESE_REVIEWS_PATH, usecols=["text_length_chars"])["text_length_chars"].dropna()
+        if not cn_len.empty:
+            length_rows.append({
+                "label": f"{GROUP_LABELS['chinese']} mean chars",
+                "value": float(cn_len.mean()),
+                "color": PALETTE["chinese"],
+                "annotation": f"mean={float(cn_len.mean()):.1f}; median={float(cn_len.median()):.1f}",
+            })
     path2 = output_dir / "figure_h3_text_length_diagnostic.svg"
     _horizontal_bar_chart(
         path2,
         "H3 Text Length Diagnostic",
-        "Longer reviews have more opportunity to match evidence terms",
+        "Chinese reviews are shortest, so they have the least evidence-match opportunity",
         length_rows,
         "value",
         "color",
         "chars",
-        "Use as caveat beside H3 evidence-prevalence claims.",
+        "JP/EN are Fukui H3 rows; Chinese are Hokuriku Google reviews. CJK vs Latin char counts are not 1:1 comparable.",
         compact_slide=True,
     )
     return [

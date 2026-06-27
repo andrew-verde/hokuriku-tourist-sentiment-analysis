@@ -27,6 +27,7 @@ from __future__ import annotations
 import hashlib
 import html
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -50,10 +51,14 @@ SOURCES: dict[str, Path] = {
     "wcn": ROOT / "output/within_language_sentiment/cn_within_source_sentiment_drivers.csv",
     "cn_plat": ROOT / "output/chinese_specific_insights/sentiment_category_by_platform.csv",
     "cn_manifest": ROOT / "output/chinese_specific_insights/chinese_specific_insights_manifest.json",
+    "cn_google_manifest": ROOT / "output/chinese_google_reviews_analysis/tagged_chinese_google_reviews_manifest.json",
+    "cn_strategy": ROOT / "docs/chinese_evidence_strategy.md",
     "pres_manifest": ROOT / "output/presentation_safe/presentation_manifest.json",
     "pres_ready": ROOT / "output/presentation_safe/presentation_readiness.md",
     "nudge_aspect": ROOT / "output/nudge_analysis/aspect_opportunity_map.csv",
+    "nudge_aspect_manifest": ROOT / "output/nudge_analysis/aspect_opportunity_map_manifest.json",
     "nudge_poi": ROOT / "output/nudge_analysis/poi_opportunity_index.csv",
+    "nudge_poi_manifest": ROOT / "output/nudge_analysis/poi_opportunity_index_manifest.json",
     "nudge_tax": ROOT / "output/nudge_analysis/nudge_taxonomy.csv",
 }
 
@@ -72,6 +77,8 @@ FIGURES = {
     "nudge_aspect": ROOT / "docs/statistical_test_figures/figure_nudge_aspect_opportunity_map.svg",
     "nudge_poi": ROOT / "docs/statistical_test_figures/figure_nudge_poi_action_map.svg",
     "nudge_info": ROOT / "docs/statistical_test_figures/figure_nudge_info_levers.svg",
+    "cn_volume": ROOT / "output/presentation_safe/multilingual/figure_volume_context.svg",
+    "h3_length": ROOT / "docs/statistical_test_figures/figure_h3_text_length_diagnostic.svg",
 }
 
 # Global caches: DATA holds loaded files, SHA holds file hashes, COMMAND holds the
@@ -277,6 +284,15 @@ def manifest_metric(src_id, *path):
     return g
 
 
+def strategy_ratio(label):
+    def g(d):
+        match = re.search(rf"\*\*{re.escape(label)}: (\d+)/(\d+) shared\*\*", d)
+        if not match:
+            raise KeyError(f"missing strategy ratio: {label}")
+        return f"{match.group(1)} of {match.group(2)}"
+    return g
+
+
 def aspect_value(aspect, col, segment="pooled"):
     def g(d):
         r = d[(d["analysis"] == "A_primary") & (d["segment"] == segment) & (d["aspect"] == aspect)]
@@ -323,6 +339,15 @@ def poi_sum(col, fukui: bool | None = None):
 def poi_total_reviews():
     def g(d):
         return int(d["n_reviews"].sum())
+    return g
+
+
+def poi_positive_language_median(col):
+    def g(d):
+        values = d.loc[d[col] > 0, col]
+        if values.empty:
+            raise KeyError(f"no positive POI language counts: {col}")
+        return float(values.median())
     return g
 
 
@@ -388,6 +413,10 @@ def build_html() -> str:
     # --- PULL HEADLINE VALUES: each is resolved from a source file at build time ---
     # These will appear in the HTML with traced links; if any getter fails, the build fails
     total_rows = n("nudge_poi", poi_total_reviews(), "sum(n_reviews) true tagged review records")
+    tagged_jp_n = stat("nudge_aspect_manifest", manifest_metric("nudge_aspect_manifest", "tagged_language_group_counts", "japanese"), "{:,.0f}", "", "tagged_language_group_counts.japanese")
+    tagged_en_n = stat("nudge_aspect_manifest", manifest_metric("nudge_aspect_manifest", "tagged_language_group_counts", "english"), "{:,.0f}", "", "tagged_language_group_counts.english")
+    tagged_cn_n = stat("nudge_aspect_manifest", manifest_metric("nudge_aspect_manifest", "tagged_language_group_counts", "chinese"), "{:,.0f}", "", "tagged_language_group_counts.chinese")
+    tagged_other_n = stat("nudge_aspect_manifest", manifest_metric("nudge_aspect_manifest", "tagged_language_group_counts", "other_non_english_non_japanese"), "{:,.0f}", "", "tagged_language_group_counts.other_non_english_non_japanese")
     all_en_n = stat("nudge_aspect", aspect_n("english"), "{:,.0f}", "", "A_primary english n")
     all_jp_n = stat("nudge_aspect", aspect_n("japanese"), "{:,.0f}", "", "A_primary japanese n")
     pooled_model_n = stat("nudge_aspect", aspect_n("pooled"), "{:,.0f}", "", "A_primary pooled n")
@@ -395,6 +424,17 @@ def build_html() -> str:
     en_n = stat("h2", h2_n("english"), "{:,.0f}", "", "H2 group_summary n_rating_present[english]")
     jp_n = stat("h2", h2_n("japanese"), "{:,.0f}", "", "H2 group_summary n_rating_present[japanese]")
     cn_n = n("cn_manifest", manifest_metric("cn_manifest", "rows_represented"), "metrics.rows_represented")
+    cn_google_n = n("cn_google_manifest", manifest_metric("cn_google_manifest", "n_reviews"), "metrics.n_reviews")
+    cn_google_pois = n("cn_google_manifest", manifest_metric("cn_google_manifest", "unique_pois"), "metrics.unique_pois")
+    cn_google_rating = stat("cn_google_manifest", manifest_metric("cn_google_manifest", "mean_review_rating"), "{:.2f}", " stars", "metrics.mean_review_rating")
+    cn_false_negative_n = n("cn_google_manifest", manifest_metric("cn_google_manifest", "snownlp_validation", "snownlp_negative_rated_4_or_5_n"), "metrics.snownlp_validation.snownlp_negative_rated_4_or_5_n")
+    cn_snownlp_negative_n = n("cn_google_manifest", manifest_metric("cn_google_manifest", "snownlp_validation", "snownlp_negative_n"), "metrics.snownlp_validation.snownlp_negative_n")
+    cn_false_negative_share = stat("cn_google_manifest", manifest_metric("cn_google_manifest", "snownlp_validation", "snownlp_negative_rated_4_or_5_share"), lambda x: f"{float(x)*100:.0f}%", "", "metrics.snownlp_validation.snownlp_negative_rated_4_or_5_share")
+    cn_topic_overlap = stat("cn_strategy", strategy_ratio("Top-6 topics"), "{}", "", "§1 convergence: Top-6 topics shared")
+    cn_pain_overlap = stat("cn_strategy", strategy_ratio("Top-6 friction"), "{}", "", "§1 convergence: Top-6 friction codes shared")
+    cn_poi_median = stat("nudge_poi", poi_positive_language_median("n_reviews_chinese"), "{:.0f}", " reviews/POI", "median(n_reviews_chinese where > 0)")
+    cn_gate_language_n = stat("nudge_poi_manifest", manifest_metric("nudge_poi_manifest", "low_confidence_threshold_n_reviews"), "{:.0f}", " reviews", "metrics.low_confidence_threshold_n_reviews")
+    cn_gate_tag_n = stat("nudge_poi_manifest", manifest_metric("nudge_poi_manifest", "min_dominant_aspect_n_positive"), "{:.0f}", " supporting tags", "metrics.min_dominant_aspect_n_positive")
 
     # --- Nudge opportunity map: aspect estimates, POI archetypes, taxonomy labels ---
     open_prev = stat("nudge_aspect", aspect_value("opening_hours_availability", "prevalence"), lambda x: f"{float(x)*100:.1f}%", "", "opening_hours_availability pooled prevalence")
@@ -638,17 +678,17 @@ footer{padding:40px 0 80px;color:var(--muted);font-size:13.5px;
     H.append("<h2 class='sec'>Opportunity Map — where to nudge next</h2>")
     H.append(
         f"<p class='lead'>The old cross-language score gap is not the headline. The useful bridge is the "
-        f"friction null: complaint-evidence prevalence is effectively language-invariant "
+        f"pain-points null: complaint-evidence prevalence is effectively language-invariant "
         f"({h3_fri}, {h3_fri_p}). That means aspect evidence — not raw cross-language rating gaps — is the "
         f"more trustworthy, actionable signal. We therefore mine reviewed aspect codes for low-cost nudge "
         f"opportunities to test next semester. These are exploratory, hypothesis-generating rankings; they "
         f"do <b>not</b> claim intervention effectiveness.</p>"
     )
     H.append("<p><a class='jump-link' href='docs/nudge_experiment_register.html'>Next-semester experiment register →</a></p>")
-    H.append(fig("nudge_aspect", "Penalty-by-prevalence map from the live aspect-opportunity CSV; significant friction aspects are labelled."))
+    H.append(fig("nudge_aspect", "Penalty-by-prevalence map from the live aspect-opportunity CSV; significant pain-point aspects are labelled."))
     H.append(fig("nudge_info", "Nudge-able information levers with Wilson prevalence intervals and Firth odds ratios from the source CSV."))
     H.append(
-        f"<p>The FDR-significant nudge-able friction levers are opening-hours availability "
+        f"<p>The FDR-significant nudge-able pain-point levers are opening-hours availability "
         f"(prevalence {open_prev}, Firth OR {open_or}, {open_p}) and itinerary fit / time cost "
         f"(prevalence {time_prev}, Firth OR {time_or}, {time_p}). Other information levers are present "
         f"but not yet evidenced strongly enough for ranking: English-information gaps ({eng_gap_prev}), "
@@ -657,7 +697,7 @@ footer{padding:40px 0 80px;color:var(--muted);font-size:13.5px;
     )
     H.append(fig("nudge_poi", "POI action map: fix-it, promote-it, and crowding-hotspot candidates with rating-based Wilson intervals."))
     H.append(
-        f"<p><b>Fix-it</b> candidates are high-volume POIs with elevated nudge-able friction: {fix_count} total, "
+        f"<p><b>Fix-it</b> candidates are high-volume POIs with elevated nudge-able pain points: {fix_count} total, "
         f"{fix_fukui} in Fukui. Top examples include {fix_1} ({fix_1_codes}) and {fix_2} ({fix_2_codes}). "
         f"<b>Promote-it</b> candidates are low-volume, high-satisfaction POIs for demand redistribution: "
         f"{promote_count} total, {promote_fukui} in Fukui, using the low-volume cutoff of {low_vol} reviews "
@@ -693,7 +733,7 @@ footer{padding:40px 0 80px;color:var(--muted);font-size:13.5px;
         "nudge will change behaviour; next-semester experiments would be needed for effectiveness claims.</div>"
     )
     H.append(
-        "<div class='caveat'>Per-POI Chinese friction is keyword topic-presence (a topic was mentioned), not polarity "
+        "<div class='caveat'>Per-POI Chinese pain points are keyword topic-presence (a topic was mentioned), not polarity "
         "(a problem occurred), and is thin (median ~3 reviews/POI) with human validation pending — so any "
         "Chinese-driven POI candidate above is directional only.</div>"
     )
@@ -708,13 +748,21 @@ footer{padding:40px 0 80px;color:var(--muted);font-size:13.5px;
         "or reviewer.</p>"
     )
     H.append("<dl class='dl'>")
-    H.append(f"<dt>Tagged Google reviews</dt><dd>{total_rows} true CSV records across the three-city Hokuriku review cache.</dd>")
+    H.append(f"<dt>Tagged Google reviews</dt><dd>{total_rows} true CSV records across the three-city Hokuriku review cache: {tagged_jp_n} Japanese-language, {tagged_en_n} English-language, {tagged_cn_n} Chinese-language, and {tagged_other_n} other non-English/non-Japanese rows.</dd>")
     H.append(f"<dt>Pooled opportunity model</dt><dd>{pooled_model_n} English/Japanese/Chinese-supported rows: {all_en_n} English-language and {all_jp_n} Japanese-language rows.</dd>")
     H.append(f"<dt>JP/EN Fukui sentiment subset</dt><dd>{jp_en_fukui_n} row-level sentiment rows: {en_n} English-language and {jp_n} Japanese-language rows.</dd>")
-    H.append(f"<dt>Chinese posts</dt><dd>{cn_n} Xiaohongshu rows, scored with SnowNLP plus a reviewed Chinese codebook. Douyin is held out of the main pipeline.</dd>")
+    H.append(
+        f"<dt>Chinese-language Google reviews · primary</dt><dd>{cn_google_n} star-rated reviews across "
+        f"{cn_google_pois} POIs in Kanazawa, Toyama, and Fukui. POI links and the shared reviewed codebook "
+        f"make these the primary Chinese statistical evidence.</dd>"
+    )
+    H.append(
+        f"<dt>Xiaohongshu · directional guidepost</dt><dd>{cn_n} Fukui posts with no POI link or star rating. "
+        f"They help identify demand and pain-point themes, but do not supply the Chinese measurement outcome.</dd>"
+    )
     H.append("</dl>")
     H.append(
-        "<p>Google review text is an Outscraper-derived local cache; Chinese posts come from an "
+        "<p>Google review text is an Outscraper-derived local cache; Xiaohongshu posts come from an "
         "external <code>tourism-data</code> checkout. Raw text, authors, URLs, and IDs stay out of "
         "this repository — only aggregate counts and statistics are published. The English and "
         "Japanese reviews differ markedly in length, which matters for keyword matching: median "
@@ -731,10 +779,11 @@ footer{padding:40px 0 80px;color:var(--muted);font-size:13.5px;
         "gives a human-auditable reason.</p>"
     )
     H.append("<ol class='pipeline'>")
-    H.append("<li><b>Sync &amp; filter.</b> Pull the Google review cache and Chinese posts, keep Fukui POIs only.</li>")
-    H.append("<li><b>Language tagging.</b> Split Google reviews into English- and Japanese-language rows.</li>")
-    H.append("<li><b>Dual-path scoring.</b> VADER (EN), oseti (JP), SnowNLP (CN) for category shares; "
-             "reviewed friction / enjoyment / recommendation / positive codebooks for matched evidence.</li>")
+    H.append("<li><b>Sync &amp; filter.</b> Pull the Hokuriku Google review cache and the Fukui Xiaohongshu guidepost.</li>")
+    H.append("<li><b>Language tagging.</b> Split Google reviews into English-, Japanese-, and Chinese-language rows.</li>")
+    H.append("<li><b>Dual-path scoring.</b> Shared Google star ratings provide the cross-language outcome; "
+             "reviewed pain-points / enjoyment / recommendation / positive codebooks provide matched evidence. "
+             "Language-specific sentiment tools remain secondary within-language checks only.</li>")
     H.append("<li><b>Category rule.</b> A shared threshold maps scores to positive / neutral / negative "
              "(positive ≥ 0.05, negative ≤ −0.05); neutral-band width is varied as a robustness check.</li>")
     H.append("<li><b>Statistical tests.</b> Category-share χ², common-scale star-rating Welch tests, "
@@ -744,8 +793,8 @@ footer{padding:40px 0 80px;color:var(--muted);font-size:13.5px;
     H.append("</ol>")
     H.append(
         "<div class='caveat'>Measurement honesty: VADER, oseti, and SnowNLP scores are <em>not</em> a common "
-        "scale, so raw scores are never compared across languages. Cross-language comparison uses category "
-        "shares, common 1–5 Google star ratings, and reviewed evidence prevalence. Review rows are nested in "
+        "scale, so raw scores are never compared across languages. Cross-language comparison uses common "
+        "Google star ratings and reviewed evidence prevalence. Review rows are nested in "
         "POIs, so single-level p-values are descriptive; the within-POI paired test (A2) is the venue-clustering "
         "robustness check.</div>"
     )
@@ -806,7 +855,7 @@ footer{padding:40px 0 80px;color:var(--muted);font-size:13.5px;
     ))
     H.append(hyp(
         "H3", "Reviewed-evidence prevalence vs. review language",
-        "For each evidence family (friction, enjoyment, recommendation, positive sentiment), "
+        "For each evidence family (pain points, enjoyment, recommendation, positive sentiment), "
         "prevalence is equal across English and Japanese review rows.",
         "Prevalence differs across languages for that family.",
         "One review row; four parallel family tests.",
@@ -816,7 +865,7 @@ footer{padding:40px 0 80px;color:var(--muted);font-size:13.5px;
         f"Enjoyment {h3_enj} ({h3_enj_p}) → <span class='rej'>Reject</span>; "
         f"positive {h3_pos} ({h3_pos_p}) → <span class='rej'>Reject</span>; "
         f"recommendation {h3_rec} ({h3_rec_p}) → <span class='rej'>Reject</span>; "
-        f"friction {h3_fri} ({h3_fri_p}) → <span class='keep'>Fail to reject</span>.",
+        f"pain points {h3_fri} ({h3_fri_p}) → <span class='keep'>Fail to reject</span>.",
     ))
     H.append(hyp(
         "H4 · robustness", "Language gap within shared venues (clustering control)",
@@ -848,7 +897,7 @@ footer{padding:40px 0 80px;color:var(--muted);font-size:13.5px;
         f"cross-cultural differences in rating and expressive style: Japanese-language reviewers tend "
         f"toward more reserved scale use, so the gap may partly reflect expression norms rather than "
         f"differences in actual experience quality at Fukui venues. "
-        f"This interpretation is reinforced — not refuted — by the friction (complaint) null: "
+        f"This interpretation is reinforced — not refuted — by the pain-points (complaint) null: "
         f"complaint-evidence prevalence does <em>not</em> differ between groups "
         f"({h3_fri}, {h3_fri_p}), meaning the groups differ in how much they praise, not in how much "
         f"they complain — exactly the asymmetric pattern a positivity-expression difference would produce. "
@@ -910,7 +959,7 @@ footer{padding:40px 0 80px;color:var(--muted);font-size:13.5px;
         f"differs by {h3_pos} ({h3_pos_p}) and recommendation evidence by {h3_rec} ({h3_rec_p}).</p>"
     )
     H.append(
-        f"<div class='callout'>Friction (complaint) evidence is the telling null: the English–Japanese "
+        f"<div class='callout'>Pain-points (complaint) evidence is the telling null: the English–Japanese "
         f"difference is only {h3_fri} and is <b>not</b> significant ({h3_fri_p}). The groups differ in how "
         f"much they praise, not in how much they complain.</div>"
     )
@@ -949,22 +998,39 @@ footer{padding:40px 0 80px;color:var(--muted);font-size:13.5px;
     H.append(fig("wen_drivers", "Within-English sentiment drivers; bar length is the within-tool effect size for each predictor."))
     H.append("</section>")
 
-    # ---- Appendix A6 cross-source / chinese ----
-    H.append("<section id='a6'><span class='sec-num'>APPENDIX A6 — MOST CAVEATED</span>")
-    H.append("<div class='rank'><span class='badge b-desc'>Descriptive only · gaps noted</span></div>")
-    H.append("<h3 style='font-size:25px;font-weight:600;margin:0 0 6px'>Chinese social posts and cross-source comparison</h3>")
+    # ---- Appendix A6 Chinese evidence ----
+    H.append("<section id='a6'><span class='sec-num'>APPENDIX A6 — CHINESE EVIDENCE</span>")
+    H.append("<div class='rank'><span class='badge b-mixed'>Google primary · Xiaohongshu directional</span></div>")
+    H.append("<h3 style='font-size:25px;font-weight:600;margin:0 0 6px'>Chinese evidence now starts with star-rated Google reviews</h3>")
     H.append(
-        f"<p class='lead'>Chinese-language Xiaohongshu posts read overwhelmingly positive — {cn_pos} positive "
-        f"versus {cn_neg} negative — but this is a different platform (curated social media, not solicited "
-        f"reviews), a different tool (SnowNLP), and a different unit, so it sits beside the Google comparison "
-        f"as descriptive context, not a like-for-like test.</p>"
+        f"<p class='lead'>The primary Chinese source is {cn_google_n} Chinese-language Google reviews across "
+        f"{cn_google_pois} Hokuriku POIs. Their positive signal is the shared Google star rating "
+        f"(mean {cn_google_rating}), while reviewed keyword evidence supplies topic and pain-point prevalence. "
+        f"This puts Chinese into the same rating-and-evidence comparison used by the POI opportunity map.</p>"
     )
-    H.append(fig("cross_cat", "Sentiment category shares across English, Japanese, and Chinese-language source groups — descriptive across platforms and tools."))
-    H.append(fig("cn_plat", "Chinese-language sentiment category shares within the Xiaohongshu platform."))
+    H.append(fig("cn_volume", "Hokuriku review volume by supported language. Chinese is included in the pooled Google-rating model; no sentiment-tool score is shown."))
     H.append(
-        "<div class='caveat'>The within-Chinese city/platform friction comparison cannot be run yet: current "
-        "Fukui Chinese data is single-platform (Xiaohongshu only), so there are no comparison groups. This is a "
-        "stated data gap, not a finding.</div>"
+        f"<p>Xiaohongshu remains useful only as a directional guidepost. Keyword evidence converges: "
+        f"{cn_topic_overlap} leading topics and {cn_pain_overlap} leading pain-point codes are shared across "
+        f"Xiaohongshu and Chinese-language Google reviews, with <code>transport_access</code> ranked first in both. "
+        f"Convergence is about mentioned themes, not sentiment.</p>"
+    )
+    H.append(fig("h3_length", "Chinese-language Google reviews are shortest, giving them the least opportunity for keyword evidence to match."))
+    H.append(
+        f"<div class='caveat'><b>SnowNLP is not a Chinese sentiment result.</b> Of {cn_snownlp_negative_n} rows "
+        f"it labels negative, {cn_false_negative_n} are high-star reviews ({cn_false_negative_share}). "
+        f"The unvalidated category shares are therefore not reported; Chinese positives use star ratings.</div>"
+    )
+    H.append(
+        "<div class='caveat'><b>Pain-point tags mark topic presence, not polarity.</b> They can fire when a "
+        "high-star review says parking was convenient. Lynn approved the colloquial keyword vocabulary, "
+        "improving recall, but tagging remains polarity-blind.</div>"
+    )
+    H.append(
+        f"<div class='caveat'><b>POI-level Chinese evidence is directional.</b> Median coverage is "
+        f"{cn_poi_median}. The language-aware gate blocks a flip when the driving language has fewer than "
+        f"{cn_gate_language_n} at that POI or the aspect has fewer than {cn_gate_tag_n}. Thin Chinese evidence "
+        f"can inform follow-up, but cannot drive a headline opportunity classification.</div>"
     )
     H.append("</section>")
 
@@ -980,7 +1046,7 @@ footer{padding:40px 0 80px;color:var(--muted);font-size:13.5px;
         f"express evaluation on a rating scale. This study cannot separate the two.</p>"
     )
     H.append(
-        f"<div class='callout'>The most informative result is not the gap itself but the friction "
+        f"<div class='callout'>The most informative result is not the gap itself but the pain-points "
         f"(complaint) null. Complaint-evidence prevalence is essentially equal across groups "
         f"({h3_fri}, {h3_fri_p}): the groups differ in how much they <b>praise</b>, not in how much they "
         f"<b>complain</b>. A real difference in venue quality would be expected to move complaints too; a "
@@ -998,7 +1064,7 @@ footer{padding:40px 0 80px;color:var(--muted);font-size:13.5px;
         "<div class='callout'>Practical reading for Fukui tourism stakeholders. First, raw cross-language "
         "review scores should not be benchmarked directly — a lower Japanese-language average does not by "
         "itself mean a worse experience, and a dashboard that ranks venues on mixed-language ratings will be "
-        "misled by response style. Second, because complaint prevalence is language-independent, friction "
+        "misled by response style. Second, because complaint prevalence is language-independent, pain points "
         "evidence — not rating averages — is the more trustworthy place to look for genuine service issues "
         "that affect every group.</div>"
     )
@@ -1024,8 +1090,9 @@ footer{padding:40px 0 80px;color:var(--muted);font-size:13.5px;
         "analysis is attempted, given the date-quality gap.</dd>"
     )
     H.append(
-        f"<dt>Chinese strand</dt><dd>Single-platform (Xiaohongshu, {cn_pos} positive) and descriptive only; it "
-        f"generates hypotheses, it does not provide a like-for-like cross-source test.</dd>"
+        f"<dt>Chinese strand</dt><dd>Chinese-language Google reviews are primary star-rated evidence; "
+        f"Xiaohongshu is a Fukui-only directional guidepost. Per-POI Chinese coverage remains thin "
+        f"(median {cn_poi_median}), and keyword pain-point tags remain polarity-blind.</dd>"
     )
     H.append("</dl>")
     H.append("<h3 style='font-size:20px;font-weight:600;margin:22px 0 6px'>Where this should go next</h3>")
@@ -1043,8 +1110,8 @@ footer{padding:40px 0 80px;color:var(--muted);font-size:13.5px;
         "quantify how far VADER / oseti / SnowNLP agree with human judgement before leaning on category shares.</li>"
     )
     H.append(
-        "<li><b>Make the Chinese strand confirmatory.</b> Add a second platform (e.g. Douyin) so source can be "
-        "held constant and the comparison becomes a test rather than context.</li>"
+        "<li><b>Validate Chinese measurement.</b> Hand-label short Chinese reviews for sentiment and "
+        "pain-point polarity; retain Xiaohongshu as directional context until comparable POI-linked outcomes exist.</li>"
     )
     H.append(
         "<li><b>Add a temporal view.</b> Once date precision is sufficient, examine whether the language gap "

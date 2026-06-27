@@ -1,29 +1,29 @@
 {
   "schema_version": "research_provenance.v1",
   "kind": "cross_language_solution_priorities",
-  "generated_at": "2026-06-27T10:13:15+00:00",
+  "generated_at": "2026-06-27T13:39:43+00:00",
   "command": "scripts/build_cross_language_solution_priorities.py",
   "inputs": [
     {
       "role": "solution mapping config",
       "path": "config/cross_language_solution_mapping.yaml",
       "exists": true,
-      "bytes": 4193,
-      "sha256": "a471da8277d89da9af21ec56ab6af1e32884bb8df2deac4182fec3ed636684ca"
+      "bytes": 4199,
+      "sha256": "580f7a70f1093e703b894f240fadbe2c734dce98eae6803820bd8bebb6de67b7"
     },
     {
       "role": "review aspect opportunity aggregates",
       "path": "output/nudge_analysis/aspect_opportunity_map.csv",
       "exists": true,
-      "bytes": 38228,
-      "sha256": "2bee5c6bba559106e3e608ebe23a949721275d326328f98f00cc8144e29dc571"
+      "bytes": 38272,
+      "sha256": "6726a743db95739291eb3521e924b7e160a1e65e1f9269e632ea8cf42b7ab96f"
     },
     {
       "role": "reviewed JP-EN evidence aggregates",
-      "path": "output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv",
+      "path": "output/hypothesis_tests_hokuriku/h3_reviewed_evidence_jp_en.csv",
       "exists": true,
-      "bytes": 7313,
-      "sha256": "ec6b3edf3ed0e0549c468466ff4063c981d96b0243366b3c5ff071acc376e60f"
+      "bytes": 7936,
+      "sha256": "320f44444ce87d493c83cce6c1126d0c65d041931a2e2033777a54f96740ee8d"
     },
     {
       "role": "reviewed Chinese friction aggregates",
@@ -44,7 +44,7 @@
       "path": "output/within_language_sentiment/cn_within_source_sentiment_drivers.csv",
       "exists": true,
       "bytes": 35073,
-      "sha256": "adf1dff95f670b8fec376f8973fe621c9e801e0dfc195d60186720da3175becd"
+      "sha256": "7d040006dfcf82e91a0b036b26e9c803f42720d3ad6eb1b7b2e340201fa2392c"
     }
   ],
   "outputs": [
@@ -52,15 +52,15 @@
       "role": "ranked aggregate priorities",
       "path": "output/nudge_analysis/cross_language_solution_priorities.csv",
       "exists": true,
-      "bytes": 4783,
-      "sha256": "5414bc9066a2b55ba0419d01b9c20a1127c91d8fffcf1a15a5f5abfac8d2d5d0"
+      "bytes": 4791,
+      "sha256": "8e459c5c5f0a08f77c449151545c943a4974f43984d66bd20c515166aefe2431"
     },
     {
       "role": "source-specific aggregate evidence",
       "path": "output/nudge_analysis/cross_language_solution_evidence.csv",
       "exists": true,
-      "bytes": 2450,
-      "sha256": "e74399014c75af9d530b370b9ea87d70210c0374cb9a70f2160b3a1865ab9e34"
+      "bytes": 2484,
+      "sha256": "c1f2cacc6df957776cb1be29c6d76e9b4eb43f5d753eafaffa9ed58df551e16d"
     }
   ],
   "filters": {

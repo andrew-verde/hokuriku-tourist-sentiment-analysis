@@ -1,23 +1,23 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="980" height="288" viewBox="0 0 980 288">
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="288" viewBox="0 0 1200 288">
 <rect width="100%" height="100%" fill="#fbfaf7"/>
 <text x="32" y="38" font-family="Arial, sans-serif" font-size="34" font-weight="700" fill="#1f2933">Comparable Volume Context</text>
 <text x="32" y="66" font-family="Arial, sans-serif" font-size="20" fill="#52616b">Rows represented by source group; rating shown only for Google reviews</text>
-<line x1="310.00" x2="310.00" y1="84.00" y2="264.00" stroke="#d7dde8" stroke-width="1" opacity="0.58"/>
-<line x1="542.50" x2="542.50" y1="84.00" y2="264.00" stroke="#d7dde8" stroke-width="1" opacity="0.58"/>
-<line x1="775.00" x2="775.00" y1="84.00" y2="264.00" stroke="#d7dde8" stroke-width="1" opacity="0.58"/>
-<text x="294" y="118" text-anchor="end" font-family="Arial, sans-serif" font-size="19" fill="#1f2933">Chinese · Google reviews (Hokuriku)</text>
-<rect x="310" y="98" width="27.99" height="26" rx="3" fill="#bc6c25"/>
-<rect x="343.99" y="98.00" width="236.32" height="27.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
-<text x="462.15" y="118.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="17" font-weight="400" fill="#1f2933">n=243; SnowNLP mean 0.63</text>
-<text x="294" y="166" text-anchor="end" font-family="Arial, sans-serif" font-size="19" fill="#1f2933">Chinese · Xiaohongshu (Fukui, social)</text>
-<rect x="310" y="146" width="23.04" height="26" rx="3" fill="#bc6c25"/>
-<rect x="339.04" y="146.00" width="236.32" height="27.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
-<text x="457.20" y="166.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="17" font-weight="400" fill="#1f2933">n=200; SnowNLP mean 0.81</text>
-<text x="294" y="214" text-anchor="end" font-family="Arial, sans-serif" font-size="19" fill="#1f2933">japanese</text>
-<rect x="310" y="194" width="465.00" height="26" rx="3" fill="#5b6c94"/>
-<text x="765.00" y="214" text-anchor="end" font-family="Arial, sans-serif" font-size="17" fill="#ffffff">n=4,037; mean rating 4.26</text>
-<text x="294" y="262" text-anchor="end" font-family="Arial, sans-serif" font-size="19" fill="#1f2933">english</text>
-<rect x="310" y="242" width="105.85" height="26" rx="3" fill="#2f6f73"/>
-<rect x="421.85" y="242.00" width="227.14" height="27.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
-<text x="535.42" y="262.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="17" font-weight="400" fill="#1f2933">n=919; mean rating 4.49</text>
+<line x1="500.00" x2="500.00" y1="84.00" y2="264.00" stroke="#d7dde8" stroke-width="1" opacity="0.58"/>
+<line x1="747.50" x2="747.50" y1="84.00" y2="264.00" stroke="#d7dde8" stroke-width="1" opacity="0.58"/>
+<line x1="995.00" x2="995.00" y1="84.00" y2="264.00" stroke="#d7dde8" stroke-width="1" opacity="0.58"/>
+<text x="484" y="118" text-anchor="end" font-family="Arial, sans-serif" font-size="19" fill="#1f2933">Chinese · Xiaohongshu (Fukui, social)</text>
+<rect x="500" y="98" width="24.52" height="26" rx="3" fill="#bc6c25"/>
+<rect x="530.52" y="98.00" width="236.32" height="27.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="648.68" y="118.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="17" font-weight="400" fill="#1f2933">n=200; SnowNLP mean 0.81</text>
+<text x="484" y="166" text-anchor="end" font-family="Arial, sans-serif" font-size="19" fill="#1f2933">japanese</text>
+<rect x="500" y="146" width="495.00" height="26" rx="3" fill="#5b6c94"/>
+<text x="985.00" y="166" text-anchor="end" font-family="Arial, sans-serif" font-size="17" fill="#ffffff">n=4,037; mean rating 4.26</text>
+<text x="484" y="214" text-anchor="end" font-family="Arial, sans-serif" font-size="19" fill="#1f2933">english</text>
+<rect x="500" y="194" width="112.68" height="26" rx="3" fill="#2f6f73"/>
+<rect x="618.68" y="194.00" width="227.14" height="27.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="732.25" y="214.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="17" font-weight="400" fill="#1f2933">n=919; mean rating 4.49</text>
+<text x="484" y="262" text-anchor="end" font-family="Arial, sans-serif" font-size="19" fill="#1f2933">Chinese · Google reviews (Hokuriku)</text>
+<rect x="500" y="242" width="29.80" height="26" rx="3" fill="#bc6c25"/>
+<rect x="535.80" y="242.00" width="227.14" height="27.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="649.37" y="262.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="17" font-weight="400" fill="#1f2933">n=243; mean rating 4.43</text>
 </svg>

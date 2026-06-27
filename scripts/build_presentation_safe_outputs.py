@@ -290,8 +290,8 @@ def _svg_header(
     title: str,
     subtitle: str,
     *,
-    title_size: int = 24,
-    subtitle_size: int = 14,
+    title_size: int = 30,
+    subtitle_size: int = 18,
 ) -> list[str]:
     return [
         f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}">',
@@ -301,7 +301,8 @@ def _svg_header(
     ]
 
 
-def _text(x: float, y: float, value: object, size: int = 12, fill: str = FIGURE_INK, anchor: str = "start", weight: int = 400) -> str:
+def _text(x: float, y: float, value: object, size: int = 16, fill: str = FIGURE_INK, anchor: str = "start", weight: int = 400) -> str:
+    size = max(size, 16)
     return (
         f'<text x="{x:.2f}" y="{y:.2f}" text-anchor="{anchor}" font-family="Arial, sans-serif" '
         f'font-size="{size}" font-weight="{weight}" fill="{fill}">{html.escape(str(value))}</text>'
@@ -317,6 +318,7 @@ def _chip(parts: list[str], x: float, y: float, width: float, height: float, lab
 
 
 def _chip_width(label: str, size: int = 12) -> float:
+    size = max(size, 16)
     return max(34.0, len(label) * size * 0.54 + 16.0)
 
 
@@ -366,7 +368,7 @@ def _write_single_sentiment_profile(row: pd.Series, path: Path, language_label: 
         ),
     )
     parts.append(
-        f'<text x="{left - 14}" y="{top + 24}" text-anchor="end" font-family="Arial, sans-serif" font-size="14" fill="#1f2933">share of rows</text>'
+        f'<text x="{left - 14}" y="{top + 24}" text-anchor="end" font-family="Arial, sans-serif" font-size="16" fill="#1f2933">share of rows</text>'
     )
     _gridlines(parts, left, chart_width, top + 4, top + 36)
     x = left
@@ -377,11 +379,11 @@ def _write_single_sentiment_profile(row: pd.Series, path: Path, language_label: 
         )
         if segment_width > 48:
             parts.append(
-                f'<text x="{x + segment_width / 2:.2f}" y="{top + 26}" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#ffffff">{value:.1f}%</text>'
+                f'<text x="{x + segment_width / 2:.2f}" y="{top + 26}" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" fill="#ffffff">{value:.1f}%</text>'
             )
         x += segment_width
     parts.append(
-        f'<text x="{left}" y="{top + 72}" font-family="Arial, sans-serif" font-size="13" fill="#52616b">Date range: {html.escape(str(row["date_range_start"]))} to {html.escape(str(row["date_range_end"]))}; dated={_fmt_n(row["review_date_parseable_count"])}, undated={_fmt_n(row["review_date_missing_count"])}</text>'
+        f'<text x="{left}" y="{top + 72}" font-family="Arial, sans-serif" font-size="16" fill="#52616b">Date range: {html.escape(str(row["date_range_start"]))} to {html.escape(str(row["date_range_end"]))}; dated={_fmt_n(row["review_date_parseable_count"])}, undated={_fmt_n(row["review_date_missing_count"])}</text>'
     )
     legend_y = height - 34
     legend_x = left
@@ -389,7 +391,7 @@ def _write_single_sentiment_profile(row: pd.Series, path: Path, language_label: 
         offset = index * 150
         parts.extend([
             f'<rect x="{legend_x + offset}" y="{legend_y - 10}" width="10" height="10" fill="{FIGURE_PALETTE[category]}"/>',
-            f'<text x="{legend_x + offset + 16}" y="{legend_y}" font-family="Arial, sans-serif" font-size="12" fill="#52616b">{category} ({value:.1f}%)</text>',
+            f'<text x="{legend_x + offset + 16}" y="{legend_y}" font-family="Arial, sans-serif" font-size="16" fill="#52616b">{category} ({value:.1f}%)</text>',
         ])
     parts.append("</svg>")
     path.write_text("\n".join(parts), encoding="utf-8")
@@ -434,13 +436,13 @@ def _write_poi_priority_mix(row: pd.Series, path: Path, language_label: str) -> 
         bar_width = (int(item["count"]) / max_count) * chart_width
         label = str(item["category"]).replace("_", " ")
         parts.extend([
-            f'<text x="{left - 14}" y="{y + 23}" text-anchor="end" font-family="Arial, sans-serif" font-size="13" fill="#1f2933">{html.escape(label[:34])}</text>',
+            f'<text x="{left - 14}" y="{y + 23}" text-anchor="end" font-family="Arial, sans-serif" font-size="16" fill="#1f2933">{html.escape(label[:34])}</text>',
             f'<rect x="{left}" y="{y + 8}" width="{bar_width:.2f}" height="20" rx="3" fill="{color}"/>',
         ])
         value_label = f"{_fmt_n(item['count'])} ({float(item['pct']):.1f}%)"
         if not _label_chip(parts, left + bar_width + 8, y + 23, value_label, canvas_width=width):
             parts.append(
-                f'<text x="{left + bar_width + 8}" y="{y + 23}" font-family="Arial, sans-serif" font-size="12" fill="#1f2933">{html.escape(value_label)}</text>'
+                f'<text x="{left + bar_width + 8}" y="{y + 23}" font-family="Arial, sans-serif" font-size="16" fill="#1f2933">{html.escape(value_label)}</text>'
             )
     parts.append("</svg>")
     path.write_text("\n".join(parts), encoding="utf-8")
@@ -488,7 +490,7 @@ def _write_multilingual_sentiment_share(
     for index, row in enumerate(rows):
         y = top + index * row_height
         parts.append(
-            f'<text x="{left - 14}" y="{y + 25}" text-anchor="end" font-family="Arial, sans-serif" font-size="13" fill="#1f2933">{html.escape(row["label"])}</text>'
+            f'<text x="{left - 14}" y="{y + 25}" text-anchor="end" font-family="Arial, sans-serif" font-size="16" fill="#1f2933">{html.escape(row["label"])}</text>'
         )
         x = left
         for category in ["negative", "neutral", "positive"]:
@@ -499,20 +501,20 @@ def _write_multilingual_sentiment_share(
             )
             if segment_width > 44:
                 parts.append(
-                    f'<text x="{x + segment_width / 2:.2f}" y="{y + 25}" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#ffffff">{value:.1f}%</text>'
+                    f'<text x="{x + segment_width / 2:.2f}" y="{y + 25}" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" fill="#ffffff">{value:.1f}%</text>'
                 )
             x += segment_width
         n_label = f"n={_fmt_n(row['n'])}"
         if not _label_chip(parts, left + chart_width + 10, y + 25, n_label, canvas_width=width, text_fill=FIGURE_MUTED):
             parts.append(
-                f'<text x="{left + chart_width + 10}" y="{y + 25}" font-family="Arial, sans-serif" font-size="12" fill="#52616b">{html.escape(n_label)}</text>'
+                f'<text x="{left + chart_width + 10}" y="{y + 25}" font-family="Arial, sans-serif" font-size="16" fill="#52616b">{html.escape(n_label)}</text>'
             )
     legend_y = height - 30
     for index, category in enumerate(["negative", "neutral", "positive"]):
         offset = index * 122
         parts.extend([
             f'<rect x="{left + offset}" y="{legend_y - 10}" width="10" height="10" fill="{FIGURE_PALETTE[category]}"/>',
-            f'<text x="{left + offset + 16}" y="{legend_y}" font-family="Arial, sans-serif" font-size="12" fill="#52616b">{category}</text>',
+            f'<text x="{left + offset + 16}" y="{legend_y}" font-family="Arial, sans-serif" font-size="16" fill="#52616b">{category}</text>',
         ])
     parts.append("</svg>")
     path.write_text("\n".join(parts), encoding="utf-8")
@@ -522,10 +524,10 @@ def _write_multilingual_volume_context(baseline: pd.DataFrame, path: Path) -> No
     rows = baseline.copy()
     rows["label"] = rows["group"].astype(str).str.replace("_", " ", regex=False)
     rows = rows.sort_values(["source_kind", "volume"], ascending=[True, False])
-    width = 980
+    width = 1200
     top = 88
     row_height = 48
-    left = 310
+    left = 500
     right = 205
     height = top + 8 + max(1, len(rows)) * row_height
     chart_width = width - left - right
@@ -544,7 +546,9 @@ def _write_multilingual_volume_context(baseline: pd.DataFrame, path: Path) -> No
         volume = int(row["volume"])
         bar_width = (volume / max_volume) * chart_width
         if row["source_kind"] == "google_review":
-            color = FIGURE_PALETTE[str(row["group"])]
+            # EN/JP map by group; the Chinese-Google rating bar keeps the Chinese
+            # colour (its group label is not a palette key).
+            color = FIGURE_PALETTE.get(str(row["group"]), FIGURE_PALETTE["chinese_social"])
             metric = f"mean rating {float(row['rating_mean']):.2f}"
         else:
             color = FIGURE_PALETTE["chinese_social"]
@@ -634,12 +638,12 @@ def _write_statistical_evidence_summary(jp_en_tests: pd.DataFrame, cross_tests: 
             label = f"{status} ({metric_type})"
             color = "#8d99ae"
         parts.extend([
-            f'<text x="{left - 14}" y="{y + 24}" text-anchor="end" font-family="Arial, sans-serif" font-size="12" fill="#1f2933">{html.escape(name[:52])}</text>',
+            f'<text x="{left - 14}" y="{y + 24}" text-anchor="end" font-family="Arial, sans-serif" font-size="16" fill="#1f2933">{html.escape(name[:52])}</text>',
             f'<rect x="{left}" y="{y + 9}" width="{bar_width:.2f}" height="20" rx="3" fill="{color}"/>',
         ])
         if not _label_chip(parts, left + bar_width + 8, y + 24, label, canvas_width=width):
             parts.append(
-                f'<text x="{left + bar_width + 8}" y="{y + 24}" font-family="Arial, sans-serif" font-size="12" fill="#1f2933">{html.escape(label)}</text>'
+                f'<text x="{left + bar_width + 8}" y="{y + 24}" font-family="Arial, sans-serif" font-size="16" fill="#1f2933">{html.escape(label)}</text>'
             )
     parts.append(
         _text(

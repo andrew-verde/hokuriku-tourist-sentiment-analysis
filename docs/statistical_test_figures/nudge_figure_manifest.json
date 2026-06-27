@@ -1,22 +1,22 @@
 {
   "schema_version": "research_provenance.v1",
   "kind": "nudge_figure_pack",
-  "generated_at": "2026-06-27T07:33:30+00:00",
+  "generated_at": "2026-06-27T13:23:49+00:00",
   "command": "scripts/build_nudge_figures.py",
   "inputs": [
     {
       "role": "aspect_opportunity_map",
       "path": "output/nudge_analysis/aspect_opportunity_map.csv",
       "exists": true,
-      "bytes": 38228,
-      "sha256": "ba88feda4285ac2541d48b7676b5a8187831a2185e1eda70e49776e1e43898d6"
+      "bytes": 38272,
+      "sha256": "a4886e5c6270b1cb76f271eff6f1a2a4f75de042f99c74a63ca91a50ee210b03"
     },
     {
       "role": "poi_opportunity_index",
       "path": "output/nudge_analysis/poi_opportunity_index.csv",
       "exists": true,
-      "bytes": 152930,
-      "sha256": "8d8abcf2b473d2e16e861c2c57756bcc59afbaee8479fc0c3ed2c0d11ea426c0"
+      "bytes": 152936,
+      "sha256": "4271bc8e366502e170f8bd253dacdc7ee2ef9bf519a20bc98a872b69aabdc252"
     }
   ],
   "outputs": [
@@ -24,36 +24,43 @@
       "role": "nudge_figure_index",
       "path": "docs/statistical_test_figures/nudge_figure_index.csv",
       "exists": true,
-      "bytes": 720,
-      "sha256": "fb83f7bcefa46cca54705374c12fea6036a9969dd6b62748e06b6110fe7f5901"
+      "bytes": 983,
+      "sha256": "df614c5f030455da9768388c5e58e488885a1e5fcc9b539bb481960a629727e5"
     },
     {
       "role": "nudge_figure_questions",
       "path": "docs/statistical_test_figures/nudge_figure_questions.md",
       "exists": true,
-      "bytes": 971,
-      "sha256": "e6f608652b6ba33d8a5638f3dcf607ef2a8a4f93689086201f8cd2a17cec478e"
+      "bytes": 1280,
+      "sha256": "2c75bd43eace0c911f88ea9102ba400dcd0d0dad113ca160b09a92991a6ccfd6"
     },
     {
       "role": "nudge_figure_figure_nudge_aspect_opportunity_map",
       "path": "docs/statistical_test_figures/figure_nudge_aspect_opportunity_map.svg",
       "exists": true,
-      "bytes": 5752,
-      "sha256": "bffdd14343ca10227f1b6699ed813c021ef9bfe9692d383986dafc142f1c281e"
+      "bytes": 5925,
+      "sha256": "04c00fd0363b35f5099fac00391ecab11be28e441be6b50c7043bf012e3e17ec"
     },
     {
       "role": "nudge_figure_figure_nudge_poi_action_map",
       "path": "docs/statistical_test_figures/figure_nudge_poi_action_map.svg",
       "exists": true,
-      "bytes": 26396,
-      "sha256": "1c936e9db3fe1bc5a72f9bb2e64c185de42771416fe28be7b52b089790142590"
+      "bytes": 26793,
+      "sha256": "2c11aff4601478128ca6ce669261215f21e49e470c5ccbc2e4d9810b96febcc1"
     },
     {
       "role": "nudge_figure_figure_nudge_info_levers",
       "path": "docs/statistical_test_figures/figure_nudge_info_levers.svg",
       "exists": true,
-      "bytes": 5951,
-      "sha256": "a1b0deda3c4e04adf22022dfdcbf93b76d7501c801ab0a1c7d3280c5522ded02"
+      "bytes": 5959,
+      "sha256": "fbac290693a671630146b5a9c5b1c436410f2e6d953fea157483e78641ed51b1"
+    },
+    {
+      "role": "nudge_figure_figure_nudge_hokuriku_volume_context",
+      "path": "docs/statistical_test_figures/figure_nudge_hokuriku_volume_context.svg",
+      "exists": true,
+      "bytes": 1844,
+      "sha256": "f0b47181ecefff3751bef8e13c994c29bc3827bd5dad9bea7ec11dc9035d696f"
     }
   ],
   "filters": {
@@ -61,7 +68,7 @@
     "source": "nudge analysis CSVs"
   },
   "metrics": {
-    "figure_count": 3
+    "figure_count": 4
   },
   "caveats": [
     "Exploratory and hypothesis-generating; not causal.",

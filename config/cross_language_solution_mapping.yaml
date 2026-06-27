@@ -20,8 +20,8 @@ solutions:
         - booking_ticketing
       primary_review_aspect: opening_hours_availability
       primary_chinese_code: opening_hours_availability
-    evidence_summary_en: All 3 groups show planning friction; Google models put hours and itinerary fit through FDR.
-    evidence_summary_ja: 3群すべてに計画上の摩擦があり、Googleモデルでは営業時間と旅程適合がFDRを通過。
+    evidence_summary_en: All 3 groups show planning pain points; Google models put hours and itinerary fit through FDR.
+    evidence_summary_ja: 3群すべてに計画上の不満点があり、Googleモデルでは営業時間と旅程適合がFDRを通過。
     experiment_hypothesis_en: A concise readiness card reduces planning uncertainty and increases itinerary commitment.
     experiment_hypothesis_ja: 簡潔な準備カードは計画時の不確実性を減らし、旅程への追加を増やす。
     intervention_en: A/B test one card with hours, duration, transfers, booking, and backups.

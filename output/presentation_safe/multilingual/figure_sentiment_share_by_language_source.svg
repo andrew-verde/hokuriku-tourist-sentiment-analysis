@@ -1,35 +1,35 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1000" height="306" viewBox="0 0 1000 306">
 <rect width="100%" height="100%" fill="#fbfaf7"/>
-<text x="32" y="38" font-family="Arial, sans-serif" font-size="24" font-weight="700" fill="#1f2933">Sentiment Category Share by Language Source</text>
-<text x="32" y="66" font-family="Arial, sans-serif" font-size="14" fill="#52616b">Secondary library/category shares; source platforms and tools differ</text>
+<text x="32" y="38" font-family="Arial, sans-serif" font-size="30" font-weight="700" fill="#1f2933">Sentiment Category Share by Language Source</text>
+<text x="32" y="66" font-family="Arial, sans-serif" font-size="18" fill="#52616b">Secondary library/category shares; source platforms and tools differ</text>
 <line x1="245.00" x2="245.00" y1="100.00" y2="230.00" stroke="#d7dde8" stroke-width="1" opacity="0.58"/>
 <line x1="582.50" x2="582.50" y1="100.00" y2="230.00" stroke="#d7dde8" stroke-width="1" opacity="0.58"/>
 <line x1="920.00" x2="920.00" y1="100.00" y2="230.00" stroke="#d7dde8" stroke-width="1" opacity="0.58"/>
-<text x="231" y="123" text-anchor="end" font-family="Arial, sans-serif" font-size="13" fill="#1f2933">english Google reviews</text>
+<text x="231" y="123" text-anchor="end" font-family="Arial, sans-serif" font-size="16" fill="#1f2933">english Google reviews</text>
 <rect x="245.00" y="106" width="34.69" height="24" fill="#9a031e"/>
 <rect x="279.69" y="106" width="25.23" height="24" fill="#8d99ae"/>
 <rect x="304.93" y="106" width="615.07" height="24" fill="#2f6f73"/>
-<text x="612.46" y="123" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#ffffff">91.1%</text>
-<text x="930" y="123" font-family="Arial, sans-serif" font-size="12" fill="#52616b">n=214</text>
-<text x="231" y="171" text-anchor="end" font-family="Arial, sans-serif" font-size="13" fill="#1f2933">japanese Google reviews</text>
+<text x="612.46" y="123" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" fill="#ffffff">91.1%</text>
+<text x="930" y="123" font-family="Arial, sans-serif" font-size="16" fill="#52616b">n=214</text>
+<text x="231" y="171" text-anchor="end" font-family="Arial, sans-serif" font-size="16" fill="#1f2933">japanese Google reviews</text>
 <rect x="245.00" y="154" width="49.50" height="24" fill="#9a031e"/>
-<text x="269.75" y="171" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#ffffff">7.3%</text>
+<text x="269.75" y="171" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" fill="#ffffff">7.3%</text>
 <rect x="294.50" y="154" width="136.88" height="24" fill="#8d99ae"/>
-<text x="362.94" y="171" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#ffffff">20.3%</text>
+<text x="362.94" y="171" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" fill="#ffffff">20.3%</text>
 <rect x="431.37" y="154" width="488.63" height="24" fill="#2f6f73"/>
-<text x="675.69" y="171" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#ffffff">72.4%</text>
-<text x="930" y="171" font-family="Arial, sans-serif" font-size="12" fill="#52616b">n=1,800</text>
-<text x="231" y="219" text-anchor="end" font-family="Arial, sans-serif" font-size="13" fill="#1f2933">Chinese-language social rows</text>
+<text x="675.69" y="171" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" fill="#ffffff">72.4%</text>
+<text x="930" y="171" font-family="Arial, sans-serif" font-size="16" fill="#52616b">n=1,800</text>
+<text x="231" y="219" text-anchor="end" font-family="Arial, sans-serif" font-size="16" fill="#1f2933">Chinese-language social rows</text>
 <rect x="245.00" y="202" width="121.50" height="24" fill="#9a031e"/>
-<text x="305.75" y="219" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#ffffff">18.0%</text>
+<text x="305.75" y="219" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" fill="#ffffff">18.0%</text>
 <rect x="366.50" y="202" width="6.75" height="24" fill="#8d99ae"/>
 <rect x="373.25" y="202" width="546.75" height="24" fill="#2f6f73"/>
-<text x="646.62" y="219" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#ffffff">81.0%</text>
-<text x="930" y="219" font-family="Arial, sans-serif" font-size="12" fill="#52616b">n=200</text>
+<text x="646.62" y="219" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" fill="#ffffff">81.0%</text>
+<text x="930" y="219" font-family="Arial, sans-serif" font-size="16" fill="#52616b">n=200</text>
 <rect x="245" y="266" width="10" height="10" fill="#9a031e"/>
-<text x="261" y="276" font-family="Arial, sans-serif" font-size="12" fill="#52616b">negative</text>
+<text x="261" y="276" font-family="Arial, sans-serif" font-size="16" fill="#52616b">negative</text>
 <rect x="367" y="266" width="10" height="10" fill="#8d99ae"/>
-<text x="383" y="276" font-family="Arial, sans-serif" font-size="12" fill="#52616b">neutral</text>
+<text x="383" y="276" font-family="Arial, sans-serif" font-size="16" fill="#52616b">neutral</text>
 <rect x="489" y="266" width="10" height="10" fill="#2f6f73"/>
-<text x="505" y="276" font-family="Arial, sans-serif" font-size="12" fill="#52616b">positive</text>
+<text x="505" y="276" font-family="Arial, sans-serif" font-size="16" fill="#52616b">positive</text>
 </svg>

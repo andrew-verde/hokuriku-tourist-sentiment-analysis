@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="340" viewBox="0 0 1080 340">
+<rect width="100%" height="100%" fill="#fbfaf7"/>
+<text x="24.00" y="38.00" text-anchor="start" font-family="Arial, sans-serif" font-size="34" font-weight="700" fill="#172033">Hokuriku Modelled Review Volume</text>
+<text x="24.00" y="67.00" text-anchor="start" font-family="Arial, sans-serif" font-size="20" font-weight="400" fill="#5b677a">Supported-language Google reviews across Fukui, Ishikawa, and Toyama</text>
+<text x="264.00" y="112.00" text-anchor="end" font-family="Arial, sans-serif" font-size="19" font-weight="400" fill="#172033">japanese-language reviews</text>
+<rect x="280" y="93" width="700.00" height="28" rx="3" fill="#5b6c94"/>
+<text x="970.00" y="114.00" text-anchor="end" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#ffffff">n=4,037</text>
+<text x="264.00" y="178.00" text-anchor="end" font-family="Arial, sans-serif" font-size="19" font-weight="400" fill="#172033">english-language reviews</text>
+<rect x="280" y="159" width="159.35" height="28" rx="3" fill="#2f6f73"/>
+<text x="429.35" y="180.00" text-anchor="end" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#ffffff">n=919</text>
+<text x="264.00" y="244.00" text-anchor="end" font-family="Arial, sans-serif" font-size="19" font-weight="400" fill="#172033">chinese-language reviews</text>
+<rect x="280" y="225" width="42.14" height="28" rx="3" fill="#bc6c25"/>
+<text x="332.14" y="246.00" text-anchor="start" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#172033">n=243</text>
+<text x="24.00" y="330.00" text-anchor="start" font-family="Arial, sans-serif" font-size="16" font-weight="400" fill="#5b677a">Counts come from the pooled Hokuriku low-rating model; no sentiment score is shown.</text>
+</svg>

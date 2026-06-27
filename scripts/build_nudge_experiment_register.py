@@ -303,7 +303,7 @@ def build_html() -> str:
 
     H.append(card(
         "Fix-it information levers",
-        f"<p><b>Opportunity.</b> Opening-hours availability and itinerary fit / time cost are the strongest nudge-able friction signals.</p>"
+        f"<p><b>Opportunity.</b> Opening-hours availability and itinerary fit / time cost are the strongest nudge-able pain-point signals.</p>"
         f"<p><b>Nudge type + mechanism.</b> {v['opening_type']}: {v['opening_mechanism']} Also {v['time_type']}: {v['time_mechanism']}</p>"
         f"<p><b>Evidence so far.</b> Opening-hours availability prevalence {v['opening_prev']}, Firth OR {v['opening_or']}, {v['opening_fdr']}. "
         f"Itinerary fit / time cost prevalence {v['time_prev']}, Firth OR {v['time_or']}, {v['time_fdr']}.</p>"
@@ -314,13 +314,13 @@ def build_html() -> str:
 
     H.append(card(
         "POI-specific fix-it trials",
-        f"<p><b>Opportunity.</b> {v['fix_count']} fix-it POIs have high volume and elevated nudge-able friction.</p>"
+        f"<p><b>Opportunity.</b> {v['fix_count']} fix-it POIs have high volume and elevated nudge-able pain points.</p>"
         f"<p><b>Evidence so far.</b> {v['fix1_name']} has {v['fix1_n']} reviews and elevated codes {v['fix1_codes']}; "
         f"{v['fix2_name']} has {v['fix2_n']} reviews and elevated codes {v['fix2_codes']}; "
         f"{v['fix3_name']} has {v['fix3_n']} reviews and elevated codes {v['fix3_codes']}.</p>"
-        "<p><b>Proposed experiment.</b> Intervention: targeted signage, translation, booking QR, or hours/route prompt matched to the elevated friction codes. Unit: venue entrance, booking page, or visitor session. Primary outcome: friction-code prevalence and low-rating share.</p>"
+        "<p><b>Proposed experiment.</b> Intervention: targeted signage, translation, booking QR, or hours/route prompt matched to the elevated pain-point codes. Unit: venue entrance, booking page, or visitor session. Primary outcome: pain-point-code prevalence and low-rating share.</p>"
         "<p><b>Collect next.</b> Site-level exposure logs, intervention dates, QR scans, visitor counts, review ratings, and reviewed aspect tags.</p>"
-        "<p><b>Why effectiveness is not quantified yet.</b> Current POI ranking identifies where friction concentrates; it does not isolate an intervention effect.</p>"
+        "<p><b>Why effectiveness is not quantified yet.</b> Current POI ranking identifies where pain points concentrate; it does not isolate an intervention effect.</p>"
     ))
 
     H.append(card(

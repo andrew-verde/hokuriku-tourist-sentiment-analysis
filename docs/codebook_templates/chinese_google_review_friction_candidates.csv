@@ -1,17 +1,17 @@
 code_family,code,proposed_keyword,register_note,example_review,example_poi,status,reviewer,source,proposed_at
-friction,waiting_crowding,全是人,"review-register 'packed'; not an s2t variant of existing 人多/挤",黄金周全是人，游泳池约上了也进不去,21st Century Museum of Contemporary Art,pending,auto,google_review_zh_missed_negatives,2026-06-27
-friction,waiting_crowding,遊客很多,"trad 'too many tourists'; distinct from 人多",大部分都已經商業化，遊客也很多,Nagamachi Samurai District,pending,auto,google_review_zh_missed_negatives,2026-06-27
-friction,waiting_crowding,人擠人,"trad colloquial 'crammed shoulder-to-shoulder'",日本房子又小，人擠人像菜市場,Nomura Samurai House,pending,auto,google_review_zh_missed_negatives,2026-06-27
-friction,opening_hours_availability,收舖,"Cantonese 'shops close (early)'",太早收舖，1800已經無野睇,Higashi Chaya District,pending,auto,google_review_zh_missed_negatives,2026-06-27
-friction,opening_hours_availability,沒開門,"trad negated 'not open'; many short-street reviews",没多少店开门,Nishi Chaya District,pending,auto,google_review_zh_missed_negatives,2026-06-27
-friction,opening_hours_availability,下午才開,"'only opens in afternoon -> empty in morning'",店大部分都是下午開，所以早上來的話會有點冷清,Kazuemachi Chaya District,pending,auto,google_review_zh_missed_negatives,2026-06-27
-friction,food_amenities_gap,店不多,"'few shops / amenities'",連假來的這裡基本沒什麼人 店也不多,Nishi Chaya District,pending,auto,google_review_zh_missed_negatives,2026-06-27
-friction,food_amenities_gap,沒幾家開門,"'hardly any shops open'",开门的店也没几家不用特意前往,Nishi Chaya District,pending,auto,google_review_zh_missed_negatives,2026-06-27
-friction,itinerary_fit_time_cost,不用特意前往,"'not worth a special trip'",超级短的街，也没多少店开门,Nishi Chaya District,pending,auto,google_review_zh_missed_negatives,2026-06-27
-friction,itinerary_fit_time_cost,時間太趕,"trad 'too rushed to enjoy'",可惜時間太趕，吃完飯就沒時間逛一下,Tojinbo Cliffs,pending,auto,google_review_zh_missed_negatives,2026-06-27
-friction,itinerary_fit_time_cost,走馬看花,"idiom 'cursory glance; little to see'",沒興趣的20分鐘走馬看花就看完了,Ishikawa Prefectural History Museum,pending,auto,google_review_zh_missed_negatives,2026-06-27
-friction,itinerary_fit_time_cost,空無一人,"'deserted / desolate old street'",非常萧条的老街 空无一人,Takaoka Sankyokai,pending,auto,google_review_zh_missed_negatives,2026-06-27
-friction,cleanliness_comfort,臭,"'stinky'; codebook only has 味道大",來看將軍的頭盔 好多鴿子 好臭喔,Oyama Shrine,pending,auto,google_review_zh_missed_negatives,2026-06-27
-friction,staff_communication,態度冰冷,"trad 'cold/icy attitude'; vs existing 态度差",前台服务态度冰冷，不人性化,Gyokusenin Maru Garden,pending,auto,google_review_zh_missed_negatives,2026-06-27
-friction,price_value,沒標價,"'unlabelled / opaque pricing'",有些沒標價的實屬罕見,Tojinbo Cliffs,pending,auto,google_review_zh_missed_negatives,2026-06-27
-friction,cleanliness_comfort,被子很薄很冷,"accommodation comfort 'thin cold bedding'",房间小，被子很薄很冷,Gyokusenin Maru Garden,pending,auto,google_review_zh_missed_negatives,2026-06-27
+friction,waiting_crowding,全是人,"review-register 'packed'; not an s2t variant of existing 人多/挤",黄金周全是人，游泳池约上了也进不去,21st Century Museum of Contemporary Art,reviewed,Lynn,google_review_zh_missed_negatives,2026-06-27
+friction,waiting_crowding,遊客很多,"trad 'too many tourists'; distinct from 人多",大部分都已經商業化，遊客也很多,Nagamachi Samurai District,reviewed,Lynn,google_review_zh_missed_negatives,2026-06-27
+friction,waiting_crowding,人擠人,"trad colloquial 'crammed shoulder-to-shoulder'",日本房子又小，人擠人像菜市場,Nomura Samurai House,reviewed,Lynn,google_review_zh_missed_negatives,2026-06-27
+friction,opening_hours_availability,收舖,"Cantonese 'shops close (early)'",太早收舖，1800已經無野睇,Higashi Chaya District,reviewed,Lynn,google_review_zh_missed_negatives,2026-06-27
+friction,opening_hours_availability,沒開門,"trad negated 'not open'; many short-street reviews",没多少店开门,Nishi Chaya District,reviewed,Lynn,google_review_zh_missed_negatives,2026-06-27
+friction,opening_hours_availability,下午才開,"'only opens in afternoon -> empty in morning'",店大部分都是下午開，所以早上來的話會有點冷清,Kazuemachi Chaya District,reviewed,Lynn,google_review_zh_missed_negatives,2026-06-27
+friction,food_amenities_gap,店不多,"'few shops / amenities'",連假來的這裡基本沒什麼人 店也不多,Nishi Chaya District,reviewed,Lynn,google_review_zh_missed_negatives,2026-06-27
+friction,food_amenities_gap,沒幾家開門,"'hardly any shops open'",开门的店也没几家不用特意前往,Nishi Chaya District,reviewed,Lynn,google_review_zh_missed_negatives,2026-06-27
+friction,itinerary_fit_time_cost,不用特意前往,"'not worth a special trip'",超级短的街，也没多少店开门,Nishi Chaya District,reviewed,Lynn,google_review_zh_missed_negatives,2026-06-27
+friction,itinerary_fit_time_cost,時間太趕,"trad 'too rushed to enjoy'",可惜時間太趕，吃完飯就沒時間逛一下,Tojinbo Cliffs,reviewed,Lynn,google_review_zh_missed_negatives,2026-06-27
+friction,itinerary_fit_time_cost,走馬看花,"idiom 'cursory glance; little to see'",沒興趣的20分鐘走馬看花就看完了,Ishikawa Prefectural History Museum,reviewed,Lynn,google_review_zh_missed_negatives,2026-06-27
+friction,itinerary_fit_time_cost,空無一人,"'deserted / desolate old street'",非常萧条的老街 空无一人,Takaoka Sankyokai,reviewed,Lynn,google_review_zh_missed_negatives,2026-06-27
+friction,cleanliness_comfort,臭,"'stinky'; codebook only has 味道大",來看將軍的頭盔 好多鴿子 好臭喔,Oyama Shrine,reviewed,Lynn,google_review_zh_missed_negatives,2026-06-27
+friction,staff_communication,態度冰冷,"trad 'cold/icy attitude'; vs existing 态度差",前台服务态度冰冷，不人性化,Gyokusenin Maru Garden,reviewed,Lynn,google_review_zh_missed_negatives,2026-06-27
+friction,price_value,沒標價,"'unlabelled / opaque pricing'",有些沒標價的實屬罕見,Tojinbo Cliffs,reviewed,Lynn,google_review_zh_missed_negatives,2026-06-27
+friction,cleanliness_comfort,被子很薄很冷,"accommodation comfort 'thin cold bedding'",房间小，被子很薄很冷,Gyokusenin Maru Garden,reviewed,Lynn,google_review_zh_missed_negatives,2026-06-27

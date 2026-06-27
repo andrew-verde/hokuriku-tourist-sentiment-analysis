@@ -25,6 +25,7 @@ sys.path.insert(0, str(ROOT / "scripts"))
 from importlib import metadata
 
 from build_chinese_social_media_dataset import (  # noqa: E402
+    CHINESE_GOOGLE_REVIEW_CANDIDATES_PATH,
     CODEBOOK_PATH,
     REVIEWED_CODEBOOK_PATH,
     _append_sentiment_fields,
@@ -111,6 +112,11 @@ def build(input_path: Path = DEFAULT_INPUT, output_dir: Path = DEFAULT_OUTPUT_DI
         inputs=[
             file_record(input_path, "zh_google_reviews_source", required=True),
             file_record(REVIEWED_CODEBOOK_PATH, "reviewed_chinese_codebook", required=True),
+            file_record(
+                CHINESE_GOOGLE_REVIEW_CANDIDATES_PATH,
+                "reviewed_chinese_google_review_candidates",
+                required=True,
+            ),
             file_record(CODEBOOK_PATH, "legacy_yaml_codebook"),
         ],
         outputs=[file_record(out_path, "tagged_chinese_google_reviews", required=True)],

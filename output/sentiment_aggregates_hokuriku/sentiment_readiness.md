@@ -1,6 +1,6 @@
 # Sentiment Readiness
 
-- generated_at: 2026-06-27T07:33:14+00:00
+- generated_at: 2026-06-27T13:39:03+00:00
 - command: `scripts/build_sentiment_analysis.py --groups japanese,english --prefecture  --aggregate-output-dir output/sentiment_aggregates_hokuriku`
 - input: `output/multilingual_review_analysis/reviews_multilingual.csv`
 - input_sha256: `6bc06f34848954674506f6fefb84ffd9689b4cc9b2c90780fd5c8fc45eafaa56`

@@ -1,31 +1,31 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1000" height="386" viewBox="0 0 1000 386">
 <rect width="100%" height="100%" fill="#fbfaf7"/>
-<text x="32" y="38" font-family="Arial, sans-serif" font-size="24" font-weight="700" fill="#1f2933">Japanese-Language Reviews Tourism Priority Mix</text>
-<text x="32" y="66" font-family="Arial, sans-serif" font-size="14" fill="#52616b">Google review POI-category distribution; n=1,800 rows</text>
+<text x="32" y="38" font-family="Arial, sans-serif" font-size="30" font-weight="700" fill="#1f2933">Japanese-Language Reviews Tourism Priority Mix</text>
+<text x="32" y="66" font-family="Arial, sans-serif" font-size="18" fill="#52616b">Google review POI-category distribution; n=1,800 rows</text>
 <line x1="270.00" x2="270.00" y1="96.00" y2="322.00" stroke="#d7dde8" stroke-width="1" opacity="0.58"/>
 <line x1="590.00" x2="590.00" y1="96.00" y2="322.00" stroke="#d7dde8" stroke-width="1" opacity="0.58"/>
 <line x1="910.00" x2="910.00" y1="96.00" y2="322.00" stroke="#d7dde8" stroke-width="1" opacity="0.58"/>
-<text x="256" y="123" text-anchor="end" font-family="Arial, sans-serif" font-size="13" fill="#1f2933">museum cultural</text>
+<text x="256" y="123" text-anchor="end" font-family="Arial, sans-serif" font-size="16" fill="#1f2933">museum cultural</text>
 <rect x="270" y="108" width="640.00" height="20" rx="3" fill="#5b6c94"/>
-<text x="918.0" y="123" font-family="Arial, sans-serif" font-size="12" fill="#1f2933">567 (31.5%)</text>
-<text x="256" y="161" text-anchor="end" font-family="Arial, sans-serif" font-size="13" fill="#1f2933">castle historic</text>
+<text x="918.0" y="123" font-family="Arial, sans-serif" font-size="16" fill="#1f2933">567 (31.5%)</text>
+<text x="256" y="161" text-anchor="end" font-family="Arial, sans-serif" font-size="16" fill="#1f2933">castle historic</text>
 <rect x="270" y="146" width="547.44" height="20" rx="3" fill="#5b6c94"/>
-<rect x="821.44" y="146.00" width="87.28" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
-<text x="865.08" y="161.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#1f2933">485 (26.9%)</text>
-<text x="256" y="199" text-anchor="end" font-family="Arial, sans-serif" font-size="13" fill="#1f2933">temple shrine</text>
+<rect x="821.44" y="146.00" width="111.04" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="876.96" y="161.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="400" fill="#1f2933">485 (26.9%)</text>
+<text x="256" y="199" text-anchor="end" font-family="Arial, sans-serif" font-size="16" fill="#1f2933">temple shrine</text>
 <rect x="270" y="184" width="397.32" height="20" rx="3" fill="#5b6c94"/>
-<rect x="671.32" y="184.00" width="87.28" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
-<text x="714.96" y="199.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#1f2933">352 (19.6%)</text>
-<text x="256" y="237" text-anchor="end" font-family="Arial, sans-serif" font-size="13" fill="#1f2933">nature scenic</text>
+<rect x="671.32" y="184.00" width="111.04" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="726.84" y="199.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="400" fill="#1f2933">352 (19.6%)</text>
+<text x="256" y="237" text-anchor="end" font-family="Arial, sans-serif" font-size="16" fill="#1f2933">nature scenic</text>
 <rect x="270" y="222" width="378.13" height="20" rx="3" fill="#5b6c94"/>
-<rect x="652.13" y="222.00" width="87.28" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
-<text x="695.77" y="237.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#1f2933">335 (18.6%)</text>
-<text x="256" y="275" text-anchor="end" font-family="Arial, sans-serif" font-size="13" fill="#1f2933">market shopping</text>
+<rect x="652.13" y="222.00" width="111.04" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="707.65" y="237.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="400" fill="#1f2933">335 (18.6%)</text>
+<text x="256" y="275" text-anchor="end" font-family="Arial, sans-serif" font-size="16" fill="#1f2933">market shopping</text>
 <rect x="270" y="260" width="56.44" height="20" rx="3" fill="#5b6c94"/>
-<rect x="330.44" y="260.00" width="74.32" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
-<text x="367.60" y="275.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#1f2933">50 (2.8%)</text>
-<text x="256" y="313" text-anchor="end" font-family="Arial, sans-serif" font-size="13" fill="#1f2933">food dining</text>
+<rect x="330.44" y="260.00" width="93.76" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="377.32" y="275.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="400" fill="#1f2933">50 (2.8%)</text>
+<text x="256" y="313" text-anchor="end" font-family="Arial, sans-serif" font-size="16" fill="#1f2933">food dining</text>
 <rect x="270" y="298" width="12.42" height="20" rx="3" fill="#5b6c94"/>
-<rect x="286.42" y="298.00" width="74.32" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
-<text x="323.58" y="313.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#1f2933">11 (0.6%)</text>
+<rect x="286.42" y="298.00" width="93.76" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="333.30" y="313.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="400" fill="#1f2933">11 (0.6%)</text>
 </svg>

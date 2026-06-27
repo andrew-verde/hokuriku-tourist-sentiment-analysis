@@ -1,7 +1,7 @@
 {
   "schema_version": "research_provenance.v1",
   "kind": "statistical_test_figure_pack",
-  "generated_at": "2026-06-27T10:13:10+00:00",
+  "generated_at": "2026-06-27T13:39:37+00:00",
   "command": "scripts/build_statistical_test_figures.py",
   "inputs": [
     {
@@ -95,119 +95,119 @@
       "path": "docs/statistical_test_figures/figure_h1_sentiment_category_share.svg",
       "exists": true,
       "bytes": 3484,
-      "sha256": "946415d9fd46016294f62e4e1e9d85802bb071e22ed0bad66024212ec04be2f5"
+      "sha256": "d35bc1132b3b6d876be2de47b2519e9082b71fb8b0d10983b330cbfe207819c7"
     },
     {
       "role": "statistical_test_figure_figure_h1_neutral_band_sensitivity",
       "path": "docs/statistical_test_figures/figure_h1_neutral_band_sensitivity.svg",
       "exists": true,
       "bytes": 2624,
-      "sha256": "efc45964f01823f73f41800b7911b1deaea2d9a20dc34a8da0b84ac4fdd8da43"
+      "sha256": "3a790ab719c7b59bbd0a396f16ed199d73c9065286e77d4992d890f3419ca524"
     },
     {
       "role": "statistical_test_figure_figure_h2_rating_distribution",
       "path": "docs/statistical_test_figures/figure_h2_rating_distribution.svg",
       "exists": true,
       "bytes": 4331,
-      "sha256": "dad8c03672e012a63084b8b71db907b3f919e501338a9e3516a5b8a71d43926b"
+      "sha256": "bc65d0c94565a4343800ccda183b6dc82896601f5327ac55122f777532f114ff"
     },
     {
       "role": "statistical_test_figure_figure_h2_rating_mean_sensitivity",
       "path": "docs/statistical_test_figures/figure_h2_rating_mean_sensitivity.svg",
       "exists": true,
       "bytes": 3178,
-      "sha256": "9a4954c3b605ae55f85c53f43cdb1deebd20d678382fa1404284349a28ea83de"
+      "sha256": "3ddcd2367c210a7fd1b0a243e6ad9d3726a5e40dd0e332f6ae3b2ed52e8d7cb7"
     },
     {
       "role": "statistical_test_figure_figure_h3_reviewed_evidence_prevalence",
       "path": "docs/statistical_test_figures/figure_h3_reviewed_evidence_prevalence.svg",
       "exists": true,
       "bytes": 4731,
-      "sha256": "e2c9b34302e4ac48bacd3be1e5fc7cc01ae0de9d8a1735048215ff362090937e"
+      "sha256": "1db9af8d61771d741de7f6025793281e8ab1ba03ca907b706bb4af9cdbf66bee"
     },
     {
       "role": "statistical_test_figure_figure_h3_text_length_diagnostic",
       "path": "docs/statistical_test_figures/figure_h3_text_length_diagnostic.svg",
       "exists": true,
-      "bytes": 2035,
-      "sha256": "9f98f2773951fd216c6953e8e46c1ec933a4e0bbb521621c6227a0791754c2ed"
+      "bytes": 2636,
+      "sha256": "ba95c08f9e42e92d47c3c6e12deb6c407fc25159786d2e162446ce03b4a43c20"
     },
     {
       "role": "statistical_test_figure_figure_hypothesis_overview",
       "path": "docs/statistical_test_figures/figure_hypothesis_overview.svg",
       "exists": true,
-      "bytes": 5568,
-      "sha256": "8519817ba02889d75ffa5909ebbd384ac846129308c6cae082b1f18d8e80f45d"
+      "bytes": 5572,
+      "sha256": "6fcef3a559828cd5dfc136184df325042075ba1392cbe0735a5f27c00356a69a"
     },
     {
       "role": "statistical_test_figure_figure_h2_rating_gap_robustness_ladder",
       "path": "docs/statistical_test_figures/figure_h2_rating_gap_robustness_ladder.svg",
       "exists": true,
       "bytes": 5161,
-      "sha256": "7e35c648f33756074378b462d4ce50a37c80734f287861b424de31bcbd190fe2"
+      "sha256": "5d130c46a3df0f68243eb9743ffc16716559771578f18718ab9d1c49f8e973f6"
     },
     {
       "role": "statistical_test_figure_figure_within_poi_paired_shift",
       "path": "docs/statistical_test_figures/figure_within_poi_paired_shift.svg",
       "exists": true,
       "bytes": 4039,
-      "sha256": "c0ddae4a086ee832fb94b21587de6e413ede1ebe0d5b63ee034d31a3b17db3b9"
+      "sha256": "656722ed8f461393496a30dd1d880003fa446bd01ed7c8415574ac81536fd26c"
     },
     {
       "role": "statistical_test_figure_figure_cross_source_sentiment_category",
       "path": "docs/statistical_test_figures/figure_cross_source_sentiment_category.svg",
       "exists": true,
       "bytes": 4440,
-      "sha256": "b8749f498dd70a5789cb3778ae12591380458f4e4ab35665b0060ad78f55d21c"
+      "sha256": "fa614bb9fe59545a9258384b42ad8f88cf13884f07e999cebebf861250a33e10"
     },
     {
       "role": "statistical_test_figure_figure_cross_source_evidence_prevalence",
       "path": "docs/statistical_test_figures/figure_cross_source_evidence_prevalence.svg",
       "exists": true,
       "bytes": 3986,
-      "sha256": "8c52540978a0ac70ecab5250c31f3f0f023c5f2fe75f357ccdd74b1b2b9541a4"
+      "sha256": "6fd7edccee91279d4eff54cd8dc29d3a28cb1b13a0af4b08e7eae4973e80af9f"
     },
     {
       "role": "statistical_test_figure_figure_cross_source_test_effects",
       "path": "docs/statistical_test_figures/figure_cross_source_test_effects.svg",
       "exists": true,
-      "bytes": 5430,
-      "sha256": "dd857edd4e1c0e40450c98a2ac8aaaac71970fa9abc1478d0b8ce1c150d92cac"
+      "bytes": 5313,
+      "sha256": "d2d4e5809e95b0384bd946297b85740cd559dd0cb7b37aec3c246dded4b6b5f3"
     },
     {
       "role": "statistical_test_figure_figure_date_scrub_requirements",
       "path": "docs/statistical_test_figures/figure_date_scrub_requirements.svg",
       "exists": true,
       "bytes": 3017,
-      "sha256": "de6cc1f20c0586fad099a38d9832f151480e78666663740cd034b064abcaf78b"
+      "sha256": "de1b864667effcb6938ca1d7a0844e0b6938222108c2bb8bb9fcc9169a405d1f"
     },
     {
       "role": "statistical_test_figure_figure_chinese_city_platform_friction_status",
       "path": "docs/statistical_test_figures/figure_chinese_city_platform_friction_status.svg",
       "exists": true,
       "bytes": 1094,
-      "sha256": "e793322defb96a30827b2472a2eb96ddce5a7e76eccc556e504708d0838eb055"
+      "sha256": "d25e8412f7535ceb585dca914a6132f490400fa7cabd062290a5dcd6207eee1a"
     },
     {
       "role": "statistical_test_figure_figure_within_english_driver_effects",
       "path": "docs/statistical_test_figures/figure_within_english_driver_effects.svg",
       "exists": true,
-      "bytes": 13430,
-      "sha256": "ca4b20f0465bba4b3d6153fc3f15594b103f6b450d913d3b44e078febf77ea1b"
+      "bytes": 13429,
+      "sha256": "5e24342bbfb0341f3180dc6f98b77739deb8259cd91f5ee85eddfaab31c69286"
     },
     {
       "role": "statistical_test_figure_figure_within_japanese_driver_effects",
       "path": "docs/statistical_test_figures/figure_within_japanese_driver_effects.svg",
       "exists": true,
-      "bytes": 13444,
-      "sha256": "d1265045c32e7d6911d6c0a8c8bd388d7f85f22af06c36af7096dd1b18c6aed8"
+      "bytes": 13440,
+      "sha256": "9033caac4e7c04e8b33fde968f5fe7c35bc5af5272f82f758b062d281444e3e0"
     },
     {
       "role": "statistical_test_figure_figure_within_chinese_driver_effects",
       "path": "docs/statistical_test_figures/figure_within_chinese_driver_effects.svg",
       "exists": true,
-      "bytes": 20436,
-      "sha256": "ac6ba4536d4ecfaf9aa33dc59445960e91e43e1c0fe575ec412ddd89521adca2"
+      "bytes": 20435,
+      "sha256": "b80ba7e0d6403091af4e8fe9e6e7b71a35958c101d531c27f764b42ab1bb3662"
     }
   ],
   "filters": {

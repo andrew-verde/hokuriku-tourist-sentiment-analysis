@@ -106,6 +106,7 @@ N_POIS = fnum(raw("poi_mfst", deck.manifest_metric("n_pois_total")))
 TAGGED_ROWS = fnum(raw("aspect_mfst", deck.manifest_metric("tagged_input_rows")))
 LANG_JP = fnum(raw("aspect_mfst", deck.manifest_metric("tagged_language_group_counts", "japanese")))
 LANG_EN = fnum(raw("aspect_mfst", deck.manifest_metric("tagged_language_group_counts", "english")))
+LANG_CN = fnum(raw("aspect_mfst", deck.manifest_metric("tagged_language_group_counts", "chinese")))
 LANG_OTHER = fnum(raw("aspect_mfst", deck.manifest_metric("tagged_language_group_counts", "other_non_english_non_japanese")))
 POI_FUKUI = fnum(raw("poi_mfst", deck.manifest_metric("n_pois_by_prefecture", "Fukui")))
 POI_ISHIKAWA = fnum(raw("poi_mfst", deck.manifest_metric("n_pois_by_prefecture", "Ishikawa")))
@@ -160,6 +161,10 @@ CLEAN_PV = fpv(asp("cleanliness_comfort", "p_value_bh_fdr"))
 
 ENG_GAP_PREV = fpct1(asp("english_information_gap", "prevalence"))
 SIGN_PREV = fpct1(asp("wayfinding_signage", "prevalence"))
+SIGN_OR = f2(asp("wayfinding_signage", "odds_ratio"))
+SIGN_CIL = f2(asp("wayfinding_signage", "or_ci_low"))
+SIGN_CIH = f2(asp("wayfinding_signage", "or_ci_high"))
+SIGN_PV = fpv(asp("wayfinding_signage", "p_value_bh_fdr"))
 ACCESS_PREV = fpct1(asp("transport_access", "prevalence"))
 BOOKING_PREV = fpct1(asp("booking_ticketing", "prevalence"))
 
@@ -572,10 +577,10 @@ def build():
     label(s, "I.  INTRODUCTION")
     title(s, "The question", "問い")
     _, tf = textbox(s, MX, Inches(2.15), Inches(7.5), Inches(4.0))
-    en_jp(tf, "Reviews carry two signals: friction (what went wrong) and draw (what pulled visitors in).",
+    en_jp(tf, "Reviews carry two signals: pain points (what went wrong) and draw (what pulled visitors in).",
           "口コミは2種類のシグナルを持つ。不満(問題点)と魅力(惹きつけた点)。",
           first=True, bullet=True, space_after=18)
-    en_jp(tf, "Some frictions ease with better pre-visit information. Others need an on-site operator fix.",
+    en_jp(tf, "Some pain points ease with better pre-visit information. Others need an on-site operator fix.",
           "一部の不満は訪問前の情報で和らぐ。他は現地での事業者改善が必要。",
           bullet=True, space_after=18)
     en_jp(tf, "Which signals are nudge-able, and which sites are fix-it or promote-it?",
@@ -621,8 +626,8 @@ def build():
     rj.text = "タグ付き口コミ"
     _style_run(rj, 11.5, GREY, font=JP_FONT)
     en_jp(c1, f"{TAGGED_ROWS} rows", f"{TAGGED_ROWS} 行", en_size=17, jp_size=12, en_color=NAVY, bold=True)
-    en_jp(c1, f"Japanese {LANG_JP} · English {LANG_EN} · other {LANG_OTHER}",
-          f"日本語 {LANG_JP} ・ 英語 {LANG_EN} ・ その他 {LANG_OTHER}",
+    en_jp(c1, f"Japanese {LANG_JP} · English {LANG_EN} · Chinese {LANG_CN} · other {LANG_OTHER}",
+          f"日本語 {LANG_JP} ・ 英語 {LANG_EN} ・ 中国語 {LANG_CN} ・ その他 {LANG_OTHER}",
           en_size=14.5, jp_size=11.5, en_color=INK, space_after=0)
     _, c2 = card(s, MX, Inches(4.3), Inches(5.7), Inches(1.95))
     pe = c2.paragraphs[0]
@@ -641,8 +646,8 @@ def build():
           en_size=13, jp_size=10.5, en_color=GREY, space_after=0)
     picture_fit(s, "volume", Inches(6.55), Inches(2.0), Inches(6.2), Inches(3.5))
     caption(s, Inches(6.65), Inches(5.6), Inches(6.0),
-            "Per-source volume. The Google review scale and the social-post scale are not directly comparable, so they sit side by side rather than being merged.",
-            "ソース別の件数。Google 口コミの尺度と SNS 投稿の尺度は直接比較できないため、統合せず並置している。")
+            "Hokuriku supported-language rows entering the pooled low-rating model. No sentiment score is shown.",
+            "北陸の統合低評価モデルに入る対応言語の行数。感情スコアは表示しない。")
     foot(s, 3)
     notes(s, f"Lynn takes this slide. Each review row is tagged with the aspects it mentions, across three Hokuriku "
               "prefectures. The 'other' bucket contains mixed-language Google reviews. It is separate from the "
@@ -654,7 +659,7 @@ def build():
     label(s, "II.  METHODS")
     title(s, "Turning text into a tested signal", "テキストを検証可能なシグナルに変える")
     _, tf = textbox(s, MX, Inches(2.15), Inches(7.6), Inches(4.0))
-    en_jp(tf, "Each review tagged for 18 aspect codes (12 friction, 6 draw) from reviewed keyword codebooks.",
+    en_jp(tf, "Each review tagged for 18 aspect codes (12 pain points, 6 draw) from reviewed keyword codebooks.",
           "各口コミを18のアスペクトコード(不満12・魅力6)に、レビュー済み辞書でタグ付け。",
           first=True, bullet=True, space_after=17)
     en_jp(tf, f"Outcome: a low rating, defined as {LOW_RATING_DEF} ({LOW_RATING_ROWS} of {MODEL_ROWS} modelled rows).",
@@ -693,8 +698,8 @@ def build():
           bullet=True, en_size=16, jp_size=12.5, space_after=0)
     picture_fit(s, "txtlen", Inches(8.25), Inches(2.15), Inches(4.5), Inches(2.95))
     caption(s, Inches(8.3), Inches(5.2), Inches(4.45),
-            "Text length differs sharply by language, so it enters every model as a control.",
-            "口コミの長さは言語で大きく異なるため、全モデルの統制変数に入れる。")
+            "JP/EN are the Fukui confirmatory diagnostic; Chinese (Hokuriku Google reviews) added for comparison — shortest text, least match opportunity. CJK vs Latin chars not 1:1.",
+            "日本語・英語は福井の確認診断。比較のため中国語(北陸のGoogleレビュー)を追加:文字数が最短で一致機会が最小。CJKとラテン文字は同等比較不可。")
     foot(s, 5)
     notes(s, "Lynn: Do not read every number. Three ideas. One, the outcome is a low star rating, modelled with "
               "logistic regression. Two, Firth penalization keeps the odds ratio finite and stable when an aspect is "
@@ -715,7 +720,7 @@ def build():
     en_jp(tf, f"Robustness: Firth and plain-logit odds ratios agree to max |Δlog| = {FIRTH_SANITY}.",
           f"頑健性:Firth と通常ロジットの OR は最大 |Δlog| = {FIRTH_SANITY} で一致。",
           bullet=True, en_size=16, jp_size=12.5, space_after=16)
-    en_jp(tf, "Nudge-able = pre-visit information can ease it. Operator fix = the site must change. Only nudge-able, FDR-significant frictions qualify.",
+    en_jp(tf, "Nudge-able = pre-visit information can ease it. Operator fix = the site must change. Only nudge-able, FDR-significant pain points qualify.",
           "ナッジ可能=訪問前情報で緩和。事業者改善=現地を変える必要。ナッジ可能かつ FDR 有意のみ候補。",
           bullet=True, en_size=16, jp_size=12.5, space_after=0)
     placeholder(s, Inches(8.05), Inches(2.05), Inches(4.55), Inches(4.25),
@@ -723,22 +728,23 @@ def build():
     foot(s, 6)
     notes(s, "Lynn: This is the integrity slide. The Benjamini-Hochberg correction controls the false discovery rate "
               "because we fit many models. The decision rule is the key: an opportunity score is forced to zero unless "
-              "the friction is both FDR-significant and harmful, so there is no cherry-picking. The robustness line "
+              "the pain point is both FDR-significant and harmful, so there is no cherry-picking. The robustness line "
               "shows Firth barely moves the answer versus a plain logit. Then the nudge-able versus operator split sets "
               "up Results.")
 
     # ---- 7 RESULTS: stat table ----
     s = new()
     label(s, "III.  RESULTS")
-    title(s, "Which frictions actually predict low ratings", "どの不満が低評価を予測するか")
+    title(s, "Which pain points actually predict low ratings", "どの不満が低評価を予測するか")
     _, tf = textbox(s, MX, Inches(1.9), CW, Inches(0.55))
-    en_jp(tf, "Of the modelled frictions, four are statistically significant after FDR correction. Two of them are nudge-able.",
-          "モデル化した不満のうち、FDR 補正後に有意なのは4つ。そのうち2つがナッジ可能。",
+    en_jp(tf, "Three nudge-able pain points are statistically significant after FDR correction.",
+          "FDR 補正後に有意なナッジ可能の不満点は3つ。",
           first=True, en_size=15, jp_size=11.5, space_after=0)
     headers = ["Aspect", "Prev.", "OR (95% CI)", "FDR p", "Nudge-able"]
     body = [
         ("Opening hours / availability", "開館時間・営業状況", OPEN_PREV, OPEN_OR, f"{OPEN_CIL} to {OPEN_CIH}", OPEN_PV, "Yes", True),
         ("Itinerary fit / time-cost", "行程適合・所要時間", TIME_PREV, TIME_OR, f"{TIME_CIL} to {TIME_CIH}", TIME_PV, "Yes", True),
+        ("Wayfinding / signage", "道案内・表示", SIGN_PREV, SIGN_OR, f"{SIGN_CIL} to {SIGN_CIH}", SIGN_PV, "Yes", True),
         ("Price / value", "価格・コスパ", PRICE_PREV, PRICE_OR, f"{PRICE_CIL} to {PRICE_CIH}", PRICE_PV, "No (operator)", False),
         ("Cleanliness / comfort", "清潔さ・快適さ", CLEAN_PREV, CLEAN_OR, f"{CLEAN_CIL} to {CLEAN_CIH}", CLEAN_PV, "No (operator)", False),
     ]
@@ -762,18 +768,18 @@ def build():
         _cell(gt.cell(ri, 4), nud, 12, NAVY if ok else GREY, bold=ok, align=PP_ALIGN.CENTER, fill=rowfill)
     picture_fit(s, "nudge_aspect_fig", Inches(8.85), Inches(2.6), Inches(3.95), Inches(3.4))
     caption(s, MX, Inches(5.95), Inches(8.05),
-            "OR = adjusted odds of a low rating, with a 95% interval. Aspects not shown (English-information gap, signage, transport, booking) are not FDR-significant, so their scores stay at zero.",
-            "OR は低評価の調整済みオッズ比(95%区間)。表外(英語情報の不足・案内表示・交通・予約)は FDR 有意でなく、スコアはゼロ。")
+            "OR = adjusted odds of a low rating, with a 95% interval. English-information gap, transport, and booking are not FDR-significant, so their scores stay at zero.",
+            "OR は低評価の調整済みオッズ比(95%区間)。英語情報の不足・交通・予約は FDR 有意でなく、スコアはゼロ。")
     foot(s, 7)
     notes(s, "Andrew: Read the table top to bottom. Opening hours and itinerary fit are both significant after FDR "
-              "and both nudge-able. Price and cleanliness are also significant, but they are operator fixes, so they "
-              "are flagged rather than nudged. The aspects not in the table, like English-information gap and signage, "
+              "and nudge-able; wayfinding/signage also clears FDR. Price and cleanliness are significant operator fixes, so they "
+              "are flagged rather than nudged. The aspects not in the table, like English-information gap and transport, "
               "are present in reviews but do not clear FDR, so we hold them at zero and wait for more data.")
 
     # ---- 8 RESULTS: the two justified nudges ----
     s = new()
     label(s, "III.  RESULTS")
-    title(s, "The two justified information nudges", "根拠のある2つの情報ナッジ")
+    title(s, "Three justified information nudges", "根拠のある3つの情報ナッジ")
     _, b1 = card(s, MX, Inches(2.0), Inches(7.55), Inches(2.0))
     pe = b1.paragraphs[0]
     rr = pe.add_run()
@@ -800,12 +806,13 @@ def build():
           en_size=15, jp_size=11.5, space_after=0)
     picture_fit(s, "nudge_info_fig", Inches(8.35), Inches(2.0), Inches(4.4), Inches(4.2))
     infobox(s, MX, Inches(6.35), Inches(12.13), Inches(0.65),
-            f"Price (OR {PRICE_OR}) and cleanliness (OR {CLEAN_OR}) show larger or comparable effects, but they sit with the operator, so they are flagged, not nudged.",
-            f"価格(OR {PRICE_OR})と清潔さ(OR {CLEAN_OR})はより大きいか同程度の効果を示すが、事業者側の領域のため、ナッジではなく記録にとどめる。")
+            f"Wayfinding/signage also qualifies (OR {SIGN_OR}, FDR {SIGN_PV}): test clearer route cues. Price (OR {PRICE_OR}) and cleanliness (OR {CLEAN_OR}) remain operator fixes.",
+            f"道案内・表示も該当(OR {SIGN_OR}、FDR {SIGN_PV}):ルート案内を検証。価格(OR {PRICE_OR})と清潔さ(OR {CLEAN_OR})は事業者側の改善。")
     foot(s, 8)
     notes(s, "Andrew: This is the justification slide. Each nudge is tied to its odds ratio, confidence interval, and "
-              "FDR p value. Opening hours: a 3.6 times higher odds of a low rating, eased by showing hours and closure "
-              "risk before the trip. Itinerary fit: a 4.2 times higher odds, eased by showing realistic durations. "
+              f"FDR p value. Opening hours: {OPEN_OR} times higher odds of a low rating, eased by showing hours and closure "
+              f"risk before the trip. Itinerary fit: {TIME_OR} times higher odds, eased by showing realistic durations. "
+              f"Wayfinding/signage also qualifies at OR {SIGN_OR}; test clearer route cues. "
               "Price and cleanliness are larger effects but belong to the operator, so we are honest and exclude them "
               "from the nudge set.")
 
@@ -864,8 +871,8 @@ def build():
     stat_callout(s, Inches(2.78), Inches(1.95), Inches(2.05), PROMOTE_COUNT, "Promote-it sites", "推奨型", vsize=36)
     stat_callout(s, Inches(4.96), Inches(1.95), Inches(2.05), CROWD_COUNT, "Crowding hotspots", "混雑ホット", vsize=36)
     _, tf = textbox(s, MX, Inches(3.85), Inches(6.5), Inches(3.0))
-    en_jp(tf, f"Fix-it: {FIX_COUNT} ({FIX_FUKUI} Fukui), high friction lift. Promote-it: {PROMOTE_COUNT} ({PROMOTE_FUKUI} Fukui), high positive share.",
-          f"改善型 {FIX_COUNT}(福井 {FIX_FUKUI})、摩擦上振れ。推奨型 {PROMOTE_COUNT}(福井 {PROMOTE_FUKUI})、高い肯定割合。",
+    en_jp(tf, f"Fix-it: {FIX_COUNT} ({FIX_FUKUI} Fukui), high pain-point lift. Promote-it: {PROMOTE_COUNT} ({PROMOTE_FUKUI} Fukui), high positive share.",
+          f"改善型 {FIX_COUNT}(福井 {FIX_FUKUI})、不満点上振れ。推奨型 {PROMOTE_COUNT}(福井 {PROMOTE_FUKUI})、高い肯定割合。",
           first=True, en_size=14.5, jp_size=11.5, space_after=14)
     en_jp(tf, f"Volume gates confidence: thin under {LOW_VOL} reviews, high-volume over {HIGH_VOL}.",
           f"件数で信頼度を判断:{LOW_VOL} 件未満は少数、{HIGH_VOL} 件超は多数。",
@@ -875,7 +882,7 @@ def build():
           en_size=14, jp_size=11, space_after=0)
     picture_fit(s, "nudge_poi_fig", Inches(7.15), Inches(1.95), Inches(5.5), Inches(4.9))
     foot(s, 10)
-    notes(s, "Lynn: Your slide. Three archetypes from the POI index. Fix-it sites are busy with fixable friction. "
+    notes(s, "Lynn: Your slide. Three archetypes from the POI index. Fix-it sites are busy with fixable pain points. "
               "Promote-it sites have high satisfaction but low volume, the demand-redistribution targets. Crowding "
               "hotspots are where you would redirect demand away from. Read the two top Fukui promote-it sites with "
               "their Wilson intervals, and note the small-sample uncertainty honestly. Positive share is computed from "

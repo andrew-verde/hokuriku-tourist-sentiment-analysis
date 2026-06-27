@@ -1,6 +1,6 @@
 {
   "schema_version": "sentiment_manifest.v2",
-  "generated_at": "2026-06-27T07:33:14+00:00",
+  "generated_at": "2026-06-27T13:39:03+00:00",
   "command": "scripts/build_sentiment_analysis.py --groups japanese,english --prefecture  --aggregate-output-dir output/sentiment_aggregates_hokuriku",
   "filters": {
     "city": null,
@@ -296,7 +296,7 @@
   "provenance": {
     "schema_version": "research_provenance.v1",
     "kind": "jp_en_sentiment_analysis",
-    "generated_at": "2026-06-27T07:33:14+00:00",
+    "generated_at": "2026-06-27T13:39:03+00:00",
     "command": "scripts/build_sentiment_analysis.py --groups japanese,english --prefecture  --aggregate-output-dir output/sentiment_aggregates_hokuriku",
     "inputs": [
       {
@@ -348,7 +348,7 @@
         "path": "output/sentiment_aggregates_hokuriku/sentiment_readiness.md",
         "exists": true,
         "bytes": 3916,
-        "sha256": "119f6dae6da5ed4266b93f94539094adda9baad93746578e67d570bf10f3b04b"
+        "sha256": "5e63a6dae098d1115bf18fd85b8b61e9302e92421c637a65acc96b1d312462aa"
       }
     ],
     "filters": {

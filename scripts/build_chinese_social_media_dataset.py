@@ -59,6 +59,9 @@ DOUYIN_INCLUDED_OUTPUT_DIR = ROOT / "output" / "chinese_social_media_analysis_wi
 # source for promoted Chinese evidence terms.
 CODEBOOK_PATH = ROOT / "config" / "chinese_social_friction_codebook.yaml"
 REVIEWED_CODEBOOK_PATH = ROOT / "docs" / "codebook_templates" / "chinese_reviewed_codebook_template.csv"
+CHINESE_GOOGLE_REVIEW_CANDIDATES_PATH = (
+    ROOT / "docs" / "codebook_templates" / "chinese_google_review_friction_candidates.csv"
+)
 DEFAULT_XHS_MANUAL_WORKBOOK = ROOT / "docs" / "codebook_reviews" / "source" / "fukui_xhs_reviews_manual.xlsx"
 MULTILINGUAL_FRICTION_PATH = ROOT / "output" / "multilingual_review_analysis" / "friction_by_city_language_group.csv"
 
@@ -179,6 +182,7 @@ class CodebookImportError(RuntimeError):
 def load_chinese_codebook(
     path: Path = CODEBOOK_PATH,
     reviewed_path: Path = REVIEWED_CODEBOOK_PATH,
+    supplementary_path: Path = CHINESE_GOOGLE_REVIEW_CANDIDATES_PATH,
 ) -> dict:
     # Start with the older YAML codebook so tests/old runs still have a base
     # structure, then replace matching codes with reviewed CSV decisions.
@@ -198,6 +202,22 @@ def load_chinese_codebook(
         # Reviewed rows supersede YAML terms for matching codes. This preserves
         # delete/FIX decisions instead of appending reviewed terms onto stale YAML.
         codebook.update(reviewed)
+    # Lynn-reviewed Google-review candidates supplement the original reviewed
+    # codebook audit source; pending rows remain excluded from runtime matching.
+    if supplementary_path.exists():
+        supplementary = pd.read_csv(supplementary_path, dtype=str).fillna("")
+        reviewed_candidates = supplementary[
+            supplementary["status"].str.strip().str.lower().eq("reviewed")
+        ]
+        for row in reviewed_candidates.itertuples(index=False):
+            code = row.code.strip()
+            keyword = row.proposed_keyword.strip()
+            if code not in codebook:
+                raise CodebookImportError(
+                    f"Supplementary Chinese codebook code not found: {code}"
+                )
+            if keyword:
+                codebook[code]["keywords"].append(keyword)
     for attrs in codebook.values():
         keywords = attrs["keywords"]
         attrs["keywords"] = list(dict.fromkeys([

@@ -13,6 +13,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 from build_chinese_social_media_dataset import (  # noqa: E402
+    CHINESE_GOOGLE_REVIEW_CANDIDATES_PATH,
     REVIEWED_CODEBOOK_PATH,
     _append_sentiment_fields,
     _reviewed_terms_from_codebook,
@@ -156,6 +157,11 @@ def main() -> None:
         inputs=[
             file_record(args.input, "synced_tagged_multilingual_reviews", required=True),
             file_record(REVIEWED_CODEBOOK_PATH, "reviewed_chinese_codebook", required=True),
+            file_record(
+                CHINESE_GOOGLE_REVIEW_CANDIDATES_PATH,
+                "reviewed_chinese_google_review_candidates",
+                required=True,
+            ),
         ],
         outputs=[file_record(args.output, "chinese_folded_tagged_multilingual_reviews", required=True)],
         metrics={

@@ -1,8 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1120" height="260" viewBox="0 0 1120 260">
 <rect width="100%" height="100%" fill="#fbfaf7"/>
-<text x="32.00" y="39.00" text-anchor="start" font-family="Arial, sans-serif" font-size="24" font-weight="700" fill="#172033">Chinese City/Platform Friction Status</text>
-<text x="32.00" y="66.00" text-anchor="start" font-family="Arial, sans-serif" font-size="14" font-weight="400" fill="#5b677a">Current tracked output is header-only because comparison groups are unavailable</text>
+<text x="32.00" y="39.00" text-anchor="start" font-family="Arial, sans-serif" font-size="30" font-weight="700" fill="#172033">Chinese City/Platform Friction Status</text>
+<text x="32.00" y="66.00" text-anchor="start" font-family="Arial, sans-serif" font-size="18" font-weight="400" fill="#5b677a">Current tracked output is header-only because comparison groups are unavailable</text>
 <rect x="172.00" y="104.00" width="776.00" height="74.00" rx="6" fill="#d7dde8" opacity="0.22"/>
-<text x="560.00" y="144.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" font-weight="700" fill="#172033">No within-Chinese city/platform comparison available - current Fukui Chinese-language posts are single-platform (Xiaohongshu only).</text>
-<text x="560.00" y="169.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#5b677a">Do not present absent city/platform friction rows as evidence.</text>
+<text x="560.00" y="144.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="700" fill="#172033">No within-Chinese city/platform comparison available - current Fukui Chinese-language posts are single-platform (Xiaohongshu only).</text>
+<text x="560.00" y="169.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="400" fill="#5b677a">Do not present absent city/platform friction rows as evidence.</text>
 </svg>

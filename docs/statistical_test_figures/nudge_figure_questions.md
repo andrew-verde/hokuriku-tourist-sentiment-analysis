@@ -19,3 +19,9 @@ All figures are aggregate-only. They omit row-level review text, authors, URLs, 
 - Path: `docs/statistical_test_figures/figure_nudge_info_levers.svg`
 - Question answered: Which nudge-able friction levers are present and statistically evidenced?
 - Caveat: Rare aspects stay visible; underpowered flags should temper interpretation.
+
+## Hokuriku modelled review volume
+
+- Path: `docs/statistical_test_figures/figure_nudge_hokuriku_volume_context.svg`
+- Question answered: How many supported-language Google reviews enter the Hokuriku model?
+- Caveat: Counts exclude unsupported or undetected language rows; no sentiment-tool result is shown.

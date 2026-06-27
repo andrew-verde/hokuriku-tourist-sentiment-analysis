@@ -1,7 +1,7 @@
 {
   "schema_version": "research_provenance.v1",
   "kind": "presentation_safe_jp_en_sentiment",
-  "generated_at": "2026-06-27T10:13:10+00:00",
+  "generated_at": "2026-06-27T13:25:24+00:00",
   "command": "scripts/build_presentation_safe_outputs.py",
   "inputs": [
     {
@@ -74,49 +74,49 @@
       "path": "output/presentation_safe/japanese/figure_japanese_sentiment_profile.svg",
       "exists": true,
       "bytes": 2101,
-      "sha256": "af5e3fef2267b2d9f32c0ee9edd6bb4904a189f072960de2f7d1c11f2bf4255e"
+      "sha256": "91a8f273f4aae260859a743e0071feeff023a0a63cf6de0e311fee045d2f41c3"
     },
     {
       "role": "presentation_figure_japanese_poi_priority_mix",
       "path": "output/presentation_safe/japanese/figure_japanese_poi_priority_mix.svg",
       "exists": true,
-      "bytes": 3349,
-      "sha256": "3330c6b382b11707bb4e7ebab66967b76f83165bc9d580d808529816c3bf391c"
+      "bytes": 3352,
+      "sha256": "e95b8fcad4faa618f96473a22164cb5523a0092b563fbe183c1ce45c3499884f"
     },
     {
       "role": "presentation_figure_english_sentiment_profile",
       "path": "output/presentation_safe/english/figure_english_sentiment_profile.svg",
       "exists": true,
       "bytes": 1854,
-      "sha256": "651ca0294a74f46e0b0b6eea6a38e029237756fed3f1ff3ba6ae4e52737c96a5"
+      "sha256": "4ba9280037912c47b7803da970d27af76c158a7b5bb3b2076083748cb0af37a1"
     },
     {
       "role": "presentation_figure_english_poi_priority_mix",
       "path": "output/presentation_safe/english/figure_english_poi_priority_mix.svg",
       "exists": true,
-      "bytes": 2744,
-      "sha256": "e4113479a11b429c2c0d91c0810068d17c85afae0719a7b6391f88f1818aba2b"
+      "bytes": 2747,
+      "sha256": "2780f2448cead6bada3d95c0e3979b765ac784147bf015b50b1a00cb0137a91e"
     },
     {
       "role": "presentation_figure_multilingual_sentiment_share",
       "path": "output/presentation_safe/multilingual/figure_sentiment_share_by_language_source.svg",
       "exists": true,
       "bytes": 3292,
-      "sha256": "46753a74b767587db40ee76a160a5636b0e5c74a298d2efe17f952061ec2607d"
+      "sha256": "1d87b8674e6d87779f47d7e42ca766fa6a2b07fb8e88e656398f0fc917088090"
     },
     {
       "role": "presentation_figure_multilingual_volume_context",
       "path": "output/presentation_safe/multilingual/figure_volume_context.svg",
       "exists": true,
-      "bytes": 2026,
-      "sha256": "26935114edc7271b2a650ee5a970a1f4db5a68233713458b0231347525a6d539"
+      "bytes": 2028,
+      "sha256": "e13a9ea81d1db830fa6634a855e7470becd99d2d9d54b0a5a768ba451b3481ec"
     },
     {
       "role": "presentation_figure_multilingual_statistical_evidence",
       "path": "output/presentation_safe/multilingual/figure_statistical_evidence_summary.svg",
       "exists": true,
       "bytes": 3513,
-      "sha256": "d89331d5845bf26543ba90ea1e0411e7f019c85ef8f33a2a9323d7ff649574d9"
+      "sha256": "18e8a17ad43646e85cfe199c9610563938ba57ae853ad71bfbcf490f5a4a7733"
     },
     {
       "role": "presentation_readiness_markdown",
