@@ -18,6 +18,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 LOCK_PATH = ROOT / "requirements-sentiment.lock.txt"
 OSETI_PIN = "oseti==0.4.3.1"
+ZHCONV_PIN = "zhconv==1.4.3"
 
 # This script handles a package dependency conflict: oseti depends on an old
 # mecab package that fails to build, but the sentiment analyzer works fine with
@@ -73,6 +74,8 @@ def main() -> int:
     requirements = _read_lock(LOCK_PATH)
     if OSETI_PIN not in requirements:
         raise RuntimeError(f"{LOCK_PATH} must include {OSETI_PIN}")
+    if ZHCONV_PIN not in requirements:
+        raise RuntimeError(f"{LOCK_PATH} must include {ZHCONV_PIN}")
 
     # Install all transitive dependencies (mecab-python3, ipadic, etc.) first.
     dependency_requirements = [req for req in requirements if req != OSETI_PIN]

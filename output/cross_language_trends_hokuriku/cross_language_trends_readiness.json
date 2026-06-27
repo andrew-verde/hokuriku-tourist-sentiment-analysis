@@ -1,0 +1,213 @@
+{
+  "schema_version": "cross_language_trends_manifest.v2",
+  "prefecture": "Hokuriku",
+  "neighboring_prefecture_scaffold": [
+    "Ishikawa",
+    "Toyama"
+  ],
+  "reviews_input": "output/multilingual_review_analysis/reviews_multilingual.csv",
+  "reviews_input_sha256": "6bc06f34848954674506f6fefb84ffd9689b4cc9b2c90780fd5c8fc45eafaa56",
+  "poi_metadata_input": "output/checkpoints/poi_metadata.json",
+  "poi_metadata_input_sha256": "34b088a57c0e61d23471cf3745ca2ec6e2811dce71aa7ab2a5a508fa5178e79a",
+  "chinese_input": "output/chinese_google_reviews_analysis/tagged_chinese_google_reviews.csv",
+  "chinese_input_sha256": "e521c2e38e362d560ade9ba137749c5477cbb4182e259157effc6c620a8fff42",
+  "sentiment_summary_input": "output/sentiment_aggregates_hokuriku/source_group_sentiment_summary.csv",
+  "sentiment_summary_input_sha256": "0e17c09ad873494dee34f4716296cdefe1b15745e95ce8cf9bd0296c4dac5116",
+  "review_rows_retained": 4956,
+  "chinese_rows_retained": 243,
+  "chinese_date_precision_counts": {
+    "exact": 243
+  },
+  "monthly_trends_enabled": false,
+  "monthly_trends_disabled_reason": "Chinese post dates are mostly inferred or scrape-anchored; aggregate baseline is safer.",
+  "outputs": {
+    "cross_language_baseline_snapshot": "output/cross_language_trends_hokuriku/cross_language_baseline_snapshot.csv",
+    "date_scrub_requirements": "output/cross_language_trends_hokuriku/date_scrub_requirements.csv",
+    "cross_language_statistical_tests": "output/cross_language_trends_hokuriku/cross_language_statistical_tests.csv",
+    "cross_language_trends_readiness": "output/cross_language_trends_hokuriku/cross_language_trends_readiness.md",
+    "cross_language_baseline_snapshot_sha256": "7b3340de319465701795ef805153ae6a20a05e767a532f69a0fde6643ecb3825",
+    "date_scrub_requirements_sha256": "a52e89bfba6cef9da94082653a1aab5c204b7b817cf395665406e0cab4cea034",
+    "cross_language_statistical_tests_sha256": "b003f27513e4f678ab6f90d916796851718244d83123b815497dfaf5bb3b5645",
+    "cross_language_trends_readiness_sha256": "cd1b03f096e3d1dc0999b6bbc46a11c0f5d93b47adb7f9a6a0513aa275b6d8f3"
+  },
+  "provenance": {
+    "schema_version": "research_provenance.v1",
+    "kind": "cross_language_baseline",
+    "generated_at": "2026-06-27T07:33:14+00:00",
+    "command": "scripts/build_cross_language_trends.py --prefecture Hokuriku --reviews-path output/multilingual_review_analysis/reviews_multilingual.csv --chinese-path output/chinese_google_reviews_analysis/tagged_chinese_google_reviews.csv --sentiment-summary-path output/sentiment_aggregates_hokuriku/source_group_sentiment_summary.csv --output-dir output/cross_language_trends_hokuriku",
+    "inputs": [
+      {
+        "role": "reviews_multilingual",
+        "path": "output/multilingual_review_analysis/reviews_multilingual.csv",
+        "exists": true,
+        "bytes": 3366331,
+        "sha256": "6bc06f34848954674506f6fefb84ffd9689b4cc9b2c90780fd5c8fc45eafaa56"
+      },
+      {
+        "role": "poi_metadata",
+        "path": "output/checkpoints/poi_metadata.json",
+        "exists": true,
+        "bytes": 26466,
+        "sha256": "34b088a57c0e61d23471cf3745ca2ec6e2811dce71aa7ab2a5a508fa5178e79a"
+      },
+      {
+        "role": "tagged_chinese_social_posts",
+        "path": "output/chinese_google_reviews_analysis/tagged_chinese_google_reviews.csv",
+        "exists": true,
+        "bytes": 164786,
+        "sha256": "e521c2e38e362d560ade9ba137749c5477cbb4182e259157effc6c620a8fff42"
+      },
+      {
+        "role": "jp_en_sentiment_summary",
+        "path": "output/sentiment_aggregates_hokuriku/source_group_sentiment_summary.csv",
+        "exists": true,
+        "bytes": 2741,
+        "sha256": "0e17c09ad873494dee34f4716296cdefe1b15745e95ce8cf9bd0296c4dac5116"
+      }
+    ],
+    "outputs": [
+      {
+        "role": "aggregate_cross_language_baseline",
+        "path": "output/cross_language_trends_hokuriku/cross_language_baseline_snapshot.csv",
+        "exists": true,
+        "bytes": 728,
+        "sha256": "7b3340de319465701795ef805153ae6a20a05e767a532f69a0fde6643ecb3825"
+      },
+      {
+        "role": "aggregate_date_scrub_requirements",
+        "path": "output/cross_language_trends_hokuriku/date_scrub_requirements.csv",
+        "exists": true,
+        "bytes": 443,
+        "sha256": "a52e89bfba6cef9da94082653a1aab5c204b7b817cf395665406e0cab4cea034"
+      },
+      {
+        "role": "aggregate_cross_language_statistical_tests",
+        "path": "output/cross_language_trends_hokuriku/cross_language_statistical_tests.csv",
+        "exists": true,
+        "bytes": 8458,
+        "sha256": "b003f27513e4f678ab6f90d916796851718244d83123b815497dfaf5bb3b5645"
+      },
+      {
+        "role": "readiness_markdown",
+        "path": "output/cross_language_trends_hokuriku/cross_language_trends_readiness.md",
+        "exists": true,
+        "bytes": 2613,
+        "sha256": "cd1b03f096e3d1dc0999b6bbc46a11c0f5d93b47adb7f9a6a0513aa275b6d8f3"
+      }
+    ],
+    "filters": {
+      "prefecture": "Hokuriku",
+      "review_groups": [
+        "english",
+        "japanese"
+      ],
+      "chinese_group": "chinese_social",
+      "chinese_default_layer": "xiaohongshu_only"
+    },
+    "metrics": {
+      "review_rows_retained": 4956,
+      "chinese_rows_retained": 243,
+      "review_scope_method": [
+        "all_prefectures_no_filter"
+      ],
+      "chinese_scope_method": [
+        "all_prefectures_no_filter"
+      ],
+      "monthly_trends_enabled": false,
+      "chinese_date_precision_counts": {
+        "exact": 243
+      },
+      "statistical_tests": [
+        {
+          "test_name": "cross_source_sentiment_category_independence",
+          "comparison": "google_review_english_vs_google_review_japanese_vs_chinese_social_all",
+          "status": "ok",
+          "statistic": 410.1153578057259,
+          "p_value": 2.725509041933834e-80,
+          "effect": 0.19859948129959543,
+          "details_json": "{\"method\": \"chi_square\", \"dof\": 12, \"expected\": {\"negative\": {\"google_review_english\": 12.449894, \"google_review_japanese\": 87.443932, \"chinese_social_all\": 17.901327}, \"neutral\": {\"google_review_english\": 26.590113, \"google_review_japanese\": 186.760146, \"chinese_social_all\": 38.233122}, \"positive\": {\"google_review_english\": 129.959992, \"google_review_japanese\": 912.795922, \"chinese_social_all\": 186.865551}}, \"observed\": {\"negative\": {\"google_review_english\": 9, \"google_review_japanese\": 54, \"chinese_social_all\": 81}, \"neutral\": {\"google_review_english\": 5, \"google_review_japanese\": 222, \"chinese_social_all\": 4}, \"positive\": {\"google_review_english\": 155, \"google_review_japanese\": 911, \"chinese_social_all\": 158}}, \"denominators\": {\"google_review_english\": 169, \"google_review_japanese\": 1187, \"chinese_social_all\": 243}, \"row_units\": {\"google_review_english\": \"one Google review\", \"google_review_japanese\": \"one Google review\", \"chinese_social_all\": \"one Xiaohongshu note or Douyin comment row\"}, \"interpretation\": \"Descriptive cross-source category-share comparison; source platforms and scoring tools differ. Chinese (SnowNLP) sentiment categories are unvalidated on short text (~79% of Chinese 'negative' rows are 4-5 star), so the Chinese negative_pct and category shares are NOT interpretable as sentiment and are retained only as a descriptive, non-confirmatory artifact.\"}"
+        },
+        {
+          "test_name": "pairwise_cross_source_sentiment_category_independence",
+          "comparison": "google_review_english_vs_chinese_social_all",
+          "status": "ok",
+          "statistic": 153.0446017772071,
+          "p_value": 1.7566391348651484e-30,
+          "effect": 0.25662026314503994,
+          "details_json": "{\"method\": \"chi_square\", \"dof\": 6, \"expected\": {\"negative\": {\"google_review_english\": 19.052496, \"chinese_social_all\": 27.395009}, \"neutral\": {\"google_review_english\": 6.54475, \"chinese_social_all\": 9.410499}, \"positive\": {\"google_review_english\": 143.402754, \"chinese_social_all\": 206.194492}}, \"observed\": {\"negative\": {\"google_review_english\": 9, \"chinese_social_all\": 81}, \"neutral\": {\"google_review_english\": 5, \"chinese_social_all\": 4}, \"positive\": {\"google_review_english\": 155, \"chinese_social_all\": 158}}, \"denominators\": {\"google_review_english\": 169, \"chinese_social_all\": 243}, \"row_units\": {\"google_review_english\": \"one Google review\", \"chinese_social_all\": \"one Xiaohongshu note or Douyin comment row\"}, \"interpretation\": \"Descriptive cross-source category-share comparison; source platforms and scoring tools differ. Chinese (SnowNLP) sentiment categories are unvalidated on short text (~79% of Chinese 'negative' rows are 4-5 star), so the Chinese negative_pct and category shares are NOT interpretable as sentiment and are retained only as a descriptive, non-confirmatory artifact.\"}"
+        },
+        {
+          "test_name": "pairwise_cross_source_sentiment_category_independence",
+          "comparison": "google_review_japanese_vs_chinese_social_all",
+          "status": "ok",
+          "statistic": 269.6464690079079,
+          "p_value": 2.5819920756075488e-55,
+          "effect": 0.17748452249484428,
+          "details_json": "{\"method\": \"chi_square\", \"dof\": 6, \"expected\": {\"negative\": {\"google_review_japanese\": 92.353037, \"chinese_social_all\": 18.906308}, \"neutral\": {\"google_review_japanese\": 215.490421, \"chinese_social_all\": 44.11472}, \"positive\": {\"google_review_japanese\": 879.156542, \"chinese_social_all\": 179.978972}}, \"observed\": {\"negative\": {\"google_review_japanese\": 54, \"chinese_social_all\": 81}, \"neutral\": {\"google_review_japanese\": 222, \"chinese_social_all\": 4}, \"positive\": {\"google_review_japanese\": 911, \"chinese_social_all\": 158}}, \"denominators\": {\"google_review_japanese\": 1187, \"chinese_social_all\": 243}, \"row_units\": {\"google_review_japanese\": \"one Google review\", \"chinese_social_all\": \"one Xiaohongshu note or Douyin comment row\"}, \"interpretation\": \"Descriptive cross-source category-share comparison; source platforms and scoring tools differ. Chinese (SnowNLP) sentiment categories are unvalidated on short text (~79% of Chinese 'negative' rows are 4-5 star), so the Chinese negative_pct and category shares are NOT interpretable as sentiment and are retained only as a descriptive, non-confirmatory artifact.\"}"
+        },
+        {
+          "test_name": "within_chinese_platform_sentiment_category_independence",
+          "comparison": "chinese_source_platforms",
+          "status": "skipped",
+          "statistic": NaN,
+          "p_value": NaN,
+          "effect": NaN,
+          "details_json": "{\"reason\": \"fewer than two non-empty groups/categories\", \"observed\": {\"negative\": {\"chinese_social_google_review\": 81}, \"neutral\": {\"chinese_social_google_review\": 4}, \"positive\": {\"chinese_social_google_review\": 158}}, \"denominators\": {\"chinese_social_google_review\": 243}, \"row_units\": {\"chinese_social_google_review\": \"one source-platform row\"}, \"interpretation\": \"Descriptive cross-source category-share comparison; source platforms and scoring tools differ. Chinese (SnowNLP) sentiment categories are unvalidated on short text (~79% of Chinese 'negative' rows are 4-5 star), so the Chinese negative_pct and category shares are NOT interpretable as sentiment and are retained only as a descriptive, non-confirmatory artifact.\", \"platform_grouping\": \"source_platform\"}"
+        },
+        {
+          "test_name": "within_chinese_platform_any_friction_prevalence",
+          "comparison": "chinese_source_platforms",
+          "status": "skipped",
+          "statistic": NaN,
+          "p_value": NaN,
+          "effect": NaN,
+          "details_json": "{\"reason\": \"fewer than two groups with data\", \"group_col\": \"source_platform\", \"value_col\": \"any_friction\", \"current_scope\": \"within Chinese social rows only\"}"
+        },
+        {
+          "test_name": "within_chinese_platform_any_enjoyment_evidence_prevalence",
+          "comparison": "chinese_source_platforms",
+          "status": "skipped",
+          "statistic": NaN,
+          "p_value": NaN,
+          "effect": NaN,
+          "details_json": "{\"reason\": \"fewer than two groups with data\", \"group_col\": \"source_platform\", \"value_col\": \"any_enjoyment_evidence\", \"current_scope\": \"within Chinese social rows only\"}"
+        },
+        {
+          "test_name": "cross_source_friction_prevalence",
+          "comparison": "google_review_english_vs_google_review_japanese_vs_chinese_social_xhs",
+          "status": "ok",
+          "statistic": 27.993621405545035,
+          "p_value": 9.422299605312632e-05,
+          "effect": 0.07337863584196365,
+          "details_json": "{\"method\": \"chi_square\", \"dof\": 6, \"expected\": {\"not_present\": {\"google_review_english\": 147.643393, \"google_review_japanese\": 1036.998269, \"chinese_social_all\": 212.291979}, \"present\": {\"google_review_english\": 21.356607, \"google_review_japanese\": 150.001731, \"chinese_social_all\": 30.708021}}, \"observed\": {\"not_present\": {\"google_review_english\": 156, \"google_review_japanese\": 1081, \"chinese_social_all\": 210}, \"present\": {\"google_review_english\": 13, \"google_review_japanese\": 106, \"chinese_social_all\": 33}}, \"denominators\": {\"google_review_english\": 169, \"google_review_japanese\": 1187, \"chinese_social_all\": 243}, \"row_units\": {\"google_review_english\": \"one Google review\", \"google_review_japanese\": \"one Google review\", \"chinese_social_all\": \"one Xiaohongshu note row\"}, \"interpretation\": \"Descriptive cross-source discourse prevalence test using reviewed keyword evidence; platform/source contexts differ.\", \"evidence_column\": \"any_friction\", \"chinese_layer\": \"Xiaohongshu-only by default; Douyin can be supplied later with --chinese-path\"}"
+        },
+        {
+          "test_name": "cross_source_enjoyment_recommendation_prevalence",
+          "comparison": "google_review_english_vs_google_review_japanese_vs_chinese_social_xhs",
+          "status": "ok",
+          "statistic": 297.8308960558695,
+          "p_value": 2.3851997380757533e-61,
+          "effect": 0.23934533397002666,
+          "details_json": "{\"method\": \"chi_square\", \"dof\": 6, \"expected\": {\"not_present\": {\"google_review_english\": 119.395461, \"google_review_japanese\": 838.594153, \"chinese_social_all\": 171.67513}, \"present\": {\"google_review_english\": 49.604539, \"google_review_japanese\": 348.405847, \"chinese_social_all\": 71.32487}}, \"observed\": {\"not_present\": {\"google_review_english\": 89, \"google_review_japanese\": 891, \"chinese_social_all\": 108}, \"present\": {\"google_review_english\": 80, \"google_review_japanese\": 296, \"chinese_social_all\": 135}}, \"denominators\": {\"google_review_english\": 169, \"google_review_japanese\": 1187, \"chinese_social_all\": 243}, \"row_units\": {\"google_review_english\": \"one Google review\", \"google_review_japanese\": \"one Google review\", \"chinese_social_all\": \"one Xiaohongshu note row\"}, \"interpretation\": \"Descriptive cross-source discourse prevalence test using reviewed keyword evidence; platform/source contexts differ.\", \"evidence_column\": \"any_enjoyment_evidence\", \"chinese_layer\": \"Xiaohongshu-only by default; Douyin can be supplied later with --chinese-path\"}"
+        }
+      ]
+    },
+    "caveats": [
+      "Group membership is content language/source platform, not nationality.",
+      "Chinese SnowNLP sentiment and Google review ratings are separate instruments.",
+      "Chinese (SnowNLP) sentiment categories are unvalidated on short text (~79% of Chinese 'negative' rows are 4-5 star); the Chinese negative_pct and category shares are NOT interpretable as sentiment and are retained only as a descriptive, non-confirmatory artifact.",
+      "Cross-source sentiment category tests compare platformed discourse categories, not direct satisfaction.",
+      "Cross-source friction/enjoyment tests use reviewed keyword evidence and are descriptive across source/platform contexts.",
+      "Monthly trend output is disabled until Chinese post dates are exact enough.",
+      "Default output is Fukui-only.",
+      "Chinese social default input is Xiaohongshu-only; Douyin can be supplied later with --chinese-path."
+    ],
+    "extra": {
+      "neighboring_prefecture_scaffold": [
+        "Ishikawa",
+        "Toyama"
+      ],
+      "monthly_trends_disabled_reason": "Chinese post dates are mostly inferred or scrape-anchored; aggregate baseline is safer."
+    }
+  }
+}

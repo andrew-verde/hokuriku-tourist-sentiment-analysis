@@ -56,7 +56,9 @@ from src.provenance import (  # noqa: E402
 
 
 ROOT = Path(__file__).resolve().parent.parent
-INPUT_PATH = ROOT / "output" / "multilingual_review_analysis" / "tagged_reviews_multilingual.csv"
+# Chinese-folded tagged file (zh promoted to language_group='chinese'); built by
+# build_chinese_folded_multilingual.py from the synced tagged_reviews_multilingual.csv.
+INPUT_PATH = ROOT / "output" / "multilingual_review_analysis" / "tagged_reviews_multilingual_chinese_folded.csv"
 OUTPUT_DIR = ROOT / "output" / "nudge_analysis"
 OUTPUT_CSV = OUTPUT_DIR / "poi_opportunity_index.csv"
 OUTPUT_MANIFEST = OUTPUT_DIR / "poi_opportunity_index_manifest.json"
@@ -74,7 +76,9 @@ PROMOTE_DRAW_ASPECTS = [
     "scenic_value",
     "worthwhile_destination",
 ]
+# Tunable thresholds for POI- and aspect-level membership confidence.
 LOW_CONFIDENCE_N = 10
+MIN_DOMINANT_ASPECT_N = 3
 
 
 class PoiOpportunityError(RuntimeError):
@@ -106,6 +110,7 @@ def load_tagged_reviews(path: Path) -> pd.DataFrame:
         "poi_category",
         "review_rating",
         "city",
+        "language_group",
     } | set(ASPECTS)
     if not path.exists():
         raise PoiOpportunityError(f"Required input not found: {path}\nRun `make multilingual-reviews` first.")
@@ -161,6 +166,17 @@ def build_index(df: pd.DataFrame) -> tuple[pd.DataFrame, dict]:
         positive_count = int((group["review_rating"] >= 4).sum())
         positive_share, positive_low, positive_high = wilson_interval(positive_count, n_reviews)
         low_confidence = n_reviews < LOW_CONFIDENCE_N
+        language_counts = group["language_group"].value_counts()
+        published_language_counts = {
+            "n_reviews_chinese": int(language_counts.get("chinese", 0)),
+            "n_reviews_japanese": int(language_counts.get("japanese", 0)),
+            "n_reviews_english": int(language_counts.get("english", 0)),
+            "n_reviews_other": int(
+                language_counts.drop(
+                    labels=["chinese", "japanese", "english"], errors="ignore"
+                ).sum()
+            ),
+        }
 
         # A credible lift means this POI's Wilson lower bound is above the
         # all-review base prevalence for that aspect.
@@ -169,6 +185,9 @@ def build_index(df: pd.DataFrame) -> tuple[pd.DataFrame, dict]:
         draw_signal: list[str] = []
         dominant_nudgeable_friction: list[str] = []
         promote_draw: list[str] = []
+        fix_it_membership: list[str] = []
+        promote_strict_membership: list[str] = []
+        membership_thin_language_blocked = False
         aspect_values: dict[str, float | int | None] = {}
         for aspect in ASPECTS:
             n_positive = int(group[aspect].sum())
@@ -189,6 +208,33 @@ def build_index(df: pd.DataFrame) -> tuple[pd.DataFrame, dict]:
                     dominant_draw.append(aspect)
                     if aspect in PROMOTE_DRAW_ASPECTS:
                         promote_draw.append(aspect)
+                positive_languages = group.loc[group[aspect] == 1, "language_group"]
+                positive_language_counts = positive_languages.value_counts()
+                driving_languages = (
+                    positive_language_counts[
+                        positive_language_counts == positive_language_counts.max()
+                    ].index.tolist()
+                    if not positive_language_counts.empty
+                    else []
+                )
+                passes_membership_gate = (
+                    n_positive >= MIN_DOMINANT_ASPECT_N
+                    and bool(driving_languages)
+                    and all(
+                        int(language_counts.get(language, 0)) >= LOW_CONFIDENCE_N
+                        for language in driving_languages
+                    )
+                )
+                if aspect in NUDGEABLE_FRICTION_ASPECTS:
+                    if passes_membership_gate:
+                        fix_it_membership.append(aspect)
+                    else:
+                        membership_thin_language_blocked = True
+                if aspect in PROMOTE_DRAW_ASPECTS:
+                    if passes_membership_gate:
+                        promote_strict_membership.append(aspect)
+                    else:
+                        membership_thin_language_blocked = True
             if SIGNAL_TYPE[aspect] == "draw" and prevalence is not None and prevalence > global_base[aspect]:
                 draw_signal.append(aspect)
 
@@ -204,13 +250,13 @@ def build_index(df: pd.DataFrame) -> tuple[pd.DataFrame, dict]:
         )
         has_draw_signal = bool(draw_signal)
 
-        is_fix_it = bool((not low_confidence) and high_volume and dominant_nudgeable_friction)
+        is_fix_it = bool((not low_confidence) and high_volume and fix_it_membership)
         is_promote_it_strict = bool(
             (not low_confidence)
             and low_volume
             and positive_low is not None
             and positive_low >= 0.70
-            and dominant_draw
+            and promote_strict_membership
         )
         is_promote_it = bool((not low_confidence) and low_volume and positive_share is not None and positive_share >= 0.85)
         if n_reviews >= 30:
@@ -240,6 +286,7 @@ def build_index(df: pd.DataFrame) -> tuple[pd.DataFrame, dict]:
             "prefecture": one_value(group, "prefecture"),
             "is_fukui": bool(one_value(group, "prefecture") == "Fukui"),
             "n_reviews": n_reviews,
+            **published_language_counts,
             "mean_rating": float(group["review_rating"].mean()),
             "positive_count": positive_count,
             "positive_share": positive_share,
@@ -256,6 +303,9 @@ def build_index(df: pd.DataFrame) -> tuple[pd.DataFrame, dict]:
             "has_draw_signal": has_draw_signal,
             "dominant_nudgeable_friction_codes": join_codes(dominant_nudgeable_friction),
             "promote_draw_codes": join_codes(promote_draw),
+            "fix_it_membership_codes": join_codes(fix_it_membership),
+            "promote_strict_membership_codes": join_codes(promote_strict_membership),
+            "membership_thin_language_blocked": membership_thin_language_blocked,
             "fix_it_elevated_friction_lift_sum": fix_lift_sum,
             "promote_it_draw_prevalence_sum": promote_draw_prevalence_sum,
             "fix_it_score": float(n_reviews * fix_lift_sum) if is_fix_it else 0.0,
@@ -299,6 +349,7 @@ def build_index(df: pd.DataFrame) -> tuple[pd.DataFrame, dict]:
         "low_volume_threshold_n_reviews": low_volume_threshold,
         "low_volume_quantile_raw": low_volume_quantile,
         "low_confidence_threshold_n_reviews": LOW_CONFIDENCE_N,
+        "min_dominant_aspect_n_positive": MIN_DOMINANT_ASPECT_N,
         "global_base_prevalence": global_base,
     }
     return out, metrics
@@ -329,6 +380,11 @@ def write_outputs(
             "published_key": ["poi_name", "poi_category", "city", "prefecture"],
             "positive_share_definition": "review_rating >= 4",
             "dominant_code_rule": "POI Wilson lower bound exceeds global base prevalence",
+            "membership_aspect_support_floor": MIN_DOMINANT_ASPECT_N,
+            "membership_driving_language_rule": (
+                "Each tied plurality language for positive aspect tags must have at least "
+                f"{LOW_CONFIDENCE_N} reviews at the POI"
+            ),
             "promote_it_relaxed_rule": "n_reviews >= 10, n_reviews <= bottom-quartile cutoff, positive_share point estimate >= 0.85",
             "promote_it_score": "positive_share * (1 + has_draw_signal) * (low_volume_threshold / n_reviews)",
             "crowding_hotspot_rule": "high volume and waiting_crowding Wilson lower bound exceeds global base prevalence",
@@ -346,6 +402,10 @@ def write_outputs(
             "Review volume is capped by collection, so low-volume means bottom-quartile exposure rather than below-median volume.",
             "Small-n POIs are flagged low_confidence; Wilson intervals are descriptive uncertainty bounds.",
             "Dominant aspect codes use a conservative lift rule, not a formal multiple-comparison test.",
+            "Fix-it and strict promote-it membership require at least "
+            f"{MIN_DOMINANT_ASPECT_N} positive aspect tags and exclude aspects plurality-driven "
+            f"by a language group with fewer than {LOW_CONFIDENCE_N} reviews at that POI; "
+            "all tied plurality languages must pass.",
             "Fix-it and promote-it archetypes rank candidate follow-up work, not intervention effectiveness.",
             "Groups describe review language when present in upstream data, not reviewer nationality.",
         ],
@@ -385,8 +445,8 @@ def main() -> None:
         manifest = build(input_path=args.input, output_dir=args.output_dir)
     except Exception as error:
         raise SystemExit(str(error)) from error
-    print(f"wrote {OUTPUT_CSV}")
-    print(f"wrote {OUTPUT_MANIFEST}")
+    print(f"wrote {args.output_dir / 'poi_opportunity_index.csv'}")
+    print(f"wrote {args.output_dir / 'poi_opportunity_index_manifest.json'}")
     print(
         "pois/fix-it/promote-it: "
         f"{manifest['metrics']['n_pois_total']}/"

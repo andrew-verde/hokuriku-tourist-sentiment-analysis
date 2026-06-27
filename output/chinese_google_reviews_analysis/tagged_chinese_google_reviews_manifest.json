@@ -1,0 +1,79 @@
+{
+  "schema_version": "research_provenance.v1",
+  "kind": "chinese_google_reviews_tagged",
+  "generated_at": "2026-06-27T07:32:57+00:00",
+  "command": "scripts/build_chinese_google_reviews_dataset.py",
+  "inputs": [
+    {
+      "role": "zh_google_reviews_source",
+      "path": "output/multilingual_review_analysis/non_english_non_japanese_reviews.csv",
+      "exists": true,
+      "bytes": 539680,
+      "sha256": "d0459c9428e3c4453d892431e7ec53739cd54b48979878ce95361bb7be01bb3f"
+    },
+    {
+      "role": "reviewed_chinese_codebook",
+      "path": "docs/codebook_templates/chinese_reviewed_codebook_template.csv",
+      "exists": true,
+      "bytes": 76526,
+      "sha256": "e9a23098e950fea0af7b252b41fb0ccb123c5a3a09354f3a65bf1e2e76bbc390"
+    },
+    {
+      "role": "legacy_yaml_codebook",
+      "path": "config/chinese_social_friction_codebook.yaml",
+      "exists": true,
+      "bytes": 3532,
+      "sha256": "180ee2ebecd984dc88fe65acc829da2660a6aaea560675d8543f67066bb09bf4"
+    }
+  ],
+  "outputs": [
+    {
+      "role": "tagged_chinese_google_reviews",
+      "path": "output/chinese_google_reviews_analysis/tagged_chinese_google_reviews.csv",
+      "exists": true,
+      "bytes": 164786,
+      "sha256": "e521c2e38e362d560ade9ba137749c5477cbb4182e259157effc6c620a8fff42"
+    }
+  ],
+  "filters": {},
+  "metrics": {
+    "n_reviews": 243,
+    "by_city": {
+      "Kanazawa": 113,
+      "Toyama": 88,
+      "Fukui": 42
+    },
+    "by_detected_language": {
+      "zh-tw": 182,
+      "zh-cn": 61
+    },
+    "sentiment_category": {
+      "positive": 158,
+      "negative": 81,
+      "neutral": 4
+    },
+    "snownlp_centered_score_mean": 0.257,
+    "mean_review_rating": 4.432,
+    "any_friction_rate": 0.1358,
+    "unique_pois": 56,
+    "snownlp_validation": {
+      "snownlp_negative_n": 81,
+      "snownlp_negative_rated_4_or_5_n": 64,
+      "snownlp_negative_rated_4_or_5_share": 0.7901,
+      "snownlp_negative_rated_2_or_less_n": 6
+    }
+  },
+  "caveats": [
+    "Chinese-language Google reviews are the POI-linked, star-rated, region-wide Chinese evidence source; XHS is a separate, demoted directional guidepost (Fukui-only, no POI link, no rating).",
+    "Sentiment scored with SnowNLP (same instrument as XHS) for comparability; SnowNLP is noisy on short/traditional review text and produces some false negatives, so sentiment_category is descriptive, not a validated outcome. POI positives should use review_rating, not SnowNLP.",
+    "Friction/topic codes use the reviewed Chinese codebook with load-time simplified->traditional expansion (zhconv); colloquial review-register terms remain under-captured pending human review (see docs/codebook_templates/chinese_google_review_friction_candidates.csv).",
+    "SnowNLP negative category is unvalidated on short Chinese review text: ~79% of reviews tagged 'negative' are rated 4-5 stars (false negatives), so it is NOT a reportable Chinese sentiment outcome; POI positive signal uses review_rating instead (see metrics.snownlp_validation)."
+  ],
+  "extra": {
+    "dependency_versions": {
+      "pandas": "3.0.3",
+      "snownlp": "0.12.3",
+      "zhconv": "1.4.3"
+    }
+  }
+}

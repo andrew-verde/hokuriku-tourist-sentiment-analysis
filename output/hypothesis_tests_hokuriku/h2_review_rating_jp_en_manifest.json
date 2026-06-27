@@ -1,0 +1,56 @@
+{
+  "schema_version": "research_provenance.v1",
+  "kind": "hypothesis_h2_review_rating_jp_en",
+  "generated_at": "2026-06-27T06:19:54+00:00",
+  "command": "scripts/test_h2_review_rating_jp_en.py --input output/sentiment_row_level/google_reviews_all_japanese-english.csv --output-dir output/hypothesis_tests_hokuriku",
+  "inputs": [
+    {
+      "role": "ignored_scored_review_audit_file",
+      "path": "output/sentiment_row_level/google_reviews_all_japanese-english.csv",
+      "exists": true,
+      "bytes": 1076229,
+      "sha256": "691d47f94f49aa61160d62df1c02cd092832413a02591beb7b1608b46b5230c9"
+    }
+  ],
+  "outputs": [
+    {
+      "role": "tracked_hypothesis_test_csv",
+      "path": "output/hypothesis_tests_hokuriku/h2_review_rating_jp_en.csv",
+      "exists": true,
+      "bytes": 7574,
+      "sha256": "e13be68e9229948bcc3c8f2101facd28e8234994cd9f91b25efe4aa241a9e390"
+    }
+  ],
+  "filters": {
+    "prefecture": "Fukui",
+    "groups": [
+      "english",
+      "japanese"
+    ]
+  },
+  "metrics": {
+    "hypothesis": "H2",
+    "primary_unit": "one Fukui Google review row",
+    "sensitivity_unit": "one POI-language mean Google rating",
+    "denominators": {
+      "english": 919,
+      "japanese": 4037
+    },
+    "measurement_scale": "common_google_1_to_5_star_rating"
+  },
+  "caveats": [
+    "Group labels describe review language, not reviewer nationality.",
+    "Fukui Google review rows are nested in POIs; row-level p-values are descriptive without a clustered model.",
+    "English-language and Japanese-language review counts may be imbalanced.",
+    "Outputs are aggregate-only and omit row-level text, author fields, URLs, source IDs, review IDs, place IDs, and POI IDs.",
+    "Google review_rating is common-scale companion outcome evidence, not a replacement for text sentiment.",
+    "Ceiling effects are possible on 1-to-5 ratings."
+  ],
+  "extra": {
+    "dependency_versions": {
+      "pandas": "3.0.3",
+      "numpy": "2.4.6",
+      "scipy": "1.18.0"
+    }
+  }
+}

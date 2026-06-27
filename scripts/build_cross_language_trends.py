@@ -125,21 +125,33 @@ def load_poi_metadata(path: Path) -> pd.DataFrame:
         raise MissingInputError(str(error)) from error
 
 
+def _is_all_scope(prefecture: str | None) -> bool:
+    # Sentinel scope: run region-wide (all Hokuriku prefectures) with no
+    # prefecture filter. Keeps the existing single-prefecture Fukui path intact.
+    return prefecture is None or str(prefecture).strip().lower() in {"", "hokuriku", "all"}
+
+
 def load_review_rows(path: Path, poi_metadata_path: Path, prefecture: str) -> pd.DataFrame:
     # Load the multilingual Google reviews CSV and keep only English/Japanese language groups
     df = pd.read_csv(path)
     df = df[df["language_group"].astype(str).str.lower().isin(REVIEW_GROUPS)].copy()
 
-    # Load POI metadata (point-of-interest locations with prefecture tags)
-    # and use it to filter reviews to the specified prefecture (e.g., Fukui)
-    metadata = load_poi_metadata(poi_metadata_path)
-    try:
-        scoped = scope_reviews_by_poi_prefecture(df, metadata, prefecture)
-    except MissingScopeColumnsError as error:
-        raise MissingInputError(
-            "Review rows missing POI prefecture metadata; rerun `make multilingual-reviews`. "
-            f"{error}"
-        ) from error
+    if _is_all_scope(prefecture):
+        # Region-wide: keep all prefectures, no POI-prefecture filter.
+        scoped = df.copy()
+        scoped["scope_prefecture"] = "Hokuriku"
+        scoped["scope_method"] = "all_prefectures_no_filter"
+    else:
+        # Load POI metadata (point-of-interest locations with prefecture tags)
+        # and use it to filter reviews to the specified prefecture (e.g., Fukui)
+        metadata = load_poi_metadata(poi_metadata_path)
+        try:
+            scoped = scope_reviews_by_poi_prefecture(df, metadata, prefecture)
+        except MissingScopeColumnsError as error:
+            raise MissingInputError(
+                "Review rows missing POI prefecture metadata; rerun `make multilingual-reviews`. "
+                f"{error}"
+            ) from error
 
     # Convert data types: numeric ratings to float, dates to datetime, etc.
     # Mark whether each row has a parseable review_date (for monthly trend readiness)
@@ -156,10 +168,15 @@ def load_chinese_rows(path: Path, prefecture: str) -> pd.DataFrame:
         return df
 
     # Filter Chinese posts to the specified prefecture using city labels
-    try:
-        scoped = scope_rows_by_source_city_label(df, prefecture)
-    except MissingScopeColumnsError as error:
-        raise MissingInputError(str(error)) from error
+    if _is_all_scope(prefecture):
+        scoped = df.copy()
+        scoped["scope_prefecture"] = "Hokuriku"
+        scoped["scope_method"] = "all_prefectures_no_filter"
+    else:
+        try:
+            scoped = scope_rows_by_source_city_label(df, prefecture)
+        except MissingScopeColumnsError as error:
+            raise MissingInputError(str(error)) from error
 
     # Prepare Chinese rows for analysis: normalize sentiment scores and ensure
     # category/date-precision columns exist (fill missing with defaults)
@@ -308,7 +325,7 @@ def _review_sentiment_count_rows(sentiment_summary_path: Path, prefecture: str) 
             "sentiment_summary_path": str(sentiment_summary_path),
         }
     summary = pd.read_csv(sentiment_summary_path)
-    if "prefecture_normalized" in summary.columns:
+    if "prefecture_normalized" in summary.columns and not _is_all_scope(prefecture):
         summary = summary[summary["prefecture_normalized"].astype(str) == prefecture].copy()
     rows = []
     for _, item in summary.iterrows():
@@ -399,7 +416,12 @@ def _category_test_row(
         "observed": table.to_dict(),
         "denominators": {row["group"]: row["denominator"] for row in selected},
         "row_units": {row["group"]: row["row_unit"] for row in selected},
-        "interpretation": "Descriptive cross-source category-share comparison; source platforms and scoring tools differ.",
+        "interpretation": (
+            "Descriptive cross-source category-share comparison; source platforms and scoring tools differ. "
+            "Chinese (SnowNLP) sentiment categories are unvalidated on short text (~79% of Chinese 'negative' rows are 4-5 star), "
+            "so the Chinese negative_pct and category shares are NOT interpretable as sentiment and are retained only as a "
+            "descriptive, non-confirmatory artifact."
+        ),
         **(extra_details or {}),
     }
     if table.shape[0] < 2 or table.shape[1] < 2:
@@ -565,7 +587,7 @@ def _review_binary_count_rows(
             "sentiment_summary_path": str(sentiment_summary_path),
             "missing_column": count_column,
         }
-    if "prefecture_normalized" in summary.columns:
+    if "prefecture_normalized" in summary.columns and not _is_all_scope(prefecture):
         summary = summary[summary["prefecture_normalized"].astype(str) == prefecture].copy()
     rows = []
     for _, item in summary.iterrows():
@@ -835,6 +857,8 @@ def _write_readiness(report: dict, path: Path) -> None:
         "",
         "- Group membership is content language/source platform, not nationality.",
         "- Chinese sentiment uses SnowNLP as a secondary baseline; Google ratings are a separate measurement instrument.",
+        "- Chinese (SnowNLP) sentiment categories are unvalidated on short text: ~79% of Chinese 'negative' rows are 4-5 star, "
+        "so the Chinese negative_pct and category shares are NOT interpretable as sentiment and are retained only as a descriptive, non-confirmatory artifact.",
         "- Cross-source sentiment category tests compare platformed discourse categories, not direct visitor satisfaction.",
         "- Chinese social rows are Xiaohongshu notes by default; Google rows are reviews.",
         "- Neighboring prefectures remain scaffolded for later work, but current default output is Fukui-only.",
@@ -964,6 +988,7 @@ def build_cross_language_trends(
         caveats=[
             "Group membership is content language/source platform, not nationality.",
             "Chinese SnowNLP sentiment and Google review ratings are separate instruments.",
+            "Chinese (SnowNLP) sentiment categories are unvalidated on short text (~79% of Chinese 'negative' rows are 4-5 star); the Chinese negative_pct and category shares are NOT interpretable as sentiment and are retained only as a descriptive, non-confirmatory artifact.",
             "Cross-source sentiment category tests compare platformed discourse categories, not direct satisfaction.",
             "Cross-source friction/enjoyment tests use reviewed keyword evidence and are descriptive across source/platform contexts.",
             "Monthly trend output is disabled until Chinese post dates are exact enough.",

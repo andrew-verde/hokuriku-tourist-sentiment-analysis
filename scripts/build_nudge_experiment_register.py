@@ -275,7 +275,7 @@ def build_html() -> str:
     )
     H.append("<div class='wrap'><header class='masthead'>")
     H.append("<p><a class='jump-link' href='../PBL-Dashboard.html'>← Back to dashboard</a></p>")
-    H.append("<p class='eyebrow'>Fukui-First Nudge Opportunity Register</p>")
+    H.append("<p class='eyebrow'>Hokuriku Nudge Opportunity Register</p>")
     H.append("<h1>Next-semester experiments for high-impact nudge opportunities</h1>")
     H.append("<p class='standfirst'>Concrete exploratory tests derived from aggregate aspect and POI opportunity maps. These cards rank what to test next; they do not claim effectiveness.</p>")
     H.append("</header></div><main class='wrap'>")

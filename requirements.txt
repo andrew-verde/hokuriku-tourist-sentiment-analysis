@@ -6,6 +6,7 @@ pyyaml>=6.0
 pytest>=8.0
 openpyxl>=3.1
 snownlp>=0.12
+zhconv>=1.4
 vaderSentiment>=3.3
 
 # Optional, validation-only. The nudge opportunity analysis estimates aspect

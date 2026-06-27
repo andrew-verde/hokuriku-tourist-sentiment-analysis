@@ -1,0 +1,116 @@
+{
+  "schema_version": "research_provenance.v1",
+  "kind": "poi_nudge_opportunity_index",
+  "generated_at": "2026-06-27T07:33:18+00:00",
+  "command": "scripts/build_poi_opportunity_index.py --input output/multilingual_review_analysis/tagged_reviews_multilingual_chinese_folded.csv --output-dir output/nudge_analysis_chinese_folded",
+  "inputs": [
+    {
+      "role": "aspect_tagged_multilingual_reviews",
+      "path": "output/multilingual_review_analysis/tagged_reviews_multilingual_chinese_folded.csv",
+      "exists": true,
+      "bytes": 3660205,
+      "sha256": "015c05a465cc68556afddc41f6ab4ef33dd3a900177bbd815e40161c9e77061b"
+    }
+  ],
+  "outputs": [
+    {
+      "role": "aggregate_poi_opportunity_index",
+      "path": "output/nudge_analysis_chinese_folded/poi_opportunity_index.csv",
+      "exists": true,
+      "bytes": 152930,
+      "sha256": "8d8abcf2b473d2e16e861c2c57756bcc59afbaee8479fc0c3ed2c0d11ea426c0"
+    }
+  ],
+  "filters": {
+    "unit": "POI aggregate grouped internally by poi_id",
+    "published_key": [
+      "poi_name",
+      "poi_category",
+      "city",
+      "prefecture"
+    ],
+    "positive_share_definition": "review_rating >= 4",
+    "dominant_code_rule": "POI Wilson lower bound exceeds global base prevalence",
+    "membership_aspect_support_floor": 3,
+    "membership_driving_language_rule": "Each tied plurality language for positive aspect tags must have at least 10 reviews at the POI",
+    "promote_it_relaxed_rule": "n_reviews >= 10, n_reviews <= bottom-quartile cutoff, positive_share point estimate >= 0.85",
+    "promote_it_score": "positive_share * (1 + has_draw_signal) * (low_volume_threshold / n_reviews)",
+    "crowding_hotspot_rule": "high volume and waiting_crowding Wilson lower bound exceeds global base prevalence",
+    "nudgeable_friction_aspects": [
+      "english_information_gap",
+      "wayfinding_signage",
+      "transport_access",
+      "booking_ticketing",
+      "opening_hours_availability",
+      "itinerary_fit_time_cost"
+    ],
+    "promote_draw_aspects": [
+      "underpromoted_feature",
+      "scenic_value",
+      "worthwhile_destination"
+    ]
+  },
+  "metrics": {
+    "n_input_rows": 6036,
+    "n_pois_total": 80,
+    "n_pois_by_prefecture": {
+      "Fukui": 28,
+      "Ishikawa": 28,
+      "Toyama": 24
+    },
+    "n_low_confidence_pois": 4,
+    "n_fix_it": 11,
+    "n_promote_it": 7,
+    "n_promote_it_strict": 0,
+    "n_fix_it_fukui": 6,
+    "n_promote_it_fukui": 2,
+    "n_crowding_hotspots": 6,
+    "high_volume_threshold_n_reviews": 100.0,
+    "low_volume_threshold_n_reviews": 48,
+    "low_volume_quantile_raw": 47.75,
+    "low_confidence_threshold_n_reviews": 10,
+    "min_dominant_aspect_n_positive": 3,
+    "global_base_prevalence": {
+      "transport_access": 0.009111994698475812,
+      "wayfinding_signage": 0.0054671968190854875,
+      "english_information_gap": 0.003810470510271703,
+      "staff_communication": 0.0016567263088137839,
+      "booking_ticketing": 0.0066269052352551355,
+      "waiting_crowding": 0.03561961563949635,
+      "price_value": 0.0054671968190854875,
+      "cleanliness_comfort": 0.009443339960238568,
+      "opening_hours_availability": 0.015407554671968192,
+      "itinerary_fit_time_cost": 0.004307488402915839,
+      "accessibility_mobility": 0.04009277667329357,
+      "food_amenities_gap": 0.0006626905235255136,
+      "scenic_value": 0.052186878727634195,
+      "worthwhile_destination": 0.02468522200132538,
+      "friendly_service": 0.003810470510271703,
+      "underpromoted_feature": 0.0016567263088137839,
+      "easy_if_guided": 0.0019880715705765406,
+      "good_for_itinerary_bundle": 0.0001656726308813784
+    }
+  },
+  "caveats": [
+    "Exploratory and hypothesis-generating; not causal.",
+    "POI rows are aggregate-only and omit poi_id, review text, authors, URLs, and review IDs.",
+    "Positive share is rating-based and does not use sentiment-tool scores.",
+    "Promote-it is exploratory candidate-generation using point-estimate satisfaction; confidence intervals are reported as uncertainty, not used as a gate.",
+    "Review volume is capped by collection, so low-volume means bottom-quartile exposure rather than below-median volume.",
+    "Small-n POIs are flagged low_confidence; Wilson intervals are descriptive uncertainty bounds.",
+    "Dominant aspect codes use a conservative lift rule, not a formal multiple-comparison test.",
+    "Fix-it and strict promote-it membership require at least 3 positive aspect tags and exclude aspects plurality-driven by a language group with fewer than 10 reviews at that POI; all tied plurality languages must pass.",
+    "Fix-it and promote-it archetypes rank candidate follow-up work, not intervention effectiveness.",
+    "Groups describe review language when present in upstream data, not reviewer nationality."
+  ],
+  "extra": {
+    "dependency_versions": {
+      "pandas": "3.0.3",
+      "numpy": "2.4.6"
+    }
+  },
+  "dependency_versions": {
+    "pandas": "3.0.3",
+    "numpy": "2.4.6"
+  }
+}

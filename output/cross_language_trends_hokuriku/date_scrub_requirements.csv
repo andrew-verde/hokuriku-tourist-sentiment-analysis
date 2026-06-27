@@ -1,0 +1,4 @@
+source_kind,date_precision,count,pct_rows,usable_for_monthly_trends,scrub_required
+google_review,exact_or_provider_timestamp,4831,97.478,True,"Keep provider review_date, collection_date, POI metadata, and language filter hashes."
+google_review,missing_or_unparseable,125,2.522,False,Exclude or repair before monthly trend output.
+chinese_social_post,exact,243,100.0,True,Keep only rows with exact platform post dates for monthly trend output.

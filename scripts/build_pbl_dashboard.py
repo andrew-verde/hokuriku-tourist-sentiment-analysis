@@ -596,14 +596,14 @@ footer{padding:40px 0 80px;color:var(--muted);font-size:13.5px;
     # masthead
     H.append("<div class='wrap'><header class='masthead'>")
     H.append("<p class='eyebrow'>Fukui-First Cross-Language Tourism Text Analysis</p>")
-    H.append("<h1>Where to nudge next in Fukui tourism</h1>")
+    H.append("<h1>Where to nudge next in Hokuriku tourism</h1>")
     H.append(
-        "<p class='standfirst'>A Fukui-first opportunity map that turns cross-language "
+        "<p class='standfirst'>A Hokuriku-wide opportunity map that turns cross-language "
         "review evidence into exploratory nudge candidates for next-semester testing, "
         "with the older JP/EN measurement checks retained as appendix evidence.</p>"
     )
     H.append(
-        f"<div class='meta'>Scope: Fukui-first Hokuriku review cache &nbsp;|&nbsp; "
+        f"<div class='meta'>Scope: Hokuriku review cache (Fukui · Kanazawa · Toyama) &nbsp;|&nbsp; "
         f"{total_rows} tagged review records &nbsp;|&nbsp; "
         f"reviews input SHA256 <span title='sha256 of the scored hypothesis input'>{rev_sha[:16]}…</span><br>"
         f"CRITICAL: Every figure on this page is script-generated from analysis outputs; "
@@ -691,6 +691,11 @@ footer{padding:40px 0 80px;color:var(--muted);font-size:13.5px;
     H.append(
         "<div class='caveat'>Opportunity scores rank where to investigate next. They do not prove that a "
         "nudge will change behaviour; next-semester experiments would be needed for effectiveness claims.</div>"
+    )
+    H.append(
+        "<div class='caveat'>Per-POI Chinese friction is keyword topic-presence (a topic was mentioned), not polarity "
+        "(a problem occurred), and is thin (median ~3 reviews/POI) with human validation pending — so any "
+        "Chinese-driven POI candidate above is directional only.</div>"
     )
     H.append("</section>")
 
@@ -1000,8 +1005,8 @@ footer{padding:40px 0 80px;color:var(--muted);font-size:13.5px;
     H.append("<h3 style='font-size:20px;font-weight:600;margin:22px 0 6px'>Limitations</h3>")
     H.append("<dl class='dl'>")
     H.append(
-        "<dt>Sample &amp; scope</dt><dd>A Fukui-only convenience cache (Outscraper-derived Google reviews; "
-        "a single external Chinese checkout). No claim of national or all-Japan representativeness.</dd>"
+        "<dt>Sample &amp; scope</dt><dd>A Hokuriku convenience cache (Outscraper-derived Google reviews across "
+        "Fukui, Kanazawa, and Toyama; plus external Chinese-language sources). No claim of national or all-Japan representativeness.</dd>"
     )
     H.append(
         f"<dt>Statistical power</dt><dd>The venue-controlled paired test rests on only {wp_pairs} shared POIs; "

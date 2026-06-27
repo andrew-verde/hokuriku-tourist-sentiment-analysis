@@ -5,41 +5,39 @@
 <line x1="98.00" x2="98.00" y1="90.00" y2="492.00" stroke="#d7dde8" opacity="0.55"/>
 <text x="98.00" y="515.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="17" font-weight="400" fill="#5b677a">0.0%</text>
 <line x1="571.00" x2="571.00" y1="90.00" y2="492.00" stroke="#d7dde8" opacity="0.55"/>
-<text x="571.00" y="515.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="17" font-weight="400" fill="#5b677a">2.9%</text>
+<text x="571.00" y="515.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="17" font-weight="400" fill="#5b677a">2.7%</text>
 <line x1="1044.00" x2="1044.00" y1="90.00" y2="492.00" stroke="#d7dde8" opacity="0.55"/>
-<text x="1044.00" y="515.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="17" font-weight="400" fill="#5b677a">5.7%</text>
+<text x="1044.00" y="515.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="17" font-weight="400" fill="#5b677a">5.5%</text>
 <line x1="98.00" x2="1044.00" y1="492.00" y2="492.00" stroke="#d7dde8" opacity="0.55"/>
 <text x="86.00" y="498.00" text-anchor="end" font-family="Arial, sans-serif" font-size="17" font-weight="400" fill="#5b677a">0</text>
-<line x1="98.00" x2="1044.00" y1="456.50" y2="456.50" stroke="#d7dde8" opacity="0.55"/>
-<text x="86.00" y="462.50" text-anchor="end" font-family="Arial, sans-serif" font-size="17" font-weight="400" fill="#5b677a">1</text>
-<line x1="98.00" x2="1044.00" y1="421.01" y2="421.01" stroke="#d7dde8" opacity="0.55"/>
-<text x="86.00" y="427.01" text-anchor="end" font-family="Arial, sans-serif" font-size="17" font-weight="400" fill="#5b677a">2</text>
-<line x1="98.00" x2="1044.00" y1="350.01" y2="350.01" stroke="#d7dde8" opacity="0.55"/>
-<text x="86.00" y="356.01" text-anchor="end" font-family="Arial, sans-serif" font-size="17" font-weight="400" fill="#5b677a">4</text>
-<line x1="98.00" x2="1044.00" y1="279.02" y2="279.02" stroke="#d7dde8" opacity="0.55"/>
-<text x="86.00" y="285.02" text-anchor="end" font-family="Arial, sans-serif" font-size="17" font-weight="400" fill="#5b677a">6</text>
-<line x1="98.00" x2="1044.00" y1="208.02" y2="208.02" stroke="#d7dde8" opacity="0.55"/>
-<text x="86.00" y="214.02" text-anchor="end" font-family="Arial, sans-serif" font-size="17" font-weight="400" fill="#5b677a">8</text>
-<line x1="98.00" x2="1044.00" y1="137.03" y2="137.03" stroke="#d7dde8" opacity="0.55"/>
-<text x="86.00" y="143.03" text-anchor="end" font-family="Arial, sans-serif" font-size="17" font-weight="400" fill="#5b677a">10</text>
-<line x1="98.00" x2="1044.00" y1="456.50" y2="456.50" stroke="#9a031e" stroke-dasharray="6 5" stroke-width="1.7"/>
-<text x="1040.00" y="447.50" text-anchor="end" font-family="Arial, sans-serif" font-size="17" font-weight="400" fill="#9a031e">OR=1 reference</text>
-<circle cx="224.94" cy="451.59" r="5.00" fill="#fbfaf7" stroke="#8d99ae" stroke-width="2" opacity="0.35"/>
-<circle cx="191.53" cy="428.08" r="5.00" fill="#fbfaf7" stroke="#8d99ae" stroke-width="2" opacity="0.35"/>
-<circle cx="174.83" cy="448.85" r="5.00" fill="#fbfaf7" stroke="#8d99ae" stroke-width="2" opacity="0.35"/>
-<circle cx="208.23" cy="432.95" r="5.00" fill="#fbfaf7" stroke="#8d99ae" stroke-width="2" opacity="0.35"/>
-<circle cx="799.48" cy="449.51" r="5.00" fill="#fbfaf7" stroke="#8d99ae" stroke-width="2" opacity="0.35"/>
-<circle cx="111.36" cy="404.43" r="5.00" fill="#fbfaf7" stroke="#8d99ae" stroke-width="2" opacity="0.35"/>
-<circle cx="131.40" cy="301.71" r="7.50" fill="#9a031e" stroke="#9a031e" stroke-width="2" opacity="0.90"/>
-<circle cx="194.87" cy="133.07" r="7.50" fill="#9a031e" stroke="#9a031e" stroke-width="2" opacity="0.90"/>
-<text x="207.87" y="123.07" text-anchor="start" font-family="Arial, sans-serif" font-size="17" font-weight="700" fill="#172033">price value</text>
-<circle cx="278.38" cy="408.49" r="7.50" fill="#9a031e" stroke="#9a031e" stroke-width="2" opacity="0.90"/>
-<text x="291.38" y="398.49" text-anchor="start" font-family="Arial, sans-serif" font-size="17" font-weight="700" fill="#172033">cleanliness comfort</text>
-<circle cx="405.32" cy="363.80" r="7.50" fill="#9a031e" stroke="#9a031e" stroke-width="2" opacity="0.90"/>
-<text x="418.32" y="353.80" text-anchor="start" font-family="Arial, sans-serif" font-size="17" font-weight="700" fill="#172033">opening hours availability</text>
-<circle cx="184.85" cy="341.54" r="7.50" fill="#9a031e" stroke="#9a031e" stroke-width="2" opacity="0.90"/>
-<text x="197.85" y="331.54" text-anchor="start" font-family="Arial, sans-serif" font-size="17" font-weight="700" fill="#172033">itinerary fit time cost</text>
-<circle cx="899.69" cy="464.90" r="7.50" fill="#9a031e" stroke="#9a031e" stroke-width="2" opacity="0.90"/>
+<line x1="98.00" x2="1044.00" y1="450.10" y2="450.10" stroke="#d7dde8" opacity="0.55"/>
+<text x="86.00" y="456.10" text-anchor="end" font-family="Arial, sans-serif" font-size="17" font-weight="400" fill="#5b677a">1</text>
+<line x1="98.00" x2="1044.00" y1="408.21" y2="408.21" stroke="#d7dde8" opacity="0.55"/>
+<text x="86.00" y="414.21" text-anchor="end" font-family="Arial, sans-serif" font-size="17" font-weight="400" fill="#5b677a">2</text>
+<line x1="98.00" x2="1044.00" y1="324.42" y2="324.42" stroke="#d7dde8" opacity="0.55"/>
+<text x="86.00" y="330.42" text-anchor="end" font-family="Arial, sans-serif" font-size="17" font-weight="400" fill="#5b677a">4</text>
+<line x1="98.00" x2="1044.00" y1="240.63" y2="240.63" stroke="#d7dde8" opacity="0.55"/>
+<text x="86.00" y="246.63" text-anchor="end" font-family="Arial, sans-serif" font-size="17" font-weight="400" fill="#5b677a">6</text>
+<line x1="98.00" x2="1044.00" y1="156.84" y2="156.84" stroke="#d7dde8" opacity="0.55"/>
+<text x="86.00" y="162.84" text-anchor="end" font-family="Arial, sans-serif" font-size="17" font-weight="400" fill="#5b677a">8</text>
+<line x1="98.00" x2="1044.00" y1="450.10" y2="450.10" stroke="#9a031e" stroke-dasharray="6 5" stroke-width="1.7"/>
+<text x="1040.00" y="441.10" text-anchor="end" font-family="Arial, sans-serif" font-size="17" font-weight="400" fill="#9a031e">OR=1 reference</text>
+<circle cx="280.20" cy="452.16" r="5.00" fill="#fbfaf7" stroke="#8d99ae" stroke-width="2" opacity="0.35"/>
+<circle cx="174.19" cy="440.84" r="5.00" fill="#fbfaf7" stroke="#8d99ae" stroke-width="2" opacity="0.35"/>
+<circle cx="230.51" cy="424.51" r="5.00" fill="#fbfaf7" stroke="#8d99ae" stroke-width="2" opacity="0.35"/>
+<circle cx="111.25" cy="388.11" r="5.00" fill="#fbfaf7" stroke="#8d99ae" stroke-width="2" opacity="0.35"/>
+<circle cx="207.32" cy="402.24" r="7.50" fill="#9a031e" stroke="#9a031e" stroke-width="2" opacity="0.90"/>
+<circle cx="131.13" cy="267.32" r="7.50" fill="#9a031e" stroke="#9a031e" stroke-width="2" opacity="0.90"/>
+<circle cx="810.25" cy="436.05" r="7.50" fill="#9a031e" stroke="#9a031e" stroke-width="2" opacity="0.90"/>
+<circle cx="207.32" cy="133.07" r="7.50" fill="#9a031e" stroke="#9a031e" stroke-width="2" opacity="0.90"/>
+<text x="220.32" y="123.07" text-anchor="start" font-family="Arial, sans-serif" font-size="17" font-weight="700" fill="#172033">price value</text>
+<circle cx="286.83" cy="382.91" r="7.50" fill="#9a031e" stroke="#9a031e" stroke-width="2" opacity="0.90"/>
+<text x="299.83" y="372.91" text-anchor="start" font-family="Arial, sans-serif" font-size="17" font-weight="700" fill="#172033">cleanliness comfort</text>
+<circle cx="406.09" cy="336.37" r="7.50" fill="#9a031e" stroke="#9a031e" stroke-width="2" opacity="0.90"/>
+<text x="419.09" y="326.37" text-anchor="start" font-family="Arial, sans-serif" font-size="17" font-weight="700" fill="#172033">opening hours availability</text>
+<circle cx="184.13" cy="314.89" r="7.50" fill="#9a031e" stroke="#9a031e" stroke-width="2" opacity="0.90"/>
+<text x="197.13" y="304.89" text-anchor="start" font-family="Arial, sans-serif" font-size="17" font-weight="700" fill="#172033">itinerary fit time cost</text>
+<circle cx="899.69" cy="460.47" r="7.50" fill="#9a031e" stroke="#9a031e" stroke-width="2" opacity="0.90"/>
 <text x="571.00" y="531.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="20" font-weight="700" fill="#172033">Pooled prevalence of aspect code</text>
 <text x="24.00" y="291.00" transform="rotate(-90 24.00 291.00)" text-anchor="middle" font-family="Arial, sans-serif" font-size="20" font-weight="700" fill="#172033">Adjusted odds ratio for low rating</text>
 <rect x="98.00" y="550.00" width="14" height="14" fill="#9a031e"/>

@@ -1,15 +1,15 @@
 {
   "schema_version": "research_provenance.v1",
   "kind": "nudge_aspect_opportunity_analysis",
-  "generated_at": "2026-06-25T08:11:52+00:00",
+  "generated_at": "2026-06-27T10:13:14+00:00",
   "command": "scripts/build_nudge_opportunity_analysis.py",
   "inputs": [
     {
       "role": "aspect_tagged_multilingual_reviews",
-      "path": "output/multilingual_review_analysis/tagged_reviews_multilingual.csv",
+      "path": "output/multilingual_review_analysis/tagged_reviews_multilingual_chinese_folded.csv",
       "exists": true,
-      "bytes": 4122603,
-      "sha256": "cca5c56d5a59ef0b582cf9eaea7c817cbc87aac6c2066658a3517affd1a6bcea"
+      "bytes": 3660205,
+      "sha256": "015c05a465cc68556afddc41f6ab4ef33dd3a900177bbd815e40161c9e77061b"
     },
     {
       "role": "jp_en_fukui_row_level_sentiment_for_secondary_join",
@@ -24,8 +24,8 @@
       "role": "aggregate_nudge_aspect_opportunity_map",
       "path": "output/nudge_analysis/aspect_opportunity_map.csv",
       "exists": true,
-      "bytes": 32806,
-      "sha256": "8b04ba275f24c2ab07cc065a27d3890312916b995c5bc4759ac30a7e388b058d"
+      "bytes": 38228,
+      "sha256": "2bee5c6bba559106e3e608ebe23a949721275d326328f98f00cc8144e29dc571"
     }
   ],
   "filters": {
@@ -55,15 +55,16 @@
     "tagged_input_rows": 6036,
     "tagged_language_group_counts": {
       "japanese": 4037,
-      "other_non_english_non_japanese": 1040,
       "english": 919,
+      "other_non_english_non_japanese": 797,
+      "chinese": 243,
       "undetected_or_too_short": 40
     },
-    "primary_supported_language_rows": 4956,
-    "dropped_unsupported_language_rows": 1080,
+    "primary_supported_language_rows": 5199,
+    "dropped_unsupported_language_rows": 837,
     "dropped_missing_rating_primary_rows": 0,
-    "primary_model_rows": 4956,
-    "primary_low_rating_rows": 821,
+    "primary_model_rows": 5199,
+    "primary_low_rating_rows": 851,
     "secondary_sentiment_input_rows": 2014,
     "secondary_join_rows": 2014,
     "secondary_unmatched_sentiment_rows": 0,
@@ -82,40 +83,41 @@
     "A_secondary_jp_negative_rows": 132,
     "A_secondary_jp_models_fit": 11,
     "A_secondary_jp_models_skipped": 7,
-    "C_inbound_rows": 919,
+    "C_inbound_rows": 1162,
     "C_inbound_languages_present": [
-      "english"
+      "english",
+      "chinese"
     ],
     "C_inbound_models_fit": 3,
     "C_inbound_models_skipped": 0,
     "synthetic_zero_cell_firth_or": 0.11111133453484588,
     "plain_vs_firth_sanity": {
       "opening_hours_availability": {
-        "firth_or": 3.6114751032793024,
-        "plain_logit_or": 3.6018053066718756,
-        "log_abs_diff": 0.0026811109094222463
+        "firth_or": 3.7146940077350497,
+        "plain_logit_or": 3.70642895072441,
+        "log_abs_diff": 0.002227441985305667
       },
       "price_value": {
-        "firth_or": 10.11146321617655,
-        "plain_logit_or": 10.335263608654875,
-        "log_abs_diff": 0.02189194705729669
+        "firth_or": 8.567230155184449,
+        "plain_logit_or": 8.699383905934672,
+        "log_abs_diff": 0.015307729803559766
       },
       "cleanliness_comfort": {
-        "firth_or": 2.3526909832164793,
-        "plain_logit_or": 2.3197062445877705,
-        "log_abs_diff": 0.014119213321836965
+        "firth_or": 2.6038128157486917,
+        "plain_logit_or": 2.574975860438152,
+        "log_abs_diff": 0.01113667892492154
       },
       "itinerary_fit_time_cost": {
-        "firth_or": 4.2386943259218235,
-        "plain_logit_or": 4.201122019914334,
-        "log_abs_diff": 0.008903642610015083
+        "firth_or": 4.227432004187145,
+        "plain_logit_or": 4.1898051046819305,
+        "log_abs_diff": 0.008940499038491367
       }
     },
     "max_abs_ln_or": 4.074775181622501,
-    "min_model_p_value": 1.109461464879819e-09,
+    "min_model_p_value": 1.869821383330454e-09,
     "status_counts": {
+      "prevalence_only": 60,
       "ok": 47,
-      "prevalence_only": 39,
       "skipped": 10
     },
     "ci_method_counts": {
@@ -123,7 +125,7 @@
     },
     "total_firth_fit_rows": 47,
     "total_firth_non_converged_or_unstable_rows": 0,
-    "total_output_rows": 96,
+    "total_output_rows": 117,
     "total_models_fit": 47,
     "total_models_skipped": 10
   },

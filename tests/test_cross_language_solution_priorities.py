@@ -45,7 +45,10 @@ def test_real_aggregate_inputs_rank_expected_solutions(tmp_path):
     assert priorities["rank"].tolist() == [1, 2, 3]
     assert priorities["language_support_count"].eq(3).all()
     assert priorities["support_rule"].eq("all_three").all()
-    assert priorities["impact_tier"].tolist() == ["High", "High", "Medium"]
+    # off_peak_alternative_prompt rose Medium->High once Chinese Google reviews were
+    # folded in at POI level: their crowding evidence (人擠人 / 全是人 / 遊客很多) raises
+    # the off-peak prompt's impact tier.
+    assert priorities["impact_tier"].tolist() == ["High", "High", "High"]
     assert priorities["ease_tier"].tolist() == ["Easy", "Moderate", "Harder"]
     assert len(evidence) == 9
     assert set(evidence["language_source_group"]) == {"english", "japanese", "chinese"}

@@ -1,8 +1,8 @@
 {
   "schema_version": "research_provenance.v1",
   "kind": "hypothesis_h2_review_rating_jp_en",
-  "generated_at": "2026-06-25T08:10:57+00:00",
-  "command": "scripts/test_h2_review_rating_jp_en.py",
+  "generated_at": "2026-06-27T05:17:36+00:00",
+  "command": "scripts/test_h2_review_rating_jp_en.py --input output/sentiment_row_level/google_reviews_fukui_japanese-english.csv --output-dir output/hypothesis_tests",
   "inputs": [
     {
       "role": "ignored_scored_review_audit_file",
@@ -17,8 +17,8 @@
       "role": "tracked_hypothesis_test_csv",
       "path": "output/hypothesis_tests/h2_review_rating_jp_en.csv",
       "exists": true,
-      "bytes": 6835,
-      "sha256": "2939d78efe5790e9de50627df23bb392fd0bd16404967eee4cf7b8980ff98800"
+      "bytes": 7519,
+      "sha256": "b0dbb1670d42d1bf2c52452b14c37958af6757bf0bca6cc1847e68c9842d791b"
     }
   ],
   "filters": {

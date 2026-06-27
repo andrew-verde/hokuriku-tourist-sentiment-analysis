@@ -1,7 +1,7 @@
 PYTHON = .venv/bin/python3
 PBL_SITE ?= $(HOME)/pbl-site
 
-.PHONY: help test chinese-codebook-template reviewed-codebook-config reviewed-codebook-status chinese-social chinese-social-xhs-only chinese-social-with-douyin chinese-insights chinese-insights-xhs-only multilingual-reviews cross-language-trends sentiment-env sentiment-analysis hypothesis-h1 hypothesis-h2 hypothesis-h3 hypothesis-within-poi hypothesis-tests nudge-analysis poi-opportunity nudge-priorities nudge-figures nudge-register nudge-all within-en-sentiment within-jp-sentiment within-cn-sentiment within-language-sentiment presentation-safe statistical-test-figures dashboard nudge-slides nudge-pptx deploy
+.PHONY: help test chinese-codebook-template reviewed-codebook-config reviewed-codebook-status chinese-social chinese-social-xhs-only chinese-social-with-douyin chinese-insights chinese-insights-xhs-only multilingual-reviews chinese-folded-multilingual cross-language-trends sentiment-env sentiment-analysis hypothesis-h1 hypothesis-h2 hypothesis-h3 hypothesis-within-poi hypothesis-tests nudge-analysis poi-opportunity poi-opportunity-chinese-folded nudge-priorities nudge-figures nudge-register nudge-all within-en-sentiment within-jp-sentiment within-cn-sentiment within-language-sentiment presentation-safe statistical-test-figures dashboard nudge-slides nudge-pptx deploy chinese-google-reviews sentiment-analysis-hokuriku hypothesis-tests-hokuriku cross-language-trends-hokuriku cn-anchor-figure hokuriku-all
 
 help:
 	@echo "Hokuriku tourist sentiment analysis"
@@ -15,6 +15,7 @@ help:
 	@echo "  make chinese-insights        Build tracked Chinese-specific figure/data outputs"
 	@echo "  make chinese-insights-xhs-only Build labeled XHS-only figure/data outputs"
 	@echo "  make multilingual-reviews    Sync local Google review data from english-fukui-tourism"
+	@echo "  make chinese-folded-multilingual Promote Chinese Google reviews in copied multilingual output"
 	@echo "  make cross-language-trends   Build Fukui-first EN/JP/CN baseline tables"
 	@echo "  make sentiment-env           Install pinned JP-EN sentiment runtime"
 	@echo "  make sentiment-analysis      Build JP-EN sentiment aggregate outputs"
@@ -25,6 +26,7 @@ help:
 	@echo "  make hypothesis-tests        Run H1, H2, H3, and within-POI robustness scripts"
 	@echo "  make nudge-analysis          Build aggregate aspect nudge opportunity map"
 	@echo "  make poi-opportunity         Build aggregate POI nudge opportunity index"
+	@echo "  make poi-opportunity-chinese-folded Build POI index from Chinese-folded multilingual output"
 	@echo "  make nudge-priorities        Rank cross-language solution families"
 	@echo "  make nudge-figures           Build aggregate nudge opportunity SVG figures"
 	@echo "  make nudge-register          Build HTML next-semester nudge experiment register"
@@ -68,8 +70,35 @@ chinese-insights-xhs-only:
 multilingual-reviews:
 	$(PYTHON) scripts/sync_google_review_data.py
 
+chinese-folded-multilingual:
+	$(PYTHON) scripts/build_chinese_folded_multilingual.py
+
 cross-language-trends:
 	$(PYTHON) scripts/build_cross_language_trends.py
+
+# --- Hokuriku-wide (region-wide) parallel runs, alongside the Fukui defaults ---
+chinese-google-reviews:
+	$(PYTHON) scripts/build_chinese_google_reviews_dataset.py
+
+sentiment-analysis-hokuriku:
+	$(PYTHON) scripts/build_sentiment_analysis.py --groups japanese,english --prefecture "" --aggregate-output-dir output/sentiment_aggregates_hokuriku
+
+hypothesis-tests-hokuriku: sentiment-analysis-hokuriku
+	$(PYTHON) scripts/test_h1_sentiment_category_jp_en.py --input output/sentiment_row_level/google_reviews_all_japanese-english.csv --output-dir output/hypothesis_tests_hokuriku
+	$(PYTHON) scripts/test_h2_review_rating_jp_en.py --input output/sentiment_row_level/google_reviews_all_japanese-english.csv --output-dir output/hypothesis_tests_hokuriku
+	$(PYTHON) scripts/test_h3_reviewed_evidence_jp_en.py --input output/sentiment_row_level/google_reviews_all_japanese-english.csv --output-dir output/hypothesis_tests_hokuriku
+
+cross-language-trends-hokuriku: chinese-google-reviews sentiment-analysis-hokuriku
+	$(PYTHON) scripts/build_cross_language_trends.py --prefecture Hokuriku \
+	  --reviews-path output/multilingual_review_analysis/reviews_multilingual.csv \
+	  --chinese-path output/chinese_google_reviews_analysis/tagged_chinese_google_reviews.csv \
+	  --sentiment-summary-path output/sentiment_aggregates_hokuriku/source_group_sentiment_summary.csv \
+	  --output-dir output/cross_language_trends_hokuriku
+
+cn-anchor-figure: cross-language-trends-hokuriku
+	$(PYTHON) scripts/build_cn_anchor_comparison_figure.py
+
+hokuriku-all: hypothesis-tests-hokuriku cross-language-trends-hokuriku cn-anchor-figure
 
 sentiment-env:
 	$(PYTHON) scripts/bootstrap_sentiment_environment.py
@@ -91,11 +120,14 @@ hypothesis-within-poi:
 
 hypothesis-tests: hypothesis-h1 hypothesis-h2 hypothesis-h3 hypothesis-within-poi
 
-nudge-analysis:
+nudge-analysis: chinese-folded-multilingual
 	$(PYTHON) scripts/build_nudge_opportunity_analysis.py
 
-poi-opportunity:
+poi-opportunity: chinese-folded-multilingual
 	$(PYTHON) scripts/build_poi_opportunity_index.py
+
+poi-opportunity-chinese-folded: chinese-folded-multilingual
+	$(PYTHON) scripts/build_poi_opportunity_index.py --input output/multilingual_review_analysis/tagged_reviews_multilingual_chinese_folded.csv --output-dir output/nudge_analysis_chinese_folded
 
 nudge-figures:
 	$(PYTHON) scripts/build_nudge_figures.py

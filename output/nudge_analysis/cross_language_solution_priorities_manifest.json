@@ -1,7 +1,7 @@
 {
   "schema_version": "research_provenance.v1",
   "kind": "cross_language_solution_priorities",
-  "generated_at": "2026-06-27T03:21:42+00:00",
+  "generated_at": "2026-06-27T10:13:15+00:00",
   "command": "scripts/build_cross_language_solution_priorities.py",
   "inputs": [
     {
@@ -15,15 +15,15 @@
       "role": "review aspect opportunity aggregates",
       "path": "output/nudge_analysis/aspect_opportunity_map.csv",
       "exists": true,
-      "bytes": 32806,
-      "sha256": "8b04ba275f24c2ab07cc065a27d3890312916b995c5bc4759ac30a7e388b058d"
+      "bytes": 38228,
+      "sha256": "2bee5c6bba559106e3e608ebe23a949721275d326328f98f00cc8144e29dc571"
     },
     {
       "role": "reviewed JP-EN evidence aggregates",
       "path": "output/hypothesis_tests/h3_reviewed_evidence_jp_en.csv",
       "exists": true,
       "bytes": 7313,
-      "sha256": "94e7d871bdbbd3194985e1e72a6aa3cfa5900a0962a7b66e13b5caea1144a70b"
+      "sha256": "ec6b3edf3ed0e0549c468466ff4063c981d96b0243366b3c5ff071acc376e60f"
     },
     {
       "role": "reviewed Chinese friction aggregates",
@@ -44,7 +44,7 @@
       "path": "output/within_language_sentiment/cn_within_source_sentiment_drivers.csv",
       "exists": true,
       "bytes": 35073,
-      "sha256": "359b96eb767b3551becce2fc899d3253d83627494d627826f5df161b982678bc"
+      "sha256": "adf1dff95f670b8fec376f8973fe621c9e801e0dfc195d60186720da3175becd"
     }
   ],
   "outputs": [
@@ -52,15 +52,15 @@
       "role": "ranked aggregate priorities",
       "path": "output/nudge_analysis/cross_language_solution_priorities.csv",
       "exists": true,
-      "bytes": 4134,
-      "sha256": "d2cc802fcc854e1b7b34c54b8a22eeea34820c5cbcf95bb520b04aa5ed13a837"
+      "bytes": 4783,
+      "sha256": "5414bc9066a2b55ba0419d01b9c20a1127c91d8fffcf1a15a5f5abfac8d2d5d0"
     },
     {
       "role": "source-specific aggregate evidence",
       "path": "output/nudge_analysis/cross_language_solution_evidence.csv",
       "exists": true,
       "bytes": 2450,
-      "sha256": "edf732f66eebd08c11acb3f965a48b7482f653f4246d7bf966a0682b60baf375"
+      "sha256": "e74399014c75af9d530b370b9ea87d70210c0374cb9a70f2160b3a1865ab9e34"
     }
   ],
   "filters": {

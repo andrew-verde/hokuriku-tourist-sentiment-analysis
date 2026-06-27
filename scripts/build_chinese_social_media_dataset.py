@@ -23,6 +23,7 @@ from pathlib import Path
 
 import pandas as pd
 import yaml
+from zhconv import convert
 from dotenv import load_dotenv
 from scipy import stats
 
@@ -197,6 +198,12 @@ def load_chinese_codebook(
         # Reviewed rows supersede YAML terms for matching codes. This preserves
         # delete/FIX decisions instead of appending reviewed terms onto stale YAML.
         codebook.update(reviewed)
+    for attrs in codebook.values():
+        keywords = attrs["keywords"]
+        attrs["keywords"] = list(dict.fromkeys([
+            *keywords,
+            *(convert(keyword, "zh-hant") for keyword in keywords),
+        ]))
     return codebook
 
 

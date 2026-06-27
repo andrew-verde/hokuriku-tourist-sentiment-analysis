@@ -53,7 +53,9 @@ from src.provenance import file_record, research_manifest, write_json  # noqa: E
 
 
 ROOT = Path(__file__).resolve().parent.parent
-TAGGED_INPUT = ROOT / "output" / "multilingual_review_analysis" / "tagged_reviews_multilingual.csv"
+# Analysis reads the Chinese-folded tagged file (zh promoted to language_group='chinese');
+# produced by build_chinese_folded_multilingual.py from the synced tagged_reviews_multilingual.csv.
+TAGGED_INPUT = ROOT / "output" / "multilingual_review_analysis" / "tagged_reviews_multilingual_chinese_folded.csv"
 SENTIMENT_INPUT = ROOT / "output" / "sentiment_row_level" / "google_reviews_fukui_japanese-english.csv"
 OUTPUT_DIR = ROOT / "output" / "nudge_analysis"
 OUTPUT_CSV = OUTPUT_DIR / "aspect_opportunity_map.csv"

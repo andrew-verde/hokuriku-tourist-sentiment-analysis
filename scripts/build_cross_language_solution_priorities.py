@@ -391,7 +391,10 @@ def build_cross_language_solution_priorities(
                 "evidence_caveat": (
                     "Source-specific aggregate evidence only. Chinese-language XHS posts have no "
                     "star rating. SnowNLP associations are within XHS only. No cross-tool score "
-                    "comparison or causal claim."
+                    "comparison or causal claim. Chinese friction/topic codes are keyword "
+                    "topic-presence (a topic was mentioned), not polarity or severity, so where "
+                    "the impact tier relies on Chinese language-support it is directional, not "
+                    "confirmatory."
                 ),
                 "command": command,
                 "generated_at": generated_at,

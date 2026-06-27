@@ -1,0 +1,10 @@
+prefecture,city,group,source_kind,volume,rating_mean,sentiment_norm_mean,positive_pct,neutral_pct,negative_pct
+Hokuriku,Fukui,chinese_social_google_review,chinese_social_post,42,,0.57547,61.905,0.0,38.095
+Hokuriku,Fukui,english,google_review,214,4.5327,,,,
+Hokuriku,Fukui,japanese,google_review,1800,4.2617,,,,
+Hokuriku,Kanazawa,chinese_social_google_review,chinese_social_post,113,,0.630775,64.602,0.0,35.398
+Hokuriku,Kanazawa,english,google_review,536,4.4291,,,,
+Hokuriku,Kanazawa,japanese,google_review,1050,4.2238,,,,
+Hokuriku,Toyama,chinese_social_google_review,chinese_social_post,88,,0.650836,67.045,4.545,28.409
+Hokuriku,Toyama,english,google_review,169,4.6213,,,,
+Hokuriku,Toyama,japanese,google_review,1187,4.2982,,,,

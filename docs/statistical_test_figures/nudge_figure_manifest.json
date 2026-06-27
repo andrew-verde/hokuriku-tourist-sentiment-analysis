@@ -1,22 +1,22 @@
 {
   "schema_version": "research_provenance.v1",
   "kind": "nudge_figure_pack",
-  "generated_at": "2026-06-27T01:19:04+00:00",
+  "generated_at": "2026-06-27T07:33:30+00:00",
   "command": "scripts/build_nudge_figures.py",
   "inputs": [
     {
       "role": "aspect_opportunity_map",
       "path": "output/nudge_analysis/aspect_opportunity_map.csv",
       "exists": true,
-      "bytes": 32806,
-      "sha256": "8b04ba275f24c2ab07cc065a27d3890312916b995c5bc4759ac30a7e388b058d"
+      "bytes": 38228,
+      "sha256": "ba88feda4285ac2541d48b7676b5a8187831a2185e1eda70e49776e1e43898d6"
     },
     {
       "role": "poi_opportunity_index",
       "path": "output/nudge_analysis/poi_opportunity_index.csv",
       "exists": true,
-      "bytes": 149843,
-      "sha256": "d3f5b6ac4f1715f15ae497861c670b01e44842c6b44b21c9cb6c2aaf4584fe6f"
+      "bytes": 152930,
+      "sha256": "8d8abcf2b473d2e16e861c2c57756bcc59afbaee8479fc0c3ed2c0d11ea426c0"
     }
   ],
   "outputs": [
@@ -38,22 +38,22 @@
       "role": "nudge_figure_figure_nudge_aspect_opportunity_map",
       "path": "docs/statistical_test_figures/figure_nudge_aspect_opportunity_map.svg",
       "exists": true,
-      "bytes": 5975,
-      "sha256": "5e8f0ad4f2739c00289519700be3bf0cbc6f7c6d4e42c4d56fa250800c7a5984"
+      "bytes": 5752,
+      "sha256": "bffdd14343ca10227f1b6699ed813c021ef9bfe9692d383986dafc142f1c281e"
     },
     {
       "role": "nudge_figure_figure_nudge_poi_action_map",
       "path": "docs/statistical_test_figures/figure_nudge_poi_action_map.svg",
       "exists": true,
-      "bytes": 25960,
-      "sha256": "0cdf66e446c1c37d29ff37433eba12ed9e90a591fddab6141fe3ffead52aeaa7"
+      "bytes": 26396,
+      "sha256": "1c936e9db3fe1bc5a72f9bb2e64c185de42771416fe28be7b52b089790142590"
     },
     {
       "role": "nudge_figure_figure_nudge_info_levers",
       "path": "docs/statistical_test_figures/figure_nudge_info_levers.svg",
       "exists": true,
-      "bytes": 5949,
-      "sha256": "c717d883b39e4674d05de0b90a33235e2321d0ea82a89d0555210389abd2c66b"
+      "bytes": 5951,
+      "sha256": "a1b0deda3c4e04adf22022dfdcbf93b76d7501c801ab0a1c7d3280c5522ded02"
     }
   ],
   "filters": {

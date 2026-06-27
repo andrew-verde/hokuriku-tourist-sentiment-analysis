@@ -1,7 +1,7 @@
 {
   "schema_version": "research_provenance.v1",
   "kind": "hypothesis_within_poi_paired_jp_en",
-  "generated_at": "2026-06-25T08:10:58+00:00",
+  "generated_at": "2026-06-27T05:17:38+00:00",
   "command": "scripts/test_within_poi_paired_jp_en.py",
   "inputs": [
     {
