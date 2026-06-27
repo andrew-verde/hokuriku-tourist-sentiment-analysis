@@ -1,7 +1,7 @@
 PYTHON = .venv/bin/python3
 PBL_SITE ?= $(HOME)/pbl-site
 
-.PHONY: help test chinese-codebook-template reviewed-codebook-config reviewed-codebook-status chinese-social chinese-social-xhs-only chinese-social-with-douyin chinese-insights chinese-insights-xhs-only multilingual-reviews cross-language-trends sentiment-env sentiment-analysis hypothesis-h1 hypothesis-h2 hypothesis-h3 hypothesis-within-poi hypothesis-tests nudge-analysis poi-opportunity nudge-figures nudge-register nudge-all within-en-sentiment within-jp-sentiment within-cn-sentiment within-language-sentiment presentation-safe statistical-test-figures dashboard deploy
+.PHONY: help test chinese-codebook-template reviewed-codebook-config reviewed-codebook-status chinese-social chinese-social-xhs-only chinese-social-with-douyin chinese-insights chinese-insights-xhs-only multilingual-reviews cross-language-trends sentiment-env sentiment-analysis hypothesis-h1 hypothesis-h2 hypothesis-h3 hypothesis-within-poi hypothesis-tests nudge-analysis poi-opportunity nudge-figures nudge-register nudge-all within-en-sentiment within-jp-sentiment within-cn-sentiment within-language-sentiment presentation-safe statistical-test-figures dashboard nudge-slides nudge-pptx deploy
 
 help:
 	@echo "Hokuriku tourist sentiment analysis"
@@ -35,6 +35,8 @@ help:
 	@echo "  make presentation-safe       Build slide-safe JP-EN aggregate scaffold"
 	@echo "  make statistical-test-figures Build aggregate-only SVG figures for statistical tests"
 	@echo "  make dashboard               Build provenance-locked PBL-Dashboard.html"
+	@echo "  make nudge-slides            Build bilingual nudge IMRAD seminar deck HTML"
+	@echo "  make nudge-pptx              Build native editable bilingual nudge PowerPoint"
 	@echo "  make deploy                  Regenerate figures+dashboard and sync to PBL_SITE ($(PBL_SITE))"
 	@echo "  make test                    Run pytest"
 
@@ -121,6 +123,12 @@ statistical-test-figures:
 
 dashboard:
 	$(PYTHON) scripts/build_pbl_dashboard.py
+
+nudge-slides:
+	$(PYTHON) scripts/build_nudge_seminar_slides.py
+
+nudge-pptx:
+	$(PYTHON) scripts/build_nudge_pptx.py
 
 # Regenerate figures + both HTML pages, then sync landing page plus referenced
 # assets (figure SVGs + provenance source files) into the served directory.

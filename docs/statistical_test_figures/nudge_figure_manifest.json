@@ -1,7 +1,7 @@
 {
   "schema_version": "research_provenance.v1",
   "kind": "nudge_figure_pack",
-  "generated_at": "2026-06-25T08:38:50+00:00",
+  "generated_at": "2026-06-27T01:19:04+00:00",
   "command": "scripts/build_nudge_figures.py",
   "inputs": [
     {
@@ -38,22 +38,22 @@
       "role": "nudge_figure_figure_nudge_aspect_opportunity_map",
       "path": "docs/statistical_test_figures/figure_nudge_aspect_opportunity_map.svg",
       "exists": true,
-      "bytes": 5990,
-      "sha256": "29d795aaa095b5c90ce4528b2712018378a9e60dfa94f95f9dce54bcfed1b086"
+      "bytes": 5975,
+      "sha256": "5e8f0ad4f2739c00289519700be3bf0cbc6f7c6d4e42c4d56fa250800c7a5984"
     },
     {
       "role": "nudge_figure_figure_nudge_poi_action_map",
       "path": "docs/statistical_test_figures/figure_nudge_poi_action_map.svg",
       "exists": true,
-      "bytes": 25864,
-      "sha256": "e6f5b1cc85ce3768a1d6c94d16b892a7cddf8541bcf23a223ec6ad1033cb2f69"
+      "bytes": 25960,
+      "sha256": "0cdf66e446c1c37d29ff37433eba12ed9e90a591fddab6141fe3ffead52aeaa7"
     },
     {
       "role": "nudge_figure_figure_nudge_info_levers",
       "path": "docs/statistical_test_figures/figure_nudge_info_levers.svg",
       "exists": true,
-      "bytes": 5950,
-      "sha256": "8710b7ada7b958fddf1be4bdada31fe0e20c776b2212bd60294d88ca1ff39082"
+      "bytes": 5949,
+      "sha256": "c717d883b39e4674d05de0b90a33235e2321d0ea82a89d0555210389abd2c66b"
     }
   ],
   "filters": {

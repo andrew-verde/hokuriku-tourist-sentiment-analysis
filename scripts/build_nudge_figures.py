@@ -159,8 +159,8 @@ def _svg_header(width: int, height: int, title: str, subtitle: str) -> list[str]
     return [
         f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}">',
         f'<rect width="100%" height="100%" fill="{PALETTE["bg"]}"/>',
-        _text(32, 39, title, size=24, weight=700),
-        _text(32, 66, subtitle, size=14, fill=PALETTE["muted"]),
+        _text(24, 38, title, size=34, weight=700),
+        _text(24, 67, subtitle, size=20, fill=PALETTE["muted"]),
     ]
 
 
@@ -197,9 +197,9 @@ def _fmt_p(value: object) -> str:
 def _legend(parts: list[str], x: float, y: float, items: list[tuple[str, str]]) -> None:
     offset = 0
     for label, color in items:
-        parts.append(f'<rect x="{x + offset:.2f}" y="{y - 10:.2f}" width="10" height="10" fill="{color}"/>')
-        parts.append(_text(x + offset + 16, y, label, size=12, fill=PALETTE["muted"]))
-        offset += max(120, len(label) * 7 + 32)
+        parts.append(f'<rect x="{x + offset:.2f}" y="{y - 14:.2f}" width="14" height="14" fill="{color}"/>')
+        parts.append(_text(x + offset + 21, y, label, size=18, fill=PALETTE["muted"]))
+        offset += max(155, len(label) * 10 + 42)
 
 
 def _required_row(df: pd.DataFrame, mask: pd.Series, label: str) -> pd.Series:
@@ -234,12 +234,12 @@ def write_aspect_opportunity_map(aspects: pd.DataFrame, output_dir: Path) -> dic
     if required_labels:
         raise NudgeFigureError(f"Required significant aspect rows missing: {', '.join(sorted(required_labels))}")
 
-    width = 1120
-    height = 720
-    left = 110
-    right = 70
-    top = 102
-    bottom = 132
+    width = 1080
+    height = 600
+    left = 98
+    right = 36
+    top = 90
+    bottom = 108
     chart_w = width - left - right
     chart_h = height - top - bottom
     x_max = max(float(data["prevalence"].max()) * 1.18, 0.01)
@@ -262,16 +262,16 @@ def write_aspect_opportunity_map(aspects: pd.DataFrame, output_dir: Path) -> dic
     for tick in (0.0, x_max / 2, x_max):
         x = sx(tick)
         parts.append(f'<line x1="{x:.2f}" x2="{x:.2f}" y1="{top:.2f}" y2="{top + chart_h:.2f}" stroke="{PALETTE["line"]}" opacity="0.55"/>')
-        parts.append(_text(x, top + chart_h + 24, f"{tick * 100:.1f}%", size=11, fill=PALETTE["muted"], anchor="middle"))
+        parts.append(_text(x, top + chart_h + 23, f"{tick * 100:.1f}%", size=17, fill=PALETTE["muted"], anchor="middle"))
     # Evenly spaced integer odds-ratio ticks (plus the OR=1 reference) read more
     # cleanly than quarter-of-max ticks that land on awkward decimals.
     y_ticks = sorted({0.0, 1.0, *(float(v) for v in range(2, int(math.floor(y_max)) + 1, 2))})
     for tick in y_ticks:
         y = sy(tick)
         parts.append(f'<line x1="{left:.2f}" x2="{left + chart_w:.2f}" y1="{y:.2f}" y2="{y:.2f}" stroke="{PALETTE["line"]}" opacity="0.55"/>')
-        parts.append(_text(left - 12, y + 4, f"{tick:.0f}", size=11, fill=PALETTE["muted"], anchor="end"))
+        parts.append(_text(left - 12, y + 6, f"{tick:.0f}", size=17, fill=PALETTE["muted"], anchor="end"))
     parts.append(f'<line x1="{left:.2f}" x2="{left + chart_w:.2f}" y1="{sy(1.0):.2f}" y2="{sy(1.0):.2f}" stroke="{PALETTE["negative"]}" stroke-dasharray="6 5" stroke-width="1.7"/>')
-    parts.append(_text(left + chart_w - 4, sy(1.0) - 8, "OR=1 reference", size=11, fill=PALETTE["negative"], anchor="end"))
+    parts.append(_text(left + chart_w - 4, sy(1.0) - 9, "OR=1 reference", size=17, fill=PALETTE["negative"], anchor="end"))
 
     for _, row in data.sort_values("fdr_significant").iterrows():
         sig = _bool_value(row["fdr_significant"])
@@ -284,11 +284,11 @@ def write_aspect_opportunity_map(aspects: pd.DataFrame, output_dir: Path) -> dic
         parts.append(f'<circle cx="{x:.2f}" cy="{y:.2f}" r="{radius:.2f}" fill="{fill}" stroke="{color}" stroke-width="2" opacity="{opacity:.2f}"/>')
         if sig and row["aspect"] in SIGNIFICANT_LABEL_ASPECTS:
             label = str(row["aspect"]).replace("_", " ")
-            parts.append(_text(min(x + 10, left + chart_w - 8), max(y - 8, top + 14), label, size=11, weight=700, fill=PALETTE["ink"]))
-    parts.append(_text(left + chart_w / 2, height - 78, "Pooled prevalence of aspect code", size=13, weight=700, anchor="middle"))
-    parts.append(_vtext(34, top + chart_h / 2, "Adjusted odds ratio for low rating", size=13, weight=700))
-    _legend(parts, left, height - 42, [("FDR-significant", PALETTE["negative"]), ("not FDR-significant", PALETTE["neutral"])])
-    parts.append(_text(32, height - 18, "Firth-penalized logit; text length, language, and prefecture adjusted; BH-FDR; exploratory ranking only.", size=12, fill=PALETTE["muted"]))
+            parts.append(_text(min(x + 13, left + chart_w - 8), max(y - 10, top + 20), label, size=17, weight=700, fill=PALETTE["ink"]))
+    parts.append(_text(left + chart_w / 2, height - 69, "Pooled prevalence of aspect code", size=20, weight=700, anchor="middle"))
+    parts.append(_vtext(24, top + chart_h / 2, "Adjusted odds ratio for low rating", size=20, weight=700))
+    _legend(parts, left, height - 36, [("FDR-significant", PALETTE["negative"]), ("not FDR-significant", PALETTE["neutral"])])
+    parts.append(_text(24, height - 10, "Firth-penalized logit; text length, language, and prefecture adjusted; BH-FDR; exploratory ranking only.", size=16, fill=PALETTE["muted"]))
     _write_svg(path, parts)
     return {
         "figure": "Nudge aspect opportunity map",
@@ -316,12 +316,12 @@ def write_poi_action_map(pois: pd.DataFrame, output_dir: Path) -> dict[str, str]
     low_threshold = float(data["low_volume_threshold"].dropna().iloc[0])
     high_threshold = float(data["high_volume_threshold"].dropna().iloc[0])
 
-    width = 1240
-    height = 760
+    width = 1200
+    height = 650
     left = 92
-    right = 80
-    top = 104
-    bottom = 138
+    right = 42
+    top = 90
+    bottom = 112
     chart_w = width - left - right
     chart_h = height - top - bottom
     x_max = max(float(data["n_reviews"].max()) * 1.08, high_threshold * 1.08)
@@ -344,15 +344,18 @@ def write_poi_action_map(pois: pd.DataFrame, output_dir: Path) -> dict[str, str]
     for threshold, label in [(low_threshold, "low-volume cutoff"), (high_threshold, "high-volume cutoff")]:
         x = sx(threshold)
         parts.append(f'<line x1="{x:.2f}" x2="{x:.2f}" y1="{top:.2f}" y2="{top + chart_h:.2f}" stroke="{PALETTE["line"]}" stroke-dasharray="6 5" stroke-width="1.5"/>')
-        parts.append(_text(x + 6, top + 14, label, size=11, fill=PALETTE["muted"]))
+        if x > left + chart_w * 0.82:
+            parts.append(_text(x - 7, top + 19, label, size=16, fill=PALETTE["muted"], anchor="end"))
+        else:
+            parts.append(_text(x + 7, top + 19, label, size=16, fill=PALETTE["muted"]))
     for tick in (0.0, low_threshold, high_threshold, x_max):
         x = sx(tick)
-        parts.append(_text(x, top + chart_h + 24, f"{tick:.0f}", size=11, fill=PALETTE["muted"], anchor="middle"))
+        parts.append(_text(x, top + chart_h + 24, f"{tick:.0f}", size=17, fill=PALETTE["muted"], anchor="middle"))
     for tick in (0.7, 0.85, 1.0):
         if y_min <= tick <= y_max:
             y = sy(tick)
             parts.append(f'<line x1="{left:.2f}" x2="{left + chart_w:.2f}" y1="{y:.2f}" y2="{y:.2f}" stroke="{PALETTE["line"]}" opacity="0.55"/>')
-            parts.append(_text(left - 12, y + 4, f"{tick * 100:.0f}%", size=11, fill=PALETTE["muted"], anchor="end"))
+            parts.append(_text(left - 12, y + 6, f"{tick * 100:.0f}%", size=17, fill=PALETTE["muted"], anchor="end"))
 
     data = data.reset_index(drop=True)
     # Most POIs pile up at the review-collection cap (~100-105), so points that
@@ -401,8 +404,8 @@ def write_poi_action_map(pois: pd.DataFrame, output_dir: Path) -> dict[str, str]
         prefer_left = jx > left + chart_w * 0.5
         placed = placed_left if prefer_left else placed_right
         ty = y
-        while any(abs(ty - p) < 14 for p in placed):
-            ty += 14
+        while any(abs(ty - p) < 20 for p in placed):
+            ty += 20
         placed.append(ty)
         if prefer_left:
             tx, anchor, lead = max(jx - 12, left + 4), "end", -4
@@ -410,14 +413,14 @@ def write_poi_action_map(pois: pd.DataFrame, output_dir: Path) -> dict[str, str]
             tx, anchor, lead = min(jx + 12, left + chart_w - 4), "start", 4
         if abs(ty - y) > 4:
             parts.append(f'<line x1="{jx:.2f}" x2="{tx + lead:.2f}" y1="{y:.2f}" y2="{ty:.2f}" stroke="{PALETTE["muted"]}" stroke-width="0.8" opacity="0.6"/>')
-        parts.append(_text_halo(tx, ty + 3, text, size=10, weight=700, anchor=anchor))
+        parts.append(_text_halo(tx, ty + 5, text, size=16, weight=700, anchor=anchor))
 
-    parts.append(_text(left + chart_w / 2, height - 84, "Review volume (n reviews)", size=13, weight=700, anchor="middle"))
-    parts.append(_vtext(30, top + chart_h / 2, "Positive share (4-5 star reviews)", size=13, weight=700))
+    parts.append(_text(left + chart_w / 2, height - 70, "Review volume (n reviews)", size=20, weight=700, anchor="middle"))
+    parts.append(_vtext(25, top + chart_h / 2, "Positive share (4-5 star reviews)", size=20, weight=700))
     _legend(
         parts,
         left,
-        height - 48,
+        height - 35,
         [
             ("promote-it", PALETTE["positive"]),
             ("fix-it", PALETTE["event"]),
@@ -425,7 +428,7 @@ def write_poi_action_map(pois: pd.DataFrame, output_dir: Path) -> dict[str, str]
             ("other", PALETTE["neutral"]),
         ],
     )
-    parts.append(_text(32, height - 18, "Positive share is rating-based; promote-it is exploratory candidate-generation; small-n Wilson CIs are wide.", size=12, fill=PALETTE["muted"]))
+    parts.append(_text(24, height - 9, "Positive share is rating-based; promote-it is exploratory candidate-generation; small-n Wilson CIs are wide.", size=16, fill=PALETTE["muted"]))
     _write_svg(path, parts)
     return {
         "figure": "Nudge POI action map",
@@ -451,11 +454,11 @@ def write_info_levers(aspects: pd.DataFrame, output_dir: Path) -> dict[str, str]
     data = pd.DataFrame(rows).sort_values("prevalence", ascending=True)
 
     width = 1160
-    height = 520
-    left = 330
-    right = 270
-    top = 98
-    row_h = 54
+    height = 450
+    left = 335
+    right = 275
+    top = 86
+    row_h = 47
     chart_w = width - left - right
     x_max = max(float(data["prevalence_ci_high"].max()) * 1.15, 0.01)
 
@@ -473,7 +476,7 @@ def write_info_levers(aspects: pd.DataFrame, output_dir: Path) -> dict[str, str]
     for tick in (0.0, x_max / 2, x_max):
         x = sx(tick)
         parts.append(f'<line x1="{x:.2f}" x2="{x:.2f}" y1="{top - 8:.2f}" y2="{grid_bottom:.2f}" stroke="{PALETTE["line"]}" opacity="0.55"/>')
-        parts.append(_text(x, grid_bottom + 24, f"{tick * 100:.1f}%", size=11, fill=PALETTE["muted"], anchor="middle"))
+        parts.append(_text(x, grid_bottom + 25, f"{tick * 100:.1f}%", size=17, fill=PALETTE["muted"], anchor="middle"))
     for idx, row in enumerate(data.itertuples(index=False)):
         y = top + idx * row_h
         cy = y + 22
@@ -482,7 +485,7 @@ def write_info_levers(aspects: pd.DataFrame, output_dir: Path) -> dict[str, str]
         prevalence = float(row.prevalence)
         low = float(row.prevalence_ci_low)
         high = float(row.prevalence_ci_high)
-        parts.append(_text(left - 14, cy + 4, _safe_label(row.aspect, 38), size=12, anchor="end"))
+        parts.append(_text(left - 16, cy + 6, _safe_label(row.aspect, 38), size=18, anchor="end"))
         # Bar = point prevalence. The Wilson CI is drawn on top as a capped
         # I-beam error bar in dark ink, so it reads as uncertainty rather than a
         # second stray bar extending past the prevalence bar.
@@ -497,9 +500,9 @@ def write_info_levers(aspects: pd.DataFrame, output_dir: Path) -> dict[str, str]
             label = f"OR {float(row.odds_ratio):.2f}; {_fmt_p(row.p_value_bh_fdr)}{star}{under}"
         else:
             label = f"OR n/a; {_fmt_p(row.p_value_bh_fdr)}{under}"
-        parts.append(_text(left + chart_w + 18, cy + 4, label, size=11, weight=700 if sig else 400, fill=PALETTE["ink"]))
-    parts.append(_text(left + chart_w / 2, height - 54, "Pooled prevalence with Wilson 95% CI", size=13, weight=700, anchor="middle"))
-    parts.append(_text(32, height - 18, "Asterisk marks BH-FDR significance; rare or underpowered levers remain visible with uncertainty.", size=12, fill=PALETTE["muted"]))
+        parts.append(_text(left + chart_w + 18, cy + 6, label, size=17, weight=700 if sig else 400, fill=PALETTE["ink"]))
+    parts.append(_text(left + chart_w / 2, height - 40, "Pooled prevalence with Wilson 95% CI", size=20, weight=700, anchor="middle"))
+    parts.append(_text(24, height - 9, "Asterisk marks BH-FDR significance; rare or underpowered levers remain visible with uncertainty.", size=16, fill=PALETTE["muted"]))
     _write_svg(path, parts)
     return {
         "figure": "Nudge information levers",

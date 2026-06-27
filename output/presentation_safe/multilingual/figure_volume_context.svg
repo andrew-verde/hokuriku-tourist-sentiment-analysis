@@ -1,19 +1,19 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="264" viewBox="0 0 1000 264">
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="240" viewBox="0 0 980 240">
 <rect width="100%" height="100%" fill="#fbfaf7"/>
-<text x="32" y="38" font-family="Arial, sans-serif" font-size="24" font-weight="700" fill="#1f2933">Comparable Volume Context</text>
-<text x="32" y="66" font-family="Arial, sans-serif" font-size="14" fill="#52616b">Rows represented by source group; rating shown only for Google reviews</text>
-<line x1="285.00" x2="285.00" y1="94.00" y2="206.00" stroke="#d7dde8" stroke-width="1" opacity="0.58"/>
-<line x1="582.50" x2="582.50" y1="94.00" y2="206.00" stroke="#d7dde8" stroke-width="1" opacity="0.58"/>
-<line x1="880.00" x2="880.00" y1="94.00" y2="206.00" stroke="#d7dde8" stroke-width="1" opacity="0.58"/>
-<text x="271" y="121" text-anchor="end" font-family="Arial, sans-serif" font-size="13" fill="#1f2933">chinese social xiaohongshu</text>
-<rect x="285" y="106" width="66.11" height="20" rx="3" fill="#bc6c25"/>
-<rect x="355.11" y="106.00" width="171.52" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
-<text x="440.87" y="121.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#1f2933">n=200; SnowNLP mean 0.81</text>
-<text x="271" y="159" text-anchor="end" font-family="Arial, sans-serif" font-size="13" fill="#1f2933">japanese</text>
-<rect x="285" y="144" width="595.00" height="20" rx="3" fill="#5b6c94"/>
-<text x="872.00" y="159" text-anchor="end" font-family="Arial, sans-serif" font-size="12" fill="#ffffff">n=1,800; mean rating 4.26</text>
-<text x="271" y="197" text-anchor="end" font-family="Arial, sans-serif" font-size="13" fill="#1f2933">english</text>
-<rect x="285" y="182" width="70.74" height="20" rx="3" fill="#2f6f73"/>
-<rect x="359.74" y="182.00" width="165.04" height="22.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
-<text x="442.26" y="197.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#1f2933">n=214; mean rating 4.53</text>
+<text x="32" y="38" font-family="Arial, sans-serif" font-size="34" font-weight="700" fill="#1f2933">Comparable Volume Context</text>
+<text x="32" y="66" font-family="Arial, sans-serif" font-size="20" fill="#52616b">Rows represented by source group; rating shown only for Google reviews</text>
+<line x1="310.00" x2="310.00" y1="84.00" y2="216.00" stroke="#d7dde8" stroke-width="1" opacity="0.58"/>
+<line x1="542.50" x2="542.50" y1="84.00" y2="216.00" stroke="#d7dde8" stroke-width="1" opacity="0.58"/>
+<line x1="775.00" x2="775.00" y1="84.00" y2="216.00" stroke="#d7dde8" stroke-width="1" opacity="0.58"/>
+<text x="294" y="118" text-anchor="end" font-family="Arial, sans-serif" font-size="19" fill="#1f2933">chinese social xiaohongshu</text>
+<rect x="310" y="98" width="51.67" height="26" rx="3" fill="#bc6c25"/>
+<rect x="367.67" y="98.00" width="236.32" height="27.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="485.83" y="118.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="17" font-weight="400" fill="#1f2933">n=200; SnowNLP mean 0.81</text>
+<text x="294" y="166" text-anchor="end" font-family="Arial, sans-serif" font-size="19" fill="#1f2933">japanese</text>
+<rect x="310" y="146" width="465.00" height="26" rx="3" fill="#5b6c94"/>
+<text x="765.00" y="166" text-anchor="end" font-family="Arial, sans-serif" font-size="17" fill="#ffffff">n=1,800; mean rating 4.26</text>
+<text x="294" y="214" text-anchor="end" font-family="Arial, sans-serif" font-size="19" fill="#1f2933">english</text>
+<rect x="310" y="194" width="55.28" height="26" rx="3" fill="#2f6f73"/>
+<rect x="371.28" y="194.00" width="227.14" height="27.00" rx="4" fill="#fbfaf7" stroke="#d7dde8" stroke-width="1"/>
+<text x="484.85" y="214.00" text-anchor="middle" font-family="Arial, sans-serif" font-size="17" font-weight="400" fill="#1f2933">n=214; mean rating 4.53</text>
 </svg>

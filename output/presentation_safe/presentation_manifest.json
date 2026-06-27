@@ -1,7 +1,7 @@
 {
   "schema_version": "research_provenance.v1",
   "kind": "presentation_safe_jp_en_sentiment",
-  "generated_at": "2026-06-25T08:11:23+00:00",
+  "generated_at": "2026-06-27T01:20:45+00:00",
   "command": "scripts/build_presentation_safe_outputs.py",
   "inputs": [
     {
@@ -108,8 +108,8 @@
       "role": "presentation_figure_multilingual_volume_context",
       "path": "output/presentation_safe/multilingual/figure_volume_context.svg",
       "exists": true,
-      "bytes": 2030,
-      "sha256": "ae850ecbf71c239ad3939dc0376889d54f4b4314d64a189171c81f209f644f08"
+      "bytes": 2026,
+      "sha256": "26935114edc7271b2a650ee5a970a1f4db5a68233713458b0231347525a6d539"
     },
     {
       "role": "presentation_figure_multilingual_statistical_evidence",

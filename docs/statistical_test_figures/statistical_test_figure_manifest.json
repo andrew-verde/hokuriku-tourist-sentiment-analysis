@@ -1,7 +1,7 @@
 {
   "schema_version": "research_provenance.v1",
   "kind": "statistical_test_figure_pack",
-  "generated_at": "2026-06-25T08:47:35+00:00",
+  "generated_at": "2026-06-27T01:20:45+00:00",
   "command": "scripts/build_statistical_test_figures.py",
   "inputs": [
     {
@@ -130,7 +130,7 @@
       "path": "docs/statistical_test_figures/figure_h3_text_length_diagnostic.svg",
       "exists": true,
       "bytes": 2035,
-      "sha256": "cd1986385be1611ac72f862bd87958b48950cdea5b9c260f5c634a819e4d47ff"
+      "sha256": "9f98f2773951fd216c6953e8e46c1ec933a4e0bbb521621c6227a0791754c2ed"
     },
     {
       "role": "statistical_test_figure_figure_hypothesis_overview",

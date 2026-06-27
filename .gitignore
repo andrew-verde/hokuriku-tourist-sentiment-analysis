@@ -33,3 +33,7 @@ docs/codebook_reviews/source/XHS_NOTES_DATA_v1.xml
 
 # Seminar deck preview (derived view, gitignored like the rest of output)
 SEMINAR-Slides-Preview.html
+NUDGE-Seminar-Slides-Preview.html
+
+# Derived editable PowerPoint of the nudge seminar deck (build with: make nudge-pptx)
+NUDGE-Seminar-Slides.pptx

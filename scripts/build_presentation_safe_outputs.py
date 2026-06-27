@@ -284,12 +284,20 @@ def _language_key(language_source_group: str) -> str:
     return str(language_source_group).split("-language", maxsplit=1)[0]
 
 
-def _svg_header(width: int, height: int, title: str, subtitle: str) -> list[str]:
+def _svg_header(
+    width: int,
+    height: int,
+    title: str,
+    subtitle: str,
+    *,
+    title_size: int = 24,
+    subtitle_size: int = 14,
+) -> list[str]:
     return [
         f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}">',
         f'<rect width="100%" height="100%" fill="{FIGURE_BG}"/>',
-        f'<text x="32" y="38" font-family="Arial, sans-serif" font-size="24" font-weight="700" fill="{FIGURE_INK}">{html.escape(title)}</text>',
-        f'<text x="32" y="66" font-family="Arial, sans-serif" font-size="14" fill="{FIGURE_MUTED}">{html.escape(subtitle)}</text>',
+        f'<text x="32" y="38" font-family="Arial, sans-serif" font-size="{title_size}" font-weight="700" fill="{FIGURE_INK}">{html.escape(title)}</text>',
+        f'<text x="32" y="66" font-family="Arial, sans-serif" font-size="{subtitle_size}" fill="{FIGURE_MUTED}">{html.escape(subtitle)}</text>',
     ]
 
 
@@ -314,6 +322,8 @@ def _chip_width(label: str, size: int = 12) -> float:
 
 def _label_chip(parts: list[str], x: float, baseline_y: float, label: str, *, canvas_width: float, size: int = 12, text_fill: str = FIGURE_INK, anchor: str = "start") -> bool:
     chip_width = _chip_width(label, size=size)
+    chip_height = max(22, size + 10)
+    chip_y = baseline_y - 15 if size <= 12 else baseline_y - chip_height / 2 - size / 2 + 2
     if anchor == "end":
         chip_x = x - chip_width + 4
         if chip_x < 32:
@@ -322,7 +332,7 @@ def _label_chip(parts: list[str], x: float, baseline_y: float, label: str, *, ca
         chip_x = x - 4
         if chip_x + chip_width > canvas_width - 32:
             return False
-    _chip(parts, chip_x, baseline_y - 15, chip_width, 22, label, size=size, text_fill=text_fill)
+    _chip(parts, chip_x, chip_y, chip_width, chip_height, label, size=size, text_fill=text_fill)
     return True
 
 
@@ -512,12 +522,12 @@ def _write_multilingual_volume_context(baseline: pd.DataFrame, path: Path) -> No
     rows = baseline.copy()
     rows["label"] = rows["group"].astype(str).str.replace("_", " ", regex=False)
     rows = rows.sort_values(["source_kind", "volume"], ascending=[True, False])
-    width = 1000
-    top = 98
-    row_height = 38
-    left = 285
-    right = 120
-    height = top + 52 + max(1, len(rows)) * row_height
+    width = 980
+    top = 88
+    row_height = 48
+    left = 310
+    right = 205
+    height = top + 8 + max(1, len(rows)) * row_height
     chart_width = width - left - right
     max_volume = max([int(value) for value in rows["volume"]] or [1])
     parts = _svg_header(
@@ -525,6 +535,8 @@ def _write_multilingual_volume_context(baseline: pd.DataFrame, path: Path) -> No
         height,
         "Comparable Volume Context",
         "Rows represented by source group; rating shown only for Google reviews",
+        title_size=34,
+        subtitle_size=20,
     )
     _gridlines(parts, left, chart_width, top - 4, top + (max(1, len(rows)) - 1) * row_height + 32)
     for index, (_, row) in enumerate(rows.iterrows()):
@@ -539,20 +551,20 @@ def _write_multilingual_volume_context(baseline: pd.DataFrame, path: Path) -> No
             metric = f"SnowNLP mean {float(row['sentiment_norm_mean']):.2f}"
         value_label = f"n={_fmt_n(volume)}; {metric}"
         if bar_width > chart_width * 0.72:
-            value_x = left + bar_width - 8
+            value_x = left + bar_width - 10
             value_anchor = "end"
             value_fill = "#ffffff"
         else:
-            value_x = left + bar_width + 8
+            value_x = left + bar_width + 10
             value_anchor = "start"
             value_fill = "#1f2933"
         parts.extend([
-            f'<text x="{left - 14}" y="{y + 23}" text-anchor="end" font-family="Arial, sans-serif" font-size="13" fill="#1f2933">{html.escape(str(row["label"])[:38])}</text>',
-            f'<rect x="{left}" y="{y + 8}" width="{bar_width:.2f}" height="20" rx="3" fill="{color}"/>',
+            f'<text x="{left - 16}" y="{y + 30}" text-anchor="end" font-family="Arial, sans-serif" font-size="19" fill="#1f2933">{html.escape(str(row["label"])[:38])}</text>',
+            f'<rect x="{left}" y="{y + 10}" width="{bar_width:.2f}" height="26" rx="3" fill="{color}"/>',
         ])
-        if value_fill == "#ffffff" or not _label_chip(parts, value_x, y + 23, value_label, canvas_width=width, text_fill=value_fill, anchor=value_anchor):
+        if value_fill == "#ffffff" or not _label_chip(parts, value_x, y + 30, value_label, canvas_width=width, size=17, text_fill=value_fill, anchor=value_anchor):
             parts.append(
-                f'<text x="{value_x:.2f}" y="{y + 23}" text-anchor="{value_anchor}" font-family="Arial, sans-serif" font-size="12" fill="{value_fill}">{html.escape(value_label)}</text>'
+                f'<text x="{value_x:.2f}" y="{y + 30}" text-anchor="{value_anchor}" font-family="Arial, sans-serif" font-size="17" fill="{value_fill}">{html.escape(value_label)}</text>'
             )
     parts.append("</svg>")
     path.write_text("\n".join(parts), encoding="utf-8")

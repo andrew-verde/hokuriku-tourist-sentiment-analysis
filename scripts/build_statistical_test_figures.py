@@ -203,12 +203,20 @@ def _text(x: float, y: float, value: object, size: int = 13, weight: int = 400,
     )
 
 
-def _svg_header(width: int, height: int, title: str, subtitle: str) -> list[str]:
+def _svg_header(
+    width: int,
+    height: int,
+    title: str,
+    subtitle: str,
+    *,
+    title_size: int = 24,
+    subtitle_size: int = 14,
+) -> list[str]:
     return [
         f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}">',
         f'<rect width="100%" height="100%" fill="{PALETTE["bg"]}"/>',
-        _text(32, 39, title, size=24, weight=700),
-        _text(32, 66, subtitle, size=14, fill=PALETTE["muted"]),
+        _text(32, 39, title, size=title_size, weight=700),
+        _text(32, 66, subtitle, size=subtitle_size, fill=PALETTE["muted"]),
     ]
 
 
@@ -278,7 +286,8 @@ def _label_chip(
     text_fill: str = PALETTE["ink"],
 ) -> bool:
     chip_width = _chip_width(label, size=size)
-    chip_height = 22
+    chip_height = max(22, size + 10)
+    chip_y = baseline_y - 15 if size <= 12 else baseline_y - chip_height / 2 - size / 2 + 2
     if anchor == "end":
         chip_x = x - chip_width + 4
         if chip_x < 32:
@@ -290,7 +299,7 @@ def _label_chip(
     _chip(
         parts,
         chip_x,
-        baseline_y - 15,
+        chip_y,
         chip_width,
         chip_height,
         label,
@@ -473,16 +482,18 @@ def _horizontal_bar_chart(
     *,
     zero_center: bool = False,
     max_abs: float | None = None,
+    compact_slide: bool = False,
 ) -> None:
     # Generate a horizontal bar chart for showing effect sizes, differences, or other single-value metrics.
     # If zero_center=True, bars can extend left (negative) or right (positive) from center.
     # Otherwise, bars start from the left and extend rightward.
-    width = 1120
-    top = 102
-    row_height = 39
-    left = 365
-    right = 170
-    height = top + 76 + max(1, len(rows)) * row_height
+    width = 1080 if compact_slide else 1120
+    top = 90 if compact_slide else 102
+    row_height = 50 if compact_slide else 39
+    left = 420 if compact_slide else 365
+    right = 270 if compact_slide else 170
+    footer_space = 55 if compact_slide else 76
+    height = top + footer_space + max(1, len(rows)) * row_height
     chart_width = width - left - right
 
     values = [float(row.get(value_key, 0.0) or 0.0) for row in rows]
@@ -490,7 +501,14 @@ def _horizontal_bar_chart(
         limit = max_abs or max([abs(value) for value in values] + [1.0])
     else:
         limit = max_abs or max(values + [1.0])
-    parts = _svg_header(width, height, title, subtitle)
+    parts = _svg_header(
+        width,
+        height,
+        title,
+        subtitle,
+        title_size=34 if compact_slide else 24,
+        subtitle_size=20 if compact_slide else 14,
+    )
     y1 = top - 8
     y2 = height - 62
     if zero_center:
@@ -506,7 +524,10 @@ def _horizontal_bar_chart(
         y = top + idx * row_height
         value = float(row.get(value_key, 0.0) or 0.0)
         color = str(row.get(color_key, PALETTE["score"]))
-        parts.append(_text(left - 14, y + 23, _safe_label(row["label"], 48), size=12, anchor="end"))
+        label_size = 19 if compact_slide else 12
+        annotation_size = 18 if compact_slide else 12
+        baseline = y + (30 if compact_slide else 23)
+        parts.append(_text(left - 14, baseline, _safe_label(row["label"], 48), size=label_size, anchor="end"))
         if zero_center:
             axis_x = left + chart_width / 2
             bar_width = abs(value) / limit * (chart_width / 2)
@@ -514,13 +535,15 @@ def _horizontal_bar_chart(
         else:
             x = left
             bar_width = value / limit * chart_width
-        parts.append(f'<rect x="{x:.2f}" y="{y + 8:.2f}" width="{bar_width:.2f}" height="20" rx="3" fill="{color}"/>')
+        bar_y = y + (10 if compact_slide else 8)
+        bar_height = 26 if compact_slide else 20
+        parts.append(f'<rect x="{x:.2f}" y="{bar_y:.2f}" width="{bar_width:.2f}" height="{bar_height}" rx="3" fill="{color}"/>')
         text_x = x + bar_width + 8 if value >= 0 or not zero_center else x - 8
         anchor = "start" if value >= 0 or not zero_center else "end"
         label = str(row.get("annotation", f"{value_label}={value:.3f}"))
-        if not _label_chip(parts, text_x, y + 23, label, anchor=anchor, canvas_width=width, size=12):
-            parts.append(_text(text_x, y + 23, label, size=12, anchor=anchor))
-    parts.append(_text(32, height - 20, note, size=12, fill=PALETTE["muted"]))
+        if not _label_chip(parts, text_x, baseline, label, anchor=anchor, canvas_width=width, size=annotation_size):
+            parts.append(_text(text_x, baseline, label, size=annotation_size, anchor=anchor))
+    parts.append(_text(24 if compact_slide else 32, height - 12 if compact_slide else height - 20, note, size=17 if compact_slide else 12, fill=PALETTE["muted"]))
     _write_svg(path, parts)
 
 
@@ -864,6 +887,7 @@ def write_h3_figures(h3: pd.DataFrame, output_dir: Path) -> list[dict[str, str]]
         "color",
         "chars",
         "Use as caveat beside H3 evidence-prevalence claims.",
+        compact_slide=True,
     )
     return [
         {"figure": "H3 reviewed evidence prevalence", "path": str(path1), "question": "Which reviewed evidence families differ most between JP/EN review rows?", "caveat": "Keyword evidence prevalence; text length can affect match opportunity."},
