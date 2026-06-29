@@ -22,6 +22,15 @@ from pptx import Presentation
 
 ROOT = Path(__file__).resolve().parent.parent
 PPTX = ROOT / "NUDGE-Seminar-Slides.pptx"
+# The intro was split into two read-along slides (research question + approach)
+# in NUDGE-Intro-Simple.pptx; its speaker notes replace the live deck's single
+# "Research question" note for the Q&A script.
+INTRO_PPTX = ROOT / "NUDGE-Intro-Simple.pptx"
+# The presented deck is assembled from the simplified decks; methods slides 5-6
+# collapse into one "How we tested it" slide, so the spoken script is sourced
+# from these rather than the full live deck.
+METHODS_PPTX = ROOT / "NUDGE-Methods-Simple.pptx"
+RESULTS_PPTX = ROOT / "NUDGE-Results-Simple.pptx"
 OUT_QA = ROOT / "Seminar-Speaker-Script-and-QA.docx"
 OUT_HANDOUT = ROOT / "Seminar-Submission-Handout-A4.docx"
 
@@ -461,40 +470,64 @@ def add_question(doc: Document, question: str, answer: str) -> None:
 
 
 def build_qa() -> None:
-    prs = Presentation(PPTX)
-    notes = [slide.notes_slide.notes_text_frame.text.strip() for slide in prs.slides]
-    if len(notes) != 13:
-        raise ValueError(f"expected 13 slide notes, found {len(notes)}")
+    def deck_notes(path: Path, expected: int) -> list[str]:
+        prs = Presentation(path)
+        ns = [s.notes_slide.notes_text_frame.text.strip() for s in prs.slides]
+        if len(ns) != expected:
+            raise ValueError(f"{path.name}: expected {expected} notes, found {len(ns)}")
+        return ns
+
+    live = deck_notes(PPTX, 13)
+    intro = deck_notes(INTRO_PPTX, 2)
+    methods = deck_notes(METHODS_PPTX, 3)
+    results = deck_notes(RESULTS_PPTX, 5)
+    # Assembled presented order (13 slides). The simplified decks supply most
+    # slides; the title, the two-priorities slide, and the close stay live.
+    notes = [
+        live[0],     # 1  Title and scope
+        intro[0],    # 2  Research question
+        intro[1],    # 3  Our approach: small nudges
+        methods[0],  # 4  The data
+        methods[1],  # 5  Turning review text into signals
+        methods[2],  # 6  How we tested it (statistical model + rules, merged)
+        results[0],  # 7  Which problems predict low ratings
+        live[7],     # 8  Two priority information nudges
+        results[1],  # 9  A separate idea from Chinese posts
+        results[2],  # 10 Where to act: fix-it and promote-it sites
+        results[3],  # 11 Rank common nudges by impact, then ease
+        results[4],  # 12 What this can and cannot claim
+        live[12],    # 13 Next step: test the first nudge
+    ]
 
     titles = [
         "Title and scope",
         "Research question",
+        "Our approach: small nudges",
         "The data",
-        "How review text became data",
-        "The statistical model",
-        "Rules used to avoid overclaiming",
-        "Pain points associated with low ratings",
-        "Two priorities and one idea to test",
-        "Chinese-language Xiaohongshu context",
-        "Candidate sites for action",
-        "Three candidate experiments",
-        "Study limits",
-        "Next step",
+        "Turning review text into signals",
+        "How we tested it",
+        "Which problems predict low ratings",
+        "Two priority information nudges",
+        "A separate idea from Chinese posts",
+        "Where to act: fix-it and promote-it sites",
+        "Rank common nudges by impact, then ease",
+        "What this can and cannot claim",
+        "Next step: test the first nudge",
     ]
     sources: list[list[Path]] = [
-        [POI_CSV, POI_MANIFEST],
-        [ASPECT_MANIFEST],
-        [ASPECT_MANIFEST, POI_MANIFEST],
-        [ASPECT_CSV, ASPECT_MANIFEST],
-        [ASPECT_CSV, ASPECT_MANIFEST],
-        [ASPECT_MANIFEST],
-        [ASPECT_CSV, ASPECT_MANIFEST],
-        [ASPECT_CSV, ASPECT_MANIFEST],
-        [XHS_TOPICS_CSV, XHS_TOPICS_MANIFEST],
-        [POI_CSV, POI_MANIFEST],
-        [PRIORITY_CSV, PRIORITY_MANIFEST],
-        [ASPECT_MANIFEST, POI_MANIFEST],
-        [PRIORITY_CSV, PRIORITY_MANIFEST],
+        [POI_CSV, POI_MANIFEST],                # 1  Title
+        [ASPECT_MANIFEST, POI_MANIFEST],        # 2  Research question
+        [ASPECT_MANIFEST],                      # 3  Our approach
+        [ASPECT_MANIFEST, POI_MANIFEST],        # 4  The data
+        [ASPECT_CSV, ASPECT_MANIFEST],          # 5  Turning review text into signals
+        [ASPECT_CSV, ASPECT_MANIFEST],          # 6  How we tested it (model + rules)
+        [ASPECT_CSV, ASPECT_MANIFEST],          # 7  Which problems predict low ratings
+        [ASPECT_CSV, ASPECT_MANIFEST],          # 8  Two priority information nudges
+        [XHS_TOPICS_CSV, XHS_TOPICS_MANIFEST],  # 9  A separate idea from Chinese posts
+        [POI_CSV, POI_MANIFEST],                # 10 Where to act: fix-it and promote-it
+        [PRIORITY_CSV, PRIORITY_MANIFEST],      # 11 Rank common nudges
+        [ASPECT_MANIFEST, POI_MANIFEST],        # 12 What this can and cannot claim
+        [PRIORITY_CSV, PRIORITY_MANIFEST],      # 13 Next step
     ]
     qa: list[list[tuple[str, str]]] = [
         [
@@ -521,6 +554,20 @@ def build_qa() -> None:
                 "What does fix-it versus promote-it mean?",
                 "Fix-it identifies sites with elevated pain-point evidence. Promote-it identifies lower-volume sites "
                 "with high positive star-rating shares. Both are exploratory follow-up categories.",
+            ),
+        ],
+        [
+            (
+                "Why information nudges instead of bigger fixes?",
+                "Information nudges are cheap to build and quick to test, and they target problems a visitor can act "
+                "on before the trip. Operator fixes such as price or cleanliness require the site operator, so they "
+                "are flagged separately rather than nudged.",
+            ),
+            (
+                "What are the two levers on this slide?",
+                "Information provision gives clearer pre-visit information. Demand redistribution guides visitors "
+                "toward quieter, under-visited but well-rated places. Both are low-cost prompts that preserve "
+                "visitor choice.",
             ),
         ],
         [
@@ -574,8 +621,6 @@ def build_qa() -> None:
                 "It compares odds after adjustment. OR 4.77 means 4.77 times the odds, not 4.77 times the probability. "
                 "Association does not establish causal impact.",
             ),
-        ],
-        [
             (
                 "Why use Benjamini-Hochberg FDR?",
                 f"The primary analysis fits {metrics['A_primary_models_fit']} aspect models. Multiple testing increases "
@@ -734,8 +779,8 @@ def build_qa() -> None:
     add_inline_section(
         doc,
         "Delivery plan",
-        "Green ANDREW leads slides 1-8 and 10-13. Xu ZILIN presents slides 3 and 9. Speak slowly, pause after key "
-        "numbers, and read only the headline statistics. Detailed methods and caveats below are for professor Q&A.",
+        "Green ANDREW leads slides 1-3, 5-8, and 11-13. Xu ZILIN presents slides 4, 9, and 10. Speak slowly, pause "
+        "after key numbers, and read only the headline statistics. Detailed methods and caveats below are for professor Q&A.",
     )
 
     for index, (title_text, note, questions, slide_sources) in enumerate(

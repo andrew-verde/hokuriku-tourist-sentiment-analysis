@@ -179,19 +179,22 @@ def build():
     bp.label(s, "II.  METHODS")
     bp.title(s, "How we tested it", "どう調べたか")
 
-    _, tf = bp.textbox(s, bp.MX, Inches(2.0), Inches(6.5), Inches(4.6))
-    bp.en_jp(tf, "For each topic we make a fair comparison: are reviews that mention the problem more likely to be low-rated, after allowing for review length, language, and prefecture?",
-             "各話題で公平に比較する：口コミの長さ・言語・県の違いをそろえた上で、その問題に触れた口コミは低評価になりやすいか？",
-             first=True, bullet=True, en_size=15, jp_size=11.5, space_after=15)
-    bp.en_jp(tf, "We test many topics, so we tighten the bar to avoid being fooled by chance.",
-             "多くの話題を調べるので、偶然の当たりに惑わされないよう基準を厳しくする。",
-             bullet=True, en_size=15, jp_size=11.5, space_after=15)
-    bp.en_jp(tf, f"A topic is kept only if the link is solid, points to worse ratings, and appears at least {bp.MIN_RANKING_MENTIONS} times.",
-             f"残すのは、結びつきが確かで、悪い評価の方向で、{bp.MIN_RANKING_MENTIONS}回以上現れた話題だけ。",
-             bullet=True, en_size=15, jp_size=11.5, space_after=15)
-    bp.en_jp(tf, "We then sort each kept topic into \"better information can help\" or \"the site operator must act.\"",
+    _, tf = bp.textbox(s, bp.MX, Inches(1.9), Inches(6.7), Inches(4.6))
+    bp.en_jp(tf, f"For each of the {bp.N_ASPECTS} topics we fit a multiple logistic regression: does mentioning the problem predict a low rating, after adjusting for review length, language, and prefecture?",
+             f"{bp.N_ASPECTS}の話題ごとに多重ロジスティック回帰を行う:口コミの長さ・言語・県をそろえた上で、その問題への言及が低評価を予測するか？",
+             first=True, bullet=True, en_size=13.5, jp_size=10.5, space_after=9)
+    bp.en_jp(tf, "Each model returns an adjusted odds ratio with a 95% confidence interval - how strongly the topic is tied to a low rating.",
+             "各モデルは、調整済みオッズ比と95%信頼区間を返す:その話題が低評価とどれだけ強く結びつくか。",
+             bullet=True, en_size=13.5, jp_size=10.5, space_after=9)
+    bp.en_jp(tf, "Because we test many topics, we correct for multiple comparisons (false-discovery rate) so chance findings do not slip through.",
+             "多くの話題を検定するため、多重比較の補正(偽発見率・FDR)を行い、偶然の結果を除く。",
+             bullet=True, en_size=13.5, jp_size=10.5, space_after=9)
+    bp.en_jp(tf, f"A topic is kept only if it is statistically significant, points to worse ratings, and appears at least {bp.MIN_RANKING_MENTIONS} times.",
+             f"統計的に有意で、悪い評価の方向で、{bp.MIN_RANKING_MENTIONS}回以上現れた話題だけを残す。",
+             bullet=True, en_size=13.5, jp_size=10.5, space_after=9)
+    bp.en_jp(tf, "We then sort each kept topic into \"information can help\" or \"the operator must act.\"",
              "残った話題を「情報で改善できる」か「事業者の対応が必要」かに振り分ける。",
-             bullet=True, en_size=15, jp_size=11.5, space_after=0)
+             bullet=True, en_size=13.5, jp_size=10.5, space_after=0)
 
     picture_fit(s, FUNNEL_PNG, Inches(7.35), Inches(1.95), Inches(5.4), Inches(4.0))
     bp.infobox(s, bp.MX, Inches(6.5), Inches(12.1), Inches(0.66),
@@ -199,10 +202,13 @@ def build():
                "これは「次にどこで実験するか」の順位づけ。ナッジの効果を証明するものではない。")
     foot(s, 5)
     bp.notes(s,
-             "Andrew (60 sec spoken, plain): For each topic we run a fair comparison that accounts for review length, "
-             "language, and prefecture. Because we test many topics, we tighten the bar to avoid false alarms. A topic "
-             f"is kept only if the link is solid, harmful, and seen at least {bp.MIN_RANKING_MENTIONS} times. We then "
-             "label each survivor as something information can help or something the operator must fix.\n\n"
+             f"Andrew (60 sec): For each of the {bp.N_ASPECTS} topics we fit a separate multiple logistic regression, "
+             "asking whether mentioning the problem predicts a low rating after adjusting for review length, language, "
+             "and prefecture. Each model gives an adjusted odds ratio with a 95 percent confidence interval. Because we "
+             "test many topics, we correct for multiple comparisons using the false-discovery rate. A topic is kept "
+             f"only if it is statistically significant, points to worse ratings, and is seen at least "
+             f"{bp.MIN_RANKING_MENTIONS} times. We then label each survivor as something information can help or "
+             "something the operator must fix.\n\n"
              "--- FULL METHOD (for Q&A / examiners; do NOT read aloud) ---\n"
              f"Model: Firth bias-reduced (penalized) logistic regression, one per aspect; outcome = low rating "
              f"({bp.LOW_RATING_STARS} stars or fewer); adjusted for text length, review language, and prefecture. "
