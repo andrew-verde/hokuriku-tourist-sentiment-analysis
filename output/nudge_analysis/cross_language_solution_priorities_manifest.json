@@ -1,15 +1,15 @@
 {
   "schema_version": "research_provenance.v1",
   "kind": "cross_language_solution_priorities",
-  "generated_at": "2026-06-27T13:39:43+00:00",
+  "generated_at": "2026-06-29T09:18:11+00:00",
   "command": "scripts/build_cross_language_solution_priorities.py",
   "inputs": [
     {
       "role": "solution mapping config",
       "path": "config/cross_language_solution_mapping.yaml",
       "exists": true,
-      "bytes": 4199,
-      "sha256": "580f7a70f1093e703b894f240fadbe2c734dce98eae6803820bd8bebb6de67b7"
+      "bytes": 4258,
+      "sha256": "0298ea0775ff2f74a96104fb02a41022733cc42d9d791d97f73bcbccc9f7bc19"
     },
     {
       "role": "review aspect opportunity aggregates",
@@ -52,8 +52,8 @@
       "role": "ranked aggregate priorities",
       "path": "output/nudge_analysis/cross_language_solution_priorities.csv",
       "exists": true,
-      "bytes": 4791,
-      "sha256": "8e459c5c5f0a08f77c449151545c943a4974f43984d66bd20c515166aefe2431"
+      "bytes": 4850,
+      "sha256": "7ebd1dcae05f0ff22f29e4ad5ac1cd4dff100be50a54ad539424bac0f77caea3"
     },
     {
       "role": "source-specific aggregate evidence",

@@ -65,8 +65,8 @@ solutions:
         - waiting_crowding
       primary_review_aspect: waiting_crowding
       primary_chinese_code: waiting_crowding
-    evidence_summary_en: All 3 groups show crowding evidence; its low-rating link does not clear FDR.
-    evidence_summary_ja: 3群すべてに混雑の根拠があるが、低評価との関連はFDRを通過しない。
+    evidence_summary_en: All 3 groups show crowding evidence; its low-rating link clears FDR but is borderline (CI includes 1).
+    evidence_summary_ja: 3群すべてに混雑の根拠があり、低評価との関連はFDRを通過するが境界的(信頼区間が1を含む)。
     experiment_hypothesis_en: Off-peak timing and substitute-site prompts shift visits without reducing itinerary commitment.
     experiment_hypothesis_ja: オフピーク時間と代替地の提示は旅程への追加を減らさずに来訪を分散する。
     intervention_en: A/B test quieter-time and nearby-substitute prompts.

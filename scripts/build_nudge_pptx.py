@@ -108,6 +108,7 @@ LANG_JP = fnum(raw("aspect_mfst", deck.manifest_metric("tagged_language_group_co
 LANG_EN = fnum(raw("aspect_mfst", deck.manifest_metric("tagged_language_group_counts", "english")))
 LANG_CN = fnum(raw("aspect_mfst", deck.manifest_metric("tagged_language_group_counts", "chinese")))
 LANG_OTHER = fnum(raw("aspect_mfst", deck.manifest_metric("tagged_language_group_counts", "other_non_english_non_japanese")))
+LANG_UNDETECTED = fnum(raw("aspect_mfst", deck.manifest_metric("tagged_language_group_counts", "undetected_or_too_short")))
 POI_FUKUI = fnum(raw("poi_mfst", deck.manifest_metric("n_pois_by_prefecture", "Fukui")))
 POI_ISHIKAWA = fnum(raw("poi_mfst", deck.manifest_metric("n_pois_by_prefecture", "Ishikawa")))
 POI_TOYAMA = fnum(raw("poi_mfst", deck.manifest_metric("n_pois_by_prefecture", "Toyama")))
@@ -116,6 +117,8 @@ POI_TOYAMA = fnum(raw("poi_mfst", deck.manifest_metric("n_pois_by_prefecture", "
 MODEL_ROWS = fnum(raw("aspect_mfst", deck.manifest_metric("primary_model_rows")))
 LOW_RATING_ROWS = fnum(raw("aspect_mfst", deck.manifest_metric("primary_low_rating_rows")))
 LOW_RATING_DEF = ftext(raw("aspect_mfst", deck.manifest_top("filters", "low_rating_definition")))
+LOW_RATING_STARS = fnum(raw("aspect_mfst", deck.low_rating_cutoff()))
+N_ASPECTS = fnum(raw("nudge_tax", deck.taxonomy_count()))
 
 # Model + guards
 MODELS_PRIMARY = fnum(raw("aspect_mfst", deck.manifest_metric("A_primary_models_fit")))
@@ -125,7 +128,9 @@ STATUS_PREV = fnum(raw("aspect_mfst", deck.manifest_metric("status_counts", "pre
 STATUS_SKIP = fnum(raw("aspect_mfst", deck.manifest_metric("status_counts", "skipped")))
 MIN_P = fp(raw("aspect_mfst", deck.manifest_metric("min_model_p_value")))
 FIRTH_SANITY = f"{float(raw('aspect_mfst', deck.plain_vs_firth_max_logdiff())):.3f}"
+FIRTH_SANITY_ASPECTS = fnum(raw("aspect_mfst", deck.plain_vs_firth_aspect_count()))
 CAVEAT_GATE = ftext(raw("aspect_mfst", deck.caveat_text(6)))
+MIN_RANKING_MENTIONS = fnum(raw("aspect_mfst", deck.manifest_top("filters", "min_pooled_positive_for_ranking")))
 
 
 def asp(aspect, col):
@@ -134,6 +139,7 @@ def asp(aspect, col):
 
 # Aspect opportunity map (prevalence, odds ratio, 95% CI, FDR p)
 OPEN_PREV = fpct1(asp("opening_hours_availability", "prevalence"))
+OPEN_N = fnum(asp("opening_hours_availability", "n_positive"))
 OPEN_OR = f2(asp("opening_hours_availability", "odds_ratio"))
 OPEN_CIL = f2(asp("opening_hours_availability", "or_ci_low"))
 OPEN_CIH = f2(asp("opening_hours_availability", "or_ci_high"))
@@ -141,6 +147,7 @@ OPEN_P = fp(asp("opening_hours_availability", "p_value_bh_fdr"))
 OPEN_PV = fpv(asp("opening_hours_availability", "p_value_bh_fdr"))
 
 TIME_PREV = fpct1(asp("itinerary_fit_time_cost", "prevalence"))
+TIME_N = fnum(asp("itinerary_fit_time_cost", "n_positive"))
 TIME_OR = f2(asp("itinerary_fit_time_cost", "odds_ratio"))
 TIME_CIL = f2(asp("itinerary_fit_time_cost", "or_ci_low"))
 TIME_CIH = f2(asp("itinerary_fit_time_cost", "or_ci_high"))
@@ -161,6 +168,7 @@ CLEAN_PV = fpv(asp("cleanliness_comfort", "p_value_bh_fdr"))
 
 ENG_GAP_PREV = fpct1(asp("english_information_gap", "prevalence"))
 SIGN_PREV = fpct1(asp("wayfinding_signage", "prevalence"))
+SIGN_N = fnum(asp("wayfinding_signage", "n_positive"))
 SIGN_OR = f2(asp("wayfinding_signage", "odds_ratio"))
 SIGN_CIL = f2(asp("wayfinding_signage", "or_ci_low"))
 SIGN_CIH = f2(asp("wayfinding_signage", "or_ci_high"))
@@ -171,6 +179,16 @@ BOOKING_PREV = fpct1(asp("booking_ticketing", "prevalence"))
 # Chinese-language Xiaohongshu context
 CN_ROWS = fnum(raw("cn_mfst", deck.manifest_metric("denominators", "chinese_social_rows")))
 CN_XHS_ROWS = fnum(raw("cn_mfst", deck.manifest_metric("denominators", "n_total_xhs_rows")))
+
+
+def cnt(code, col):
+    return raw("cn_topics", deck.cn_topic_value(code, col))
+
+
+XHS_SCENIC_N = fnum(cnt("scenic_nature", "count"))
+XHS_SCENIC_PCT = f"{float(cnt('scenic_nature', 'pct_posts')):.1f}%"
+XHS_DINO_N = fnum(cnt("dinosaurs_museums", "count"))
+XHS_DINO_PCT = f"{float(cnt('dinosaurs_museums', 'pct_posts')):.1f}%"
 
 
 def cnv(predictor, col):
@@ -216,14 +234,18 @@ FIX_COUNT = fnum(raw("nudge_poi", deck.poi_sum("is_fix_it")))
 FIX_FUKUI = fnum(raw("nudge_poi", deck.poi_sum("is_fix_it", True)))
 PROMOTE_COUNT = fnum(raw("nudge_poi", deck.poi_sum("is_promote_it")))
 PROMOTE_FUKUI = fnum(raw("nudge_poi", deck.poi_sum("is_promote_it", True)))
+PROMOTE_STRICT_COUNT = fnum(raw("nudge_poi", deck.poi_sum("is_promote_it_strict")))
 CROWD_COUNT = fnum(raw("nudge_poi", deck.poi_sum("is_crowding_hotspot")))
 LOW_VOL = fnum(raw("nudge_poi", deck.poi_metric("low_volume_threshold")))
 HIGH_VOL = fnum(raw("nudge_poi", deck.poi_metric("high_volume_threshold")))
+LOW_CONFIDENCE = fnum(raw("poi_mfst", deck.manifest_metric("low_confidence_threshold_n_reviews")))
 PROMO1 = ftext(raw("nudge_poi", deck.poi_ranked("promote_fukui", 0, "poi_name")))
+PROMO1_N = fnum(raw("nudge_poi", deck.poi_ranked("promote_fukui", 0, "n_reviews")))
 PROMO1_SHARE = fpct1(raw("nudge_poi", deck.poi_ranked("promote_fukui", 0, "positive_share")))
 PROMO1_LOW = fpct1(raw("nudge_poi", deck.poi_ranked("promote_fukui", 0, "positive_share_ci_low")))
 PROMO1_HIGH = fpct1(raw("nudge_poi", deck.poi_ranked("promote_fukui", 0, "positive_share_ci_high")))
 PROMO2 = ftext(raw("nudge_poi", deck.poi_ranked("promote_fukui", 1, "poi_name")))
+PROMO2_N = fnum(raw("nudge_poi", deck.poi_ranked("promote_fukui", 1, "n_reviews")))
 PROMO2_SHARE = fpct1(raw("nudge_poi", deck.poi_ranked("promote_fukui", 1, "positive_share")))
 PROMO2_LOW = fpct1(raw("nudge_poi", deck.poi_ranked("promote_fukui", 1, "positive_share_ci_low")))
 PROMO2_HIGH = fpct1(raw("nudge_poi", deck.poi_ranked("promote_fukui", 1, "positive_share_ci_high")))
@@ -534,29 +556,28 @@ def build():
     r = tf.paragraphs[0].add_run()
     r.text = "福井大学 ・ 竹本研 ・ 福井観光PBL"
     _style_run(r, 17, NAVY, bold=True, font=JP_FONT)
-    placeholder(s, Inches(10.55), Inches(0.55), Inches(2.2), Inches(1.1), "logo", "ロゴ")
     tb, tf = textbox(s, MX, Inches(1.85), CW, Inches(1.7))
     pe = tf.paragraphs[0]
     pe.space_after = Pt(3)
     r = pe.add_run()
-    r.text = "Turning Hokuriku review text into testable nudges"
+    r.text = "From Hokuriku reviews to tourism nudges"
     _style_run(r, 38, NAVY, bold=True, font=HEAD_FONT)
     pj = tf.add_paragraph()
     pj.space_before = Pt(2)
     rj = pj.add_run()
-    rj.text = "北陸の口コミテキストを、検証可能なナッジへ"
+    rj.text = "北陸の口コミから、観光ナッジへ"
     _style_run(rj, 18, GREY, font=JP_FONT)
     tb2, tf2 = textbox(s, MX, Inches(3.95), CW, Inches(1.1))
     en_jp(tf2,
-          "An exploratory opportunity map of which review signals are nudge-able, and which sites are fix-it or promote-it.",
-          "口コミに表れるシグナルのうち、どれがナッジ可能か、どのスポットが改善型か推奨型かを探索的に地図化する。",
+          "Which visitor problems can better information address? Which problems require operator action?",
+          "より良い情報で改善できる問題は何か。事業者の対応が必要な問題は何か。",
           en_size=16, jp_size=13, en_color=INK, first=True, space_after=0)
     # presenters + date, formal, no chips
     tbp, tfp = textbox(s, MX, Inches(5.55), CW, Inches(0.9))
     pe = tfp.paragraphs[0]
     pe.space_after = Pt(2)
     r = pe.add_run()
-    r.text = "Green Andrew  ・  Xu Zilin"
+    r.text = "Green ANDREW  ・  Xu ZILIN"
     _style_run(r, 18, NAVY, bold=True)
     pj = tfp.add_paragraph()
     rj = pj.add_run()
@@ -565,26 +586,27 @@ def build():
     # scope stat line (traced)
     sc_tb, sc_tf = textbox(s, MX, Inches(6.55), CW, Inches(0.8))
     en_jp(sc_tf,
-          f"{TOTAL_REVIEWS} tagged reviews across {N_POIS} sites, three prefectures. Every figure traces to a source file ●",
-          f"3県・{N_POIS}スポットの{TOTAL_REVIEWS}件のタグ付き口コミ。すべての数値はソースファイルに紐づく ●",
+          f"{TOTAL_REVIEWS} Google reviews across {N_POIS} sites in Hokuriku ●",
+          f"北陸{N_POIS}スポットのGoogle口コミ{TOTAL_REVIEWS}件 ●",
           en_size=12, jp_size=10.5, en_color=GREY, first=True, space_after=0)
-    notes(s, "Both: Greet the audience. Andrew speaks in slow, clear English. State the one-line goal: read review "
-              "text, then rank which signals are nudge-able and where to experiment next. Lynn covers the data and "
-              "the Chinese-language strand. Note the provenance dot: every number is a live reference to a source file.")
+    notes(s, "Andrew (35 sec): Good morning. We studied online reviews of tourism sites in Hokuriku. Our question is "
+              "simple: which visitor problems may be reduced through better information, and which problems require "
+              "changes by the operator? We use the results to choose future experiments. We do not claim that any "
+              "nudge already works.")
 
     # ---- 2 INTRODUCTION ----
     s = new()
     label(s, "I.  INTRODUCTION")
-    title(s, "The question", "問い")
+    title(s, "Research question", "研究の問い")
     _, tf = textbox(s, MX, Inches(2.15), Inches(7.5), Inches(4.0))
-    en_jp(tf, "Reviews carry two signals: pain points (what went wrong) and draw (what pulled visitors in).",
-          "口コミは2種類のシグナルを持つ。不満(問題点)と魅力(惹きつけた点)。",
+    en_jp(tf, "Reviews describe visitor pain points and reasons to visit.",
+          "口コミには、訪問者の不満点と訪問したい理由が表れる。",
           first=True, bullet=True, space_after=18)
-    en_jp(tf, "Some pain points ease with better pre-visit information. Others need an on-site operator fix.",
-          "一部の不満は訪問前の情報で和らぐ。他は現地での事業者改善が必要。",
+    en_jp(tf, "Some pain points may be reduced with clearer information before a trip.",
+          "一部の不満点は、旅行前の分かりやすい情報で減らせる可能性がある。",
           bullet=True, space_after=18)
-    en_jp(tf, "Which signals are nudge-able, and which sites are fix-it or promote-it?",
-          "どのシグナルがナッジ可能で、どのスポットが改善型か推奨型か?",
+    en_jp(tf, "We rank low-cost ideas that should be tested next.",
+          "次に検証すべき低コストの施策を順位づける。",
           bullet=True, space_after=0)
     levers = [("Information provision", "情報提供"),
               ("Pre-commitment", "事前コミットメント"),
@@ -605,17 +627,17 @@ def build():
         rjp.text = jp
         _style_run(rjp, 12, GREY, font=JP_FONT)
     infobox(s, MX, Inches(6.3), Inches(7.5), Inches(0.7),
-            "This is an exploratory, hypothesis-generating study. It ranks candidate experiments. It does not estimate causal effects.",
-            "本研究は探索的・仮説生成型である。候補となる実験を順位づけする。因果効果は推定しない。")
+            "Exploratory study: the results identify experiments to test. They do not prove cause and effect.",
+            "探索的研究:結果は検証候補を示すものであり、因果関係を証明するものではない。")
     foot(s, 2)
-    notes(s, "Andrew: Keep it to three sentences, slowly. The pivot from last time: the question is not whether a "
-              "language gap exists, but where a low-cost nudge could plausibly help. Stress the honest frame. We rank "
-              "where to experiment. We do not claim any nudge works yet. This sets up Methods.")
+    notes(s, "Andrew (40 sec): Reviews tell us about pain points, such as unclear opening hours, and attractions, such "
+              "as scenery. Some problems may respond to information before the visit. Other problems, such as price or "
+              "cleanliness, need action by the operator. This study ranks practical ideas for future testing.")
 
     # ---- 3 METHODS DATA ----
     s = new()
     label(s, "II.  METHODS")
-    title(s, "The corpus", "コーパス")
+    title(s, "The data", "データ")
     _, c1 = card(s, MX, Inches(2.05), Inches(5.7), Inches(2.05))
     pe = c1.paragraphs[0]
     rr = pe.add_run()
@@ -625,9 +647,9 @@ def build():
     rj = pj.add_run()
     rj.text = "タグ付き口コミ"
     _style_run(rj, 11.5, GREY, font=JP_FONT)
-    en_jp(c1, f"{TAGGED_ROWS} rows", f"{TAGGED_ROWS} 行", en_size=17, jp_size=12, en_color=NAVY, bold=True)
-    en_jp(c1, f"Japanese {LANG_JP} · English {LANG_EN} · Chinese {LANG_CN} · other {LANG_OTHER}",
-          f"日本語 {LANG_JP} ・ 英語 {LANG_EN} ・ 中国語 {LANG_CN} ・ その他 {LANG_OTHER}",
+    en_jp(c1, f"{TAGGED_ROWS} Google reviews", f"Google口コミ {TAGGED_ROWS}件", en_size=17, jp_size=12, en_color=NAVY, bold=True)
+    en_jp(c1, f"Japanese {LANG_JP} · English {LANG_EN} · Chinese {LANG_CN}",
+          f"日本語 {LANG_JP} ・ 英語 {LANG_EN} ・ 中国語 {LANG_CN}",
           en_size=14.5, jp_size=11.5, en_color=INK, space_after=0)
     _, c2 = card(s, MX, Inches(4.3), Inches(5.7), Inches(1.95))
     pe = c2.paragraphs[0]
@@ -641,145 +663,155 @@ def build():
     en_jp(c2, f"Fukui {POI_FUKUI} · Ishikawa {POI_ISHIKAWA} · Toyama {POI_TOYAMA}",
           f"福井 {POI_FUKUI} ・ 石川 {POI_ISHIKAWA} ・ 富山 {POI_TOYAMA}",
           en_size=15, jp_size=12)
-    en_jp(c2, "Language labels describe the review language, not the reviewer's nationality.",
-          "言語ラベルは口コミの言語を表し、執筆者の国籍ではない。",
+    en_jp(c2, f"Other languages {LANG_OTHER} · undetected or too short {LANG_UNDETECTED}",
+          f"その他の言語 {LANG_OTHER} ・ 判定不能または短文 {LANG_UNDETECTED}",
           en_size=13, jp_size=10.5, en_color=GREY, space_after=0)
     picture_fit(s, "volume", Inches(6.55), Inches(2.0), Inches(6.2), Inches(3.5))
     caption(s, Inches(6.65), Inches(5.6), Inches(6.0),
-            "Hokuriku supported-language rows entering the pooled low-rating model. No sentiment score is shown.",
-            "北陸の統合低評価モデルに入る対応言語の行数。感情スコアは表示しない。")
+            "The rating model uses Japanese, English, and Chinese-language Google reviews.",
+            "評価モデルでは、日本語・英語・中国語のGoogle口コミを使用。")
     foot(s, 3)
-    notes(s, f"Lynn takes this slide. Each review row is tagged with the aspects it mentions, across three Hokuriku "
-              "prefectures. The 'other' bucket contains mixed-language Google reviews. It is separate from the "
-              f"{CN_ROWS} Xiaohongshu posts shown later. Privacy line matters for a Japanese audience: only aggregates "
-              "leave the project.")
+    notes(s, f"Lynn (45 sec): Our dataset contains {TAGGED_ROWS} Google reviews from {N_POIS} sites in Fukui, "
+              f"Ishikawa, and Toyama. The rating model uses {LANG_JP} Japanese-language reviews, {LANG_EN} English-language "
+              f"reviews, and {LANG_CN} Chinese-language reviews. Language means the language of the text. It does not "
+              f"tell us the reviewer's nationality. Later, I will show a separate set of {CN_ROWS} Xiaohongshu posts.")
 
     # ---- 4 METHODS PIPELINE ----
     s = new()
     label(s, "II.  METHODS")
-    title(s, "Turning text into a tested signal", "テキストを検証可能なシグナルに変える")
+    title(s, "How review text became data", "口コミテキストをデータに変える方法")
     _, tf = textbox(s, MX, Inches(2.15), Inches(7.6), Inches(4.0))
-    en_jp(tf, "Each review tagged for 18 aspect codes (12 pain points, 6 draw) from reviewed keyword codebooks.",
-          "各口コミを18のアスペクトコード(不満12・魅力6)に、レビュー済み辞書でタグ付け。",
+    en_jp(tf, f"1. Tag each review with {N_ASPECTS} aspects using human-reviewed keyword lists.",
+          f"1. 人が確認したキーワードリストを使い、各口コミに{N_ASPECTS}の項目を付ける。",
           first=True, bullet=True, space_after=17)
-    en_jp(tf, f"Outcome: a low rating, defined as {LOW_RATING_DEF} ({LOW_RATING_ROWS} of {MODEL_ROWS} modelled rows).",
-          f"結果変数:低評価。定義は {LOW_RATING_DEF}(モデル {MODEL_ROWS} 行中 {LOW_RATING_ROWS} 行)。",
+    en_jp(tf, f"2. Define a low rating as {LOW_RATING_STARS} stars or fewer: {LOW_RATING_ROWS} of {MODEL_ROWS} reviews.",
+          f"2. {LOW_RATING_STARS}つ星以下を低評価と定義:{MODEL_ROWS}件中{LOW_RATING_ROWS}件。",
           bullet=True, space_after=17)
-    en_jp(tf, "Per aspect: when a review mentions it, are the odds of a low rating higher?",
-          "アスペクトごと:言及があると低評価のオッズは高いか?",
+    en_jp(tf, "3. Test whether each pain-point tag is associated with a low rating.",
+          "3. 各不満点への言及が低評価と関連するかを検証する。",
           bullet=True, space_after=17)
-    en_jp(tf, "Sentiment tools are never compared across languages; secondary checks stay within-language.",
-          "感情ツールを言語間で比較しない。副次チェックは同一言語内のみ。",
+    en_jp(tf, "Google star ratings provide the shared outcome. Sentiment-tool scores are not compared across languages.",
+          "共通の結果変数にはGoogleの星評価を使う。感情分析ツールの点数は言語間で比較しない。",
           bullet=True, space_after=0)
     stat_callout(s, Inches(8.55), Inches(2.2), Inches(4.05), MODEL_ROWS, "modelled rows", "モデル対象行")
     stat_callout(s, Inches(8.55), Inches(4.05), Inches(4.05), LOW_RATING_ROWS, "low-rated rows", "低評価の行")
     foot(s, 4)
-    notes(s, "Andrew: Slowly. The modelled outcome is a low star rating, a shared 1 to 5 scale with no sentiment tool "
-              f"in the loop. {MODEL_ROWS} rows have a supported language and a rating; {LOW_RATING_ROWS} of them are "
-              "low-rated. The aspect tags are the predictors. Emphasise the honesty rule. It is the methodological "
-              "backbone reviewers will probe. Then hand to Lynn for the model.")
+    notes(s, f"Andrew (50 sec): We used human-reviewed keyword lists to tag {MODEL_ROWS} Japanese, English, and "
+              f"Chinese-language Google reviews. A low rating means {LOW_RATING_STARS} stars or fewer. There were {LOW_RATING_ROWS} "
+              "low-rated reviews. For each pain point, we tested whether a review mentioning it was more likely to have "
+              "a low rating. We use star ratings as the common outcome, so different sentiment tools are not compared.")
 
     # ---- 5 METHODS MODEL (stats-heavy) ----
     s = new()
     label(s, "II.  METHODS")
     title(s, "The statistical model", "統計モデル")
-    _, tf = textbox(s, MX, Inches(2.05), Inches(7.4), Inches(4.0))
-    en_jp(tf, "Model: Firth penalized logistic regression, one fit per aspect, outcome = a low rating.",
-          "モデル:Firth ペナルティ付きロジスティック回帰。アスペクトごとに推定、結果は低評価。",
+    _, tf = textbox(s, MX, Inches(2.05), Inches(7.0), Inches(4.0))
+    en_jp(tf, "Model: Firth bias-reduced logistic regression, fitted separately for each aspect.",
+          "モデル:各項目についてFirthバイアス低減ロジスティック回帰を実施。",
           first=True, bullet=True, en_size=16, jp_size=12.5, space_after=15)
-    en_jp(tf, "Why Firth: rare aspect mentions make plain logistic regression unstable under separation. Firth returns finite, less-biased odds ratios. Hand-coded here.",
-          "Firth の理由:言及が稀で、通常のロジスティック回帰は分離下で不安定。Firth は有限で偏りの小さいオッズ比を返す。自前実装。",
+    en_jp(tf, "Why Firth: several pain points were mentioned rarely. Firth is more stable with sparse data.",
+          "Firthを使う理由:言及数が少ない不満点でも、より安定して推定できる。",
           bullet=True, en_size=16, jp_size=12.5, space_after=15)
-    en_jp(tf, "Adjusted for review text length, language, and prefecture.",
-          "文字数・言語・県を調整。",
+    en_jp(tf, "Adjusted for text length, review language, and prefecture.",
+          "口コミの長さ、言語、県を調整。",
           bullet=True, en_size=16, jp_size=12.5, space_after=15)
-    en_jp(tf, f"Effect: an adjusted odds ratio with a Wald penalized-information 95% CI. {MODELS_PRIMARY} primary models, {MODELS_TOTAL} across segments.",
-          f"効果:調整済みオッズ比と Wald ペナルティ付き95%CI。主分析 {MODELS_PRIMARY}、全体 {MODELS_TOTAL} モデル。",
+    en_jp(tf, f"Output: adjusted odds ratio, 95% confidence interval, and p-value for each of {MODELS_PRIMARY} primary models.",
+          f"出力:{MODELS_PRIMARY}の主モデルごとに、調整済みオッズ比・95%信頼区間・p値を算出。",
           bullet=True, en_size=16, jp_size=12.5, space_after=0)
-    picture_fit(s, "txtlen", Inches(8.25), Inches(2.15), Inches(4.5), Inches(2.95))
-    caption(s, Inches(8.3), Inches(5.2), Inches(4.45),
-            "JP/EN are the Fukui confirmatory diagnostic; Chinese (Hokuriku Google reviews) added for comparison — shortest text, least match opportunity. CJK vs Latin chars not 1:1.",
-            "日本語・英語は福井の確認診断。比較のため中国語(北陸のGoogleレビュー)を追加:文字数が最短で一致機会が最小。CJKとラテン文字は同等比較不可。")
+    model_steps = [
+        ("Outcome", "低評価", f"{LOW_RATING_STARS} stars or fewer", f"{LOW_RATING_STARS}つ星以下"),
+        ("Predictor", "説明変数", "One aspect tag", "1つの項目タグ"),
+        ("Controls", "調整項目", "Length, language, prefecture", "長さ・言語・県"),
+    ]
+    for i, (en_h, jp_h, en_b, jp_b) in enumerate(model_steps):
+        _, ctf = card(s, Inches(8.2), Inches(2.05 + i * 1.38), Inches(4.45), Inches(1.12))
+        en_jp(ctf, en_h, jp_h, en_size=15, jp_size=11, en_color=NAVY, bold=True, first=True, space_after=2)
+        en_jp(ctf, en_b, jp_b, en_size=13, jp_size=10.5, en_color=INK, space_after=0)
     foot(s, 5)
-    notes(s, "Lynn: Do not read every number. Three ideas. One, the outcome is a low star rating, modelled with "
-              "logistic regression. Two, Firth penalization keeps the odds ratio finite and stable when an aspect is "
-              "rare, which is common here. Three, every model adjusts for text length, language, and prefecture, so "
-              "the association is not just longer reviews matching more words. Andrew can field nesting questions.")
+    notes(s, "Andrew (50 sec): We used Firth logistic regression because several pain points were mentioned only a "
+              "small number of times. This method reduces small-sample bias and is more stable than ordinary logistic "
+              "regression when data are sparse. Each model adjusts for review length, language, and prefecture. The "
+              "result is an adjusted odds ratio with a confidence interval.")
 
     # ---- 6 METHODS INFERENCE + DECISION RULE (stats-heavy) ----
     s = new()
     label(s, "II.  METHODS")
-    title(s, "Inference, multiple testing, and the decision rule", "推論・多重比較・判定ルール")
+    title(s, "Rules used to avoid overclaiming", "過大な主張を避けるためのルール")
     _, tf = textbox(s, MX, Inches(2.05), Inches(6.95), Inches(4.4))
-    en_jp(tf, f"Multiple testing: Benjamini-Hochberg FDR across the aspect family. Smallest model {MIN_P}.",
-          f"多重比較:アスペクト群で BH-FDR 補正。最小モデル {MIN_P}。",
+    en_jp(tf, "Correct p-values for multiple tests using Benjamini-Hochberg FDR.",
+          "複数の検定にはBenjamini-Hochberg FDR補正を行う。",
           first=True, bullet=True, en_size=16, jp_size=12.5, space_after=16)
-    en_jp(tf, "Decision rule: a non-zero opportunity score needs FDR-significant AND harmful (OR > 1). Everything else stays at zero.",
-          "判定:非ゼロの機会スコアは FDR 有意かつ有害(OR > 1)が必要。それ以外はゼロ。",
+    en_jp(tf, f"Ranking requires a harmful association, FDR significance, and at least {MIN_RANKING_MENTIONS} pooled mentions.",
+          f"順位づけには、有害な関連、FDR有意、統合データで{MIN_RANKING_MENTIONS}件以上の言及が必要。",
           bullet=True, en_size=16, jp_size=12.5, space_after=16)
-    en_jp(tf, f"Robustness: Firth and plain-logit odds ratios agree to max |Δlog| = {FIRTH_SANITY}.",
-          f"頑健性:Firth と通常ロジットの OR は最大 |Δlog| = {FIRTH_SANITY} で一致。",
+    en_jp(tf, f"For {FIRTH_SANITY_ASPECTS} selected aspects, Firth and standard-logit estimates were similar (maximum |Δlog OR| = {FIRTH_SANITY}).",
+          f"選択した{FIRTH_SANITY_ASPECTS}項目では、Firthと通常ロジットの推定値は近かった(最大|Δlog OR|={FIRTH_SANITY})。",
           bullet=True, en_size=16, jp_size=12.5, space_after=16)
-    en_jp(tf, "Nudge-able = pre-visit information can ease it. Operator fix = the site must change. Only nudge-able, FDR-significant pain points qualify.",
-          "ナッジ可能=訪問前情報で緩和。事業者改善=現地を変える必要。ナッジ可能かつ FDR 有意のみ候補。",
+    en_jp(tf, "Classify each result as an information nudge or an operator fix.",
+          "各結果を、情報ナッジまたは事業者による改善に分類する。",
           bullet=True, en_size=16, jp_size=12.5, space_after=0)
-    placeholder(s, Inches(8.05), Inches(2.05), Inches(4.55), Inches(4.25),
-                "diagram or photo", "図または写真")
+    _, guard = card(s, Inches(8.05), Inches(2.05), Inches(4.55), Inches(4.25), bg=TINT)
+    guard.vertical_anchor = MSO_ANCHOR.MIDDLE
+    en_jp(guard, "Statistical evidence", "統計的根拠", en_size=18, jp_size=13, en_color=NAVY, bold=True, first=True, space_after=10)
+    en_jp(guard, "Association + uncertainty + enough mentions", "関連性・不確実性・十分な言及数", en_size=15, jp_size=11.5, space_after=18)
+    en_jp(guard, "Action check", "実行可能性の確認", en_size=18, jp_size=13, en_color=NAVY, bold=True, space_after=10)
+    en_jp(guard, "Can information help, or must the site change?", "情報で改善できるか、現地の変更が必要か。", en_size=15, jp_size=11.5, space_after=0)
     foot(s, 6)
-    notes(s, "Lynn: This is the integrity slide. The Benjamini-Hochberg correction controls the false discovery rate "
-              "because we fit many models. The decision rule is the key: an opportunity score is forced to zero unless "
-              "the pain point is both FDR-significant and harmful, so there is no cherry-picking. The robustness line "
-              "shows Firth barely moves the answer versus a plain logit. Then the nudge-able versus operator split sets "
-              "up Results.")
+    notes(s, f"Andrew (50 sec): We applied four safeguards. First, BH-FDR correction reduces false positives from "
+              f"multiple tests. Second, a ranked opportunity needs at least {MIN_RANKING_MENTIONS} pooled mentions. "
+              "Third, the association must point toward low ratings. Fourth, we separate problems that information may "
+              "address from problems that require an operator change. These rules reduce cherry-picking.")
 
     # ---- 7 RESULTS: stat table ----
     s = new()
     label(s, "III.  RESULTS")
-    title(s, "Which pain points actually predict low ratings", "どの不満が低評価を予測するか")
+    title(s, "Pain points associated with low ratings", "低評価と関連する不満点")
     _, tf = textbox(s, MX, Inches(1.9), CW, Inches(0.55))
-    en_jp(tf, "Three nudge-able pain points are statistically significant after FDR correction.",
-          "FDR 補正後に有意なナッジ可能の不満点は3つ。",
+    en_jp(tf, "Two clear information priorities and one preliminary signal.",
+          "明確な情報改善の優先項目は2つ。予備的なシグナルは1つ。",
           first=True, en_size=15, jp_size=11.5, space_after=0)
-    headers = ["Aspect", "Prev.", "OR (95% CI)", "FDR p", "Nudge-able"]
+    headers = ["Pain point", "Mentions", "OR (95% CI)", "FDR p", "Interpretation"]
     body = [
-        ("Opening hours / availability", "開館時間・営業状況", OPEN_PREV, OPEN_OR, f"{OPEN_CIL} to {OPEN_CIH}", OPEN_PV, "Yes", True),
-        ("Itinerary fit / time-cost", "行程適合・所要時間", TIME_PREV, TIME_OR, f"{TIME_CIL} to {TIME_CIH}", TIME_PV, "Yes", True),
-        ("Wayfinding / signage", "道案内・表示", SIGN_PREV, SIGN_OR, f"{SIGN_CIL} to {SIGN_CIH}", SIGN_PV, "Yes", True),
-        ("Price / value", "価格・コスパ", PRICE_PREV, PRICE_OR, f"{PRICE_CIL} to {PRICE_CIH}", PRICE_PV, "No (operator)", False),
-        ("Cleanliness / comfort", "清潔さ・快適さ", CLEAN_PREV, CLEAN_OR, f"{CLEAN_CIL} to {CLEAN_CIH}", CLEAN_PV, "No (operator)", False),
+        ("Opening hours", "営業時間", OPEN_N, OPEN_OR, f"{OPEN_CIL} to {OPEN_CIH}", OPEN_PV, "Priority", True),
+        ("Itinerary / time", "旅程・所要時間", TIME_N, TIME_OR, f"{TIME_CIL} to {TIME_CIH}", TIME_PV, "Priority", True),
+        ("Wayfinding", "道案内", SIGN_N, SIGN_OR, f"{SIGN_CIL} to {SIGN_CIH}", SIGN_PV, "Preliminary", False),
     ]
     n_rows = len(body) + 1
-    tx, ty, tw, th = MX, Inches(2.7), Inches(8.05), Inches(3.0)
+    tx, ty, tw, th = MX, Inches(2.7), Inches(8.25), Inches(2.35)
     gt = s.shapes.add_table(n_rows, 5, tx, ty, tw, th).table
     gt.first_row = False
     gt.horz_banding = False
-    widths = [Inches(2.85), Inches(0.9), Inches(2.0), Inches(1.05), Inches(1.25)]
+    widths = [Inches(2.35), Inches(1.0), Inches(2.15), Inches(1.05), Inches(1.7)]
     for i, wv in enumerate(widths):
         gt.columns[i].width = wv
     for j, htext in enumerate(headers):
         _cell(gt.cell(0, j), htext, 12.5, WHITE, bold=True,
               align=PP_ALIGN.LEFT if j == 0 else PP_ALIGN.CENTER, fill=NAVY)
-    for ri, (en, jp, prev, orv, ci, pv, nud, ok) in enumerate(body, start=1):
+    for ri, (en, jp, mentions, orv, ci, pv, interpretation, ok) in enumerate(body, start=1):
         rowfill = WHITE if ri % 2 else CARD_BG
         _cell(gt.cell(ri, 0), en, 12, INK, bold=True, fill=rowfill, jp=jp)
-        _cell(gt.cell(ri, 1), prev, 12, INK, align=PP_ALIGN.CENTER, fill=rowfill)
+        _cell(gt.cell(ri, 1), mentions, 12, INK, align=PP_ALIGN.CENTER, fill=rowfill)
         _cell(gt.cell(ri, 2), f"{orv}  ({ci})", 12, INK, align=PP_ALIGN.CENTER, fill=rowfill)
         _cell(gt.cell(ri, 3), pv, 12, INK, align=PP_ALIGN.CENTER, fill=rowfill)
-        _cell(gt.cell(ri, 4), nud, 12, NAVY if ok else GREY, bold=ok, align=PP_ALIGN.CENTER, fill=rowfill)
-    picture_fit(s, "nudge_aspect_fig", Inches(8.85), Inches(2.6), Inches(3.95), Inches(3.4))
-    caption(s, MX, Inches(5.95), Inches(8.05),
-            "OR = adjusted odds of a low rating, with a 95% interval. English-information gap, transport, and booking are not FDR-significant, so their scores stay at zero.",
-            "OR は低評価の調整済みオッズ比(95%区間)。英語情報の不足・交通・予約は FDR 有意でなく、スコアはゼロ。")
+        _cell(gt.cell(ri, 4), interpretation, 12, NAVY if ok else GREY, bold=ok, align=PP_ALIGN.CENTER, fill=rowfill)
+    picture_fit(s, "nudge_aspect_fig", Inches(9.0), Inches(2.55), Inches(3.75), Inches(3.2))
+    infobox(s, MX, Inches(5.35), Inches(8.25), Inches(1.0),
+            f"Price (OR {PRICE_OR}) and cleanliness (OR {CLEAN_OR}) were also linked to low ratings, but they require operator action.",
+            f"価格(OR {PRICE_OR})と清潔さ(OR {CLEAN_OR})も低評価と関連したが、事業者の対応が必要。")
+    caption(s, MX, Inches(6.45), Inches(8.25),
+            "OR = adjusted odds ratio. Wayfinding is borderline: its 95% interval includes 1.",
+            "OR=調整済みオッズ比。道案内は境界的で、95%信頼区間に1を含む。")
     foot(s, 7)
-    notes(s, "Andrew: Read the table top to bottom. Opening hours and itinerary fit are both significant after FDR "
-              "and nudge-able; wayfinding/signage also clears FDR. Price and cleanliness are significant operator fixes, so they "
-              "are flagged rather than nudged. The aspects not in the table, like English-information gap and transport, "
-              "are present in reviews but do not clear FDR, so we hold them at zero and wait for more data.")
+    notes(s, f"Andrew (60 sec): Opening-hour problems were mentioned in {OPEN_N} reviews and had an adjusted odds ratio "
+              f"of {OPEN_OR}. Itinerary and time problems were mentioned in only {TIME_N} reviews, but their association "
+              f"was also strong, with an odds ratio of {TIME_OR}. Wayfinding had an odds ratio of {SIGN_OR}, but its "
+              "confidence interval includes one. We therefore call wayfinding preliminary. These are associations, not "
+              "causal effects.")
 
     # ---- 8 RESULTS: the two justified nudges ----
     s = new()
     label(s, "III.  RESULTS")
-    title(s, "Three justified information nudges", "根拠のある3つの情報ナッジ")
+    title(s, "Two priorities and one idea to test", "優先すべき2項目と、検証する1案")
     _, b1 = card(s, MX, Inches(2.0), Inches(7.55), Inches(2.0))
     pe = b1.paragraphs[0]
     rr = pe.add_run()
@@ -789,8 +821,8 @@ def build():
     rj = pj.add_run()
     rj.text = "開館時間・営業状況"
     _style_run(rj, 11.5, GREY, font=JP_FONT)
-    en_jp(b1, f"Adjusted odds of a low rating {OPEN_OR}x higher (95% CI {OPEN_CIL} to {OPEN_CIH}, {OPEN_P}). Information nudge: show current hours, last entry, and closure risk before the trip.",
-          f"低評価の調整済みオッズが {OPEN_OR} 倍(95%CI {OPEN_CIL}〜{OPEN_CIH}、{OPEN_P})。情報ナッジ:営業時間・最終入場・休業リスクを訪問前に提示。",
+    en_jp(b1, f"Reviews mentioning opening-hour problems were more likely to give {LOW_RATING_STARS} stars or fewer. Show current hours, last entry, and possible closures before visitors travel.",
+          f"営業時間の問題に触れた口コミでは、{LOW_RATING_STARS}つ星以下の評価が多く見られた。出発前に、営業時間・最終入場時刻・臨時休業の可能性を知らせる。",
           en_size=15, jp_size=11.5, space_after=0)
     _, b2 = card(s, MX, Inches(4.15), Inches(7.55), Inches(2.05))
     pe = b2.paragraphs[0]
@@ -801,102 +833,100 @@ def build():
     rj = pj.add_run()
     rj.text = "行程適合・所要時間"
     _style_run(rj, 11.5, GREY, font=JP_FONT)
-    en_jp(b2, f"Adjusted odds of a low rating {TIME_OR}x higher (95% CI {TIME_CIL} to {TIME_CIH}, {TIME_P}). Pre-commitment nudge: show realistic durations and route order before the itinerary locks.",
-          f"低評価の調整済みオッズが {TIME_OR} 倍(95%CI {TIME_CIL}〜{TIME_CIH}、{TIME_P})。事前コミットメントのナッジ:所要時間とルート順を行程確定前に提示。",
+    en_jp(b2, f"Reviews mentioning timing or itinerary problems were more likely to give {LOW_RATING_STARS} stars or fewer. Show realistic visit times and route order before plans are finalized.",
+          f"時間や旅程の問題に触れた口コミでは、{LOW_RATING_STARS}つ星以下の評価が多く見られた。計画を決める前に、現実的な滞在時間と観光ルートを示す。",
           en_size=15, jp_size=11.5, space_after=0)
     picture_fit(s, "nudge_info_fig", Inches(8.35), Inches(2.0), Inches(4.4), Inches(4.2))
     infobox(s, MX, Inches(6.35), Inches(12.13), Inches(0.65),
-            f"Wayfinding/signage also qualifies (OR {SIGN_OR}, FDR {SIGN_PV}): test clearer route cues. Price (OR {PRICE_OR}) and cleanliness (OR {CLEAN_OR}) remain operator fixes.",
-            f"道案内・表示も該当(OR {SIGN_OR}、FDR {SIGN_PV}):ルート案内を検証。価格(OR {PRICE_OR})と清潔さ(OR {CLEAN_OR})は事業者側の改善。")
+            f"Idea to test: clearer route guidance. Evidence is limited (n = {SIGN_N}; OR {SIGN_OR}, 95% CI {SIGN_CIL} to {SIGN_CIH}).",
+            f"検証する案:より分かりやすいルート案内。データは限定的(n={SIGN_N}; OR {SIGN_OR}, 95%CI {SIGN_CIL}〜{SIGN_CIH})。")
     foot(s, 8)
-    notes(s, "Andrew: This is the justification slide. Each nudge is tied to its odds ratio, confidence interval, and "
-              f"FDR p value. Opening hours: {OPEN_OR} times higher odds of a low rating, eased by showing hours and closure "
-              f"risk before the trip. Itinerary fit: {TIME_OR} times higher odds, eased by showing realistic durations. "
-              f"Wayfinding/signage also qualifies at OR {SIGN_OR}; test clearer route cues. "
-              "Price and cleanliness are larger effects but belong to the operator, so we are honest and exclude them "
-              "from the nudge set.")
+    notes(s, "Andrew (55 sec): Our first priority is a simple visit-readiness card showing opening hours, last entry, "
+              "and closure risks. Our second priority is realistic visit duration and route order before the visitor "
+              "finalizes a plan. Wayfinding remains an idea to test because the evidence is limited. These proposals "
+              "follow the observed associations, but only an experiment can show whether they work.")
 
     # ---- 9 RESULTS: Chinese-language Xiaohongshu context ----
     s = new()
     label(s, "III.  RESULTS")
-    title(s, "A separate promotion hypothesis from Xiaohongshu", "小紅書から得た、別枠のプロモーション仮説")
+    title(s, "What Chinese-language Xiaohongshu posts discuss", "中国語の小紅書投稿で話題になったこと")
     _, c1 = card(s, MX, Inches(2.0), Inches(5.7), Inches(3.15))
     pe = c1.paragraphs[0]
     rr = pe.add_run()
-    rr.text = "Descriptive evidence grade"
+    rr.text = "Separate, directional evidence"
     _style_run(rr, 16, NAVY, bold=True, font=HEAD_FONT)
     pj = c1.add_paragraph()
     rj = pj.add_run()
-    rj.text = "記述的エビデンス"
+    rj.text = "別枠の方向性を示すデータ"
     _style_run(rj, 11.5, GREY, font=JP_FONT)
-    en_jp(c1, f"{CN_ROWS} Chinese-language Fukui social posts, all {CN_XHS_ROWS} from Xiaohongshu. No star-rating outcome.",
-          f"福井に関する中国語 SNS 投稿 {CN_ROWS} 件。全 {CN_XHS_ROWS} 件が小紅書。星評価の結果変数はない。",
+    en_jp(c1, f"{CN_ROWS} Chinese-language posts about Fukui, all from Xiaohongshu.",
+          f"福井に関する中国語投稿{CN_ROWS}件。すべて小紅書から収集。",
           en_size=14, jp_size=11, space_after=12)
-    en_jp(c1, "SnowNLP categories are interpreted only within this source.",
-          "SnowNLP の分類は、このソース内だけで解釈する。",
+    en_jp(c1, "These posts have no star ratings and do not enter the Google rating model.",
+          "星評価がないため、Google評価モデルには含めない。",
           en_size=13.5, jp_size=10.8, en_color=GREY, space_after=0)
     _, c2 = card(s, Inches(6.55), Inches(2.0), Inches(6.1), Inches(3.15))
     pe = c2.paragraphs[0]
     rr = pe.add_run()
-    rr.text = "Signals worth testing"
+    rr.text = "Topic mentions"
     _style_run(rr, 16, NAVY, bold=True, font=HEAD_FONT)
     pj = c2.add_paragraph()
     rj = pj.add_run()
-    rj.text = "検証する価値のあるシグナル"
+    rj.text = "話題への言及"
     _style_run(rj, 11.5, GREY, font=JP_FONT)
-    en_jp(c2, f"Dinosaur / museum: {DINO_POS} of {DINO_N} posts positive ({DINO_PCT}) versus {DINO_OTHER_PCT} without this tag; BH-FDR {DINO_FDR}.",
-          f"恐竜・博物館:{DINO_N} 件中 {DINO_POS} 件がポジティブ({DINO_PCT})。タグなしは {DINO_OTHER_PCT}、BH-FDR {DINO_FDR}。",
+    en_jp(c2, f"Scenic nature appeared in {XHS_SCENIC_N} of {CN_ROWS} posts ({XHS_SCENIC_PCT}).",
+          f"自然景観は{CN_ROWS}件中{XHS_SCENIC_N}件({XHS_SCENIC_PCT})で言及。",
           en_size=14, jp_size=11, space_after=12)
-    en_jp(c2, f"Scenic nature: {SCENIC_POS} of {SCENIC_N} positive ({SCENIC_PCT}) versus {SCENIC_OTHER_PCT}; BH-FDR {SCENIC_FDR}.",
-          f"自然景観:{SCENIC_N} 件中 {SCENIC_POS} 件がポジティブ({SCENIC_PCT})。タグなしは {SCENIC_OTHER_PCT}、BH-FDR {SCENIC_FDR}。",
+    en_jp(c2, f"Dinosaurs and museums appeared in {XHS_DINO_N} posts ({XHS_DINO_PCT}).",
+          f"恐竜・博物館は{XHS_DINO_N}件({XHS_DINO_PCT})で言及。",
           en_size=14, jp_size=11, space_after=0)
     infobox(s, MX, Inches(5.45), Inches(12.05), Inches(0.92),
-            "Candidate nudge: A/B test a Chinese-language discovery card foregrounding dinosaur / museum and scenic-nature content. Measure clicks, saves, and itinerary intent.",
-            "候補ナッジ:恐竜・博物館と自然景観を前面に出した中国語の発見カードを A/B テストし、クリック・保存・旅程への追加意向を測定する。")
+            "Test idea: compare Chinese-language discovery cards featuring scenic nature and dinosaurs/museums. Measure clicks, saves, and itinerary additions.",
+            "検証案:自然景観と恐竜・博物館を紹介する中国語カードを比較し、クリック・保存・旅程への追加を測定する。")
     _, tf = textbox(s, MX, Inches(6.48), Inches(12.0), Inches(0.42))
-    en_jp(tf, "Hypothesis-generating only: one platform, reviewed keyword tags, SnowNLP secondary sentiment, no rating model, no causal claim.",
-          "仮説生成に限定:単一プラットフォーム、レビュー済みキーワードタグ、SnowNLP の副次的感情分析、星評価モデルなし、因果主張なし。",
+    en_jp(tf, "Topic presence only: a mention does not show positive or negative opinion, importance, or causal impact.",
+          "話題の有無のみ:言及は、肯定・否定、重要度、因果効果を示すものではない。",
           first=True, en_size=11.5, jp_size=9.5, en_color=GREY, space_after=0)
     foot(s, 9)
-    notes(s, f"Lynn: Present this as a separate evidence stream. The {CN_ROWS} Xiaohongshu posts cannot enter the "
-              "star-rating model because they have no ratings. Within Xiaohongshu, dinosaur and scenic-nature tags "
-              "coincide with higher SnowNLP-positive shares after topic-family FDR correction. This supports an "
-              "A/B-test candidate, not a proven effect. Do not compare SnowNLP with VADER or oseti.")
+    notes(s, f"Lynn (60 sec): We also analyzed {CN_ROWS} Chinese-language Xiaohongshu posts about Fukui. These posts "
+              f"have no star ratings, so we keep them separate from the Google model. Scenic nature appeared in "
+              f"{XHS_SCENIC_N} posts, and dinosaurs or museums appeared in {XHS_DINO_N}. These are topic mentions only. "
+              "They suggest content for a Chinese-language discovery-card test, but they do not show sentiment or impact.")
 
     # ---- 10 RESULTS: POI action map ----
     s = new()
     label(s, "III.  RESULTS")
-    title(s, "Where to act: fix-it and promote-it sites", "どこで動くか:改善型と推奨型のスポット")
+    title(s, "Candidate sites for action", "施策候補となるスポット")
     stat_callout(s, MX, Inches(1.95), Inches(2.05), FIX_COUNT, "Fix-it sites", "改善型", vsize=36)
     stat_callout(s, Inches(2.78), Inches(1.95), Inches(2.05), PROMOTE_COUNT, "Promote-it sites", "推奨型", vsize=36)
     stat_callout(s, Inches(4.96), Inches(1.95), Inches(2.05), CROWD_COUNT, "Crowding hotspots", "混雑ホット", vsize=36)
     _, tf = textbox(s, MX, Inches(3.85), Inches(6.5), Inches(3.0))
-    en_jp(tf, f"Fix-it: {FIX_COUNT} ({FIX_FUKUI} Fukui), high pain-point lift. Promote-it: {PROMOTE_COUNT} ({PROMOTE_FUKUI} Fukui), high positive share.",
-          f"改善型 {FIX_COUNT}(福井 {FIX_FUKUI})、不満点上振れ。推奨型 {PROMOTE_COUNT}(福井 {PROMOTE_FUKUI})、高い肯定割合。",
+    en_jp(tf, "Fix-it sites have high review volume and unusually frequent pain-point tags.",
+          "改善型は口コミ数が多く、不満点タグが通常より多いスポット。",
           first=True, en_size=14.5, jp_size=11.5, space_after=14)
-    en_jp(tf, f"Volume gates confidence: thin under {LOW_VOL} reviews, high-volume over {HIGH_VOL}.",
-          f"件数で信頼度を判断:{LOW_VOL} 件未満は少数、{HIGH_VOL} 件超は多数。",
+    en_jp(tf, "Promote-it sites have strong star ratings and lower review volume.",
+          "推奨型は星評価が高く、口コミ数が少ないスポット。",
           en_size=14.5, jp_size=11.5, en_color=GREY, space_after=14)
-    en_jp(tf, f"Top Fukui promote-it: {PROMO1} {PROMO1_SHARE} (Wilson 95% CI {PROMO1_LOW} to {PROMO1_HIGH}); then {PROMO2} {PROMO2_SHARE} ({PROMO2_LOW} to {PROMO2_HIGH}).",
-          f"福井の推奨型トップ:{PROMO1} {PROMO1_SHARE}(Wilson 95%CI {PROMO1_LOW}〜{PROMO1_HIGH});次に {PROMO2} {PROMO2_SHARE}({PROMO2_LOW}〜{PROMO2_HIGH})。",
+    en_jp(tf, f"All {PROMOTE_COUNT} promote-it sites are exploratory; {PROMOTE_STRICT_COUNT} met the strict rule. Review volume does not equal visitor volume.",
+          f"推奨型{PROMOTE_COUNT}件はすべて探索的で、厳格基準を満たしたものは{PROMOTE_STRICT_COUNT}件。口コミ数は来訪者数ではない。",
           en_size=14, jp_size=11, space_after=0)
     picture_fit(s, "nudge_poi_fig", Inches(7.15), Inches(1.95), Inches(5.5), Inches(4.9))
     foot(s, 10)
-    notes(s, "Lynn: Your slide. Three archetypes from the POI index. Fix-it sites are busy with fixable pain points. "
-              "Promote-it sites have high satisfaction but low volume, the demand-redistribution targets. Crowding "
-              "hotspots are where you would redirect demand away from. Read the two top Fukui promote-it sites with "
-              "their Wilson intervals, and note the small-sample uncertainty honestly. Positive share is computed from "
-              "Google star ratings, so thin sites are not over-read.")
+    notes(s, f"Andrew (55 sec): We also created an exploratory site-level index. It identifies {FIX_COUNT} fix-it "
+              f"candidates, {PROMOTE_COUNT} promote-it candidates, and {CROWD_COUNT} crowding hotspots. These are places "
+              "for follow-up work, not final classifications. Promote-it uses high positive Google star-rating shares "
+              f"ratings among lower-volume sites. No site met the strict promote-it rule. Fukui examples are {PROMO1}, "
+              f"n={PROMO1_N}, {PROMO1_SHARE} positive, and {PROMO2}, n={PROMO2_N}, {PROMO2_SHARE} positive.")
 
     # ---- 11 RESULTS: FINAL CROSS-LANGUAGE PRIORITIES ----
     s = new()
     label(s, "III.  RESULTS")
-    title(s, "Rank common nudges by impact, then ease",
-          "共通ナッジをインパクト、次に実装容易性で順位づける")
+    title(s, "Three candidate experiments, ranked",
+          "3つの実験候補を順位づけ")
     _, tf = textbox(s, MX, Inches(1.82), CW, Inches(0.55))
     en_jp(tf,
-          "Each solution has reviewed support from English, Japanese, and Chinese-language sources. Evidence types remain separate.",
-          "各施策には英語・日本語・中国語ソースのレビュー済みエビデンスがある。エビデンス種別は統合しない。",
+          "These are three pre-specified candidates. Evidence strength differs by source and remains separate.",
+          "事前に設定した3つの候補。根拠の強さはソースごとに異なり、別々に扱う。",
           first=True, en_size=13.5, jp_size=10.5, en_color=GREY, space_after=0)
     gt = s.shapes.add_table(4, 4, MX, Inches(2.48), Inches(12.05), Inches(3.92)).table
     widths = [Inches(0.75), Inches(2.55), Inches(4.35), Inches(4.4)]
@@ -905,11 +935,21 @@ def build():
     headers = [
         ("Rank", "順位"),
         ("Common solution", "共通施策"),
-        ("Evidence and ease", "エビデンスと実装容易性"),
+        ("Why this rank", "順位の理由"),
         ("Next-semester test", "来学期の実験"),
     ]
     for j, (en, jp) in enumerate(headers):
         _cell(gt.cell(0, j), en, 11.5, WHITE, bold=True, align=PP_ALIGN.CENTER, fill=NAVY, jp=jp)
+    evidence_en = [
+        "Strong Google rating associations for hours and itinerary; easiest prototype.",
+        "Cross-language attraction signals; Chinese XHS topic evidence is directional.",
+        "Crowding appears across sources; rating association remains preliminary; harder to implement.",
+    ]
+    evidence_ja = [
+        "営業時間と旅程はGoogle評価と強く関連。試作が最も容易。",
+        "言語をまたぐ魅力シグナル。中国語XHSの話題データは方向性のみ。",
+        "複数ソースで混雑に言及。評価との関連は予備的で、実装も難しい。",
+    ]
     for row_index, priority in enumerate(PRIORITIES, start=1):
         row_fill = WHITE if row_index % 2 else CARD_BG
         _cell(gt.cell(row_index, 0), priority["rank"], 16, NAVY, bold=True,
@@ -918,64 +958,64 @@ def build():
               fill=row_fill, jp=priority["name_ja"])
         _cell(
             gt.cell(row_index, 2),
-            f"{priority['impact']} impact, {priority['ease']}\n{priority['summary_en']}",
+            f"{priority['ease']}\n{evidence_en[row_index - 1]}",
             10.5,
             INK,
             fill=row_fill,
-            jp=f"インパクト {priority['impact']}・実装容易性 {priority['ease']}\n{priority['summary_ja']}",
+            jp=f"実装容易性 {priority['ease']}\n{evidence_ja[row_index - 1]}",
         )
         _cell(gt.cell(row_index, 3), priority["test_en"], 10.5, INK,
               fill=row_fill, jp=priority["test_ja"])
     infobox(
         s, MX, Inches(6.55), Inches(12.05), Inches(0.52),
-        "Ordinal opportunity ranking, not causal effectiveness. Impact tier first; implementation ease breaks ties.",
-        "因果的効果ではなく機会ランキング。インパクト層を優先し、同じ層では実装容易性で順位づける。",
+        "Opportunity ranking only. It does not estimate how well any intervention will work.",
+        "機会の順位づけのみ。各施策の効果を推定したものではない。",
     )
     foot(s, 11)
-    notes(s, "Both: This is the decision slide. Read only the first row in detail. Each solution has reviewed "
-              "support from English, Japanese, and Chinese-language sources, although evidence types differ. "
-              "Priority one comes first because it combines high-impact evidence with the easiest prototype. "
-              "The experiment register carries these exact ranks into next semester.")
+    notes(s, "Andrew (55 sec): We ranked three pre-specified experiments. The first is the multilingual visit-readiness "
+              "card because opening hours and itinerary fit have the strongest relevant rating evidence, and the card is "
+              "easy to prototype. The second tests localized discovery content. The third tests off-peak and alternative "
+              "site prompts. Evidence from different sources is kept separate. This ranking does not estimate effectiveness.")
 
     # ---- 12 DISCUSSION ----
     s = new()
     label(s, "IV.  DISCUSSION")
-    title(s, "What this can and cannot claim", "主張できること・できないこと")
+    title(s, "Study limits", "研究の限界")
     cavs = [
-        (CAV0, "探索的・仮説生成型であり、因果関係ではない。"),
-        (CAV1, "機会スコアは候補となる追跡実験を順位づけるものであり、介入効果ではない。"),
-        (CAV3, "POI レベルのクラスタリングは Firth では未モデル化。行レベル推定は POI 入れ子の不確実性を過小評価しうる。"),
-        (CAV8, "言語グループは口コミの言語を表し、執筆者の国籍ではない。"),
+        ("Observational review data cannot establish cause and effect.", "観察データである口コミから、因果関係は証明できない。"),
+        ("Opportunity scores rank follow-up experiments. They do not measure intervention effectiveness.", "機会スコアは次の実験を順位づけるもので、施策の効果を測るものではない。"),
+        ("The Firth model does not account for reviews nested within each site. Uncertainty may be understated.", "Firthモデルはスポット内の口コミのまとまりを考慮していない。不確実性を過小評価する可能性がある。"),
+        ("Language groups describe the review text, not reviewer nationality.", "言語グループは口コミの言語を示し、投稿者の国籍を示さない。"),
     ]
-    _, tf = textbox(s, MX, Inches(2.05), Inches(7.75), Inches(4.0))
+    _, tf = textbox(s, MX, Inches(2.05), Inches(8.1), Inches(4.2))
     for i, (en, jp) in enumerate(cavs):
         en_jp(tf, en, jp, first=(i == 0), bullet=True, en_size=15.5, jp_size=12, space_after=15)
-    placeholder(s, Inches(8.75), Inches(2.05), Inches(3.88), Inches(3.55), "photo", "写真")
-    infobox(s, MX, Inches(6.25), Inches(12.13), Inches(0.7),
-            "Every caveat here is quoted from the analysis manifest, not paraphrased on the slide.",
-            "ここに挙げた注意点はすべて分析マニフェストからの引用であり、スライド上で言い換えていない。")
+    _, ltf = card(s, Inches(9.05), Inches(2.05), Inches(3.55), Inches(3.55), bg=TINT)
+    ltf.vertical_anchor = MSO_ANCHOR.MIDDLE
+    en_jp(ltf, "Main interpretation", "主な解釈", en_size=18, jp_size=13, en_color=NAVY, bold=True, first=True, space_after=12)
+    en_jp(ltf, "Useful for choosing experiments", "実験候補の選択に役立つ", en_size=16, jp_size=12, space_after=18)
+    en_jp(ltf, "Requires randomized testing before policy use", "政策に使う前に無作為化実験が必要", en_size=16, jp_size=12, space_after=0)
     foot(s, 12)
-    notes(s, "Andrew: Slowly. This is the intellectual honesty slide. Each bullet is the verbatim caveat string from "
-              "the manifest, so the limitations we present are exactly the ones the analysis itself records. The four: "
-              "not causal, ranks experiments rather than effects, POI clustering unmodelled, and language is not "
-              "nationality. These limits are why the ranked solutions become randomized experiments next semester. "
-              "Pause here.")
+    notes(s, "Andrew (45 sec): These results have important limits. Reviews are observational and self-selected, so "
+              "the associations are not causal. The model also treats review rows separately and does not model clustering "
+              "within tourism sites. This may understate uncertainty. Language labels describe the text, not nationality. "
+              "The results are useful for choosing experiments, but randomized testing is required before policy use.")
 
     # ---- 13 FUTURE WORK (close, white) ----
     s = new()
     label(s, "IV.  DISCUSSION")
-    title(s, "From ranking to experiments", "順位づけから実験へ")
+    title(s, "Next step: test the first nudge", "次のステップ:第1候補を検証")
     _, c1 = card(s, MX, Inches(2.1), Inches(6.0), Inches(2.55))
     pe = c1.paragraphs[0]
     rr = pe.add_run()
-    rr.text = "Experiment register"
+    rr.text = "Pre-register the test"
     _style_run(rr, 17, NAVY, bold=True, font=HEAD_FONT)
     pj = c1.add_paragraph()
     rj = pj.add_run()
-    rj.text = "実験レジスター"
+    rj.text = "実験計画を事前登録"
     _style_run(rj, 11.5, GREY, font=JP_FONT)
-    en_jp(c1, "The experiment register turns the top-ranked opportunities into A/B-testable nudges. It records hypothesis, metric, and target site for each.",
-          "実験レジスターは上位の機会を A/B テスト可能なナッジに変える。各項目について仮説・指標・対象スポットを記録する。",
+    en_jp(c1, "Record the hypothesis, target site, randomization unit, and outcomes before data collection.",
+          "データ収集前に、仮説・対象スポット・無作為化単位・評価指標を記録する。",
           en_size=13.5, jp_size=11, space_after=4)
     pe = c1.add_paragraph()
     rr = pe.add_run()
@@ -990,29 +1030,37 @@ def build():
     rj = pj.add_run()
     rj.text = "最初の実験"
     _style_run(rj, 11.5, GREY, font=JP_FONT)
-    en_jp(c2, f"Begin with priority {PRIORITIES[0]['rank']}: {PRIORITIES[0]['name_en']}. Randomize exposure, log interactions, then estimate behavior change.",
-          f"優先順位 {PRIORITIES[0]['rank']} の「{PRIORITIES[0]['name_ja']}」から開始。提示を無作為化し、反応を記録して行動変化を推定する。",
+    en_jp(c2, f"Start with priority {PRIORITIES[0]['rank']}: {PRIORITIES[0]['name_en']}. Randomize exposure and measure clicks, saves, and itinerary additions.",
+          f"優先順位{PRIORITIES[0]['rank']}の「{PRIORITIES[0]['name_ja']}」から開始。表示を無作為化し、クリック・保存・旅程への追加を測定する。",
           en_size=13.5, jp_size=11, space_after=0)
-    cl_tb, cl_tf = textbox(s, MX, Inches(5.2), CW, Inches(1.3))
+    infobox(
+        s, MX, Inches(4.78), Inches(12.05), Inches(0.52),
+        f"In one line: {TOTAL_REVIEWS} reviews across {N_POIS} POIs -> {FIX_COUNT} fix-it and "
+        f"{PROMOTE_COUNT} promote-it sites -> 3 cross-language nudges.",
+        f"一言で:{N_POIS}スポットの{TOTAL_REVIEWS}件の口コミ → {FIX_COUNT}の改善型・"
+        f"{PROMOTE_COUNT}の推奨型 → 3つの言語横断ナッジ。",
+    )
+    cl_tb, cl_tf = textbox(s, MX, Inches(5.55), CW, Inches(1.3))
     pe = cl_tf.paragraphs[0]
     pe.space_after = Pt(3)
     rr = pe.add_run()
-    rr.text = "This deck ranks where to run the next experiment. The register records how to run it."
-    _style_run(rr, 17, NAVY, bold=True, font=HEAD_FONT)
+    rr.text = ("We mapped where Hokuriku visitors hit friction and which gems to promote. "
+               "The analysis chooses the experiment; randomization tests whether it works.")
+    _style_run(rr, 16, NAVY, bold=True, font=HEAD_FONT)
     pj = cl_tf.add_paragraph()
     rj = pj.add_run()
-    rj.text = "このデッキは次の実験をどこで行うかを順位づけする。レジスターはどのように行うかを記録する。"
-    _style_run(rj, 13, GREY, font=JP_FONT)
+    rj.text = "北陸の旅行者がどこで不満を感じ、どの名所を推すべきかを地図化した。分析で実験を選び、無作為化で効果を検証する。"
+    _style_run(rj, 12, GREY, font=JP_FONT)
     pe2 = cl_tf.add_paragraph()
     pe2.space_before = Pt(8)
     rr = pe2.add_run()
     rr.text = "Thank you.  ありがとうございました。"
     _style_run(rr, 15, NAVY, bold=True, font=JP_FONT)
     foot(s, 13)
-    notes(s, f"Both: Lynn delivers the register hand-off. Next semester begins with priority "
-              f"{PRIORITIES[0]['rank']}, {PRIORITIES[0]['name_en']}, randomized by visitor session with exposure "
-              "and interaction logging. Andrew closes slowly: this deck ranks where to experiment, the register "
-              "records how. Then invite questions.")
+    notes(s, f"Andrew (40 sec): Our next step is a pre-registered A/B test of priority {PRIORITIES[0]['rank']}, the "
+              f"{PRIORITIES[0]['name_en']}. We will randomize exposure by visitor session and measure clicks, saves, "
+              "and itinerary additions. The current analysis selects the experiment. Randomization will test whether "
+              "the nudge changes behavior. Thank you.")
 
     prs.save(str(OUT_PPTX))
     return prs

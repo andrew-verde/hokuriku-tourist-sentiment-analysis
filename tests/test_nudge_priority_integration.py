@@ -80,8 +80,8 @@ def test_pptx_has_final_priority_slide_before_discussion():
         for shape in presentation.slides[11].shapes
         if hasattr(shape, "text")
     )
-    assert "Rank common nudges by impact, then ease" in priority_text
-    assert "What this can and cannot claim" in discussion_text
+    assert "Three candidate experiments, ranked" in priority_text
+    assert "Study limits" in discussion_text
 
 
 def test_fix_it_requires_supported_non_thin_driving_language():

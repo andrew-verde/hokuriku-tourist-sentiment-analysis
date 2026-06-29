@@ -24,6 +24,7 @@ from __future__ import annotations
 import hashlib
 import html
 import json
+import re
 from pathlib import Path
 
 import pandas as pd
@@ -40,7 +41,10 @@ SOURCES: dict[str, Path] = {
     "poi_mfst": ROOT / "output/nudge_analysis/poi_opportunity_index_manifest.json",
     "cn_drivers": ROOT / "output/within_language_sentiment/cn_within_source_sentiment_drivers.csv",
     "cn_mfst": ROOT / "output/within_language_sentiment/cn_within_source_sentiment_manifest.json",
+    "cn_topics": ROOT / "output/chinese_specific_insights_xhs_only/keyword_occurrence_by_category.csv",
+    "cn_topics_mfst": ROOT / "output/chinese_specific_insights_xhs_only/chinese_specific_insights_manifest.json",
     "solution_priorities": ROOT / "output/nudge_analysis/cross_language_solution_priorities.csv",
+    "solution_priorities_mfst": ROOT / "output/nudge_analysis/cross_language_solution_priorities_manifest.json",
 }
 
 FIGURES = {
@@ -178,12 +182,48 @@ def taxonomy_value(aspect, col):
     return g
 
 
+def taxonomy_count(signal_type=None):
+    """Count rows in the reviewed nudge taxonomy, optionally by signal type."""
+    def g(d):
+        work = d if signal_type is None else d[d["signal_type"] == signal_type]
+        return int(len(work))
+    return g
+
+
+def low_rating_cutoff():
+    """Parse the numeric low-rating threshold from the manifest definition."""
+    def g(d):
+        definition = str(d["filters"]["low_rating_definition"])
+        match = re.search(r"<=\s*(\d+)", definition)
+        if not match:
+            raise KeyError(f"cannot parse low-rating cutoff: {definition}")
+        return int(match.group(1))
+    return g
+
+
+def plain_vs_firth_aspect_count():
+    """Count aspects included in the limited plain-logit sanity check."""
+    def g(d):
+        return int(len(d["metrics"]["plain_vs_firth_sanity"]))
+    return g
+
+
 def cn_driver_value(predictor, outcome, col):
     """Resolve one within-Chinese predictor result from the aggregate test output."""
     def g(d):
         r = d[(d["predictor"] == predictor) & (d["outcome"] == outcome) & (d["status"] == "ok")]
         if len(r) != 1:
             raise KeyError(f"expected one Chinese driver row: {predictor}/{outcome}; found {len(r)}")
+        return r[col].iloc[0]
+    return g
+
+
+def cn_topic_value(code, col):
+    """Resolve one reviewed XHS topic-presence aggregate."""
+    def g(d):
+        r = d[(d["evidence_family"] == "topic") & (d["code"] == code)]
+        if len(r) != 1:
+            raise KeyError(f"expected one Chinese topic row: {code}; found {len(r)}")
         return r[col].iloc[0]
     return g
 
@@ -806,6 +846,12 @@ def build() -> str:
       <p class="secnum">IV. FUTURE WORK</p>
       <h2>From ranking to experiments</h2>
       {jp('順位づけから実験へ')}
+      <div class="pill">In one line: {total_reviews} reviews across {n_pois} POIs →
+        a POI action map of {fix_count} fix-it and {promote_count} promote-it sites,
+        distilled to 3 cross-language nudges.</div>
+      {jp(f'一言で:3県・{n_pois}スポットの{total_reviews}件の口コミ →'
+          f'{fix_count} の改善型・{promote_count} の推奨型スポットのアクションマップ、'
+          'そして3つの言語横断ナッジへ。')}
       <div class="cols2">
         <div class="card"><h3>Experiment register</h3>
           {jp('実験レジスター')}
@@ -823,10 +869,12 @@ def build() -> str:
           {jp(f'優先順位 {p1["rank"]} の<b>{p1["name_ja"]}</b>から開始。'
               '提示を無作為化し、反応を記録して行動変化を推定する。')}</div>
       </div>
-      <p class="closing">This deck ranks <b>where</b> to experiment; the register says
-        <b>how</b>. &nbsp;Thank you.</p>
-      {jp('このデッキは<b>どこで</b>実験するかを順位づけし、レジスターは<b>どのように</b>'
-          '行うかを示す。 &nbsp;ありがとうございました。')}
+      <p class="closing">We found <b>where</b> Hokuriku visitors hit friction and which gems to
+        promote; the register says <b>how</b> we test the fix. First up: {p1['name_en']}.
+        &nbsp;Thank you.</p>
+      {jp('北陸の旅行者がどこで不満を感じ、どの名所を推すべきかが<b>分かった</b>。'
+          f'レジスターはその検証<b>方法</b>を示す。最初は{p1["name_ja"]}から。'
+          ' &nbsp;ありがとうございました。')}
     """, f"{BOTH} Co-presenter delivers the register hand-off. Next semester begins with priority "
          f"{p1['rank']}, {p1['name_en']}, randomized by visitor session with exposure and interaction "
          "logging. Andrew closes: deck ranks WHERE, register says HOW. Then invite questions.",

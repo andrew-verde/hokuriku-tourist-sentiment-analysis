@@ -1,7 +1,7 @@
 {
   "schema_version": "research_provenance.v1",
   "kind": "nudge_figure_pack",
-  "generated_at": "2026-06-27T13:23:49+00:00",
+  "generated_at": "2026-06-29T02:21:40+00:00",
   "command": "scripts/build_nudge_figures.py",
   "inputs": [
     {
@@ -9,7 +9,7 @@
       "path": "output/nudge_analysis/aspect_opportunity_map.csv",
       "exists": true,
       "bytes": 38272,
-      "sha256": "a4886e5c6270b1cb76f271eff6f1a2a4f75de042f99c74a63ca91a50ee210b03"
+      "sha256": "6726a743db95739291eb3521e924b7e160a1e65e1f9269e632ea8cf42b7ab96f"
     },
     {
       "role": "poi_opportunity_index",
