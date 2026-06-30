@@ -9,7 +9,7 @@ series use.
 
 Inputs:
 
-  - `make multilingual-reviews` -> output/multilingual_review_analysis/reviews_multilingual.csv
+  - `make multilingual-reviews` -> sibling `platform-review-scraper/data/projects/hokuriku/multilingual_review_analysis/reviews_multilingual.csv`
   - `make chinese-social` -> output/chinese_social_media_analysis/tagged_chinese_social_posts.csv
 
 Google review scope is filtered by checkpoint POI prefecture metadata. The
@@ -38,6 +38,7 @@ from scipy import stats
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from src.utils.logger import setup_logger
+from src.platform_review_inputs import resolve_platform_review_paths
 from src.provenance import file_record, repo_relative, research_manifest, sha256_file, write_json
 from src.scope import (
     MissingScopeColumnsError,
@@ -50,9 +51,10 @@ from src.scope import (
 logger = setup_logger(__name__)
 
 ROOT = Path(__file__).resolve().parent.parent
-DEFAULT_REVIEWS_PATH = ROOT / "output" / "multilingual_review_analysis" / "reviews_multilingual.csv"
+PLATFORM_REVIEW_PATHS = resolve_platform_review_paths()
+DEFAULT_REVIEWS_PATH = PLATFORM_REVIEW_PATHS.reviews_multilingual_path
 DEFAULT_CHINESE_PATH = ROOT / "output" / "chinese_social_media_analysis" / "tagged_chinese_social_posts.csv"
-DEFAULT_POI_METADATA_PATH = ROOT / "output" / "checkpoints" / "poi_metadata.json"
+DEFAULT_POI_METADATA_PATH = PLATFORM_REVIEW_PATHS.poi_metadata_path
 DEFAULT_SENTIMENT_SUMMARY_PATH = ROOT / "output" / "sentiment_aggregates" / "source_group_sentiment_summary.csv"
 DEFAULT_OUTPUT_DIR = ROOT / "output" / "cross_language_trends"
 
@@ -106,7 +108,7 @@ def _require_input(path: Path, make_target: str) -> None:
     if not path.exists():
         raise MissingInputError(
             f"Required input not found: {path}\n"
-            f"Generate it first with `make {make_target}`. "
+            f"Set PLATFORM_REVIEW_SCRAPER_DIR or pass an explicit path for this input. "
             "This pipeline has no demo mode."
         )
 
@@ -118,7 +120,7 @@ def load_poi_metadata(path: Path) -> pd.DataFrame:
     except MissingScopeInputError as error:
         raise MissingInputError(
             f"Required input not found: {path}\n"
-            "Generate it first with `make multilingual-reviews`. "
+            "Set PLATFORM_REVIEW_SCRAPER_DIR or pass --reviews-path / --poi-metadata-path. "
             "This pipeline has no demo mode."
         ) from error
     except MissingScopeColumnsError as error:

@@ -10,7 +10,7 @@ Compare what different language/source groups discuss about Fukui tourism:
 - Chinese-language Google reviews as primary Chinese statistical evidence
 - Chinese-language Xiaohongshu posts as Fukui-only directional evidence;
   Douyin remains limited to explicit source-sensitivity runs
-- Japanese-language Google reviews from the local `english-fukui-tourism` review cache
+- Japanese-language Google reviews from the sibling `platform-review-scraper` review cache
 - English-language Google reviews from the same Google review cache
 
 Treat group membership as content language/source platform, not nationality.
@@ -32,13 +32,14 @@ requested.
 
 ## Data Sources Present Locally
 
-Google review artifacts are synced locally under ignored `output/` paths:
+Google review artifacts stay in sibling `platform-review-scraper` checkout and
+are read directly from ignored local source paths there:
 
-- `output/checkpoints/`: raw Google Maps/Outscraper collection checkpoints
-- `output/multilingual_review_analysis/`: derived multilingual review tables
-- `output/google_review_sync_manifest.json`: local sync manifest with hashes
+- `../platform-review-scraper/data/projects/hokuriku/checkpoints/`: raw Google Maps/Outscraper collection checkpoints
+- `../platform-review-scraper/data/projects/hokuriku/multilingual_review_analysis/`: derived multilingual review tables
+- `output/google_review_input_validation.json`: local validation manifest with hashes
 
-Current local review cache counts must come from generated sync/sentiment
+Current local review cache counts must come from generated validation/sentiment
 manifests, not hand-maintained documentation. Run `make multilingual-reviews`
 and `make sentiment-analysis`, then cite the generated aggregate manifests or
 readiness outputs.
@@ -111,7 +112,7 @@ Chinese social inputs are external and should remain external:
 
 Default pipeline should become:
 
-1. Sync Google review artifacts with `make multilingual-reviews`.
+1. Validate Google review artifacts with `make multilingual-reviews`.
 2. Build Chinese social rows from `tourism-data` with `make chinese-social`.
    Keep the main path Xiaohongshu-only for clarity until Douyin annotations and
    provenance are strong enough for the main theme analysis.
@@ -128,7 +129,7 @@ Default pipeline should become:
 - Do not commit row-level post/review text, author names, URLs, screenshots, source IDs, or raw manual captures.
 - Do not commit decks, speaker/handout documents, dashboards, delivery-only
   builders, agent scratchpads, or machine-specific handoffs.
-- Keep `output/checkpoints/`, `output/multilingual_review_analysis/`, and Chinese raw/processed social rows ignored.
+- Keep local `output/` build products ignored; platform-review-scraper source review inputs stay in the sibling checkout.
 - Track aggregate outputs that contain only counts, statistics, filters,
   commands, dependency versions, input provenance, and SHA256 hashes for ignored
   source/intermediate files.

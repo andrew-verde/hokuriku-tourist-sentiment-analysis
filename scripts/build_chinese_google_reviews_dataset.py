@@ -33,13 +33,15 @@ from build_chinese_social_media_dataset import (  # noqa: E402
     _tag_chinese_dataframe,
     load_chinese_codebook,
 )
+from src.platform_review_inputs import resolve_platform_review_paths  # noqa: E402
 from src.provenance import (  # noqa: E402
     file_record,
     research_manifest,
     write_json,
 )
 
-DEFAULT_INPUT = ROOT / "output" / "multilingual_review_analysis" / "non_english_non_japanese_reviews.csv"
+PLATFORM_REVIEW_PATHS = resolve_platform_review_paths()
+DEFAULT_INPUT = PLATFORM_REVIEW_PATHS.non_english_non_japanese_reviews_path
 DEFAULT_OUTPUT_DIR = ROOT / "output" / "chinese_google_reviews_analysis"
 OUTPUT_NAME = "tagged_chinese_google_reviews.csv"
 MANIFEST_NAME = "tagged_chinese_google_reviews_manifest.json"
@@ -63,6 +65,11 @@ def _dependency_versions() -> dict[str, str]:
 
 
 def load_chinese_google_reviews(path: Path) -> pd.DataFrame:
+    if not path.exists():
+        raise SystemExit(
+            f"Required input not found: {path}\n"
+            "Set PLATFORM_REVIEW_SCRAPER_DIR or pass --input."
+        )
     df = pd.read_csv(path)
     zh = df[df["detected_language"].astype(str).str.startswith("zh")].copy()
     if zh.empty:

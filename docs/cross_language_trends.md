@@ -28,7 +28,7 @@ Group membership is content language, never nationality.
 | Headline deliverable | Fukui-first aggregate baseline snapshot: English/Japanese Google review volume and rating mean, plus Chinese social-media post volume and SnowNLP sentiment by platform |
 | Sentiment scales | Side-by-side, separate columns (`rating_mean` vs `sentiment_norm_mean`); never merged |
 | Code layout | Separate stage script `scripts/build_cross_language_trends.py` + `make cross-language-trends`; hard error (naming the make target) when inputs are missing |
-| Google scope filter | Use `output/checkpoints/poi_metadata.json` and `prefecture_normalized`; default prefecture is Fukui, with scaffold left for Ishikawa/Toyama later |
+| Google scope filter | Use sibling `platform-review-scraper/data/projects/hokuriku/checkpoints/poi_metadata.json` and `prefecture_normalized`; default prefecture is Fukui, with scaffold left for Ishikawa/Toyama later |
 | Monthly trend posture | Disabled for now. Current Chinese post dates are mostly inferred or scrape-anchored; reintroduce only after date scrub requirements are met |
 | Statistical posture | Descriptive cross-source category-share tests and XHS-first reviewed-evidence prevalence tests are allowed with caveats; raw SnowNLP/VADER/oseti score tests remain skipped |
 | Thesis isolation | No thesis make-chain includes these targets; row-level outputs gitignored; source-ledger rows marked group project |

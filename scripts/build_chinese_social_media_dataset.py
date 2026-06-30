@@ -30,6 +30,7 @@ from scipy import stats
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from src.utils.logger import setup_logger
+from src.platform_review_inputs import resolve_platform_review_paths
 from src.provenance import file_record, research_manifest, sha256_file, write_json
 
 load_dotenv()
@@ -59,7 +60,8 @@ CHINESE_GOOGLE_REVIEW_CANDIDATES_PATH = (
     ROOT / "docs" / "codebook_templates" / "chinese_google_review_friction_candidates.csv"
 )
 DEFAULT_XHS_MANUAL_WORKBOOK = ROOT / "docs" / "codebook_reviews" / "source" / "fukui_xhs_reviews_manual.xlsx"
-MULTILINGUAL_FRICTION_PATH = ROOT / "output" / "multilingual_review_analysis" / "friction_by_city_language_group.csv"
+PLATFORM_REVIEW_PATHS = resolve_platform_review_paths()
+PLATFORM_REVIEW_FRICTION_PATH = PLATFORM_REVIEW_PATHS.review_friction_by_city_language_group_path
 
 SOURCE_COLUMNS = [
     # Source fields mirror names that can identify rows. They are useful for
@@ -1150,7 +1152,7 @@ def build_chinese_social_outputs(
     input_dir: Path = DEFAULT_INPUT_DIR,
     output_dir: Path = OUTPUT_DIR,
     input_files: list[Path] | None = None,
-    review_friction_path: Path = MULTILINGUAL_FRICTION_PATH,
+    review_friction_path: Path = PLATFORM_REVIEW_FRICTION_PATH,
     xhs_only: bool = True,
 ) -> dict:
     # Orchestrate the full build: ingest, deduplicate, annotate, score, tag,
@@ -1409,7 +1411,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--input-dir", type=Path, default=DEFAULT_INPUT_DIR)
     parser.add_argument("--output-dir", type=Path, default=None)
     parser.add_argument("--input-file", type=Path, action="append", default=None, help="Specific CSV file to include; can be repeated.")
-    parser.add_argument("--review-friction-path", type=Path, default=MULTILINGUAL_FRICTION_PATH)
+    parser.add_argument("--review-friction-path", type=Path, default=PLATFORM_REVIEW_FRICTION_PATH)
     parser.add_argument(
         "--xhs-only",
         action="store_true",

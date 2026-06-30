@@ -20,9 +20,11 @@ from build_chinese_social_media_dataset import (  # noqa: E402
     _tag_chinese_dataframe,
     load_chinese_codebook,
 )
+from src.platform_review_inputs import resolve_platform_review_paths  # noqa: E402
 from src.provenance import file_record, research_manifest, write_json  # noqa: E402
 
-INPUT_PATH = ROOT / "output" / "multilingual_review_analysis" / "tagged_reviews_multilingual.csv"
+PLATFORM_REVIEW_PATHS = resolve_platform_review_paths()
+INPUT_PATH = PLATFORM_REVIEW_PATHS.tagged_reviews_multilingual_path
 OUTPUT_PATH = (
     ROOT
     / "output"
@@ -37,7 +39,7 @@ MANIFEST_PATH = (
 )
 
 FOLD_CAVEATS = [
-    "Local post-sync stage: promotes zh rows in the synced tagged_reviews_multilingual.csv to language_group='chinese'. The synced source file is never modified.",
+    "Local post-validation stage: promotes zh rows in external tagged_reviews_multilingual.csv to language_group='chinese'. The source file is never modified.",
     "CN codebook codes map onto the shared multilingual aspect columns; all 6 nudgeable-friction aspects map 1:1. Four enjoyment aspects (friendly_service, underpromoted_feature, easy_if_guided, good_for_itinerary_bundle) have no Chinese-codebook equivalent and are set to 0 for Chinese rows, so Chinese promote-it draw is under-counted relative to EN/JP.",
     "POI-level Chinese signal is thin (median ~3 reviews/POI; most POIs below LOW_CONFIDENCE_N=10). Per-POI Chinese friction should be read as directional, not confirmatory.",
 ]
@@ -93,7 +95,10 @@ def parse_args() -> argparse.Namespace:
 
 def build_folded(input_path: Path) -> pd.DataFrame:
     if not input_path.exists():
-        raise ChineseFoldError(f"Required input not found: {input_path}")
+        raise ChineseFoldError(
+            f"Required input not found: {input_path}\n"
+            "Set PLATFORM_REVIEW_SCRAPER_DIR or pass --input."
+        )
 
     source = pd.read_csv(input_path)
     required = {
@@ -155,7 +160,7 @@ def main() -> None:
         kind="chinese_folded_multilingual_reviews",
         command=" ".join(sys.argv),
         inputs=[
-            file_record(args.input, "synced_tagged_multilingual_reviews", required=True),
+            file_record(args.input, "external_tagged_multilingual_reviews", required=True),
             file_record(REVIEWED_CODEBOOK_PATH, "reviewed_chinese_codebook", required=True),
             file_record(
                 CHINESE_GOOGLE_REVIEW_CANDIDATES_PATH,

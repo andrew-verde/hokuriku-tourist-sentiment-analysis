@@ -57,7 +57,7 @@ from src.provenance import (  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
 # Chinese-folded tagged file (zh promoted to language_group='chinese'); built by
-# build_chinese_folded_multilingual.py from the synced tagged_reviews_multilingual.csv.
+# build_chinese_folded_multilingual.py from the external tagged_reviews_multilingual.csv.
 INPUT_PATH = ROOT / "output" / "multilingual_review_analysis" / "tagged_reviews_multilingual_chinese_folded.csv"
 OUTPUT_DIR = ROOT / "output" / "nudge_analysis"
 OUTPUT_CSV = OUTPUT_DIR / "poi_opportunity_index.csv"
@@ -113,7 +113,10 @@ def load_tagged_reviews(path: Path) -> pd.DataFrame:
         "language_group",
     } | set(ASPECTS)
     if not path.exists():
-        raise PoiOpportunityError(f"Required input not found: {path}\nRun `make multilingual-reviews` first.")
+        raise PoiOpportunityError(
+            f"Required input not found: {path}\n"
+            "Set PLATFORM_REVIEW_SCRAPER_DIR or run `make multilingual-reviews` to validate the source checkout first."
+        )
     df = pd.read_csv(path)
     missing = sorted(required - set(df.columns))
     if missing:

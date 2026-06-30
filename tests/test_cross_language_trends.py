@@ -153,7 +153,7 @@ def test_missing_inputs_fail_with_make_target_hint(tmp_path):
     # Missing prerequisites should fail with a concrete make target for repair.
     reviews, chinese, metadata, sentiment_summary = _write_inputs(tmp_path)
 
-    with pytest.raises(MissingInputError, match="make multilingual-reviews"):
+    with pytest.raises(MissingInputError, match="PLATFORM_REVIEW_SCRAPER_DIR"):
         build_cross_language_trends(
             reviews_path=tmp_path / "absent.csv",
             chinese_path=chinese,

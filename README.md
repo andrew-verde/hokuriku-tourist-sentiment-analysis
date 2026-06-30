@@ -70,7 +70,7 @@ make chinese-insights
 Google review input:
 
 ```bash
-ENGLISH_FUKUI_TOURISM_DIR=/path/to/english-fukui-tourism make multilingual-reviews
+PLATFORM_REVIEW_SCRAPER_DIR=/path/to/platform-review-scraper make multilingual-reviews
 make sentiment-analysis
 make hypothesis-tests
 make within-language-sentiment

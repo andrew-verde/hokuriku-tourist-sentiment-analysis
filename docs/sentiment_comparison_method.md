@@ -84,17 +84,17 @@ Theme-sliced rates and sentiment means are suppressed for slices below 10 rows.
 Counts remain in CSV outputs for audit, but small slices should not be charted
 or interpreted as stable rates.
 
-Japanese-language and English-language reviews use the synced Google review
-table:
+Japanese-language and English-language reviews use the external Google review
+table from sibling `platform-review-scraper`:
 
 ```text
-output/multilingual_review_analysis/reviews_multilingual.csv
+../platform-review-scraper/data/projects/hokuriku/multilingual_review_analysis/reviews_multilingual.csv
 ```
 
 Filter Google reviews to:
 
 ```text
-prefecture_normalized == "Fukui" from output/checkpoints/poi_metadata.json
+prefecture_normalized == "Fukui" from ../platform-review-scraper/data/projects/hokuriku/checkpoints/poi_metadata.json
 language_group in ["english", "japanese"]
 ```
 

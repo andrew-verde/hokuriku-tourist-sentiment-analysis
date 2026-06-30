@@ -12,7 +12,7 @@ help:
 	@echo "  make chinese-social-with-douyin Build explicit XHS/Douyin source-sensitivity outputs"
 	@echo "  make chinese-insights        Build tracked Chinese-specific figure/data outputs"
 	@echo "  make chinese-insights-xhs-only Build labeled XHS-only figure/data outputs"
-	@echo "  make multilingual-reviews    Sync local Google review data from english-fukui-tourism"
+	@echo "  make multilingual-reviews    Validate sibling platform-review-scraper Google review inputs"
 	@echo "  make chinese-folded-multilingual Promote Chinese Google reviews in copied multilingual output"
 	@echo "  make cross-language-trends   Build Fukui-first EN/JP/CN baseline tables"
 	@echo "  make sentiment-env           Install pinned JP-EN sentiment runtime"
@@ -84,7 +84,6 @@ hypothesis-tests-hokuriku: sentiment-analysis-hokuriku
 
 cross-language-trends-hokuriku: chinese-google-reviews sentiment-analysis-hokuriku
 	$(PYTHON) scripts/build_cross_language_trends.py --prefecture Hokuriku \
-	  --reviews-path output/multilingual_review_analysis/reviews_multilingual.csv \
 	  --chinese-path output/chinese_google_reviews_analysis/tagged_chinese_google_reviews.csv \
 	  --sentiment-summary-path output/sentiment_aggregates_hokuriku/source_group_sentiment_summary.csv \
 	  --output-dir output/cross_language_trends_hokuriku

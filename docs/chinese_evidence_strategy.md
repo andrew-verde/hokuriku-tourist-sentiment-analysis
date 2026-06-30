@@ -46,11 +46,11 @@ Chinese any_friction coverage 13.6% → 16.5% (≤3★ Chinese 7/30 → 11/30). 
 merge is gated on `status=reviewed`, so any future pending terms stay excluded until approved.
 
 ## 4. Folding Chinese into the POI pipeline
-`scripts/build_chinese_folded_multilingual.py` is a **local post-sync stage**: it reads the
-synced `tagged_reviews_multilingual.csv` from a separately obtained
-`english-fukui-tourism` checkout, promotes zh rows to
+`scripts/build_chinese_folded_multilingual.py` is a **local post-validation stage**:
+it reads the external `tagged_reviews_multilingual.csv` from a separately
+obtained `platform-review-scraper` checkout, promotes zh rows to
 `language_group='chinese'`, and writes
-`..._chinese_folded.csv` (synced file untouched). `build_nudge_opportunity_analysis.py` and
+`..._chinese_folded.csv` (external file untouched). `build_nudge_opportunity_analysis.py` and
 `build_poi_opportunity_index.py` now read the folded file by default.
 
 ### CN-code → multilingual-aspect mapping (researcher judgment)
@@ -91,6 +91,6 @@ run into the committed headline but **left uncommitted** in git, pending this re
 ## 6. Reproducibility
 `make hokuriku-all`, `make poi-opportunity` / `make nudge-analysis` (now depend on the fold),
 `make cn-anchor-figure`. New deps: `zhconv` (in `requirements.txt` + sentiment bootstrap lock).
-`multilingual_review_analysis/` is a private synced artifact. A full rebuild
+`multilingual_review_analysis/` is a private external artifact. A full rebuild
 requires a separately obtained source checkout supplied through
-`ENGLISH_FUKUI_TOURISM_DIR`.
+`PLATFORM_REVIEW_SCRAPER_DIR`.

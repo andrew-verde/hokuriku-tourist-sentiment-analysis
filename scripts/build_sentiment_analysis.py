@@ -34,6 +34,7 @@ from scipy import stats
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from src.utils.logger import setup_logger
+from src.platform_review_inputs import resolve_platform_review_paths
 from src.provenance import (
     ProvenanceError,
     assert_no_forbidden_columns,
@@ -53,8 +54,9 @@ from src.scope import (
 logger = setup_logger(__name__)
 
 ROOT = Path(__file__).resolve().parent.parent
-DEFAULT_REVIEWS_PATH = ROOT / "output" / "multilingual_review_analysis" / "reviews_multilingual.csv"
-DEFAULT_POI_METADATA_PATH = ROOT / "output" / "checkpoints" / "poi_metadata.json"
+PLATFORM_REVIEW_PATHS = resolve_platform_review_paths()
+DEFAULT_REVIEWS_PATH = PLATFORM_REVIEW_PATHS.reviews_multilingual_path
+DEFAULT_POI_METADATA_PATH = PLATFORM_REVIEW_PATHS.poi_metadata_path
 DEFAULT_ROW_OUTPUT_DIR = ROOT / "output" / "sentiment_row_level"
 DEFAULT_AGG_OUTPUT_DIR = ROOT / "output" / "sentiment_aggregates"
 DEFAULT_REVIEWED_CODEBOOK_PATH = ROOT / "config" / "reviewed_jp_en_codebook.yaml"
@@ -199,7 +201,7 @@ def load_poi_metadata(path: Path) -> pd.DataFrame:
     except MissingScopeInputError as error:
         raise MissingInputError(
             f"Required POI metadata not found: {path}\n"
-            "Generate or sync it first with `make multilingual-reviews`. "
+            "Set PLATFORM_REVIEW_SCRAPER_DIR or pass --poi-metadata-path. "
             "Prefecture filtering requires checkpoint POI metadata."
         ) from error
     except MissingScopeColumnsError as error:
@@ -287,7 +289,8 @@ def load_reviews(
     if not path.exists():
         raise MissingInputError(
             f"Required input not found: {path}\n"
-            "Generate it first with `make multilingual-reviews`. This pipeline has no demo mode."
+            "Set PLATFORM_REVIEW_SCRAPER_DIR or pass --reviews-path. "
+            "This pipeline has no demo mode."
         )
     df = pd.read_csv(path)
 

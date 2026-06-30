@@ -54,7 +54,7 @@ from src.provenance import file_record, research_manifest, write_json  # noqa: E
 
 ROOT = Path(__file__).resolve().parent.parent
 # Analysis reads the Chinese-folded tagged file (zh promoted to language_group='chinese');
-# produced by build_chinese_folded_multilingual.py from the synced tagged_reviews_multilingual.csv.
+# produced by build_chinese_folded_multilingual.py from the external tagged_reviews_multilingual.csv.
 TAGGED_INPUT = ROOT / "output" / "multilingual_review_analysis" / "tagged_reviews_multilingual_chinese_folded.csv"
 SENTIMENT_INPUT = ROOT / "output" / "sentiment_row_level" / "google_reviews_fukui_japanese-english.csv"
 OUTPUT_DIR = ROOT / "output" / "nudge_analysis"
@@ -196,7 +196,11 @@ def load_tagged(path: Path) -> tuple[pd.DataFrame, dict]:
         "review_text",
         "review_id",
     } | set(ASPECTS)
-    df = load_csv_fail_loud(path, required, "make multilingual-reviews")
+    df = load_csv_fail_loud(
+        path,
+        required,
+        "make multilingual-reviews",
+    )
     df = add_text_length(df, path)
     df["language_group"] = df["language_group"].astype(str).str.strip().str.lower()
     df["prefecture"] = df["city"].map(CITY_TO_PREFECTURE)
@@ -237,7 +241,11 @@ def load_secondary_join(tagged_path: Path, sentiment_path: Path) -> tuple[pd.Dat
     sentiment_required = {"review_id", "language_group", "sentiment_category", "text_length_chars"}
     tagged_required = {"review_id", "city", "language_group"} | set(ASPECTS)
     sentiment = load_csv_fail_loud(sentiment_path, sentiment_required, "make sentiment-analysis")
-    tagged = load_csv_fail_loud(tagged_path, tagged_required, "make multilingual-reviews")
+    tagged = load_csv_fail_loud(
+        tagged_path,
+        tagged_required,
+        "make multilingual-reviews",
+    )
 
     if sentiment["review_id"].duplicated().any():
         raise NudgeAnalysisError(f"Duplicate review_id values in {sentiment_path}")

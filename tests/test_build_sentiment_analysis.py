@@ -253,7 +253,7 @@ def test_build_outputs_aggregate_excludes_forbidden_row_level_fields(tmp_path):
 def test_missing_input_and_columns_fail_loud(tmp_path):
     # Missing files or required columns should stop the pipeline, not generate
     # demo/fallback data.
-    with pytest.raises(MissingInputError, match="make multilingual-reviews"):
+    with pytest.raises(MissingInputError, match="PLATFORM_REVIEW_SCRAPER_DIR"):
         build_sentiment_analysis(
             paths=PipelinePaths(
                 reviews_path=tmp_path / "absent.csv",

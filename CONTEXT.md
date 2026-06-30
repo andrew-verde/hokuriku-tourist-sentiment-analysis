@@ -13,8 +13,8 @@ This term describes review language, not reviewer nationality.
 
 ## Google review data
 
-Local Google Maps review artifacts collected in the source
-`english-fukui-tourism` repository, including raw collection checkpoints and
+Local Google Maps review artifacts collected in the sibling
+`platform-review-scraper` repository, including raw collection checkpoints and
 derived multilingual review tables. These artifacts may contain row-level review
 text, author names, place IDs, or source identifiers, so they are local inputs
 for analysis and not committed in this repository.
@@ -46,4 +46,4 @@ review rather than independent comparison observations.
 
 Official or questionnaire-derived tourism datasets from FTAS, Code for Fukui,
 Ishikawa, or similar survey sources. Survey data is outside this repository's
-Google review sync unless explicitly requested.
+Google review validation unless explicitly requested.
