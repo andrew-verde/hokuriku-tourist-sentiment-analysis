@@ -16,17 +16,6 @@ Google-review comparisons run at Fukui and Hokuriku scopes where documented.
 See [repo guidance](docs/repo_guidance.md), [Chinese evidence strategy](docs/chinese_evidence_strategy.md),
 and [sentiment comparison method](docs/sentiment_comparison_method.md).
 
-## Public release boundary
-
-| Public in this repository | Excluded from Git |
-|---|---|
-| Analysis and figure-generation code | Raw posts and reviews |
-| Tests and environment locks | Row-level processed/scored text |
-| Reviewed keyword codebooks and runtime configs | Authors, handles, URLs, source/record IDs |
-| Aggregate CSV/JSON results and manifests | Screenshots and manual source captures |
-| Statistical figures and figure indexes | Slides, decks, speaker notes, handouts |
-| Methods, caveats, readiness notes | Deck/dashboard/document generation code |
-
 POI-level aggregate tables may name public attractions but contain no reviewer
 identity or review text. Small-cell and interpretation limits are documented in
 their manifests/readiness notes.
