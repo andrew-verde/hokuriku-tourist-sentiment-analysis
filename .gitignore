@@ -1,3 +1,4 @@
+# Secrets and local environment files: never commit.
 .venv/
 __pycache__/
 *.pyc
