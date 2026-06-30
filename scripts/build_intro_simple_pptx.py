@@ -4,7 +4,7 @@ INTRODUCTION, to be hand-inserted into the live Google Drive deck.
 
 Splits the single overloaded "Research question" slide into TWO slides:
   Slide 2  - the actual research question (the WHAT), big and self-reading.
-  Slide 3  - "Our approach: small nudges" (the HOW), the levers + caveat.
+  Slide 3  - "What we tested" (the HOW), useful hypotheses + caveat.
 
 Audience = Japanese viewers with limited English: every line is a full EN
 sentence the presenter can read off, with a complete plain JP subtitle, so the
@@ -105,33 +105,35 @@ def build():
              f"{bp.N_POIS} Hokuriku sites to answer this.")
     foot(s, 2)
 
-    # ===== SLIDE 3: our approach (HOW) =======================================
+    # ===== SLIDE 3: useful hypothesis tests (HOW) ============================
     s = new()
     bp.label(s, "I.  INTRODUCTION")
-    bp.title(s, "Our approach: small nudges", "私たちの方法:小さなナッジ")
+    bp.title(s, "What we tested", "私たちが検証したこと")
 
     _, tf = bp.textbox(s, bp.MX, Inches(2.15), Inches(7.4), Inches(3.7))
-    bp.en_jp(tf, "Reviews show pain points and reasons to visit.",
-             "口コミは、不満点と訪問の理由を示す。",
+    bp.en_jp(tf, "We tested whether each review aspect was associated with a low rating.",
+             "口コミの各要素が低評価と関連するかを検証した。",
              first=True, bullet=True, en_size=17, jp_size=12, space_after=16)
-    bp.en_jp(tf, "Some pain points shrink with better information before the trip.",
-             "一部の不満は、旅行前の分かりやすい情報で減る。",
+    bp.en_jp(tf, "We adjusted for review length, language, and prefecture.",
+             "口コミの長さ、言語、県を調整した。",
              bullet=True, en_size=17, jp_size=12, space_after=16)
-    bp.en_jp(tf, "We rank low-cost ideas (nudges) to test next.",
-             "次に検証する、低コストの案(ナッジ)を順位づける。",
+    bp.en_jp(tf, "We kept harmful associations that passed the FDR check.",
+             "FDR検定を通過した、低評価との関連を残した。",
              bullet=True, en_size=17, jp_size=12, space_after=0)
 
-    levers = [
-        ("Information provision", "情報提供",
-         "Give clear info before the visit", "訪問前に分かりやすい情報を渡す"),
-        ("Demand redistribution", "需要の再配分",
-         "Guide visitors to quieter good places", "空いている良い場所へ誘導する"),
+    results = [
+        ("These tests shaped the final ranking.", "この検定結果が最終順位を決めた。",
+         "Opening hours, itinerary fit, and wayfinding passed the FDR check.",
+         "営業時間、旅程適合、案内表示がFDR検定を通過した。"),
+        ("Earlier language-gap tests moved to the appendix.", "以前の言語差検定は付録へ移した。",
+         "Their measurement limits kept them from the headline.",
+         "測定上の限界があるため、主要結果にはしなかった。"),
     ]
-    for i, (en, jp, sub_en, sub_jp) in enumerate(levers):
+    for i, (en, jp, sub_en, sub_jp) in enumerate(results):
         _, c = bp.card(s, Inches(8.55), Inches(2.2) + Inches(i * 1.75), Inches(4.18), Inches(1.55))
         c.vertical_anchor = MSO_ANCHOR.MIDDLE
         _centered(c, [
-            (en, 16, bp.NAVY, bp.HEAD_FONT, True, 1),
+            (en, 14.5, bp.NAVY, bp.HEAD_FONT, True, 1),
             (jp, 11.5, bp.GREY, bp.JP_FONT, False, 6),
             (sub_en, 11.5, bp.INK, bp.EN_FONT, False, 1),
             (sub_jp, 10, bp.GREY, bp.JP_FONT, False, 0),
@@ -139,14 +141,15 @@ def build():
 
     bp.infobox(
         s, bp.MX, Inches(6.25), Inches(7.4), Inches(0.7),
-        "Exploratory study: it finds experiments to test, not proof of cause and effect.",
-        "探索的研究:検証する実験を見つけるもので、因果関係の証明ではない。",
+        "Exploratory study: these are adjusted associations, not causal effects.",
+        "探索的研究:これは調整済みの関連であり、因果効果ではない。",
     )
     bp.notes(s,
-             "Andrew (30 sec): Reviews show two things - pain points, and reasons people visit. Some pain points "
-             "can shrink with clearer information before the trip; that is an information nudge. Others, like "
-             "crowding, we address by guiding visitors toward quieter good places. We rank these low-cost ideas "
-             "to test next. This is exploratory: it finds experiments to test, not proof of cause and effect.")
+             "Andrew (30 sec): We began with hypotheses, not solutions. For each reviewed aspect, we tested "
+             "whether its presence was associated with a low star rating. We adjusted for review length, "
+             "language, and prefecture, then applied an FDR check. Opening hours, itinerary fit, and wayfinding "
+             "were useful signals for the final ranking. Earlier language-gap tests moved to the appendix. "
+             "These are exploratory associations, not causal effects.")
     foot(s, 3)
 
     prs.save(str(OUT_PPTX))
