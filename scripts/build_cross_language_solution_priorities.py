@@ -34,18 +34,8 @@ ASPECT_INPUT = ROOT / "output" / "nudge_analysis" / "aspect_opportunity_map.csv"
 # Hokuriku-wide reviewed-evidence (H3) to match the region-wide framing of the deck;
 # the Fukui-only H3 remains the within-POI/Fukui confirmatory artifact elsewhere.
 H3_INPUT = ROOT / "output" / "hypothesis_tests_hokuriku" / "h3_reviewed_evidence_jp_en.csv"
-CN_FRICTION_INPUT = (
-    ROOT
-    / "output"
-    / "chinese_social_media_analysis"
-    / "chinese_vs_review_language_friction_comparison.csv"
-)
-CN_ENJOYMENT_INPUT = (
-    ROOT
-    / "output"
-    / "chinese_social_media_analysis"
-    / "chinese_enjoyment_evidence_by_city_platform.csv"
-)
+CN_FRICTION_INPUT = ROOT / "output" / "nudge_analysis" / "cross_language_solution_evidence.csv"
+CN_ENJOYMENT_INPUT = CN_FRICTION_INPUT
 CN_WITHIN_INPUT = (
     ROOT / "output" / "within_language_sentiment" / "cn_within_source_sentiment_drivers.csv"
 )
@@ -150,18 +140,17 @@ def _cn_friction_evidence(
 ) -> dict[str, Any]:
     row = _one(
         cn_friction,
-        (cn_friction["city"] == "Fukui")
-        & (cn_friction["friction_code"] == code)
-        & (cn_friction["comparison_group"] == "google_english")
-        & (cn_friction["chinese_subset"] == "all_posts"),
-        f"Fukui/all_posts/{code}",
+        (cn_friction["solution_id"] == solution_id)
+        & (cn_friction["language_source_group"] == "chinese")
+        & (cn_friction["evidence_code"] == code),
+        f"{solution_id}/chinese/{code}",
     )
     return _evidence_row(
         solution_id,
         "chinese",
         code,
-        int(row["chinese_count"]),
-        int(row["chinese_n"]),
+        int(row["count"]),
+        int(row["denominator"]),
         "reviewed_xhs_friction_prevalence",
         "descriptive",
         None,
@@ -198,17 +187,17 @@ def _localized_evidence(
         )
     row = _one(
         cn_enjoyment,
-        (cn_enjoyment["city"] == "Fukui")
-        & (cn_enjoyment["source_platform"] == "xiaohongshu")
-        & (cn_enjoyment["code"] == "positive_sentiment"),
-        "Fukui/xiaohongshu/positive_sentiment",
+        (cn_enjoyment["solution_id"] == solution_id)
+        & (cn_enjoyment["language_source_group"] == "chinese")
+        & (cn_enjoyment["evidence_code"] == "positive_sentiment"),
+        f"{solution_id}/chinese/positive_sentiment",
     )
     return _evidence_row(
         solution_id,
         language,
         "positive_sentiment",
         int(row["count"]),
-        int(row["denominator_posts"]),
+        int(row["denominator"]),
         "reviewed_xhs_positive_evidence_prevalence",
         "descriptive",
         None,
@@ -294,17 +283,22 @@ def build_cross_language_solution_priorities(
     cn_friction = _load_csv(
         cn_friction_path,
         {
-            "city",
-            "friction_code",
-            "comparison_group",
-            "chinese_subset",
-            "chinese_count",
-            "chinese_n",
+            "solution_id",
+            "language_source_group",
+            "evidence_code",
+            "count",
+            "denominator",
         },
     )
     cn_enjoyment = _load_csv(
         cn_enjoyment_path,
-        {"city", "source_platform", "code", "count", "denominator_posts"},
+        {
+            "solution_id",
+            "language_source_group",
+            "evidence_code",
+            "count",
+            "denominator",
+        },
     )
     cn_within = _load_csv(
         cn_within_path,

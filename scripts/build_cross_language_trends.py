@@ -106,10 +106,17 @@ class MissingInputError(RuntimeError):
 def _require_input(path: Path, make_target: str) -> None:
     # Fail loudly if the upstream build step has not created the required file yet.
     if not path.exists():
+        hint = f"Run `make {make_target}` first."
+        if make_target == "multilingual-reviews":
+            hint = (
+                "Set PLATFORM_REVIEW_SCRAPER_DIR or run `make multilingual-reviews` first. "
+                "This pipeline has no demo mode."
+            )
+        elif make_target == "chinese-social":
+            hint = "Run `make chinese-social` first. This pipeline has no demo mode."
         raise MissingInputError(
             f"Required input not found: {path}\n"
-            f"Set PLATFORM_REVIEW_SCRAPER_DIR or pass an explicit path for this input. "
-            "This pipeline has no demo mode."
+            f"{hint}"
         )
 
 
