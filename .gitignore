@@ -8,6 +8,7 @@ logs/
 .claude/
 scratchpad/
 CLAUDE.md
+AGENTS.md
 
 # Raw/manual data: never commit.
 data/raw/
