@@ -27,10 +27,10 @@ agrees with the statistically stronger Google evidence on the dominant keyword/c
 themes, while the Google data (star ratings, POI-linked) is what we actually measure on.
 
 ## 2. Hokuriku expansion done as "run both"
-JP/EN analyses now run region-wide **in parallel** to the original Fukui runs; the Fukui
-confirmatory results are byte-identical and retained. See [[hokuriku-scope-expansion]] memo and
-`make hokuriku-all`. Intentionally-Fukui pieces (within-POI paired test, the Fukui JP/EN
-confirmatory deck) are left Fukui by design — not a scope miss.
+JP/EN analyses now run region-wide **in parallel** to original Fukui runs; Fukui
+confirmatory results are retained. See `make hokuriku-all` and
+[`repo_guidance.md`](repo_guidance.md). Intentionally Fukui-only tests remain
+Fukui by design.
 
 ## 3. Codebook transfer fix (simplified → traditional)
 The reviewed Chinese codebook keywords are all **simplified**; Google reviews are ~75%
@@ -47,9 +47,9 @@ merge is gated on `status=reviewed`, so any future pending terms stay excluded u
 
 ## 4. Folding Chinese into the POI pipeline
 `scripts/build_chinese_folded_multilingual.py` is a **local post-sync stage**: it reads the
-synced `tagged_reviews_multilingual.csv` (the `multilingual_review_analysis/` dir is synced from
-the sibling `english-fukui-tourism` repo, which is **not present on this machine**, so the fold
-cannot live upstream here), promotes zh rows to `language_group='chinese'`, and writes
+synced `tagged_reviews_multilingual.csv` from a separately obtained
+`english-fukui-tourism` checkout, promotes zh rows to
+`language_group='chinese'`, and writes
 `..._chinese_folded.csv` (synced file untouched). `build_nudge_opportunity_analysis.py` and
 `build_poi_opportunity_index.py` now read the folded file by default.
 
@@ -91,5 +91,6 @@ run into the committed headline but **left uncommitted** in git, pending this re
 ## 6. Reproducibility
 `make hokuriku-all`, `make poi-opportunity` / `make nudge-analysis` (now depend on the fold),
 `make cn-anchor-figure`. New deps: `zhconv` (in `requirements.txt` + sentiment bootstrap lock).
-Caveat: `multilingual_review_analysis/` is a synced artifact; `make multilingual-reviews` cannot
-run on this machine (sibling repo is a Mac path) — a fully clean-room rebuild requires the sibling repo.
+`multilingual_review_analysis/` is a private synced artifact. A full rebuild
+requires a separately obtained source checkout supplied through
+`ENGLISH_FUKUI_TOURISM_DIR`.

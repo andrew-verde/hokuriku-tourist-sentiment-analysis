@@ -2,13 +2,14 @@
 
 ## Purpose
 
-This repository exists to support a Fukui-first cross-language tourism text
-analysis project for a near-term team presentation.
+This repository supports public academic review of a Fukui-first
+cross-language tourism text analysis, with documented Hokuriku parallel runs.
 
 Compare what different language/source groups discuss about Fukui tourism:
 
-- Chinese-language Xiaohongshu posts from `tourism-data`; Douyin is temporarily
-  excluded from the main pipeline and kept for explicit source-sensitivity runs
+- Chinese-language Google reviews as primary Chinese statistical evidence
+- Chinese-language Xiaohongshu posts as Fukui-only directional evidence;
+  Douyin remains limited to explicit source-sensitivity runs
 - Japanese-language Google reviews from the local `english-fukui-tourism` review cache
 - English-language Google reviews from the same Google review cache
 
@@ -16,7 +17,9 @@ Treat group membership as content language/source platform, not nationality.
 
 ## Current Scope
 
-Primary scope is Fukui Prefecture only.
+Primary confirmatory scope is Fukui Prefecture. Documented Hokuriku-wide
+parallel runs add Chinese Google review evidence and regional sensitivity
+without replacing retained Fukui results.
 
 Google review data currently includes Fukui, Kanazawa, and Toyama rows. Initial
 analysis should filter Google POIs/reviews to Fukui. Kanazawa/Ishikawa and
@@ -97,9 +100,10 @@ Chinese social inputs are external and should remain external:
   with neutral-band sensitivity, H2 common-scale star-rating Welch tests, H3
   reviewed evidence prevalence tests with FDR correction, and within-POI paired
   Wilcoxon checks for venue-clustering robustness.
-- [x] Presentation outputs: `make presentation-safe` builds aggregate-only JP-EN
+- [x] Publication figure inputs: `make presentation-safe` builds aggregate-only JP-EN
   chart/table data, captions, readiness notes, hashes, date coverage, and
-  POI-category mix under `output/presentation_safe/`. The stage regenerates from
+  POI-category mix under `output/presentation_safe/`. Despite its historical
+  name, this is a public aggregate figure/data builder, not a deck builder. It regenerates from
   real ignored inputs, fails on missing metadata instead of placeholders, and
   scans generated data for dummy/placeholder/test markers and row-level fields.
 
@@ -117,11 +121,13 @@ Default pipeline should become:
    - Japanese-language reviews: manually reviewed Japanese codebook plus `oseti`
    - English-language reviews: manually reviewed English codebook plus VADER
 5. Compare language/source groups descriptively and statistically where valid.
-6. Generate presentation figures with explicit caveats about platform/source differences.
+6. Generate publication figures with explicit caveats about platform/source differences.
 
 ## Guardrails
 
 - Do not commit row-level post/review text, author names, URLs, screenshots, source IDs, or raw manual captures.
+- Do not commit decks, speaker/handout documents, dashboards, delivery-only
+  builders, agent scratchpads, or machine-specific handoffs.
 - Keep `output/checkpoints/`, `output/multilingual_review_analysis/`, and Chinese raw/processed social rows ignored.
 - Track aggregate outputs that contain only counts, statistics, filters,
   commands, dependency versions, input provenance, and SHA256 hashes for ignored

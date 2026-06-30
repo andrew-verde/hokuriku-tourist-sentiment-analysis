@@ -2,7 +2,7 @@ schema_version: reviewed_codebook_runtime.v1
 generated_at: '2026-06-23T09:06:26+00:00'
 command: scripts/import_reviewed_codebook_config.py
 source:
-  path: /home/andrewgreen/Repositories/andrew-verde/hokuriku-tourist-sentiment-analysis/docs/codebook_reviews/source/multilingual_keyword_codebook_review.xlsx
+  path: multilingual_keyword_codebook_review.xlsx
   sha256: 653e9cb53aa200cc67b1350ca3611f081ffda42ccb2e4a33d53f38c919ab7d60
 languages:
   Japanese:

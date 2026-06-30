@@ -45,12 +45,8 @@ ROOT = Path(__file__).resolve().parent.parent
 # Default to the companion tourism-data checkout, but allow an environment
 # override so the script can point at a different local copy.
 SIBLING_INPUT_DIR = ROOT.parent / "tourism-data"
-EXTERNAL_INPUT_DIR = Path("/home/andrewgreen/Repositories/external/tourism-data")
 DEFAULT_INPUT_DIR = Path(
-    os.getenv(
-        "TOURISM_DATA_DIR",
-        str(SIBLING_INPUT_DIR if SIBLING_INPUT_DIR.exists() else EXTERNAL_INPUT_DIR),
-    )
+    os.getenv("TOURISM_DATA_DIR", str(SIBLING_INPUT_DIR))
 )
 OUTPUT_DIR = ROOT / "output" / "chinese_social_media_analysis"
 XHS_ONLY_OUTPUT_DIR = ROOT / "output" / "chinese_social_media_analysis_xhs_only"

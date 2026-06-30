@@ -3,8 +3,7 @@
 
 Same live stage counts as scripts/build_decision_funnel_figure.py (reused via its
 gate_counts()), but every label is de-jargoned: no "odds ratio", "FDR", or
-"Benjamini-Hochberg" on the figure. Used by the simplified methods deck
-(scripts/build_methods_simple_pptx.py). The original funnel is left untouched.
+"Benjamini-Hochberg" on the figure. The original funnel is left untouched.
 
 Run:  .venv/bin/python scripts/build_decision_funnel_figure_simple.py
 """

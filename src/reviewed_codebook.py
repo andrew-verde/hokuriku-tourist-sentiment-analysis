@@ -265,7 +265,9 @@ def build_runtime_config(
         "generated_at": dt.datetime.now(dt.UTC).replace(microsecond=0).isoformat(),
         "command": command,
         "source": {
-            "path": str(source_path),
+            # Filename plus hash identifies audit input without publishing a
+            # contributor's machine-specific absolute path.
+            "path": source_path.name,
             "sha256": sha256_file(source_path),
         },
         "languages": {},

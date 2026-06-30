@@ -22,8 +22,8 @@ from src.provenance import file_record, research_manifest, sha256_file, write_js
 
 ROOT = Path(__file__).resolve().parent.parent
 SOURCE_REPO_CANDIDATES = (
-    Path("/Users/andrewgreen/Repositories/andrew-verde/english-fukui-tourism"),
-    Path("/Users/andrewgreen/Repositories/andrew-verde/america-fukui-tourism"),
+    ROOT.parent / "english-fukui-tourism",
+    ROOT.parent / "america-fukui-tourism",
 )
 DEFAULT_OUTPUT_ROOT = ROOT / "output"
 
@@ -39,7 +39,7 @@ class SyncInputError(RuntimeError):
 
 def default_source_repo() -> Path:
     # Determine where the source repository lives. First check for an environment
-    # variable override, then try known local paths, defaulting to the first option.
+    # variable override, then try portable sibling paths, defaulting to the first.
     override = os.environ.get("ENGLISH_FUKUI_TOURISM_DIR")
     if override:
         return Path(override)

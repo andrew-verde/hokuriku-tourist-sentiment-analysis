@@ -1,6 +1,6 @@
 # AGENTS.md
 
-Local agent notes.
+Contributor and automation guardrails.
 
 ## Scope
 
@@ -18,6 +18,11 @@ Do not import FTAS SEM thesis logic here unless user explicitly asks.
 - Do not commit row-level post/review text.
 - Do not commit author names, handles, URLs, screenshots, or raw manual captures.
 - Do not commit `data/raw/`, `data/processed/`, or row-level `output/`.
+- Commit reviewed, disclosure-safe aggregate tables, manifests, statistical
+  outputs, and figures needed for academic audit.
+- Keep slides, decks, speaker documents, dashboards, and delivery-only
+  generation scripts private.
+- Keep agent scratchpads, handoffs, and machine-specific state private.
 - Keep raw inputs in external repos/folders, especially `tourism-data`.
 - Prefer fail-loud missing-input errors over demo/fallback data.
 - Use "Chinese-language posts", "Japanese-language reviews", "English-language reviews"; do not infer nationality.
@@ -38,8 +43,8 @@ Do not import FTAS SEM thesis logic here unless user explicitly asks.
 ```bash
 .venv/bin/pip install -r requirements.txt
 .venv/bin/python3 -m pytest
-TOURISM_DATA_DIR=/Users/andrewgreen/Repositories/tourism-data make chinese-social
-make multilingual-reviews
+TOURISM_DATA_DIR=/path/to/tourism-data make chinese-social
+ENGLISH_FUKUI_TOURISM_DIR=/path/to/english-fukui-tourism make multilingual-reviews
 make cross-language-trends
 ```
 
@@ -60,9 +65,8 @@ ad hoc outputs or undocumented manual changes.
 
 ## Critical Academic Review Notes
 
-- Current JP-EN sentiment output is a library-score comparison only. Treat VADER
-  and oseti as secondary checks until reviewed JP/EN codebook evidence is
-  promoted into runtime configs and disagreement rates are reported.
+- JP-EN output includes reviewed codebook evidence plus library-score checks.
+  Treat VADER and oseti as secondary; preserve disagreement rates.
 - Current JP-EN tests include review-row, POI-level, and POI cluster-bootstrap
   sensitivity checks. Because rows are nested in POIs and sample sizes are
   imbalanced, treat p-values as descriptive unless a later, explicitly justified
@@ -70,9 +74,9 @@ ad hoc outputs or undocumented manual changes.
 - VADER compound and oseti document scores are not the same measurement scale.
   Compare category shares and within-tool distributions; do not claim raw score
   equivalence across languages.
-- Google review rows come from the local Outscraper-derived cache and may reflect
+- Google review rows come from a local Outscraper-derived cache and may reflect
   collection order/window and POI mix. Preserve denominators, date ranges,
-  source hashes, and POI imbalance notes in any presentation or paper output.
+  source hashes, and POI imbalance notes in any publication output.
 - The oseti runtime is reproducible through
   `scripts/bootstrap_sentiment_environment.py`; `pip check` may still report
   `oseti requires mecab` because oseti metadata names legacy `mecab`. Runtime

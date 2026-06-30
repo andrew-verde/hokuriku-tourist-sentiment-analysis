@@ -57,5 +57,12 @@ Required import rules:
 - invalid `review_decision`: fail import
 - fully deleted codes: fail import because no runtime keyword remains
 
-Current status: manual JP/EN review is not complete, so this importer should be
-treated as a validation gate and not as an evidence-producing runtime input yet.
+Current committed snapshot has complete JP/EN review decisions. The importer
+validates that audit source and regenerates the runtime config; blank or invalid
+decisions still fail loudly.
+
+## Chinese Google review candidates
+
+`chinese_google_review_friction_candidates.csv` is a disclosure-safe decision
+register. It intentionally excludes source review excerpts and example POIs.
+Row-level evidence remains private.

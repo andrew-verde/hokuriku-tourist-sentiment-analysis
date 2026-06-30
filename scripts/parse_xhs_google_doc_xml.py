@@ -12,6 +12,7 @@ from __future__ import annotations
 import argparse
 import csv
 import dataclasses
+import os
 import re
 import sys
 import xml.etree.ElementTree as ET
@@ -23,7 +24,12 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_SOURCE = ROOT / "docs" / "codebook_reviews" / "source" / "XHS_NOTES_DATA_v1.xml"
-DEFAULT_INDEX = Path("/Users/andrewgreen/Repositories/tourism-data/data/raw/social/fukui_xhs_reviews.csv")
+DEFAULT_INDEX = Path(
+    os.getenv(
+        "TOURISM_DATA_DIR",
+        str(ROOT.parent / "tourism-data"),
+    )
+) / "data" / "raw" / "social" / "fukui_xhs_reviews.csv"
 DEFAULT_OUTPUT_DIR = ROOT / "data" / "interim" / "xhs_google_doc_parse"
 
 PKG_NS = "http://schemas.microsoft.com/office/2006/xmlPackage"

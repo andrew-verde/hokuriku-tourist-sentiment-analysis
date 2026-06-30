@@ -1,7 +1,5 @@
 PYTHON = .venv/bin/python3
-PBL_SITE ?= $(HOME)/pbl-site
-
-.PHONY: help test chinese-codebook-template reviewed-codebook-config reviewed-codebook-status chinese-social chinese-social-xhs-only chinese-social-with-douyin chinese-insights chinese-insights-xhs-only multilingual-reviews chinese-folded-multilingual cross-language-trends sentiment-env sentiment-analysis hypothesis-h1 hypothesis-h2 hypothesis-h3 hypothesis-within-poi hypothesis-tests nudge-analysis poi-opportunity poi-opportunity-chinese-folded nudge-priorities nudge-figures nudge-register nudge-all within-en-sentiment within-jp-sentiment within-cn-sentiment within-language-sentiment presentation-safe statistical-test-figures dashboard nudge-slides nudge-pptx deploy chinese-google-reviews sentiment-analysis-hokuriku hypothesis-tests-hokuriku cross-language-trends-hokuriku cn-anchor-figure hokuriku-all
+.PHONY: help test public-check chinese-codebook-template reviewed-codebook-config reviewed-codebook-status chinese-social chinese-social-xhs-only chinese-social-with-douyin chinese-insights chinese-insights-xhs-only multilingual-reviews chinese-folded-multilingual cross-language-trends sentiment-env sentiment-analysis hypothesis-h1 hypothesis-h2 hypothesis-h3 hypothesis-within-poi hypothesis-tests nudge-analysis poi-opportunity poi-opportunity-chinese-folded nudge-priorities nudge-figures nudge-all within-en-sentiment within-jp-sentiment within-cn-sentiment within-language-sentiment presentation-safe statistical-test-figures chinese-google-reviews sentiment-analysis-hokuriku hypothesis-tests-hokuriku cross-language-trends-hokuriku cn-anchor-figure hokuriku-all
 
 help:
 	@echo "Hokuriku tourist sentiment analysis"
@@ -29,18 +27,14 @@ help:
 	@echo "  make poi-opportunity-chinese-folded Build POI index from Chinese-folded multilingual output"
 	@echo "  make nudge-priorities        Rank cross-language solution families"
 	@echo "  make nudge-figures           Build aggregate nudge opportunity SVG figures"
-	@echo "  make nudge-register          Build HTML next-semester nudge experiment register"
-	@echo "  make nudge-all               Build all nudge outputs, figures, register, and dashboard"
+	@echo "  make nudge-all               Build public aggregate nudge analyses and figures"
 	@echo "  make within-en-sentiment     Run English within-language sentiment drivers"
 	@echo "  make within-jp-sentiment     Run Japanese within-language sentiment drivers"
 	@echo "  make within-cn-sentiment     Run Chinese within-source sentiment drivers"
 	@echo "  make within-language-sentiment Run all within-language/source sentiment drivers"
 	@echo "  make presentation-safe       Build slide-safe JP-EN aggregate scaffold"
 	@echo "  make statistical-test-figures Build aggregate-only SVG figures for statistical tests"
-	@echo "  make dashboard               Build provenance-locked PBL-Dashboard.html"
-	@echo "  make nudge-slides            Build bilingual nudge IMRAD seminar deck HTML"
-	@echo "  make nudge-pptx              Build native editable bilingual nudge PowerPoint"
-	@echo "  make deploy                  Regenerate figures+dashboard and sync to PBL_SITE ($(PBL_SITE))"
+	@echo "  make public-check            Scan tracked files for public-release violations"
 	@echo "  make test                    Run pytest"
 
 chinese-codebook-template:
@@ -135,10 +129,7 @@ nudge-figures:
 nudge-priorities: nudge-analysis hypothesis-h3 within-cn-sentiment
 	$(PYTHON) scripts/build_cross_language_solution_priorities.py
 
-nudge-register: nudge-priorities
-	$(PYTHON) scripts/build_nudge_experiment_register.py
-
-nudge-all: nudge-analysis poi-opportunity nudge-figures nudge-register dashboard
+nudge-all: nudge-analysis poi-opportunity nudge-priorities nudge-figures
 
 within-en-sentiment:
 	$(PYTHON) scripts/test_en_within_language_sentiment_drivers.py
@@ -157,34 +148,8 @@ presentation-safe:
 statistical-test-figures:
 	$(PYTHON) scripts/build_statistical_test_figures.py
 
-dashboard:
-	$(PYTHON) scripts/build_pbl_dashboard.py
-
-nudge-slides: nudge-priorities
-	$(PYTHON) scripts/build_nudge_seminar_slides.py
-
-nudge-pptx: nudge-priorities
-	$(PYTHON) scripts/build_nudge_pptx.py
-
-# Regenerate figures + both HTML pages, then sync landing page plus referenced
-# assets (figure SVGs + provenance source files) into the served directory.
-# Asset list is parsed from both HTML pages so register-only provenance assets
-# are included too; override destination with `make deploy PBL_SITE=/path`.
-deploy: statistical-test-figures nudge-register dashboard
-	@mkdir -p "$(PBL_SITE)"
-	@cp -f PBL-Dashboard.html "$(PBL_SITE)/index.html"
-	@cp -f PBL-Dashboard.html "$(PBL_SITE)/PBL-Dashboard.html"
-	@for html in PBL-Dashboard.html docs/nudge_experiment_register.html; do \
-		grep -oE "(href|data-source)=['\"](docs|output)/[^'\"]+" "$$html"; \
-	done | sed -E "s/.*['\"]//" | sort -u \
-		| while read -r p; do \
-			mkdir -p "$(PBL_SITE)/$$(dirname "$$p")"; \
-			cp -f "$$p" "$(PBL_SITE)/$$p"; \
-		done
-	@n=$$(for html in PBL-Dashboard.html docs/nudge_experiment_register.html; do \
-		grep -oE "(href|data-source)=['\"](docs|output)/[^'\"]+" "$$html"; \
-	done | sed -E "s/.*['\"]//" | sort -u | wc -l); \
-		echo "deployed index.html + PBL-Dashboard.html + $$n referenced assets to $(PBL_SITE)"
-
 test:
 	$(PYTHON) -m pytest
+
+public-check:
+	$(PYTHON) scripts/check_public_release.py
